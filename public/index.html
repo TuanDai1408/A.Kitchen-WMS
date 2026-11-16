@@ -664,6 +664,10 @@
            ==================================================================== -->
       <section id="portal-search" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="w-44">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="scVung" onchange="onSelectVung('sc')" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          </div>
           <div class="flex-1 min-w-[180px]">
             <label class="font-bold text-slate-700 block mb-1">SITE</label>
             <select id="scSite" onchange="searchVouchers()" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
@@ -714,12 +718,19 @@
            ==================================================================== -->
       <section id="portal-history" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="w-44">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="hsVung" onchange="onSelectVung('hs')" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          </div>
           <div class="flex-1 min-w-[200px]">
             <label class="font-bold text-slate-700 block mb-1">SITE</label>
             <select id="hsSite" onchange="loadHistory()" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
           </div>
           <div class="flex-1 min-w-[140px]">
-            <label class="font-bold text-slate-700 block mb-1">THÁNG</label>
+            <div class="flex justify-between items-center mb-1">
+              <label class="font-bold text-slate-700">THÁNG ĐẶT</label>
+              <button type="button" onclick="document.getElementById('hsMonth').value=''; loadHistory();" class="text-[11px] text-brand-600 hover:underline">Tất cả tháng</button>
+            </div>
             <input type="month" id="hsMonth" onchange="loadHistory()" class="w-full p-2 border border-slate-300 rounded-lg">
           </div>
           <button onclick="loadHistory()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
@@ -812,6 +823,10 @@
            ==================================================================== -->
       <section id="portal-kiemke" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="w-44">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="kkVung" onchange="onSelectVung('kk')" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          </div>
           <div class="flex-1 min-w-[200px]">
             <label class="font-bold text-slate-700 block mb-1">SITE KIỂM KÊ</label>
             <select id="kkSite" onchange="loadAudit()" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
@@ -1071,6 +1086,31 @@
     // ========================================================================
     // INITIALIZATION
     // ========================================================================
+    function populateSitesFor(prefix, selectedRegion = '') {
+      const siteSelect = document.getElementById(prefix + 'Site');
+      if (!siteSelect) return;
+      
+      const filtered = selectedRegion ? App.siteObjs.filter(s => s.vungMien === selectedRegion) : App.siteObjs;
+      
+      let html = '';
+      // Cho phép chọn "Tất cả Site" cho các tab tra cứu, lịch sử và kiểm kê
+      if (['sc', 'hs', 'kk'].includes(prefix)) {
+        html += '<option value="">-- Tất cả Site --</option>';
+      }
+      html += filtered.map(s => `<option value="${s.ten}">${s.ten}</option>`).join('');
+      siteSelect.innerHTML = html;
+    }
+
+    function onSelectVung(prefix) {
+      const vungSelect = document.getElementById(prefix + 'Vung');
+      const selectedRegion = vungSelect ? vungSelect.value : '';
+      populateSitesFor(prefix, selectedRegion);
+      if (prefix === 'order') loadQuota();
+      if (prefix === 'sc') searchVouchers();
+      if (prefix === 'hs') loadHistory();
+      if (prefix === 'kk') loadAudit();
+    }
+
     async function initSystem() {
       showLoading('Khởi tạo dữ liệu hệ thống...');
       try {
@@ -1080,7 +1120,7 @@
         });
 
         const curMonthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        document.querySelectorAll('input[type="month"]').forEach(inp => inp.value = curMonthStr);
+        document.querySelectorAll('input[type="month"]').forEach(inp => { if (inp.id !== 'hsMonth' && inp.id !== 'kkMonth') inp.value = curMonthStr; });
         document.querySelectorAll('input[type="date"]').forEach(inp => {
           if (!inp.value) inp.value = d.toISOString().split('T')[0];
         });
@@ -1095,7 +1135,7 @@
           App.loaiHoaDon = json.data.loaiHoaDon;
 
           // Populate Vùng selects
-          ['orderVung'].forEach(id => {
+          ['orderVung', 'scVung', 'hsVung', 'kkVung'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
               el.innerHTML = '<option value="">-- Tất cả vùng --</option>' +
@@ -1105,15 +1145,25 @@
 
           // Populate Loại Hóa Đơn selects
           const loaiOpts = App.loaiHoaDon.map(l => `<option value="${l}">${l}</option>`).join('');
-          document.getElementById('ctLoai').innerHTML = loaiOpts;
-          document.getElementById('scLoai').innerHTML = '<option value="">Tất cả loại</option>' + loaiOpts;
+          const ctLoaiEl = document.getElementById('ctLoai');
+          if (ctLoaiEl) ctLoaiEl.innerHTML = loaiOpts;
+          const scLoaiEl = document.getElementById('scLoai');
+          if (scLoaiEl) scLoaiEl.innerHTML = '<option value="">Tất cả loại</option>' + loaiOpts;
 
-          // Populate Sites
-          const siteOpts = App.siteObjs.map(s => `<option value="${s.ten}">${s.ten}</option>`).join('');
-          ['orderSite', 'ctSite', 'bcSite', 'kkSite', 'scSite', 'hsSite'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = siteOpts;
-          });
+          // Populate Sites for all modules
+          populateSitesFor('order');
+          populateSitesFor('ct');
+          populateSitesFor('bc');
+          populateSitesFor('kk');
+          populateSitesFor('sc');
+          populateSitesFor('hs');
+
+          // Preload order quota for default site
+          if (App.siteObjs.length) {
+            const orderSiteEl = document.getElementById('orderSite');
+            if (orderSiteEl && !orderSiteEl.value) orderSiteEl.value = App.siteObjs[0].ten;
+            loadQuota();
+          }
 
           // Populate branchSelector
           const branchSel = document.getElementById('branchSelector');
@@ -1627,8 +1677,8 @@
     }
 
     async function loadHistory() {
-      const site = document.getElementById('hsSite').value;
-      const monthInput = document.getElementById('hsMonth').value;
+      const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
+      const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
       let thang = '';
       if (monthInput) {
         const p = monthInput.split('-');
@@ -1714,8 +1764,7 @@
     }
 
     async function loadAudit() {
-      const site = document.getElementById('kkSite').value;
-      if (!site) return;
+      const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
       showLoading('Tải bảng kiểm kê...');
       try {
         const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);

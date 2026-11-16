@@ -1,8 +1,5 @@
 // ============================================================================
 // A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1)
-// TÍCH HỢP TOÀN DIỆN:
-// 1. QUẢN LÝ KHO GIA VỊ, TỒN KHO FEFO, ROP & GIÁ SAP
-// 2. ĐẶT HÀNG VẬT TƯ, ĐỊNH MỨC NGÂN SÁCH SITE, NHẬP & TRA CỨU CHỨNG TỪ
 // ============================================================================
 
 async function sha256(str) {
@@ -31,6 +28,22 @@ function generateCode(prefix, site) {
   return `${prefix}-${ts}-${siteCode}`;
 }
 
+function extractSiteCode(site) {
+  if (!site) return '';
+  const m = String(site).trim().match(/^[A-Za-z0-9]+/);
+  return m ? m[0] : site;
+}
+
+function normalizeMonth(thang) {
+  if (!thang) return '';
+  const s = String(thang).trim();
+  if (s.includes('/')) {
+    const p = s.split('/');
+    if (p.length === 2) return `${p[1]}-${p[0]}`; // MM/YYYY -> YYYY-MM
+  }
+  return s;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -52,7 +65,7 @@ export default {
       // PHÂN HỆ 1: QUẢN LÝ KHO GIA VỊ, FEFO & VẬN HÀNH BẾP (WMS)
       // ======================================================================
 
-      // 1.1 GET /api/branches - Danh sách chi nhánh / Kho
+      // 1.1 GET /api/branches
       if (pathname === '/api/branches' && request.method === 'GET') {
         const { results } = await env.DB.prepare(`
           SELECT * FROM branches WHERE is_active = 1 ORDER BY code
@@ -60,7 +73,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
-      // 1.2 GET /api/dashboard-summary - KPIs tổng quan kho gia vị & FEFO
+      // 1.2 GET /api/dashboard-summary
       if (pathname === '/api/dashboard-summary' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
         const upperCode = branchCode.toUpperCase();
@@ -110,7 +123,7 @@ export default {
         }), { headers: corsHeaders });
       }
 
-      // 1.3 GET /api/stock - Tồn kho gia vị & Hạn sử dụng FEFO
+      // 1.3 GET /api/stock
       if (pathname === '/api/stock' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
         const query = `
@@ -140,10 +153,10 @@ export default {
           let statusText = 'An toàn';
           if (r.days_remaining <= 7) {
             dangerLevel = 'red';
-            statusText = 'Cận Date (< 7 ngày)';
+            statusText = 'Cận Date (≤ 7 ngày)';
           } else if (r.days_remaining <= 30) {
             dangerLevel = 'yellow';
-            statusText = 'Cần dùng sớm (< 30 ngày)';
+            statusText = 'Cần dùng sớm (≤ 30 ngày)';
           }
           return {
             ...r,
@@ -156,7 +169,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: enriched }), { headers: corsHeaders });
       }
 
-      // 1.4 POST /api/stock/receipt - Nhập kho gia vị theo lô
+      // 1.4 POST /api/stock/receipt
       if (pathname === '/api/stock/receipt' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, batch_code, mfg_date, exp_date, qty, storage_loc, ref_code } = body;
@@ -178,7 +191,7 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Nhập kho thành công', batch_id: batchId }), { headers: corsHeaders });
       }
 
-      // 1.5 POST /api/stock/issue - Xuất kho gia vị theo chuẩn FEFO
+      // 1.5 POST /api/stock/issue
       if (pathname === '/api/stock/issue' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, qty_needed, note } = body;
@@ -212,7 +225,7 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
       }
 
-      // 1.6 GET /api/reorder - Cảnh báo đặt hàng an toàn (ROP)
+      // 1.6 GET /api/reorder
       if (pathname === '/api/reorder' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
         const query = `
@@ -243,7 +256,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
-      // 1.7 GET /api/leadtime - Theo dõi Lead Time & SLA Giao hàng NCC
+      // 1.7 GET /api/leadtime
       if (pathname === '/api/leadtime' && request.method === 'GET') {
         const query = `
           SELECT 
@@ -271,7 +284,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
-      // 1.8 GET /api/po-sap - So sánh giá PO với Giá chuẩn SAP (PPV)
+      // 1.8 GET /api/po-sap
       if (pathname === '/api/po-sap' && request.method === 'GET') {
         const query = `
           SELECT 
@@ -297,7 +310,7 @@ export default {
       // PHÂN HỆ 2: VẬT TƯ, ĐỊNH MỨC SITE & CHỨNG TỪ GIAO NHẬN (PORTAL)
       // ======================================================================
 
-      // 2.1 GET /api/init - Dữ liệu khởi tạo hệ thống
+      // 2.1 GET /api/init
       if (pathname === '/api/init' && request.method === 'GET') {
         const { results: sites } = await env.DB.prepare(`
           SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
@@ -338,24 +351,21 @@ export default {
         }), { headers: corsHeaders });
       }
 
-      // 2.2 GET /api/quota - Tải định mức & ngân sách Site
+      // 2.2 GET /api/quota
       if (pathname === '/api/quota' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = searchParams.get('thang') || '';
+        const siteCode = extractSiteCode(site);
+        const normMonth = normalizeMonth(thang);
 
         let siteRow = await env.DB.prepare(`
-          SELECT * FROM sites WHERE site_name = ? LIMIT 1
-        `).bind(site).first();
-
-        if (!siteRow) {
-          siteRow = await env.DB.prepare(`
-            SELECT * FROM sites WHERE site_code = ? OR name = ? LIMIT 1
-          `).bind(site, site).first();
-        }
+          SELECT * FROM sites WHERE site_name = ? OR site_code = ? OR name = ? LIMIT 1
+        `).bind(site, siteCode, site).first();
 
         const nganSach = siteRow ? (siteRow.budget_limit || 0) : 0;
         const region = siteRow ? siteRow.region : '';
 
+        // Query accumulated orders with flexible site and month matching
         const daDatQuery = `
           SELECT 
             dh.item_code,
@@ -363,13 +373,15 @@ export default {
             SUM(dh.order_qty * COALESCE(nvl.unit_price, 0)) as total_tien
           FROM don_hang dh
           LEFT JOIN nvl_items nvl ON dh.item_code = nvl.item_code
-          WHERE dh.site_name = ? 
+          WHERE (dh.site_name = ? OR dh.site_name LIKE ?)
             AND dh.status NOT IN ('Đã xóa', 'Đã hủy')
-            AND (dh.applied_month = ? OR dh.applied_month LIKE ? OR dh.applied_month LIKE ?)
+            AND (
+              dh.applied_month = ? OR dh.applied_month LIKE ? OR dh.applied_month LIKE ?
+            )
           GROUP BY dh.item_code
         `;
         const { results: daDatRows } = await env.DB.prepare(daDatQuery)
-          .bind(site, thang, `%${thang}%`, `${thang.split('/').reverse().join('-')}%`)
+          .bind(site, `%${siteCode}%`, thang, `%${normMonth}%`, `%${thang}%`)
           .all();
 
         const daDatMap = {};
@@ -379,20 +391,26 @@ export default {
           tienDaDat += r.total_tien || 0;
         }
 
+        // Query NVL items with region preference, fallback to all if region empty
         let nvlQuery = `SELECT * FROM nvl_items`;
         let nvlBindings = [];
-        if (region) {
+        if (region && region !== 'Miền Trung') {
           nvlQuery += ` WHERE region = ? OR region IS NULL OR region = '' ORDER BY name`;
           nvlBindings = [region];
         } else {
           nvlQuery += ` ORDER BY name`;
         }
 
-        const { results: nvlList } = await env.DB.prepare(nvlQuery).bind(...nvlBindings).all();
+        let { results: nvlList } = await env.DB.prepare(nvlQuery).bind(...nvlBindings).all();
+        if (!nvlList || nvlList.length === 0) {
+          const fallback = await env.DB.prepare(`SELECT * FROM nvl_items ORDER BY name`).all();
+          nvlList = fallback.results;
+        }
 
         const { results: dmList } = await env.DB.prepare(`
-          SELECT item_code, quota_qty FROM dinh_muc WHERE site_name = ? AND month_period = ?
-        `).bind(site, thang).all();
+          SELECT item_code, quota_qty FROM dinh_muc 
+          WHERE (site_name = ? OR site_name LIKE ?) AND (month_period = ? OR month_period = ?)
+        `).bind(site, `%${siteCode}%`, thang, normMonth).all();
         const dmMap = {};
         for (const dm of dmList) {
           dmMap[dm.item_code] = dm.quota_qty || 0;
@@ -420,7 +438,7 @@ export default {
         }), { headers: corsHeaders });
       }
 
-      // 2.3 POST /api/order - Tạo đơn hàng vật tư
+      // 2.3 POST /api/order
       if (pathname === '/api/order' && request.method === 'POST') {
         const payload = await request.json();
         const { site, thang, items, nguoiDat, ghiChu } = payload;
@@ -474,10 +492,12 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maDon, soDong: stmts.length - 1 } }), { headers: corsHeaders });
       }
 
-      // 2.4 GET /api/orders - Lịch sử đặt hàng vật tư
+      // 2.4 GET /api/orders
       if (pathname === '/api/orders' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = searchParams.get('thang') || '';
+        const siteCode = extractSiteCode(site);
+        const normMonth = normalizeMonth(thang);
 
         let query = `
           SELECT 
@@ -497,13 +517,13 @@ export default {
         const conditions = [];
         const bindings = [];
 
-        if (site) {
-          conditions.push('dh.site_name = ?');
-          bindings.push(site);
+        if (site && site.trim()) {
+          conditions.push('(dh.site_name = ? OR dh.site_name LIKE ?)');
+          bindings.push(site, `%${siteCode}%`);
         }
-        if (thang) {
-          conditions.push('(dh.applied_month = ? OR dh.applied_month LIKE ?)');
-          bindings.push(thang, `%${thang}%`);
+        if (thang && thang.trim()) {
+          conditions.push('(dh.applied_month LIKE ? OR dh.applied_month LIKE ? OR dh.applied_month = ?)');
+          bindings.push(`%${normMonth}%`, `%${thang}%`, thang);
         }
 
         if (conditions.length) {
@@ -515,7 +535,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
-      // 2.5 GET /api/order-detail - Chi tiết đơn & Timeline
+      // 2.5 GET /api/order-detail
       if (pathname === '/api/order-detail' && request.method === 'GET') {
         const orderCode = searchParams.get('orderCode') || '';
         const { results: items } = await env.DB.prepare(`
@@ -547,21 +567,34 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { info: summary, items, timeline } }), { headers: corsHeaders });
       }
 
-      // 2.6 GET /api/vouchers & POST /api/voucher
+      // 2.6 GET /api/vouchers
       if (pathname === '/api/vouchers' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const loai = searchParams.get('loaiHoaDon') || '';
         const tuNgay = searchParams.get('tuNgay') || '';
         const denNgay = searchParams.get('denNgay') || '';
+        const siteCode = extractSiteCode(site);
 
         let query = `SELECT * FROM chung_tu`;
         const conditions = [];
         const bindings = [];
 
-        if (site) { conditions.push('site_name = ?'); bindings.push(site); }
-        if (loai) { conditions.push('invoice_type = ?'); bindings.push(loai); }
-        if (tuNgay) { conditions.push('receive_date >= ?'); bindings.push(tuNgay); }
-        if (denNgay) { conditions.push('receive_date <= ?'); bindings.push(denNgay); }
+        if (site && site.trim()) {
+          conditions.push('(site_name = ? OR site_name LIKE ?)');
+          bindings.push(site, `%${siteCode}%`);
+        }
+        if (loai && loai.trim()) {
+          conditions.push('invoice_type = ?');
+          bindings.push(loai);
+        }
+        if (tuNgay && tuNgay.trim()) {
+          conditions.push('receive_date >= ?');
+          bindings.push(tuNgay);
+        }
+        if (denNgay && denNgay.trim()) {
+          conditions.push('receive_date <= ?');
+          bindings.push(denNgay);
+        }
 
         if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
         query += ` ORDER BY created_at DESC`;
@@ -591,6 +624,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data }), { headers: corsHeaders });
       }
 
+      // 2.7 POST /api/voucher
       if (pathname === '/api/voucher' && request.method === 'POST') {
         const body = await request.json();
         const { site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu, nguoiNhap, files } = body;
@@ -613,7 +647,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
       }
 
-      // 2.7 GET /api/voucher-detail
+      // 2.8 GET /api/voucher-detail
       if (pathname === '/api/voucher-detail' && request.method === 'GET') {
         const maCT = searchParams.get('maCT');
         const voucher = await env.DB.prepare(`SELECT * FROM chung_tu WHERE voucher_code = ?`).bind(maCT).first();
@@ -626,15 +660,16 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { ...voucher, files } }), { headers: corsHeaders });
       }
 
-      // 2.8 GET /api/inventory-audit & POST
+      // 2.9 GET /api/inventory-audit & POST
       if (pathname === '/api/inventory-audit') {
         if (request.method === 'GET') {
           const site = searchParams.get('site') || '';
+          const siteCode = extractSiteCode(site);
           let query = `SELECT * FROM kiemke_tonkho`;
           const bindings = [];
-          if (site) {
-            query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ?`;
-            bindings.push(site, site, `%${site}%`);
+          if (site && site.trim()) {
+            query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ? OR site_code = ?`;
+            bindings.push(site, site, `%${site}%`, siteCode);
           }
           query += ` ORDER BY item_code LIMIT 300`;
           const { results } = await env.DB.prepare(query).bind(...bindings).all();
@@ -653,7 +688,7 @@ export default {
         }
       }
 
-      // 2.9 POST /api/report & /api/daily-report
+      // 2.10 POST /api/report & /api/daily-report
       if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'POST') {
         const body = await request.json();
         const { branchCode, reportDate, plannedMeals, actualMeals, wastedMeals, staffActual, foodQualityNote, feedback } = body;
@@ -674,7 +709,7 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { id } }), { headers: corsHeaders });
       }
 
-      // 2.10 Admin Auth
+      // 2.11 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
         const { email, password } = await request.json();
         const user = await env.DB.prepare(`SELECT * FROM admin_users WHERE email = ? LIMIT 1`).bind(email).first();
