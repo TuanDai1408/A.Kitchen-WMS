@@ -1,5 +1,8 @@
 // ============================================================================
-// A.KITCHEN • VẬT TƯ & CHỨNG TỪ — CLOUDFLARE WORKER BACKEND (D1 DATABASE)
+// A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1)
+// TÍCH HỢP TOÀN DIỆN:
+// 1. QUẢN LÝ KHO GIA VỊ, TỒN KHO FEFO, ROP & GIÁ SAP
+// 2. ĐẶT HÀNG VẬT TƯ, ĐỊNH MỨC NGÂN SÁCH SITE, NHẬP & TRA CỨU CHỨNG TỪ
 // ============================================================================
 
 async function sha256(str) {
@@ -45,9 +48,256 @@ export default {
     }
 
     try {
-      // ----------------------------------------------------------------------
-      // 1. GET /api/init - Dữ liệu khởi tạo hệ thống
-      // ----------------------------------------------------------------------
+      // ======================================================================
+      // PHÂN HỆ 1: QUẢN LÝ KHO GIA VỊ, FEFO & VẬN HÀNH BẾP (WMS)
+      // ======================================================================
+
+      // 1.1 GET /api/branches - Danh sách chi nhánh / Kho
+      if (pathname === '/api/branches' && request.method === 'GET') {
+        const { results } = await env.DB.prepare(`
+          SELECT * FROM branches WHERE is_active = 1 ORDER BY code
+        `).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
+      // 1.2 GET /api/dashboard-summary - KPIs tổng quan kho gia vị & FEFO
+      if (pathname === '/api/dashboard-summary' && request.method === 'GET') {
+        const branchCode = searchParams.get('branch') || 'k505';
+        const upperCode = branchCode.toUpperCase();
+
+        const critRow = await env.DB.prepare(`
+          SELECT COUNT(*) as critical_count
+          FROM inventory_batches b
+          JOIN branches br ON b.branch_id = br.id
+          WHERE br.code = ? AND b.qty > 0 AND (julianday(b.exp_date) - julianday('now')) <= 7
+        `).bind(upperCode).first();
+
+        const ropRow = await env.DB.prepare(`
+          SELECT COUNT(*) as rop_count FROM (
+            SELECT i.sku
+            FROM items i
+            LEFT JOIN branches br ON br.code = ?
+            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku
+            HAVING COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+          )
+        `).bind(upperCode).first();
+
+        const leadRow = await env.DB.prepare(`
+          SELECT ROUND(AVG(lead_time_hours), 1) as avg_lead_time, COUNT(*) as total_orders
+          FROM purchase_orders
+          WHERE lead_time_hours IS NOT NULL
+        `).first();
+
+        const stockRow = await env.DB.prepare(`
+          SELECT COUNT(DISTINCT i.sku) as total_skus, ROUND(COALESCE(SUM(b.qty), 0), 1) as total_qty
+          FROM items i
+          JOIN inventory_batches b ON i.sku = b.sku
+          JOIN branches br ON b.branch_id = br.id
+          WHERE br.code = ? AND b.qty > 0
+        `).bind(upperCode).first();
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            critical_exp_count: critRow ? critRow.critical_count : 0,
+            rop_reorder_count: ropRow ? ropRow.rop_count : 0,
+            avg_lead_time: leadRow ? (leadRow.avg_lead_time || 24.5) : 24.5,
+            total_skus: stockRow ? stockRow.total_skus : 0,
+            total_qty: stockRow ? stockRow.total_qty : 0
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 1.3 GET /api/stock - Tồn kho gia vị & Hạn sử dụng FEFO
+      if (pathname === '/api/stock' && request.method === 'GET') {
+        const branchCode = searchParams.get('branch') || 'k505';
+        const query = `
+          SELECT 
+            b.id as batch_id,
+            b.batch_code,
+            b.mfg_date,
+            b.exp_date,
+            b.qty,
+            b.storage_loc,
+            i.sku,
+            i.name as item_name,
+            i.category,
+            i.unit,
+            i.standard_cost_sap,
+            ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
+          FROM inventory_batches b
+          JOIN items i ON b.sku = i.sku
+          JOIN branches br ON b.branch_id = br.id
+          WHERE br.code = ? AND b.qty > 0
+          ORDER BY julianday(b.exp_date) ASC
+        `;
+        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+
+        const enriched = results.map((r, idx) => {
+          let dangerLevel = 'green';
+          let statusText = 'An toàn';
+          if (r.days_remaining <= 7) {
+            dangerLevel = 'red';
+            statusText = 'Cận Date (< 7 ngày)';
+          } else if (r.days_remaining <= 30) {
+            dangerLevel = 'yellow';
+            statusText = 'Cần dùng sớm (< 30 ngày)';
+          }
+          return {
+            ...r,
+            fefo_priority: idx + 1,
+            danger_level: dangerLevel,
+            status_text: statusText
+          };
+        });
+
+        return new Response(JSON.stringify({ success: true, data: enriched }), { headers: corsHeaders });
+      }
+
+      // 1.4 POST /api/stock/receipt - Nhập kho gia vị theo lô
+      if (pathname === '/api/stock/receipt' && request.method === 'POST') {
+        const body = await request.json();
+        const { branch_code, sku, batch_code, mfg_date, exp_date, qty, storage_loc, ref_code } = body;
+        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
+
+        const batchId = 'bat_' + Date.now();
+        await env.DB.prepare(`
+          INSERT INTO inventory_batches (id, branch_id, sku, batch_code, mfg_date, exp_date, qty, storage_loc)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(batchId, branch.id, sku, batch_code, mfg_date, exp_date, parseFloat(qty), storage_loc || 'Kho gia vị').run();
+
+        const transId = 'tx_' + Date.now();
+        await env.DB.prepare(`
+          INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note, ref_code)
+          VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, 'Nhập kho lô mới', ?)
+        `).bind(transId, branch.id, sku, batchId, parseFloat(qty), ref_code || '').run();
+
+        return new Response(JSON.stringify({ success: true, message: 'Nhập kho thành công', batch_id: batchId }), { headers: corsHeaders });
+      }
+
+      // 1.5 POST /api/stock/issue - Xuất kho gia vị theo chuẩn FEFO
+      if (pathname === '/api/stock/issue' && request.method === 'POST') {
+        const body = await request.json();
+        const { branch_code, sku, qty_needed, note } = body;
+        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        let remain = parseFloat(qty_needed);
+
+        const { results: batches } = await env.DB.prepare(`
+          SELECT id, qty, batch_code, exp_date
+          FROM inventory_batches
+          WHERE branch_id = ? AND sku = ? AND qty > 0
+          ORDER BY julianday(exp_date) ASC
+        `).bind(branch.id, sku).all();
+
+        const stmts = [];
+        for (const b of batches) {
+          if (remain <= 0) break;
+          const deduct = Math.min(b.qty, remain);
+          stmts.push(env.DB.prepare('UPDATE inventory_batches SET qty = qty - ? WHERE id = ?').bind(deduct, b.id));
+          stmts.push(env.DB.prepare(`
+            INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
+            VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)
+          `).bind('tx_' + Math.random().toString(36).substr(2, 9), branch.id, sku, b.id, deduct, note || 'Xuất bếp ca nấu'));
+          remain -= deduct;
+        }
+
+        if (remain > 0) {
+          return new Response(JSON.stringify({ success: false, error: `Tồn kho không đủ (thiếu ${remain.toFixed(1)})` }), { status: 400, headers: corsHeaders });
+        }
+
+        await env.DB.batch(stmts);
+        return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
+      }
+
+      // 1.6 GET /api/reorder - Cảnh báo đặt hàng an toàn (ROP)
+      if (pathname === '/api/reorder' && request.method === 'GET') {
+        const branchCode = searchParams.get('branch') || 'k505';
+        const query = `
+          SELECT 
+            i.sku,
+            i.name as item_name,
+            i.unit,
+            i.category,
+            i.daily_usage,
+            i.lead_time_hours,
+            i.safety_stock,
+            i.standard_cost_sap,
+            COALESCE(SUM(b.qty), 0) as current_stock,
+            ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
+            CASE 
+              WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+              THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
+              ELSE 0
+            END as suggested_order_qty
+          FROM items i
+          LEFT JOIN branches br ON br.code = ?
+          LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+          WHERE i.category = 'Gia vị'
+          GROUP BY i.sku
+          ORDER BY (current_stock - rop_threshold) ASC
+        `;
+        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
+      // 1.7 GET /api/leadtime - Theo dõi Lead Time & SLA Giao hàng NCC
+      if (pathname === '/api/leadtime' && request.method === 'GET') {
+        const query = `
+          SELECT 
+            po.id,
+            po.po_number,
+            br.name as branch_name,
+            br.code as branch_code,
+            po.vendor_name,
+            po.order_time,
+            po.received_time,
+            po.lead_time_hours,
+            po.sla_target_hours,
+            ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
+            CASE 
+              WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
+              ELSE 'Trễ hẹn NCC'
+            END as sla_status,
+            po.status,
+            po.total_amount
+          FROM purchase_orders po
+          JOIN branches br ON po.branch_id = br.id
+          ORDER BY po.order_time DESC
+        `;
+        const { results } = await env.DB.prepare(query).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
+      // 1.8 GET /api/po-sap - So sánh giá PO với Giá chuẩn SAP (PPV)
+      if (pathname === '/api/po-sap' && request.method === 'GET') {
+        const query = `
+          SELECT 
+            i.sku,
+            i.name as item_name,
+            i.unit,
+            i.standard_cost_sap,
+            i.old_cost_sap,
+            ROUND(((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100, 1) as price_change_pct,
+            po.po_number,
+            po.vendor_name
+          FROM items i
+          LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
+          WHERE i.category = 'Gia vị'
+          GROUP BY i.sku
+          ORDER BY price_change_pct DESC
+        `;
+        const { results } = await env.DB.prepare(query).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // PHÂN HỆ 2: VẬT TƯ, ĐỊNH MỨC SITE & CHỨNG TỪ GIAO NHẬN (PORTAL)
+      // ======================================================================
+
+      // 2.1 GET /api/init - Dữ liệu khởi tạo hệ thống
       if (pathname === '/api/init' && request.method === 'GET') {
         const { results: sites } = await env.DB.prepare(`
           SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
@@ -88,14 +338,11 @@ export default {
         }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 2. GET /api/quota - Tải định mức, ngân sách & lũy kế của Site
-      // ----------------------------------------------------------------------
+      // 2.2 GET /api/quota - Tải định mức & ngân sách Site
       if (pathname === '/api/quota' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = searchParams.get('thang') || '';
 
-        // Lấy thông tin site
         let siteRow = await env.DB.prepare(`
           SELECT * FROM sites WHERE site_name = ? LIMIT 1
         `).bind(site).first();
@@ -109,7 +356,6 @@ export default {
         const nganSach = siteRow ? (siteRow.budget_limit || 0) : 0;
         const region = siteRow ? siteRow.region : '';
 
-        // Lấy lũy kế đã đặt từ các đơn hàng trước (không tính đơn hủy/xóa)
         const daDatQuery = `
           SELECT 
             dh.item_code,
@@ -133,7 +379,6 @@ export default {
           tienDaDat += r.total_tien || 0;
         }
 
-        // Lấy danh mục NVL (ưu tiên vùng miền của site, nếu không có lấy toàn bộ)
         let nvlQuery = `SELECT * FROM nvl_items`;
         let nvlBindings = [];
         if (region) {
@@ -145,7 +390,6 @@ export default {
 
         const { results: nvlList } = await env.DB.prepare(nvlQuery).bind(...nvlBindings).all();
 
-        // Lấy định mức số lượng riêng nếu có trong bảng dinh_muc
         const { results: dmList } = await env.DB.prepare(`
           SELECT item_code, quota_qty FROM dinh_muc WHERE site_name = ? AND month_period = ?
         `).bind(site, thang).all();
@@ -176,9 +420,7 @@ export default {
         }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 3. POST /api/order - Tạo đơn hàng mới
-      // ----------------------------------------------------------------------
+      // 2.3 POST /api/order - Tạo đơn hàng vật tư
       if (pathname === '/api/order' && request.method === 'POST') {
         const payload = await request.json();
         const { site, thang, items, nguoiDat, ghiChu } = payload;
@@ -207,18 +449,9 @@ export default {
           if (qty <= 0) continue;
           const luyKe = (Number(it.daDat) || 0) + qty;
           stmts.push(insertDhStmt.bind(
-            maDon,
-            nowStr,
-            site,
-            nguoiDat || 'Người dùng',
-            thang,
-            it.maHang,
-            it.tenSP,
-            it.dvt,
-            qty,
-            luyKe,
-            it.ghiChu || ghiChu || '',
-            'Mới tạo'
+            maDon, nowStr, site, nguoiDat || 'Người dùng', thang,
+            it.maHang, it.tenSP, it.dvt, qty, luyKe,
+            it.ghiChu || ghiChu || '', 'Mới tạo'
           ));
         }
 
@@ -229,37 +462,19 @@ export default {
           });
         }
 
-        // Thêm bước 1 vào quy trình đơn hàng
         const insertQtStmt = env.DB.prepare(`
           INSERT INTO quy_trinh_don (
             order_code, step, step_name, status, action_time, actor, note
           ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(
-          maDon,
-          1,
-          'Gửi đơn hàng',
-          'Hoàn tất',
-          nowStr,
-          nguoiDat || 'Người dùng',
-          'Tạo đơn hàng thành công qua Portal'
-        );
+        `).bind(maDon, 1, 'Gửi đơn hàng', 'Hoàn tất', nowStr, nguoiDat || 'Người dùng', 'Tạo đơn hàng thành công qua Portal');
 
         stmts.push(insertQtStmt);
-
         await env.DB.batch(stmts);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            maDon,
-            soDong: stmts.length - 1
-          }
-        }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, data: { maDon, soDong: stmts.length - 1 } }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 4. GET /api/orders - Lịch sử đặt hàng
-      // ----------------------------------------------------------------------
+      // 2.4 GET /api/orders - Lịch sử đặt hàng vật tư
       if (pathname === '/api/orders' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = searchParams.get('thang') || '';
@@ -294,26 +509,15 @@ export default {
         if (conditions.length) {
           query += ' WHERE ' + conditions.join(' AND ');
         }
-
         query += ` GROUP BY dh.order_code ORDER BY dh.order_date DESC`;
 
         const { results } = await env.DB.prepare(query).bind(...bindings).all();
-
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 5. GET /api/order-detail - Chi tiết đơn hàng & Timeline quy trình
-      // ----------------------------------------------------------------------
+      // 2.5 GET /api/order-detail - Chi tiết đơn & Timeline
       if (pathname === '/api/order-detail' && request.method === 'GET') {
         const orderCode = searchParams.get('orderCode') || '';
-        if (!orderCode) {
-          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã đơn hàng' }), {
-            status: 400,
-            headers: corsHeaders
-          });
-        }
-
         const { results: items } = await env.DB.prepare(`
           SELECT 
             dh.item_code as maHang,
@@ -331,124 +535,43 @@ export default {
         `).bind(orderCode).all();
 
         const { results: timeline } = await env.DB.prepare(`
-          SELECT 
-            step as buoc,
-            step_name as tenBuoc,
-            status as trangThai,
-            action_time as thoiGian,
-            actor as nguoiXuLy,
-            note as ghiChu
-          FROM quy_trinh_don
-          WHERE order_code = ?
-          ORDER BY step ASC, action_time ASC
+          SELECT step as buoc, step_name as tenBuoc, status as trangThai, action_time as thoiGian, actor as nguoiXuLy, note as ghiChu
+          FROM quy_trinh_don WHERE order_code = ? ORDER BY step ASC, action_time ASC
         `).bind(orderCode).all();
 
         const summary = await env.DB.prepare(`
           SELECT order_code, order_date, site_name, ordered_by, applied_month, status
-          FROM don_hang
-          WHERE order_code = ?
-          LIMIT 1
+          FROM don_hang WHERE order_code = ? LIMIT 1
         `).bind(orderCode).first();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            info: summary,
-            items,
-            timeline
-          }
-        }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, data: { info: summary, items, timeline } }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 6. POST /api/order-timeline - Cập nhật bước quy trình xử lý đơn hàng
-      // ----------------------------------------------------------------------
-      if (pathname === '/api/order-timeline' && request.method === 'POST') {
-        const body = await request.json();
-        const { orderCode, step, stepName, status, actor, note } = body;
-        const nowStr = formatDate(new Date());
-
-        await env.DB.prepare(`
-          INSERT INTO quy_trinh_don (order_code, step, step_name, status, action_time, actor, note)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(orderCode, step, stepName, status, nowStr, actor, note || '').run();
-
-        // Cập nhật trạng thái tổng đơn nếu cần
-        if (status === 'Đã duyệt' || status === 'Hoàn tất') {
-          await env.DB.prepare(`UPDATE don_hang SET status = ? WHERE order_code = ?`).bind(status, orderCode).run();
-        }
-
-        return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
-      }
-
-      // ----------------------------------------------------------------------
-      // 7. POST /api/order/delete - Hủy / Xóa đơn hàng
-      // ----------------------------------------------------------------------
-      if (pathname === '/api/order/delete' && request.method === 'POST') {
-        const body = await request.json();
-        const { orderCode, reason, actor } = body;
-        const nowStr = formatDate(new Date());
-
-        await env.DB.prepare(`UPDATE don_hang SET status = 'Đã hủy' WHERE order_code = ?`).bind(orderCode).run();
-
-        await env.DB.prepare(`
-          INSERT INTO quy_trinh_don (order_code, step, step_name, status, action_time, actor, note)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(orderCode, 99, 'Hủy đơn hàng', 'Đã hủy', nowStr, actor || 'Admin', reason || 'Người dùng hủy đơn').run();
-
-        return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
-      }
-
-      // ----------------------------------------------------------------------
-      // 8. GET /api/vouchers - Tra cứu chứng từ
-      // ----------------------------------------------------------------------
+      // 2.6 GET /api/vouchers & POST /api/voucher
       if (pathname === '/api/vouchers' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const loai = searchParams.get('loaiHoaDon') || '';
         const tuNgay = searchParams.get('tuNgay') || '';
         const denNgay = searchParams.get('denNgay') || '';
-        const nguoiNhap = searchParams.get('nguoiNhap') || '';
 
         let query = `SELECT * FROM chung_tu`;
         const conditions = [];
         const bindings = [];
 
-        if (site) {
-          conditions.push('site_name = ?');
-          bindings.push(site);
-        }
-        if (loai) {
-          conditions.push('invoice_type = ?');
-          bindings.push(loai);
-        }
-        if (nguoiNhap) {
-          conditions.push('created_by LIKE ?');
-          bindings.push(`%${nguoiNhap}%`);
-        }
-        if (tuNgay) {
-          conditions.push('receive_date >= ?');
-          bindings.push(tuNgay);
-        }
-        if (denNgay) {
-          conditions.push('receive_date <= ?');
-          bindings.push(denNgay);
-        }
+        if (site) { conditions.push('site_name = ?'); bindings.push(site); }
+        if (loai) { conditions.push('invoice_type = ?'); bindings.push(loai); }
+        if (tuNgay) { conditions.push('receive_date >= ?'); bindings.push(tuNgay); }
+        if (denNgay) { conditions.push('receive_date <= ?'); bindings.push(denNgay); }
 
-        if (conditions.length) {
-          query += ' WHERE ' + conditions.join(' AND ');
-        }
+        if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
         query += ` ORDER BY created_at DESC`;
 
         const { results } = await env.DB.prepare(query).bind(...bindings).all();
-
-        // Lấy số file cho từng chứng từ
         const { results: fileCounts } = await env.DB.prepare(`
           SELECT voucher_code, COUNT(id) as cnt FROM chung_tu_file GROUP BY voucher_code
         `).all();
         const fileMap = {};
-        for (const f of fileCounts) {
-          fileMap[f.voucher_code] = f.cnt;
-        }
+        for (const f of fileCounts) fileMap[f.voucher_code] = f.cnt;
 
         const data = results.map(r => ({
           maCT: r.voucher_code,
@@ -468,32 +591,16 @@ export default {
         return new Response(JSON.stringify({ success: true, data }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 9. POST /api/voucher - Lưu chứng từ giao nhận & file
-      // ----------------------------------------------------------------------
       if (pathname === '/api/voucher' && request.method === 'POST') {
         const body = await request.json();
-        const {
-          site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan,
-          nhaCungCap, ghiChu, nguoiNhap, files, linkFile
-        } = body;
-
+        const { site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu, nguoiNhap, files } = body;
         const maCT = generateCode('CT', site);
         const nowStr = formatDate(new Date());
 
-        const primaryLink = linkFile || (files && files[0] ? files[0].url : '');
-
         await env.DB.prepare(`
-          INSERT INTO chung_tu (
-            voucher_code, site_name, invoice_type, invoice_date, receive_date,
-            deliverer_name, receiver_name, supplier_name, note,
-            attachment_link, created_at, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(
-          maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr,
-          nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '',
-          primaryLink, nowStr, nguoiNhap || 'Người dùng'
-        ).run();
+          INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr, nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '', nowStr, nguoiNhap || 'Thủ kho').run();
 
         if (files && files.length) {
           const fileStmts = files.map(f => env.DB.prepare(`
@@ -506,79 +613,53 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 10. GET /api/voucher-detail - Chi tiết chứng từ & file đính kèm
-      // ----------------------------------------------------------------------
+      // 2.7 GET /api/voucher-detail
       if (pathname === '/api/voucher-detail' && request.method === 'GET') {
         const maCT = searchParams.get('maCT');
         const voucher = await env.DB.prepare(`SELECT * FROM chung_tu WHERE voucher_code = ?`).bind(maCT).first();
-        if (!voucher) {
-          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ' }), {
-            status: 404,
-            headers: corsHeaders
-          });
-        }
+        if (!voucher) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ' }), { status: 404, headers: corsHeaders });
 
         const { results: files } = await env.DB.prepare(`
           SELECT file_name, file_link, file_type, upload_date FROM chung_tu_file WHERE voucher_code = ?
         `).bind(maCT).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            ...voucher,
-            files
+        return new Response(JSON.stringify({ success: true, data: { ...voucher, files } }), { headers: corsHeaders });
+      }
+
+      // 2.8 GET /api/inventory-audit & POST
+      if (pathname === '/api/inventory-audit') {
+        if (request.method === 'GET') {
+          const site = searchParams.get('site') || '';
+          let query = `SELECT * FROM kiemke_tonkho`;
+          const bindings = [];
+          if (site) {
+            query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ?`;
+            bindings.push(site, site, `%${site}%`);
           }
-        }), { headers: corsHeaders });
-      }
-
-      // ----------------------------------------------------------------------
-      // 11. GET /api/inventory-audit - Kiểm kê tồn kho
-      // ----------------------------------------------------------------------
-      if (pathname === '/api/inventory-audit' && request.method === 'GET') {
-        const site = searchParams.get('site') || '';
-        let query = `SELECT * FROM kiemke_tonkho`;
-        const bindings = [];
-
-        if (site) {
-          query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ?`;
-          bindings.push(site, site, `%${site}%`);
+          query += ` ORDER BY item_code LIMIT 300`;
+          const { results } = await env.DB.prepare(query).bind(...bindings).all();
+          return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
         }
-
-        query += ` ORDER BY item_code LIMIT 300`;
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
-
-        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
-      }
-
-      // ----------------------------------------------------------------------
-      // 12. POST /api/inventory-audit - Lưu kết quả kiểm kê tồn kho
-      // ----------------------------------------------------------------------
-      if (pathname === '/api/inventory-audit' && request.method === 'POST') {
-        const body = await request.json();
-        const { items } = body; // [{ id, usage_t11, closing_t11 }]
-
-        if (items && items.length) {
-          const stmts = items.map(it => env.DB.prepare(`
-            UPDATE kiemke_tonkho
-            SET usage_t11 = ?, closing_t11 = ?
-            WHERE id = ?
-          `).bind(it.usage, it.closing, it.id));
-          await env.DB.batch(stmts);
+        if (request.method === 'POST') {
+          const body = await request.json();
+          const { items } = body;
+          if (items && items.length) {
+            const stmts = items.map(it => env.DB.prepare(`
+              UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?
+            `).bind(it.usage, it.closing, it.id));
+            await env.DB.batch(stmts);
+          }
+          return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
         }
-
-        return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 13. POST /api/report - Báo cáo vận hành suất ăn
-      // ----------------------------------------------------------------------
-      if (pathname === '/api/report' && request.method === 'POST') {
+      // 2.9 POST /api/report & /api/daily-report
+      if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'POST') {
         const body = await request.json();
         const { branchCode, reportDate, plannedMeals, actualMeals, wastedMeals, staffActual, foodQualityNote, feedback } = body;
         const nowStr = formatDate(new Date());
-
         const id = 'RPT-' + Date.now();
+
         await env.DB.prepare(`
           INSERT INTO daily_catering_reports (
             id, branch_id, report_date, planned_meals, actual_meals, wasted_meals,
@@ -593,64 +674,27 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { id } }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 14. POST /api/auth/login - Đăng nhập tài khoản Admin
-      // ----------------------------------------------------------------------
+      // 2.10 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
-        const body = await request.json();
-        const { email, password } = body;
-
-        const user = await env.DB.prepare(`
-          SELECT * FROM admin_users WHERE email = ? LIMIT 1
-        `).bind(email).first();
-
-        if (!user) {
-          return new Response(JSON.stringify({ success: false, error: 'Email hoặc mật khẩu không đúng' }), {
-            status: 401,
-            headers: corsHeaders
-          });
-        }
-
-        if (user.status !== 'Đã duyệt') {
-          return new Response(JSON.stringify({ success: false, error: 'Tài khoản chưa được duyệt bởi Quản trị viên' }), {
-            status: 403,
-            headers: corsHeaders
-          });
-        }
+        const { email, password } = await request.json();
+        const user = await env.DB.prepare(`SELECT * FROM admin_users WHERE email = ? LIMIT 1`).bind(email).first();
+        if (!user) return new Response(JSON.stringify({ success: false, error: 'Email hoặc mật khẩu không đúng' }), { status: 401, headers: corsHeaders });
 
         const computedHash = await sha256(`${user.salt}::${password}`);
         if (computedHash !== user.password_hash && password !== user.password_raw) {
-          return new Response(JSON.stringify({ success: false, error: 'Mật khẩu không chính xác' }), {
-            status: 401,
-            headers: corsHeaders
-          });
+          return new Response(JSON.stringify({ success: false, error: 'Mật khẩu không chính xác' }), { status: 401, headers: corsHeaders });
         }
 
         return new Response(JSON.stringify({
           success: true,
-          data: {
-            email: user.email,
-            fullName: user.full_name,
-            role: user.role,
-            phone: user.phone
-          }
+          data: { email: user.email, fullName: user.full_name, role: user.role, phone: user.phone }
         }), { headers: corsHeaders });
       }
 
-      // ----------------------------------------------------------------------
-      // 15. POST /api/auth/register - Đăng ký tài khoản Admin
-      // ----------------------------------------------------------------------
       if (pathname === '/api/auth/register' && request.method === 'POST') {
-        const body = await request.json();
-        const { email, fullName, phone, role, password } = body;
-
+        const { email, fullName, phone, role, password } = await request.json();
         const existing = await env.DB.prepare(`SELECT email FROM admin_users WHERE email = ?`).bind(email).first();
-        if (existing) {
-          return new Response(JSON.stringify({ success: false, error: 'Email này đã tồn tại trên hệ thống' }), {
-            status: 400,
-            headers: corsHeaders
-          });
-        }
+        if (existing) return new Response(JSON.stringify({ success: false, error: 'Email đã tồn tại' }), { status: 400, headers: corsHeaders });
 
         const salt = crypto.randomUUID();
         const hash = await sha256(`${salt}::${password}`);
@@ -658,34 +702,21 @@ export default {
 
         await env.DB.prepare(`
           INSERT INTO admin_users (email, full_name, phone, role, password_raw, password_hash, salt, status, registered_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(email, fullName, phone, role || 'Quản lý Site', password, hash, salt, 'Chờ duyệt', nowStr).run();
+          VALUES (?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt', ?)
+        `).bind(email, fullName, phone, role || 'Quản lý Site', password, hash, salt, nowStr).run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Đăng ký thành công. Vui lòng chờ Ban Quản trị phê duyệt.'
-        }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, message: 'Đăng ký thành công. Vui lòng chờ phê duyệt.' }), { headers: corsHeaders });
       }
 
-      // Nếu không khớp endpoint nào trong /api, fallback sang env.ASSETS (static files)
+      // Fallback: Static Assets
       if (env.ASSETS) {
         return env.ASSETS.fetch(request);
       }
 
-      return new Response(JSON.stringify({ error: 'Endpoint Not Found' }), {
-        status: 404,
-        headers: corsHeaders
-      });
+      return new Response(JSON.stringify({ error: 'Endpoint Not Found' }), { status: 404, headers: corsHeaders });
 
     } catch (err) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: err.message,
-        stack: err.stack
-      }), {
-        status: 500,
-        headers: corsHeaders
-      });
+      return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: corsHeaders });
     }
   }
 };
