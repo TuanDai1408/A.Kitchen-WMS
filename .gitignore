@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Cloudflare Wrangler
+.wrangler/
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

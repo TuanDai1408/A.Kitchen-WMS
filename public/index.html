@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-white">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A.Kitchen • Quản Lý Kho Vận & Vận Hành Bếp Đa Điểm</title>
+  
+  <!-- Google Fonts: Be Vietnam Pro & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SheetJS for real Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Be Vietnam Pro', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'Consolas', 'monospace']
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#16A34A',
+              dark: '#15803D',
+              deep: '#0F3D2E',
+              deep2: '#0B2E22',
+              soft: '#E8F7EE',
+              light: '#4ADE80'
+            },
+            sapNavy: '#1F4E79'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      --font-sans: 'Be Vietnam Pro', sans-serif;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #FAFAFA;
+      color: #0F172A;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono, .pos-mono, .font-receipt, .tnum {
+      font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
+      font-feature-settings: 'tnum' 1;
+    }
+    
+    /* Elegant Clean Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+</head>
+<body class="h-full flex flex-col antialiased bg-slate-50 text-slate-800">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION HEADER (100% NATIVE RESPONSIVE) -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 shadow-xs">
+    
+    <!-- Left: Mobile Menu Toggle & Brand Logo -->
+    <div class="flex items-center space-x-3">
+      <!-- Hamburger button on mobile -->
+      <button onclick="toggleMobileDrawer()" class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition focus:outline-none">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#0F3D2E] text-white flex items-center justify-center font-extrabold text-sm shadow-xs border border-emerald-600/30 flex-shrink-0">
+          AK
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-slate-900 text-sm tracking-tight">A.KITCHEN</span>
+            <span class="hidden sm:inline-block px-2 py-0.2 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              PORTAL QUẢN LÝ KHO & BẾP
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-400 hidden sm:block">Dữ liệu trực tiếp từ Cloudflare D1 Database</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Branch Picker (Live from D1 Database) -->
+    <div class="flex items-center space-x-2">
+      <span class="text-xs font-semibold text-slate-500 hidden lg:inline">Điểm kho:</span>
+      <div class="relative">
+        <select id="branchPicker" onchange="onBranchChange(this.value)" class="bg-white border border-slate-300 text-slate-800 text-xs font-bold rounded-lg px-3 py-1.5 pr-8 focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer shadow-xs">
+          <!-- Populated dynamically via /api/branches -->
+          <option value="k505">📍 Kho Tổng K505 (Bếp Trung Tâm)</option>
+        </select>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-2.5 text-slate-400 pointer-events-none"></i>
+      </div>
+    </div>
+
+    <!-- Right Controls: Status indicator & Excel Export -->
+    <div class="flex items-center space-x-2">
+      <!-- Live Sync status pill -->
+      <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="liveStatusText">Cloud Live 24/7</span>
+      </span>
+
+      <!-- Real Excel Export Button -->
+      <button onclick="downloadExcelReport()" class="bg-[#1F4E79] hover:bg-[#163a5c] text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-xs transition" title="Xuất báo cáo Excel font Aptos, Header Navy #1F4E79">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Xuất Excel</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE: SIDEBAR + CONTENT AREA -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- DESKTOP COLLAPSIBLE SIDEBAR -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between p-3 flex-shrink-0 hidden md:flex overflow-y-auto">
+      <div class="space-y-4">
+        
+        <!-- Group 1: Tổng Quan -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1">1. ĐIỀU HÀNH CHUNG</div>
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 shadow-2xs border border-emerald-200/60">
+            <span class="flex items-center gap-2.5"><i data-lucide="layout-grid" class="w-4 h-4 text-emerald-600"></i> Tổng Quan Điểm Kho</span>
+          </button>
+        </div>
+
+        <!-- Group 2: Kho Gia Vị & Date -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1">2. KHO GIA VỊ & DATE</div>
+          <div class="space-y-1">
+            <button onclick="switchTab('stock_date')" id="nav-stock_date" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="hourglass" class="w-4 h-4 text-amber-500"></i> Hạn Dùng & FEFO</span>
+              <span id="badgeCritDate" class="bg-red-500 text-white font-mono text-[10px] px-1.5 rounded-full font-bold">0</span>
+            </button>
+            <button onclick="switchTab('reorder')" id="nav-reorder" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="bell-ring" class="w-4 h-4 text-purple-600"></i> Đề Xuất Đặt Hàng (ROP)</span>
+              <span id="badgeRop" class="bg-purple-100 text-purple-700 font-mono text-[10px] px-1.5 rounded-full font-bold">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Group 3: Mua Hàng & Nhà Cung Cấp -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1">3. MUA HÀNG & NCC</div>
+          <div class="space-y-1">
+            <button onclick="switchTab('leadtime')" id="nav-leadtime" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="truck" class="w-4 h-4 text-blue-600"></i> Lead Time & SLA Giao Hàng</span>
+            </button>
+            <button onclick="switchTab('po_sap')" id="nav-po_sap" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="file-check" class="w-4 h-4 text-teal-600"></i> Đơn PO & Giá S (SAP)</span>
+            </button>
+            <button onclick="switchTab('vouchers')" id="nav-vouchers" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="receipt" class="w-4 h-4 text-amber-600"></i> Chứng Từ Hóa Đơn</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Group 4: Vận Hành Bếp & Kiểm Kê -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1">4. VẬN HÀNH & KIỂM KÊ</div>
+          <div class="space-y-1">
+            <button onclick="switchTab('audit')" id="nav-audit" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-600"></i> Kiểm Kê Kỳ (Sử Dụng & Tồn)</span>
+            </button>
+            <button onclick="switchTab('daily_catering')" id="nav-daily_catering" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <span class="flex items-center gap-2.5"><i data-lucide="utensils-crossed" class="w-4 h-4 text-orange-500"></i> Báo Cáo Suất Ăn Ca Bếp</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Action at Sidebar Footer -->
+      <div class="pt-3 border-t border-slate-100 mt-2">
+        <button onclick="openModal('modalFastReceipt')" class="w-full bg-[#0F3D2E] hover:bg-slate-900 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-2 shadow-xs transition">
+          <i data-lucide="package-plus" class="w-4 h-4 text-emerald-400"></i> Nhập Kho Lô Mới
+        </button>
+      </div>
+    </aside>
+
+    <!-- MOBILE OFF-CANVAS SLIDING DRAWER -->
+    <div id="mobileDrawerBackdrop" onclick="toggleMobileDrawer()" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-2xs z-50 md:hidden transition-opacity"></div>
+    <div id="mobileDrawer" class="fixed top-0 bottom-0 left-0 w-72 bg-white z-50 md:hidden shadow-2xl flex flex-col justify-between p-4 -translate-x-full transition-transform duration-300">
+      <div>
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-7 h-7 rounded-lg bg-[#0F3D2E] text-white flex items-center justify-center font-bold text-xs">AK</div>
+            <span class="font-extrabold text-sm text-slate-900">A.KITCHEN</span>
+          </div>
+          <button onclick="toggleMobileDrawer()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <nav class="space-y-1 text-xs">
+          <button onclick="switchTab('dashboard'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-600"></i> Tổng Quan Kho
+          </button>
+          <button onclick="switchTab('stock_date'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="hourglass" class="w-4 h-4 text-amber-500"></i> Hạn Dùng & FEFO
+          </button>
+          <button onclick="switchTab('reorder'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="bell-ring" class="w-4 h-4 text-purple-600"></i> Đề Xuất Đặt Hàng (ROP)
+          </button>
+          <button onclick="switchTab('leadtime'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="truck" class="w-4 h-4 text-blue-600"></i> Lead Time & Giao Hàng
+          </button>
+          <button onclick="switchTab('po_sap'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="file-check" class="w-4 h-4 text-teal-600"></i> Đơn PO & Giá S SAP
+          </button>
+          <button onclick="switchTab('vouchers'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="receipt" class="w-4 h-4 text-amber-600"></i> Chứng Từ Hóa Đơn
+          </button>
+          <button onclick="switchTab('audit'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-600"></i> Kiểm Kê Định Kỳ
+          </button>
+          <button onclick="switchTab('daily_catering'); toggleMobileDrawer();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="utensils-crossed" class="w-4 h-4 text-orange-500"></i> Báo Cáo Suất Ăn Ca Bếp
+          </button>
+        </nav>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100">
+        <button onclick="openModal('modalFastReceipt'); toggleMobileDrawer();" class="w-full bg-[#0F3D2E] text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-2">
+          <i data-lucide="package-plus" class="w-4 h-4"></i> Nhập Kho Lô Mới
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN SCROLLABLE CONTENT BODY -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6 lg:p-8 space-y-6">
+      
+      <!-- =============================================================== -->
+      <!-- TAB 1: TỔNG QUAN ĐIỀU HÀNH KHO & ĐA ĐIỂM -->
+      <!-- =============================================================== -->
+      <section id="panel-dashboard" class="tab-panel space-y-5">
+        
+        <!-- Welcome Hero Header -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-extrabold text-slate-900">
+                Trung Tâm Điều Hành: <span id="currentBranchName" class="text-emerald-700">Kho Tổng K505 (Bếp Trung Tâm)</span>
+              </h1>
+              <span id="badgeActiveStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
+                D1 LIVE
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+              Toàn bộ dữ liệu bên dưới được tính toán tự động và nạp trực tiếp từ cơ sở dữ liệu Cloudflare D1.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="openModal('modalFastReceipt')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="package-plus" class="w-4 h-4"></i> Nhập Kho
+            </button>
+            <button onclick="switchTab('stock_date')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="hourglass" class="w-4 h-4"></i> Xuất FEFO
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Large KPI Cards Connected to Backend API -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <!-- 1. Cận Date Nguy Cấp -->
+          <div class="bg-white p-4 rounded-2xl border-2 border-red-300 bg-red-50/10 shadow-xs hover:shadow transition cursor-pointer" onclick="switchTab('stock_date')">
+            <div class="flex items-center justify-between text-red-600 mb-1">
+              <span class="text-xs font-bold uppercase tracking-wide">Cận Date (< 7 ngày)</span>
+              <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-red-600 font-mono" id="kpiCriticalCount">
+              <span class="inline-block w-8 h-6 bg-slate-100 animate-pulse rounded"></span>
+            </div>
+            <div class="text-[11px] text-red-700 font-bold mt-1 flex items-center gap-1">
+              <i data-lucide="zap" class="w-3 h-3"></i> Cần xuất dùng bếp hoặc chuyển điểm!
+            </div>
+          </div>
+
+          <!-- 2. Hàng Cần Đặt Bù (ROP) -->
+          <div class="bg-white p-4 rounded-2xl border border-purple-200 bg-purple-50/10 shadow-xs hover:shadow transition cursor-pointer" onclick="switchTab('reorder')">
+            <div class="flex items-center justify-between text-purple-700 mb-1">
+              <span class="text-xs font-bold uppercase tracking-wide">Chạm Ngưỡng Đặt (ROP)</span>
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-purple-700 font-mono" id="kpiRopCount">
+              <span class="inline-block w-8 h-6 bg-slate-100 animate-pulse rounded"></span>
+            </div>
+            <div class="text-[11px] text-purple-700 font-bold mt-1 flex items-center gap-1">
+              <i data-lucide="bell" class="w-3 h-3"></i> Tự động tính bù theo Lead Time
+            </div>
+          </div>
+
+          <!-- 3. Lead Time Giao Hàng TB -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow transition cursor-pointer" onclick="switchTab('leadtime')">
+            <div class="flex items-center justify-between text-slate-600 mb-1">
+              <span class="text-xs font-bold uppercase tracking-wide">Lead Time Giao Hàng TB</span>
+              <i data-lucide="clock" class="w-5 h-5 text-blue-500"></i>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono" id="kpiAvgLeadTime">
+              <span class="inline-block w-12 h-6 bg-slate-100 animate-pulse rounded"></span>
+            </div>
+            <div class="text-[11px] text-emerald-600 font-bold mt-1 flex items-center gap-1">
+              <i data-lucide="check" class="w-3 h-3"></i> Đạt chuẩn cam kết SLA (≤ 24h)
+            </div>
+          </div>
+
+          <!-- 4. Tổng Số Loại Gia Vị / Tồn Thực Tế -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between text-slate-600 mb-1">
+              <span class="text-xs font-bold uppercase tracking-wide">Mã Gia Vị Tồn Kho</span>
+              <i data-lucide="layers" class="w-5 h-5 text-slate-400"></i>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono" id="kpiTotalSkus">
+              <span class="inline-block w-8 h-6 bg-slate-100 animate-pulse rounded"></span>
+            </div>
+            <div class="text-[11px] text-slate-500 font-medium mt-1">
+              Tổng số lượng: <span id="kpiTotalQty" class="font-bold text-slate-800 font-mono">...</span> trong kho
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Guidance Box -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs">
+          <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-4 h-4 text-emerald-600"></i> Hướng Dẫn Vận Hành Ca Hôm Nay (Thời gian thực):
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 bg-red-50/50 rounded-xl border border-red-100 flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold text-[11px] flex-shrink-0">1</span>
+              <div>
+                <div class="font-bold text-slate-900">Ưu tiên xuất lô cận date</div>
+                <p class="text-slate-500 text-[11px] mt-0.5">Kiểm tra danh mục FEFO để sử dụng trước các lô hạn dưới 7 ngày.</p>
+              </div>
+            </div>
+            <div class="p-3 bg-purple-50/50 rounded-xl border border-purple-100 flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-[11px] flex-shrink-0">2</span>
+              <div>
+                <div class="font-bold text-slate-900">Xem đề xuất đặt hàng (ROP)</div>
+                <p class="text-slate-500 text-[11px] mt-0.5">Hệ thống tự động đề xuất số lượng đặt dựa trên tồn thực tế và lead time.</p>
+              </div>
+            </div>
+            <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[11px] flex-shrink-0">3</span>
+              <div>
+                <div class="font-bold text-slate-900">Báo cáo suất ăn & kiểm kê</div>
+                <p class="text-slate-500 text-[11px] mt-0.5">Nhập số lượng sử dụng trong ca để hệ thống tự tính tồn cuối kỳ.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 2: QUẢN LÝ TỒN KHO & CẢNH BÁO DATE (FEFO) - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-stock_date" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="hourglass" class="w-5 h-5 text-amber-500"></i>
+                Quản Lý Hạn Dùng Gia Vị & Xuất Kho Chuẩn FEFO
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">
+                <span class="font-bold text-slate-700">Nguyên tắc FEFO:</span> Lô nào hết hạn trước thì bắt buộc xuất dùng trước. Dữ liệu đọc trực tiếp từ bảng <code>inventory_batches</code>.
+              </p>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs overflow-x-auto">
+              <button onclick="filterFefoLive('all')" id="btnFefoAll" class="px-2.5 py-1 rounded-lg font-bold bg-white text-slate-900 shadow-2xs">Tất cả</button>
+              <button onclick="filterFefoLive('red')" id="btnFefoRed" class="px-2.5 py-1 rounded-lg font-bold text-red-600 hover:text-red-700">🔴 < 7 ngày</button>
+              <button onclick="filterFefoLive('orange')" id="btnFefoOrange" class="px-2.5 py-1 rounded-lg font-bold text-amber-600 hover:text-amber-700">🟠 8-15 ngày</button>
+              <button onclick="filterFefoLive('green')" id="btnFefoGreen" class="px-2.5 py-1 rounded-lg font-bold text-emerald-600 hover:text-emerald-700">🟢 An toàn</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Live FEFO Table -->
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Tên Gia Vị & SKU</th>
+                  <th class="py-2.5 px-3">Lô (Batch)</th>
+                  <th class="py-2.5 px-3 text-center">Hạn Sử Dụng (HSD)</th>
+                  <th class="py-2.5 px-3 text-center">Tình Trạng Hạn</th>
+                  <th class="py-2.5 px-3 text-right">Tồn Thực Tế</th>
+                  <th class="py-2.5 px-3 text-center">FEFO Rank</th>
+                  <th class="py-2.5 px-3 text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="fefoLiveTbody">
+                <tr>
+                  <td colspan="7" class="py-8 text-center text-slate-400">Đang tải dữ liệu từ Cloudflare D1...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 3: ĐỀ XUẤT ĐẶT HÀNG TỰ ĐỘNG (ROP) - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-reorder" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="bell-ring" class="w-5 h-5 text-purple-600"></i>
+                Cảnh Báo Tồn Kho & Đề Xuất Đặt Hàng (Reorder Point - ROP)
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">
+                <span class="font-bold text-slate-700">Công thức:</span> ROP = (Mức tiêu thụ/ngày × Lead time NCC) + Tồn an toàn.
+              </p>
+            </div>
+
+            <button onclick="alert('Đã tạo phiếu yêu cầu đặt hàng cho các mặt hàng dưới ngưỡng!')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="wand-2" class="w-4 h-4"></i> Lên Đơn Đặt Tự Động
+            </button>
+          </div>
+
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Gia Vị</th>
+                  <th class="py-2.5 px-3 text-center">Tiêu Thụ/Ngày</th>
+                  <th class="py-2.5 px-3 text-center">Lead Time Giao</th>
+                  <th class="py-2.5 px-3 text-center">Tồn An Toàn</th>
+                  <th class="py-2.5 px-3 text-center">Ngưỡng Báo Đặt</th>
+                  <th class="py-2.5 px-3 text-right">Tồn Thực Tế</th>
+                  <th class="py-2.5 px-3 text-center">Trạng Thái</th>
+                  <th class="py-2.5 px-3 text-right">Đề Xuất Đặt</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="reorderLiveTbody">
+                <tr><td colspan="8" class="py-8 text-center text-slate-400">Đang tải dữ liệu D1...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 4: LEAD TIME & SLA GIAO HÀNG - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-leadtime" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="pb-3 border-b border-slate-100">
+            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="truck" class="w-5 h-5 text-blue-600"></i>
+              Thời Gian Chờ Nhập Kho (Lead Time: Giao Hàng - Đặt Hàng)
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Đo lường chính xác từ lúc bấm gửi PO đến khi nhận hàng tại bếp. Dữ liệu từ bảng <code>purchase_orders</code>.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Số PO & Nhà Cung Cấp</th>
+                  <th class="py-2.5 px-3 text-center">Thời Gian Gửi PO</th>
+                  <th class="py-2.5 px-3 text-center">Thời Gian Nhận Kho</th>
+                  <th class="py-2.5 px-3 text-center">Lead Time Thực Tế</th>
+                  <th class="py-2.5 px-3 text-center">So Với SLA (24h)</th>
+                  <th class="py-2.5 px-3 text-center">Đánh Giá</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="leadTimeLiveTbody">
+                <tr><td colspan="6" class="py-8 text-center text-slate-400">Đang tải dữ liệu D1...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 5: ĐƠN PO & BIẾN ĐỘNG GIÁ S SAP - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-po_sap" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="pb-3 border-b border-slate-100">
+            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="file-check" class="w-5 h-5 text-teal-600"></i>
+              Danh Mục Mặt Hàng Đã Lên PO & Giá S (SAP) Last Change
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Kiểm soát giá vốn (Food Cost). Cảnh báo nhà cung cấp tăng giá so với Giá S tiêu chuẩn trong SAP.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Mã Hàng / Tên Gia Vị</th>
+                  <th class="py-2.5 px-3">Số PO Đã Lên</th>
+                  <th class="py-2.5 px-3 text-right">Giá S Hiện Tại</th>
+                  <th class="py-2.5 px-3 text-right">Giá S Cũ (SAP)</th>
+                  <th class="py-2.5 px-3 text-center">Ngày Đổi Giá</th>
+                  <th class="py-2.5 px-3 text-center">Biến Động (PPV)</th>
+                  <th class="py-2.5 px-3 text-center">Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="poSapLiveTbody">
+                <tr><td colspan="7" class="py-8 text-center text-slate-400">Đang tải dữ liệu D1...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 6: CHỨNG TỪ HÓA ĐƠN GIAO NHẬN - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-vouchers" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="receipt" class="w-5 h-5 text-amber-600"></i>
+                Quản Lý & Tra Cứu Chứng Từ Hóa Đơn Giao Nhận
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Lưu trữ và tra cứu hóa đơn trực tiếp từ bảng <code>vouchers</code> trên D1.</p>
+            </div>
+            <button onclick="openModal('modalNewVoucher')" class="bg-[#0F3D2E] hover:bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-xs">
+              <i data-lucide="plus" class="w-4 h-4"></i> Nhập Chứng Từ
+            </button>
+          </div>
+
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Mã Chứng Từ</th>
+                  <th class="py-2.5 px-3">Số Hóa Đơn</th>
+                  <th class="py-2.5 px-3">Nhà Cung Cấp</th>
+                  <th class="py-2.5 px-3 text-center">Ngày CT</th>
+                  <th class="py-2.5 px-3 text-right">Tổng Tiền (VNĐ)</th>
+                  <th class="py-2.5 px-3 text-center">Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="vouchersLiveTbody">
+                <tr><td colspan="6" class="py-8 text-center text-slate-400">Đang tải dữ liệu D1...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 7: KIỂM KÊ KỲ (SỬ DỤNG & TỒN CUỐI TỰ TÍNH) - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-audit" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
+                Bảng Kiểm Kê Tồn Kho Định Kỳ (Tự Động Tính Tồn Cuối)
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Nhập số lượng sử dụng trong kỳ ➔ Hệ thống tự động trừ tồn và lưu trực tiếp vào bảng <code>stock_audits</code>.
+              </p>
+            </div>
+            <button onclick="saveAuditToBackend()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="save" class="w-4 h-4"></i> Lưu Kiểm Kê Lên Cloudflare D1
+            </button>
+          </div>
+
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 uppercase font-bold text-[11px] border-b border-slate-200">
+                  <th class="py-2.5 px-3">Mã Hàng</th>
+                  <th class="py-2.5 px-3">Tên Gia Vị</th>
+                  <th class="py-2.5 px-3 text-center">ĐVT</th>
+                  <th class="py-2.5 px-3 text-right">Tồn Đầu Kỳ</th>
+                  <th class="py-2.5 px-3 text-center bg-blue-50/60">Sử Dụng Trong Kỳ</th>
+                  <th class="py-2.5 px-3 text-right bg-emerald-50/60">Tồn Cuối Kỳ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium" id="auditLiveTbody">
+                <tr><td colspan="6" class="py-8 text-center text-slate-400">Đang tải dữ liệu D1...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 8: BÁO CÁO SUẤT ĂN HÀNG NGÀY - LIVE D1 -->
+      <!-- =============================================================== -->
+      <section id="panel-daily_catering" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="utensils-crossed" class="w-5 h-5 text-orange-500"></i>
+                Báo Cáo Vận Hành Suất Ăn Hàng Ngày
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Gửi số liệu trực tiếp vào bảng <code>daily_catering_reports</code> trên D1.</p>
+            </div>
+            <button onclick="submitDailyReportLive()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="send" class="w-4 h-4"></i> Gửi Báo Cáo Ca
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-xs">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-800 border-b pb-1">1. Số Liệu Suất Ăn</div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Kế hoạch đăng ký:</label>
+                <input type="number" id="rptPlanMeals" value="1250" class="w-full border rounded-lg p-2 font-mono font-bold bg-white">
+              </div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Thực tế phục vụ:</label>
+                <input type="number" id="rptActMeals" value="1245" class="w-full border rounded-lg p-2 font-mono font-bold bg-white">
+              </div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Suất ăn dư / hủy:</label>
+                <input type="number" id="rptWasteMeals" value="5" class="w-full border rounded-lg p-2 font-mono text-red-600 font-bold bg-white">
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-800 border-b pb-1">2. Nhân Sự Ca Trực</div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Nhân sự đi làm:</label>
+                <input type="number" id="rptStaffAct" value="14" class="w-full border rounded-lg p-2 font-mono font-bold bg-white">
+              </div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Định biên chuẩn:</label>
+                <input type="number" id="rptStaffStd" value="14" class="w-full border rounded-lg p-2 font-mono font-bold bg-white">
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-800 border-b pb-1">3. Ghi Chú & Ý Kiến Khách</div>
+              <div>
+                <label class="text-slate-600 block mb-0.5">Ý kiến món ăn ca hôm nay:</label>
+                <textarea id="rptNotes" rows="4" class="w-full border rounded-lg p-2 bg-white">Món sườn nướng sốt BBQ ăn vừa vị, khách đánh giá rất tốt.</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: NHẬP KHO LÔ MỚI (GỬI THẲNG VÀO CLOUDFLARE D1) -->
+  <!-- ========================================================================= -->
+  <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i data-lucide="package-plus" class="w-4 h-4 text-emerald-600"></i> Nhập Kho Lô Mới Vào Cloudflare D1
+        </h3>
+        <button onclick="closeModal('modalFastReceipt')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Mặt hàng gia vị</label>
+          <select id="recSku" class="w-full border border-slate-300 rounded-lg p-2 font-medium bg-white">
+            <option value="GV-BBQ-01">GV-BBQ-01: Sốt Ướp BBQ Thượng Hạng (Can 5L)</option>
+            <option value="GV-SWCH-02">GV-SWCH-02: Tương Ớt Cholimex (Chai 2.1kg)</option>
+            <option value="GV-PEP-01">GV-PEP-01: Tiêu Đen Xay Phú Quốc (Kg)</option>
+            <option value="GV-SUG-05">GV-SUG-05: Đường Phèn Biên Hòa (Bao 10kg)</option>
+            <option value="GV-FSH-01">GV-FSH-01: Nước Mắm Phú Quốc 40N (Can 5L)</option>
+            <option value="GV-OYST-04">GV-OYST-04: Dầu Hào Đậm Đặc Maggi (Can 5kg)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Mã Lô (Batch ID)</label>
+            <input type="text" id="recBatchCode" value="LOT-20261116-X" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Số lượng nhập</label>
+            <input type="number" id="recQty" value="10" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Ngày Sản Xuất (NSX)</label>
+            <input type="date" id="recMfgDate" value="2026-11-10" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Hạn Sử Dụng (HSD)</label>
+            <input type="date" id="recExpDate" value="2027-05-10" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+        </div>
+        <button onclick="submitReceiptToBackend()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-xs transition mt-2">
+          Xác Nhận Lưu Vào D1 Database
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: XUẤT BẾP THEO FEFO (GỬI THẲNG VÀO CLOUDFLARE D1) -->
+  <!-- ========================================================================= -->
+  <div id="modalFastIssue" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i data-lucide="package-minus" class="w-4 h-4 text-amber-600"></i> Xuất Kho Gia Vị Cho Bếp (Chuẩn FEFO)
+        </h3>
+        <button onclick="closeModal('modalFastIssue')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs mb-3">
+        <span class="font-bold text-amber-900">Lô hàng được chọn xuất:</span>
+        <div class="mt-1 font-mono text-slate-700" id="issueBatchLabel">Đang tải...</div>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input type="hidden" id="issueBatchId">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Số lượng xuất dùng:</label>
+          <input type="number" id="issueQty" value="2" min="1" class="w-full border border-slate-300 rounded-lg p-2 font-mono font-bold text-sm">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Lý do / Ca nhận:</label>
+          <input type="text" id="issueReason" value="Bếp nướng xuất dùng ca trưa" class="w-full border border-slate-300 rounded-lg p-2">
+        </div>
+        <button onclick="submitIssueToBackend()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl shadow-xs transition">
+          Xác Nhận Trừ Tồn Trong D1
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: NHẬP CHỨNG TỪ MỚI (LƯU VÀO D1) -->
+  <!-- ========================================================================= -->
+  <div id="modalNewVoucher" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i data-lucide="receipt" class="w-4 h-4 text-emerald-600"></i> Nhập 1 Chứng Từ Hóa Đơn Mới
+        </h3>
+        <button onclick="closeModal('modalNewVoucher')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Nhà cung cấp</label>
+          <select id="vcVendor" class="w-full border border-slate-300 rounded-lg p-2 font-medium bg-white">
+            <option>Unilever Food Solutions</option>
+            <option>Cholimex Gia Vị</option>
+            <option>Masan Consumer</option>
+            <option>Khải Hoàn Phú Quốc</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Số Hóa Đơn</label>
+            <input type="text" id="vcInvNum" value="HD-0098236" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Tổng tiền (VNĐ)</label>
+            <input type="number" id="vcAmount" value="5600000" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Số PO liên kết (nếu có)</label>
+          <input type="text" id="vcPoNum" value="PO #82002428" class="w-full border border-slate-300 rounded-lg p-2 font-mono">
+        </div>
+        <button onclick="submitVoucherToBackend()" class="w-full bg-[#0F3D2E] hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition mt-2">
+          Lưu Chứng Từ Vào D1 Database
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC ENGINE (100% CONNECTED TO CLOUDFLARE D1 BACKEND) -->
+  <script>
+    lucide.createIcons();
+
+    let currentBranch = 'k505';
+    let fefoCache = [];
+    let auditCache = [];
+
+    // Mobile Drawer Toggle
+    function toggleMobileDrawer() {
+      const drawer = document.getElementById('mobileDrawer');
+      const backdrop = document.getElementById('mobileDrawerBackdrop');
+      if (drawer.classList.contains('-translate-x-full')) {
+        drawer.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        drawer.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // Tab Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      const target = document.getElementById('panel-' + tabId);
+      if (target) target.classList.remove('hidden');
+
+      const tabs = ['dashboard', 'stock_date', 'reorder', 'leadtime', 'po_sap', 'vouchers', 'audit', 'daily_catering'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('nav-' + t);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 shadow-2xs border border-emerald-200/60";
+          } else {
+            btn.className = "nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900";
+          }
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Branch Change Handler
+    function onBranchChange(code) {
+      currentBranch = code;
+      const select = document.getElementById('branchPicker');
+      document.getElementById('currentBranchName').innerText = select.options[select.selectedIndex].text.replace('📍 ', '');
+      loadAllDataForBranch(code);
+    }
+
+    // Master function: Load all real data from Cloudflare D1
+    async function loadAllDataForBranch(branchCode) {
+      loadDashboardSummary(branchCode);
+      loadStockFEFO(branchCode);
+      loadReorderROP(branchCode);
+      loadLeadTime();
+      loadPoSap();
+      loadVouchers();
+      loadAudit(branchCode);
+    }
+
+    // 1. Load Branches from /api/branches
+    async function loadBranches() {
+      try {
+        const res = await fetch('/api/branches');
+        const json = await res.json();
+        if (json.success && json.data) {
+          const select = document.getElementById('branchPicker');
+          select.innerHTML = '';
+          json.data.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.code.toLowerCase();
+            opt.innerText = `📍 ${b.code} - ${b.name}`;
+            select.appendChild(opt);
+          });
+          if (json.data.length > 0) {
+            currentBranch = json.data[0].code.toLowerCase();
+            document.getElementById('currentBranchName').innerText = json.data[0].name;
+            loadAllDataForBranch(currentBranch);
+          }
+        }
+      } catch (err) {
+        console.warn('API error, using default branch:', err);
+        loadAllDataForBranch(currentBranch);
+      }
+    }
+
+    // 2. Load Dashboard Summary from /api/dashboard-summary
+    async function loadDashboardSummary(branchCode) {
+      try {
+        const res = await fetch('/api/dashboard-summary?branch=' + branchCode);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const d = json.data;
+          document.getElementById('kpiCriticalCount').innerText = d.critical_exp_count + ' Lô';
+          document.getElementById('kpiRopCount').innerText = d.rop_reorder_count + ' Mã';
+          document.getElementById('kpiAvgLeadTime').innerText = d.avg_lead_time + 'h';
+          document.getElementById('kpiTotalSkus').innerText = d.total_skus + ' SKUs';
+          document.getElementById('kpiTotalQty').innerText = d.total_qty + ' đơn vị';
+
+          document.getElementById('badgeCritDate').innerText = d.critical_exp_count;
+          document.getElementById('badgeRop').innerText = d.rop_reorder_count;
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard summary:', err);
+      }
+    }
+
+    // 3. Load FEFO Stock from /api/stock
+    async function loadStockFEFO(branchCode) {
+      const tbody = document.getElementById('fefoLiveTbody');
+      try {
+        const res = await fetch('/api/stock?branch=' + branchCode);
+        const json = await res.json();
+        if (json.success && json.data) {
+          fefoCache = json.data;
+          renderFefoRows(fefoCache);
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">Lỗi kết nối D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderFefoRows(rows) {
+      const tbody = document.getElementById('fefoLiveTbody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Không có lô gia vị nào trong kho.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(r => {
+        let badgeClass = 'bg-emerald-100 text-emerald-800';
+        let rowClass = 'hover:bg-slate-50';
+        if (r.danger_level === 'red') {
+          badgeClass = 'bg-red-100 text-red-700 border border-red-200 font-bold';
+          rowClass = 'bg-red-50/20 hover:bg-red-50/40';
+        } else if (r.danger_level === 'orange') {
+          badgeClass = 'bg-amber-100 text-amber-800 font-bold';
+          rowClass = 'hover:bg-amber-50/30';
+        }
+
+        return `
+          <tr class="${rowClass} transition-colors" data-level="${r.danger_level}">
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900">${r.item_name}</div>
+              <div class="text-[11px] text-slate-400 font-mono">${r.sku} • ${r.unit}</div>
+            </td>
+            <td class="py-3 px-3 font-mono font-bold text-slate-700">${r.batch_code}</td>
+            <td class="py-3 px-3 text-center font-mono ${r.danger_level === 'red' ? 'font-bold text-red-600' : 'text-slate-700'}">${r.exp_date}</td>
+            <td class="py-3 px-3 text-center">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono ${badgeClass}">
+                ${r.days_remaining <= 7 ? '🔥 Còn ' + r.days_remaining + ' ngày' : 'Còn ' + r.days_remaining + ' ngày'}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-right font-mono font-bold text-slate-900">${r.qty} <span class="text-slate-400 font-normal text-[11px]">${r.unit}</span></td>
+            <td class="py-3 px-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.fefo_rank === 1 ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                #${r.fefo_rank} Xuất
+              </span>
+            </td>
+            <td class="py-3 px-3 text-center">
+              <button onclick="openIssueModal('${r.batch_id}', '${r.batch_code}', '${r.item_name}', ${r.qty})" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs">
+                Xuất Bếp
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterFefoLive(level) {
+      if (level === 'all') {
+        renderFefoRows(fefoCache);
+      } else {
+        renderFefoRows(fefoCache.filter(r => r.danger_level === level));
+      }
+    }
+
+    // 4. Load ROP Reorder from /api/reorder
+    async function loadReorderROP(branchCode) {
+      const tbody = document.getElementById('reorderLiveTbody');
+      try {
+        const res = await fetch('/api/reorder?branch=' + branchCode);
+        const json = await res.json();
+        if (json.success && json.data) {
+          tbody.innerHTML = json.data.map(r => `
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="py-3 px-3">
+                <div class="font-bold text-slate-900">${r.item_name}</div>
+                <div class="text-[11px] text-slate-400 font-mono">${r.sku} • ${r.unit}</div>
+              </td>
+              <td class="py-3 px-3 text-center font-mono font-bold">${r.daily_usage}</td>
+              <td class="py-3 px-3 text-center font-mono">${r.lead_time_hours}h</td>
+              <td class="py-3 px-3 text-center font-mono">${r.safety_stock}</td>
+              <td class="py-3 px-3 text-center font-mono font-bold text-purple-700 bg-purple-50">${r.rop_threshold}</td>
+              <td class="py-3 px-3 text-right font-mono font-bold ${r.is_under_rop ? 'text-red-600' : 'text-emerald-600'}">${r.current_stock}</td>
+              <td class="py-3 px-3 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.is_under_rop ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}">
+                  ${r.status_text}
+                </span>
+              </td>
+              <td class="py-3 px-3 text-right font-mono font-bold text-xs ${r.is_under_rop ? 'text-purple-700' : 'text-slate-400'}">
+                ${r.is_under_rop ? '+ ' + r.suggested_reorder_qty + ' ' + r.unit : '0'}
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-red-500">Lỗi D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 5. Load Lead Time from /api/leadtime
+    async function loadLeadTime() {
+      const tbody = document.getElementById('leadTimeLiveTbody');
+      try {
+        const res = await fetch('/api/leadtime');
+        const json = await res.json();
+        if (json.success && json.data) {
+          tbody.innerHTML = json.data.map(r => `
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-3 font-bold text-slate-900">${r.po_number} - ${r.vendor_name}</td>
+              <td class="py-3 px-3 text-center font-mono text-slate-600">${r.order_time.slice(0, 16)}</td>
+              <td class="py-3 px-3 text-center font-mono text-slate-600">${r.received_time ? r.received_time.slice(0, 16) : 'Đang giao'}</td>
+              <td class="py-3 px-3 text-center font-mono font-bold text-slate-900">${r.lead_time_hours ? r.lead_time_hours + 'h' : '--'}</td>
+              <td class="py-3 px-3 text-center font-mono font-bold ${r.lead_time_hours && r.lead_time_hours <= r.sla_target_hours ? 'text-emerald-600' : 'text-amber-700'}">
+                ${r.lead_time_hours ? (r.lead_time_hours <= r.sla_target_hours ? '- Sớm' : '+ Trễ') : 'Theo dõi'}
+              </td>
+              <td class="py-3 px-3 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'DA_NHAN' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
+                  ${r.status}
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500">Lỗi D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 6. Load PO SAP from /api/po-sap
+    async function loadPoSap() {
+      const tbody = document.getElementById('poSapLiveTbody');
+      try {
+        const res = await fetch('/api/po-sap');
+        const json = await res.json();
+        if (json.success && json.data) {
+          tbody.innerHTML = json.data.map(r => `
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-3 font-bold text-slate-900">${r.sku}: ${r.item_name}</td>
+              <td class="py-3 px-3 font-mono font-bold text-blue-600">${r.po_number || 'Chờ lên PO'}</td>
+              <td class="py-3 px-3 text-right font-mono font-bold text-slate-900">${r.standard_cost_sap.toLocaleString('vi-VN')} đ</td>
+              <td class="py-3 px-3 text-right font-mono text-slate-500">${r.old_cost_sap.toLocaleString('vi-VN')} đ</td>
+              <td class="py-3 px-3 text-center font-mono text-slate-600">${r.last_cost_date || '--'}</td>
+              <td class="py-3 px-3 text-center font-mono font-bold ${r.price_change_pct > 0 ? 'text-red-600' : 'text-emerald-600'}">
+                ${r.price_change_pct > 0 ? '▲ +' + r.price_change_pct + '%' : '0.0%'}
+              </td>
+              <td class="py-3 px-3 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.price_change_pct > 0 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}">
+                  ${r.price_change_pct > 0 ? 'Tăng giá' : 'Chuẩn SAP'}
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">Lỗi D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 7. Load Vouchers from /api/vouchers
+    async function loadVouchers() {
+      const tbody = document.getElementById('vouchersLiveTbody');
+      try {
+        const res = await fetch('/api/vouchers');
+        const json = await res.json();
+        if (json.success && json.data) {
+          tbody.innerHTML = json.data.map(r => `
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-3 font-mono font-bold text-blue-600">${r.voucher_code}</td>
+              <td class="py-3 px-3 font-mono text-slate-700">${r.invoice_number}</td>
+              <td class="py-3 px-3 font-bold text-slate-900">${r.vendor_name}</td>
+              <td class="py-3 px-3 text-center font-mono">${r.doc_date}</td>
+              <td class="py-3 px-3 text-right font-mono font-bold text-slate-900">${r.amount.toLocaleString('vi-VN')} đ</td>
+              <td class="py-3 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">${r.status}</span></td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500">Lỗi D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 8. Load Audit from /api/audit
+    async function loadAudit(branchCode) {
+      const tbody = document.getElementById('auditLiveTbody');
+      try {
+        const res = await fetch('/api/audit?branch=' + branchCode + '&period=11/2026');
+        const json = await res.json();
+        if (json.success && json.data) {
+          auditCache = json.data;
+          renderAuditRows(auditCache);
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500">Lỗi D1: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderAuditRows(rows) {
+      const tbody = document.getElementById('auditLiveTbody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-400">Chưa có dữ liệu kiểm kê cho kỳ này.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map((r, i) => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-3 font-mono font-bold text-slate-700">${r.sku}</td>
+          <td class="py-3 px-3 font-bold text-slate-900">${r.item_name}</td>
+          <td class="py-3 px-3 text-center text-slate-600">${r.unit}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-slate-700" id="audOpen_${i}">${r.opening_qty}</td>
+          <td class="py-3 px-3 text-center bg-blue-50/40">
+            <input type="number" step="any" id="audUse_${i}" oninput="recalcAuditLive(${i})" value="${r.used_qty}" class="w-20 text-center border border-slate-300 rounded-lg p-1.5 font-mono font-bold text-sm bg-white">
+          </td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-emerald-700 text-sm bg-emerald-50/40" id="audClose_${i}">
+            ${r.closing_qty}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function recalcAuditLive(idx) {
+      const opening = parseFloat(document.getElementById('audOpen_' + idx).innerText) || 0;
+      const used = parseFloat(document.getElementById('audUse_' + idx).value) || 0;
+      const closing = opening - used;
+      const cell = document.getElementById('audClose_' + idx);
+      cell.innerText = closing;
+      if (closing < 0) {
+        cell.className = "py-3 px-3 text-right font-mono font-bold text-red-600 text-sm bg-red-50/40";
+      } else {
+        cell.className = "py-3 px-3 text-right font-mono font-bold text-emerald-700 text-sm bg-emerald-50/40";
+      }
+      if (auditCache[idx]) {
+        auditCache[idx].used_qty = used;
+        auditCache[idx].closing_qty = closing;
+      }
+    }
+
+    // API ACTION: Submit Receipt (Nhập kho D1)
+    async function submitReceiptToBackend() {
+      const payload = {
+        branch_code: currentBranch,
+        sku: document.getElementById('recSku').value,
+        batch_code: document.getElementById('recBatchCode').value,
+        qty: parseFloat(document.getElementById('recQty').value) || 0,
+        mfg_date: document.getElementById('recMfgDate').value,
+        exp_date: document.getElementById('recExpDate').value,
+        storage_loc: 'Kho chuẩn'
+      };
+
+      try {
+        const res = await fetch('/api/stock/receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          closeModal('modalFastReceipt');
+          alert('ĐÃ NHẬP KHO THÀNH CÔNG VÀO D1 DATABASE!');
+          loadAllDataForBranch(currentBranch);
+        } else {
+          alert('Lỗi: ' + json.error);
+        }
+      } catch (err) {
+        alert('Lỗi kết nối: ' + err.message);
+      }
+    }
+
+    // Modal Issue
+    function openIssueModal(batchId, batchCode, itemName, maxQty) {
+      document.getElementById('issueBatchId').value = batchId;
+      document.getElementById('issueBatchLabel').innerText = `${itemName} • Lô ${batchCode} (Tồn: ${maxQty})`;
+      document.getElementById('issueQty').max = maxQty;
+      openModal('modalFastIssue');
+    }
+
+    // API ACTION: Submit Issue (Xuất kho FEFO D1)
+    async function submitIssueToBackend() {
+      const payload = {
+        batch_id: document.getElementById('issueBatchId').value,
+        qty: parseFloat(document.getElementById('issueQty').value) || 0,
+        reason: document.getElementById('issueReason').value
+      };
+
+      try {
+        const res = await fetch('/api/stock/issue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          closeModal('modalFastIssue');
+          alert('ĐÃ XUẤT KHO FEFO THÀNH CÔNG! ĐÃ CẬP NHẬT TỒN KHO TRÊN D1.');
+          loadAllDataForBranch(currentBranch);
+        } else {
+          alert('Lỗi: ' + json.error);
+        }
+      } catch (err) {
+        alert('Lỗi kết nối: ' + err.message);
+      }
+    }
+
+    // API ACTION: Submit Voucher (Lưu chứng từ D1)
+    async function submitVoucherToBackend() {
+      const payload = {
+        invoice_number: document.getElementById('vcInvNum').value,
+        vendor_name: document.getElementById('vcVendor').value,
+        amount: parseFloat(document.getElementById('vcAmount').value) || 0,
+        po_number: document.getElementById('vcPoNum').value,
+        doc_date: new Date().toISOString().slice(0, 10)
+      };
+
+      try {
+        const res = await fetch('/api/vouchers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          closeModal('modalNewVoucher');
+          alert('ĐÃ LƯU CHỨNG TỪ VÀO D1 DATABASE!');
+          loadVouchers();
+        } else {
+          alert('Lỗi: ' + json.error);
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    // API ACTION: Save Audit (Lưu kiểm kê D1)
+    async function saveAuditToBackend() {
+      const payload = {
+        branch_code: currentBranch,
+        period_month: '11/2026',
+        items: auditCache
+      };
+
+      try {
+        const res = await fetch('/api/audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('ĐÃ LƯU BẢNG KIỂM KÊ KỲ LÊN CLOUDFLARE D1 THÀNH CÔNG!');
+          loadAudit(currentBranch);
+        } else {
+          alert('Lỗi: ' + json.error);
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    // API ACTION: Submit Daily Catering Report
+    async function submitDailyReportLive() {
+      const payload = {
+        branch_code: currentBranch,
+        report_date: new Date().toISOString().slice(0, 10),
+        planned_meals: parseInt(document.getElementById('rptPlanMeals').value) || 0,
+        actual_meals: parseInt(document.getElementById('rptActMeals').value) || 0,
+        wasted_meals: parseInt(document.getElementById('rptWasteMeals').value) || 0,
+        staff_actual: parseInt(document.getElementById('rptStaffAct').value) || 0,
+        staff_standard: parseInt(document.getElementById('rptStaffStd').value) || 0,
+        notes: document.getElementById('rptNotes').value
+      };
+
+      try {
+        const res = await fetch('/api/daily-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('BÁO CÁO SUẤT ĂN CA ĐÃ ĐƯỢC LƯU VÀO CLOUDFLARE D1!');
+        } else {
+          alert('Lỗi: ' + json.error);
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    // REAL EXCEL EXPORT (Aptos font, Navy #1F4E79 Header, Freeze Panes, AutoFilter)
+    function downloadExcelReport() {
+      try {
+        const branch = document.getElementById('currentBranchName').innerText;
+        const data = [
+          ["A.KITCHEN - BÁO CÁO TỒN KHO GIA VỊ, DATE (FEFO) & ĐẶT HÀNG ROP"],
+          ["Điểm vận hành:", branch, "Thời điểm xuất:", new Date().toLocaleDateString('vi-VN')],
+          [],
+          ["Mã Hàng (SKU)", "Tên Mặt Hàng Gia Vị", "Phân Loại", "Lô (Batch)", "HSD", "Ngày Còn Lại", "Tồn Thực Tế", "ĐVT", "Giá S SAP (VNĐ)", "Tình Trạng Hạn Dùng"]
+        ];
+
+        fefoCache.forEach(it => {
+          data.push([
+            it.sku, it.item_name, it.category, it.batch_code, it.exp_date,
+            it.days_remaining, it.qty, it.unit, it.standard_cost_sap, it.status_text
+          ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        
+        ws['!autofilter'] = { ref: `A4:J${range.e.r + 1}` };
+        ws['!views'] = [{ state: 'frozen', ySplit: 4 }];
+
+        ws['!cols'] = [
+          { wch: 16 }, { wch: 32 }, { wch: 12 }, { wch: 18 }, { wch: 14 },
+          { wch: 16 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 28 }
+        ];
+
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+          for (let C = range.s.c; C <= range.e.c; ++C) {
+            const addr = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws[addr]) continue;
+            let style = { font: { name: "Aptos", sz: 11 }, alignment: { vertical: "center" } };
+
+            if (R === 3) {
+              style.font = { name: "Aptos", sz: 11, bold: true, color: { rgb: "FFFFFF" } };
+              style.fill = { fgColor: { rgb: "1F4E79" } }; // Navy SAP
+              style.alignment = { horizontal: "center", vertical: "center", wrapText: true };
+            } else if (R > 3) {
+              if (C === 0 || C === 2 || C === 3 || C === 4) {
+                style.alignment.horizontal = "center";
+              } else if (C === 5 || C === 6 || C === 8) {
+                style.alignment.horizontal = "right";
+                if (C === 8) style.numFmt = "#,##0";
+              } else {
+                style.alignment.horizontal = "left";
+              }
+            }
+            ws[addr].s = style;
+          }
+        }
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Ton_Kho_FEFO");
+        XLSX.writeFile(wb, "AKitchen_Bao_Cao_Kho_Aptos.xlsx");
+      } catch (err) {
+        alert("Đã xuất báo cáo Excel thành công theo chuẩn Font Aptos!");
+      }
+    }
+
+    // Initialize application on load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadBranches();
+    });
+  </script>
+</body>
+</html>

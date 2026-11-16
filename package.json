@@ -1,0 +1,18 @@
+{
+  "name": "akitchen-kho-app",
+  "version": "1.0.0",
+  "description": "Hệ thống Quản lý Kho Vận, Vật tư, Cận date & Báo cáo Suất ăn A.Kitchen chạy trên Cloudflare Pages + Workers + D1",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:init": "wrangler d1 execute akitchen_kho_db --local --file=./schema.sql",
+    "db:seed": "wrangler d1 execute akitchen_kho_db --local --file=./seed.sql",
+    "db:init:remote": "wrangler d1 execute akitchen_kho_db --remote --file=./schema.sql",
+    "db:seed:remote": "wrangler d1 execute akitchen_kho_db --remote --file=./seed.sql",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^4.162.0"
+  }
+}

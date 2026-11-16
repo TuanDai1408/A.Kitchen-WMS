@@ -1,0 +1,14 @@
+name = "akitchen-kho-app"
+main = "src/index.js"
+compatibility_date = "2026-11-16"
+
+# Serve static frontend (HTML/Tailwind/JS) from public folder
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Cloudflare D1 Database (SQLite on Edge)
+[[d1_databases]]
+binding = "DB"
+database_name = "akitchen_kho_db"
+database_id = "573cfa5f-a9af-439a-a3e5-63216c25e1f8"
