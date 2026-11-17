@@ -736,7 +736,9 @@ export default {
         } = body;
         const nowStr = formatDate(new Date());
         const id = 'RPT-' + Date.now();
-        const siteVal = site || branchCode || 'K001';
+        const siteCode = extractSiteCode(site || branchCode || 'k001').toLowerCase();
+        const branchRow = await env.DB.prepare(`SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`).bind(siteCode, siteCode).first();
+        const validBranchId = branchRow ? branchRow.id : 'b_k505';
         const imgLinkStr = Array.isArray(images) ? images.map(im => im.name || im.url).join(' , ') : (images || '');
 
         await env.DB.prepare(`
@@ -746,7 +748,7 @@ export default {
             created_at, reporter_name, report_data, images_link
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
-          id, siteVal, reportDate || nowStr,
+          id, validBranchId, reportDate || nowStr,
           Number(plannedMeals) || 0, Number(actualMeals) || 0, Number(wastedMeals) || 0,
           Number(staffActual) || 0, Number(staffStandard) || 0,
           foodQualityNote || '', feedback || '', Number(extraCost) || 0,
