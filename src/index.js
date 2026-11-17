@@ -647,6 +647,43 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
       }
 
+      // 2.7.1 POST /api/vouchers/import - Nhập hàng loạt từ Excel
+      if (pathname === '/api/vouchers/import' && request.method === 'POST') {
+        const body = await request.json();
+        const { items } = body;
+        if (!items || !items.length) {
+          return new Response(JSON.stringify({ success: false, error: 'Không có dữ liệu import' }), { status: 400, headers: corsHeaders });
+        }
+        const nowStr = formatDate(new Date());
+        let count = 0;
+        for (const item of items) {
+          const site = item.site || item.site_name || '';
+          if (!site) continue;
+          const maCT = generateCode('CT', site);
+          await env.DB.prepare(`
+            INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            maCT, site, item.loaiHoaDon || 'Hóa đơn GTGT',
+            item.ngayXuat || nowStr, item.ngayNhan || nowStr,
+            item.nguoiGiao || '', item.nguoiNhan || '',
+            item.nhaCungCap || '', item.ghiChu || '',
+            nowStr, item.nguoiNhap || 'Import Excel'
+          ).run();
+
+          if (item.linkAnh && String(item.linkAnh).trim()) {
+            const links = String(item.linkAnh).split(',').map(s => s.trim()).filter(Boolean);
+            const fileStmts = links.map((lnk, idx) => env.DB.prepare(`
+              INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+              VALUES (?, ?, ?, ?, ?)
+            `).bind(maCT, `Ảnh đính kèm ${idx + 1}`, lnk, 'DRIVE_LINK', nowStr));
+            if (fileStmts.length) await env.DB.batch(fileStmts);
+          }
+          count++;
+        }
+        return new Response(JSON.stringify({ success: true, count, message: `Đã import thành công ${count} chứng từ` }), { headers: corsHeaders });
+      }
+
       // 2.8 GET /api/voucher-detail
       if (pathname === '/api/voucher-detail' && request.method === 'GET') {
         const maCT = searchParams.get('maCT');
@@ -691,22 +728,40 @@ export default {
       // 2.10 POST /api/report & /api/daily-report
       if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'POST') {
         const body = await request.json();
-        const { branchCode, reportDate, plannedMeals, actualMeals, wastedMeals, staffActual, foodQualityNote, feedback } = body;
+        const {
+          branchCode, site, reportDate, reporterName,
+          plannedMeals, actualMeals, wastedMeals, staffActual, staffStandard,
+          foodQualityNote, feedback, extraCost, images,
+          reportData
+        } = body;
         const nowStr = formatDate(new Date());
         const id = 'RPT-' + Date.now();
+        const siteVal = site || branchCode || 'K001';
+        const imgLinkStr = Array.isArray(images) ? images.map(im => im.name || im.url).join(' , ') : (images || '');
 
         await env.DB.prepare(`
           INSERT INTO daily_catering_reports (
             id, branch_id, report_date, planned_meals, actual_meals, wasted_meals,
-            staff_actual, food_quality_note, customer_feedback, created_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            staff_actual, staff_standard, food_quality_note, customer_feedback, extra_cost,
+            created_at, reporter_name, report_data, images_link
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
-          id, branchCode || 'K001', reportDate || nowStr,
+          id, siteVal, reportDate || nowStr,
           Number(plannedMeals) || 0, Number(actualMeals) || 0, Number(wastedMeals) || 0,
-          Number(staffActual) || 0, foodQualityNote || '', feedback || '', nowStr
+          Number(staffActual) || 0, Number(staffStandard) || 0,
+          foodQualityNote || '', feedback || '', Number(extraCost) || 0,
+          nowStr, reporterName || 'Quản lý Site',
+          typeof reportData === 'object' ? JSON.stringify(reportData) : (reportData || '{}'),
+          imgLinkStr
         ).run();
 
-        return new Response(JSON.stringify({ success: true, data: { id } }), { headers: corsHeaders });
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            id,
+            tongSuatAn: Number(actualMeals) || Number(plannedMeals) || 0
+          }
+        }), { headers: corsHeaders });
       }
 
       // 2.11 Admin Auth

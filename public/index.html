@@ -598,63 +598,112 @@
       </section>
 
       <!-- ====================================================================
-           7. PORTAL NHẬP CHỨNG TỪ GIAO NHẬN
+           7. PORTAL NHẬP CHỨNG TỪ GIAO NHẬN (FULL SCREEN & FULL INPUTS)
            ==================================================================== -->
       <section id="portal-voucher" class="tab-panel space-y-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs max-w-3xl mx-auto">
-          <div class="pb-3 border-b border-slate-100 mb-4">
-            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <i data-lucide="receipt" class="w-5 h-5 text-sky-600"></i>
-              Nhập Hóa Đơn &amp; Chứng Từ Giao Nhận Hàng
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">Lưu trữ hóa đơn GTGT, biên bản giao nhận và ảnh chứng từ vào Cloudflare D1.</p>
+        <!-- Top filter bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="w-44">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="ctVung" onchange="onSelectVung('ct')" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white"></select>
           </div>
+          <div class="flex-1 min-w-[220px]">
+            <label class="font-bold text-slate-700 block mb-1">SITE ÁP DỤNG <span class="text-rose-500">*</span></label>
+            <select id="ctSite" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white"></select>
+          </div>
+          <button onclick="resetChungTuForm()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl flex items-center gap-1.5 border border-slate-300 transition-all">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
+          </button>
+        </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Site áp dụng <span class="text-rose-500">*</span></label>
-              <select id="ctSite" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+        <div class="space-y-4">
+          <!-- CARD 1: IMPORT HÀNG LOẠT BẰNG EXCEL -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
+                Import Chứng Từ Hàng Loạt Bằng File Excel
+              </h3>
+              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">Chuẩn hóa dữ liệu</span>
             </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Loại chứng từ <span class="text-rose-500">*</span></label>
-              <select id="ctLoai" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Ngày xuất hóa đơn <span class="text-rose-500">*</span></label>
-              <input type="date" id="ctNgayXuat" class="w-full p-2 border border-slate-300 rounded-lg">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Ngày nhận hàng <span class="text-rose-500">*</span></label>
-              <input type="date" id="ctNgayNhan" class="w-full p-2 border border-slate-300 rounded-lg">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Nhà cung cấp / Đối tác</label>
-              <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Hoa Phát" class="w-full p-2 border border-slate-300 rounded-lg">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Người nhận hàng</label>
-              <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng" class="w-full p-2 border border-slate-300 rounded-lg">
-            </div>
-            <div class="sm:col-span-2">
-              <label class="font-bold text-slate-700 block mb-1">Ghi chú bổ sung</label>
-              <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú về tình trạng bao bì, số lượng..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="font-bold text-slate-700 block mb-1">Đính kèm tệp / ảnh chứng từ</label>
-              <label class="border-2 border-dashed border-slate-300 hover:border-brand-500 p-5 rounded-xl flex flex-col items-center justify-center cursor-pointer bg-slate-50 transition-all">
-                <i data-lucide="upload-cloud" class="w-6 h-6 text-brand-600 mb-1"></i>
-                <span class="text-slate-600 font-medium">Bấm để chọn nhiều tệp hoặc ảnh</span>
-                <input type="file" id="ctFile" multiple class="hidden" onchange="onSelectFiles(this)">
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+              Tải file mẫu (đã có sẵn 1 dòng dữ liệu ví dụ), điền thông tin chứng từ rồi tải lên. Cột bắt buộc: <b>Site</b>, <b>Loại hóa đơn</b>. Định dạng ngày: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">yyyy-mm-dd</code>.<br>
+              Cột <b>"Link ảnh (Drive)"</b>: người dùng tự upload ảnh lên Google Drive, bật quyền chia sẻ <i>"Anyone with link" (Người có liên kết)</i> rồi dán link vào (nhiều link phân tách nhau bằng dấu phẩy). Khi tra cứu, ảnh sẽ xem được trực tiếp.
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+              <button onclick="taiTemplateChungTu()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center gap-2 border border-slate-300 shadow-xs transition-all">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
+                Tải Template Excel Mẫu
+              </button>
+              <label class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm cursor-pointer transition-all">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span>Chọn File &amp; Import Excel</span>
+                <input type="file" id="ctImportFile" accept=".xlsx, .xls" class="hidden" onchange="importExcelChungTu(this)">
               </label>
-              <div id="ctFileList" class="space-y-1 mt-2"></div>
+              <span id="importInfo" class="text-xs text-slate-500 font-medium"></span>
             </div>
+            <div id="importResult" class="mt-3"></div>
           </div>
 
-          <div class="flex justify-end gap-2 mt-5 pt-3 border-t border-slate-100">
-            <button onclick="resetVoucherForm()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Làm mới</button>
-            <button onclick="saveVoucher()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
-              <i data-lucide="save" class="w-4 h-4"></i> Lưu chứng từ
-            </button>
+          <!-- CARD 2: NHẬP THỦ CÔNG 1 CHỨNG TỪ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="receipt" class="w-4 h-4 text-sky-600"></i>
+                Nhập Thủ Công 1 Chứng Từ Giao Nhận Hàng
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Lưu trữ hóa đơn GTGT, biên bản giao nhận, phiếu xuất kho và đính kèm tệp chứng thực vào hệ thống.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Loại hóa đơn / Chứng từ <span class="text-rose-500">*</span></label>
+                <select id="ctLoai" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white"></select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Nhà cung cấp / Đối tác</label>
+                <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Thực Phẩm ABC" class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Ngày xuất hóa đơn <span class="text-rose-500">*</span></label>
+                <input type="date" id="ctNgayXuat" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Ngày nhận hàng thực tế <span class="text-rose-500">*</span></label>
+                <input type="date" id="ctNgayNhan" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Tên người giao hàng</label>
+                <input type="text" id="ctNguoiGiao" placeholder="Tên tài xế / người giao hàng..." class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Tên người nhận hàng</label>
+                <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng..." class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+              <div class="md:col-span-2 lg:col-span-3">
+                <label class="font-bold text-slate-700 block mb-1">Ghi chú bổ sung</label>
+                <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú thêm về quy cách, bao bì, số lượng thực nhận..." class="w-full p-2.5 border border-slate-300 rounded-xl"></textarea>
+              </div>
+              <div class="md:col-span-2 lg:col-span-3">
+                <label class="font-bold text-slate-700 block mb-1">File đính kèm (nhiều file — ảnh, PDF, Excel, Word · tối đa 20MB/tệp)</label>
+                <label class="border-2 border-dashed border-slate-300 hover:border-brand-500 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all text-center">
+                  <i data-lucide="upload-cloud" class="w-8 h-8 text-brand-600 mb-2"></i>
+                  <span class="text-slate-700 font-bold">Kéo thả hoặc <b class="text-brand-600 underline">bấm để chọn nhiều file</b></span>
+                  <span class="text-[11px] text-slate-400 mt-1">Hỗ trợ JPG, PNG, PDF, XLSX, DOCX (Tối đa 20MB/file)</span>
+                  <input type="file" id="ctFile" multiple class="hidden" onchange="onChonFile(this)">
+                </label>
+                <div id="ctFileList" class="space-y-1.5 mt-3"></div>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100">
+              <button type="button" onclick="resetChungTuForm()" class="px-5 py-2.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all">
+                Hủy / Làm mới
+              </button>
+              <button type="button" id="btnLuuCT" onclick="luuChungTuForm()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
+                <i data-lucide="save" class="w-4 h-4"></i> Lưu chứng từ
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -763,59 +812,292 @@
       </section>
 
       <!-- ====================================================================
-           10. PORTAL BÁO CÁO SUẤT ĂN CA BẾP
+           10. PORTAL BÁO CÁO SUẤT ĂN CA BẾP HÀNG NGÀY (FULL SCREEN & 8 CARDS)
            ==================================================================== -->
       <section id="portal-baocao" class="tab-panel space-y-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs max-w-3xl mx-auto">
-          <div class="pb-3 border-b border-slate-100 mb-4">
-            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <i data-lucide="utensils" class="w-5 h-5 text-orange-600"></i>
-              Báo Cáo Suất Ăn Ca Bếp Hàng Ngày
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">Ghi nhận số lượng suất ăn kế hoạch, thực tế, suất ăn dư/lãng phí và chất lượng thực phẩm.</p>
+        <!-- Top filter bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="w-44">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="bcVung" onchange="onSelectVung('bc')" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white"></select>
+          </div>
+          <div class="flex-1 min-w-[220px]">
+            <label class="font-bold text-slate-700 block mb-1">SITE BÁO CÁO <span class="text-rose-500">*</span></label>
+            <select id="bcSite" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white"></select>
+          </div>
+          <button onclick="resetBaoCao()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl flex items-center gap-1.5 border border-slate-300 transition-all">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
+          </button>
+        </div>
+
+        <!-- Banner cảnh báo Site -->
+        <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3 text-xs text-amber-800">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+          <div>
+            <b>Lưu ý quan trọng:</b> Chọn đúng tên <b>Site</b> mình đang quản lý (ở thanh lọc phía trên) trước khi ghi nhận và gửi báo cáo ca bếp.
+          </div>
+        </div>
+
+        <form id="bcForm" onsubmit="return false;" class="space-y-4">
+          <!-- NHÓM 1: THÔNG TIN CHUNG -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
+                1. Thông Tin Chung
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Ngày báo cáo <span class="text-rose-500">*</span></label>
+                <input type="date" id="bcNgay" name="Ngày báo cáo" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Người báo cáo <span class="text-rose-500">*</span></label>
+                <select id="bcNguoiBaoCao" onchange="bcNguoiBaoCaoChange()" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white">
+                  <option value="">-- Chọn người báo cáo --</option>
+                  <option value="Bếp trưởng">Bếp trưởng</option>
+                  <option value="Quản lý Site">Quản lý Site</option>
+                  <option value="Bếp chính">Bếp chính</option>
+                  <option value="Thủ kho">Thủ kho</option>
+                  <option value="Giám sát vận hành">Giám sát vận hành</option>
+                  <option value="Khác">Khác (Tự nhập tên)...</option>
+                </select>
+                <input type="text" id="bcNguoiBaoCaoKhac" placeholder="Nhập họ và tên người báo cáo mới" class="w-full p-2.5 border border-slate-300 rounded-xl mt-2 hidden">
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Site báo cáo <span class="text-rose-500">*</span></label>
-              <select id="bcSite" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          <!-- NHÓM 2: SỐ LIỆU SUẤT ĂN -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="utensils" class="w-4 h-4 text-orange-600"></i>
+                2. Số Liệu Suất Ăn Trong Ngày
+              </h3>
+              <span class="text-[11px] text-slate-500">Bắt buộc nhập các ô (*), có thể nhập số 0</span>
             </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Ngày báo cáo <span class="text-rose-500">*</span></label>
-              <input type="date" id="bcDate" class="w-full p-2 border border-slate-300 rounded-lg">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Suất ăn kế hoạch <span class="text-rose-500">*</span></label>
-              <input type="number" id="bcPlanned" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-lg font-mono">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Suất ăn thực tế phục vụ <span class="text-rose-500">*</span></label>
-              <input type="number" id="bcActual" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-lg font-mono">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Suất ăn hủy / lãng phí</label>
-              <input type="number" id="bcWasted" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-lg font-mono">
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">Nhân sự đi làm thực tế</label>
-              <input type="number" id="bcStaff" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-lg font-mono">
-            </div>
-            <div class="sm:col-span-2">
-              <label class="font-bold text-slate-700 block mb-1">Tình trạng thực phẩm &amp; thiết bị</label>
-              <textarea id="bcQuality" rows="2" placeholder="Chất lượng nguyên vật liệu, nhiệt độ bảo quản, máy móc..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="font-bold text-slate-700 block mb-1">Ý kiến phản hồi từ khách hàng</label>
-              <textarea id="bcFeedback" rows="2" placeholder="Ghi nhận khen ngợi hoặc khiếu nại (nếu có)..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất KH - Sáng <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcSang" name="Số suất ăn khách hàng - Sáng" oninput="tinhTongSuat()" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất KH - Trưa <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcTrua" name="Số suất ăn khách hàng - Trưa" oninput="tinhTongSuat()" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất KH - Chiều <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcChieu" name="Số suất ăn khách hàng - Chiều" oninput="tinhTongSuat()" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất Nhân viên <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcNhanVien" name="Số suất ăn nhân viên" oninput="tinhTongSuat()" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất ăn Hủy <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcHuy" name="Số suất ăn hủy" oninput="tinhTongSuat()" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right text-rose-600 font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-emerald-800 block mb-1">Tổng suất đã xuất (Tự tính)</label>
+                <input type="text" id="bcTong" value="0" disabled readonly class="w-full p-2.5 border border-emerald-300 rounded-xl font-mono tabular-nums text-right font-extrabold bg-emerald-50 text-emerald-800 text-sm">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất Lưu mẫu <span class="text-rose-500">*</span></label>
+                <input type="number" min="0" value="0" id="bcLuuMau" name="Số suất ăn lưu mẫu" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right font-bold">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất Giáo viên (Cả ngày)</label>
+                <input type="number" min="0" value="0" id="bcGiaoVien" name="Số suất ăn giáo viên (Cả ngày)" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
             </div>
           </div>
 
-          <div class="flex justify-end gap-2 mt-5 pt-3 border-t border-slate-100">
-            <button onclick="submitCateringReport()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
+          <!-- NHÓM 3: GIAO HÀNG · NGUYÊN VẬT LIỆU · THIẾT BỊ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="truck" class="w-4 h-4 text-blue-600"></i>
+                3. Giao Hàng · Nguyên Vật Liệu · Thiết Bị
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Giờ giao suất ăn so với kế hoạch</label>
+                <select id="bcGioGiao" name="Giờ giao suất ăn so với kế hoạch" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white">
+                  <option value="">-- Chọn trạng thái --</option>
+                  <option value="Đúng giờ">Đúng giờ</option>
+                  <option value="Sớm hơn">Sớm hơn</option>
+                  <option value="Trễ hơn">Trễ hơn</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Lý do nếu giao trễ</label>
+                <input type="text" id="bcLyDoTre" name="Lý do nếu giao trễ" placeholder="Ghi rõ lý do kẹt xe, chế biến chậm..." class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Tình trạng NVL (thiếu hụt/đổi trả nếu có)</label>
+                <textarea id="bcTinhTrangNVL" name="Tình trạng nguyên vật liệu (thiếu hụt/đổi trả nếu có)" rows="2" placeholder="Ghi nhận tình trạng rau củ, thịt cá, hạn dùng..." class="w-full p-2.5 border border-slate-300 rounded-xl"></textarea>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Sự cố thiết bị / máy móc (nếu có)</label>
+                <textarea id="bcSuCoThietBi" name="Sự cố thiết bị/máy móc (nếu có)" rows="2" placeholder="Tủ đông, bếp gas, lò nướng, hút mùi..." class="w-full p-2.5 border border-slate-300 rounded-xl"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- NHÓM 4: DƯ / THẤT THOÁT -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="trash-2" class="w-4 h-4 text-amber-600"></i>
+                4. Suất Ăn Dư / Thất Thoát
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Suất ăn dư/thất thoát - Số lượng</label>
+                <input type="number" min="0" value="0" id="bcSuatDu" name="Suất ăn dư/thất thoát - số lượng" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Nguyên nhân dư/thất thoát</label>
+                <input type="text" id="bcNguyenNhanDu" name="Nguyên nhân dư/thất thoát" placeholder="Khách báo hủy đột xuất, thời tiết..." class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <!-- NHÓM 5: NHÂN SỰ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
+                5. Nhân Sự Ca Bếp
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số nhân viên có mặt</label>
+                <input type="number" min="0" value="0" id="bcStaffCoMat" name="Số nhân viên có mặt" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số nhân viên vắng</label>
+                <input type="number" min="0" value="0" id="bcStaffVang" name="Số nhân viên vắng" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số nhân viên tăng ca</label>
+                <input type="number" min="0" value="0" id="bcStaffTangCa" name="Số nhân viên tăng ca" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div class="sm:col-span-3">
+                <label class="font-bold text-slate-700 block mb-1">Sự cố nhân sự (nếu có)</label>
+                <input type="text" id="bcSuCoNhanSu" name="Sự cố nhân sự (nếu có)" placeholder="Nghỉ ốm đột xuất, thiếu người ca tối..." class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <!-- NHÓM 6: PHẢN HỒI KHÁCH HÀNG -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="message-square" class="w-4 h-4 text-violet-600"></i>
+                6. Phản Hồi Từ Khách Hàng
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số lượng khiếu nại</label>
+                <input type="number" min="0" value="0" id="bcKhieuNai" name="Số lượng khiếu nại từ khách hàng" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số lượng khen ngợi</label>
+                <input type="number" min="0" value="0" id="bcKhenNgoi" name="Số lượng khen ngợi từ khách hàng" class="w-full p-2.5 border border-slate-300 rounded-xl font-mono tabular-nums text-right">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Phân loại khiếu nại</label>
+                <select id="bcPhanLoaiKhieuNai" name="Phân loại khiếu nại (nếu có)" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white">
+                  <option value="">-- Không có khiếu nại --</option>
+                  <option value="Chất lượng món ăn">Chất lượng món ăn</option>
+                  <option value="Vệ sinh an toàn thực phẩm">Vệ sinh an toàn thực phẩm</option>
+                  <option value="Thái độ phục vụ">Thái độ phục vụ</option>
+                  <option value="Số lượng/định lượng">Số lượng/định lượng</option>
+                  <option value="Giao trễ">Giao trễ</option>
+                  <option value="Khác">Khác</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Mức độ nghiêm trọng</label>
+                <select id="bcMucDo" name="Mức độ nghiêm trọng của phản ánh" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white">
+                  <option value="">-- Chọn mức độ --</option>
+                  <option value="Thấp">Thấp</option>
+                  <option value="Trung bình">Trung bình</option>
+                  <option value="Cao">Cao</option>
+                  <option value="Nghiêm trọng">Nghiêm trọng</option>
+                </select>
+              </div>
+              <div class="md:col-span-2 lg:col-span-4">
+                <label class="font-bold text-slate-700 block mb-1">Chi tiết ý kiến phản hồi từ khách hàng</label>
+                <textarea id="bcChiTietPhanHoi" name="Chi tiết ý kiến khách hàng" rows="2" placeholder="Ghi nhận cụ thể nội dung phản hồi, món ăn liên quan, thời gian..." class="w-full p-2.5 border border-slate-300 rounded-xl"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- NHÓM 7: CHI PHÍ PHÁT SINH NGOÀI KẾ HOẠCH -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="banknote" class="w-4 h-4 text-emerald-600"></i>
+                7. Chi Phí Ngoài Kế Hoạch
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Có phát sinh chi phí ngoài kế hoạch?</label>
+                <select id="bcPhatSinhChiPhi" name="Có phát sinh chi phí ngoài kế hoạch không?" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white">
+                  <option value="Không">Không</option>
+                  <option value="Có">Có</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số tiền và lý do (nếu có phát sinh)</label>
+                <input type="text" id="bcChiPhiLyDo" name="Số tiền và lý do (nếu có phát sinh)" placeholder="VD: 500.000đ - mua thêm bình gas khẩn cấp" class="w-full p-2.5 border border-slate-300 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <!-- NHÓM 8: HÌNH ẢNH & ĐỀ XUẤT -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="pb-3 border-b border-slate-100 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i data-lucide="camera" class="w-4 h-4 text-rose-600"></i>
+                8. Hình Ảnh &amp; Kiến Nghị Đề Xuất
+              </h3>
+            </div>
+            <div class="space-y-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Hình ảnh món ăn / khu bếp trong ngày (nhiều ảnh · tối đa 20MB/ảnh)</label>
+                <label class="border-2 border-dashed border-slate-300 hover:border-brand-500 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all text-center">
+                  <i data-lucide="image" class="w-8 h-8 text-rose-500 mb-2"></i>
+                  <span class="text-slate-700 font-bold">Kéo thả hoặc <b class="text-brand-600 underline">bấm để chọn ảnh</b></span>
+                  <span class="text-[11px] text-slate-400 mt-1">Ảnh thực tế khay cơm, món ăn, vệ sinh an toàn khu bếp</span>
+                  <input type="file" id="bcAnh" accept="image/*" multiple class="hidden" onchange="bcChonAnh(this)">
+                </label>
+                <div id="bcAnhList" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mt-3"></div>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Đề xuất / kiến nghị từ site (nếu có)</label>
+                <textarea id="bcDeXuat" name="Đề xuất / kiến nghị từ site (nếu có)" rows="3" placeholder="Kiến nghị nâng cấp công cụ dụng cụ, hỗ trợ nhân sự, đổi nhà cung cấp..." class="w-full p-2.5 border border-slate-300 rounded-xl"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pb-8">
+            <button type="button" onclick="resetBaoCao()" class="px-5 py-2.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all">
+              Làm mới form
+            </button>
+            <button type="button" id="btnGuiBaoCao" onclick="guiBaoCao()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
               <i data-lucide="send" class="w-4 h-4"></i> Gửi Báo Cáo Ca Bếp
             </button>
           </div>
-        </div>
+        </form>
       </section>
 
       <!-- ====================================================================
@@ -1135,7 +1417,7 @@
           App.loaiHoaDon = json.data.loaiHoaDon;
 
           // Populate Vùng selects
-          ['orderVung', 'scVung', 'hsVung', 'kkVung'].forEach(id => {
+          ['orderVung', 'ctVung', 'bcVung', 'scVung', 'hsVung', 'kkVung'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
               el.innerHTML = '<option value="">-- Tất cả vùng --</option>' +
@@ -1544,51 +1826,97 @@
     // ========================================================================
     // PORTAL: VOUCHERS, AUDIT & REPORTS
     // ========================================================================
+    // ========================================================================
+    // PORTAL: VOUCHERS (NHẬP CHỨNG TỪ & IMPORT EXCEL)
+    // ========================================================================
     let uploadedFiles = [];
-    function onSelectFiles(input) {
-      const files = Array.from(input.files);
-      files.forEach(f => uploadedFiles.push({ name: f.name, size: f.size, type: f.type }));
+
+    function onChonFile(input) {
+      const files = Array.from(input.files || []);
+      const maxBytes = 20 * 1024 * 1024; // 20MB
+      files.forEach(f => {
+        if (f.size > maxBytes) {
+          showToast(`File "${f.name}" vượt quá 20MB, vui lòng chọn file nhỏ hơn.`);
+          return;
+        }
+        uploadedFiles.push({ name: f.name, size: f.size, type: f.type || 'DOCUMENT' });
+      });
       renderUploadedFiles();
+      input.value = '';
     }
+
+    function onSelectFiles(input) {
+      onChonFile(input);
+    }
+
     function renderUploadedFiles() {
       const el = document.getElementById('ctFileList');
+      if (!el) return;
+      if (!uploadedFiles.length) {
+        el.innerHTML = '';
+        return;
+      }
       el.innerHTML = uploadedFiles.map((f, i) => `
-        <div class="flex items-center justify-between p-2 bg-slate-100 rounded-lg text-xs">
-          <span>📄 <b>${f.name}</b> (${Math.round(f.size/1024)} KB)</span>
-          <button onclick="removeFile(${i})" class="text-rose-600 font-bold">Xóa</button>
+        <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <i data-lucide="file-text" class="w-4 h-4 text-brand-600 shrink-0"></i>
+            <span class="font-bold text-slate-800 truncate">${f.name}</span>
+            <span class="text-slate-400 font-mono text-[11px]">(${Math.round(f.size / 1024)} KB)</span>
+          </div>
+          <button type="button" onclick="removeFile(${i})" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 text-xs">Xóa</button>
         </div>
       `).join('');
+      lucide.createIcons();
     }
+
     function removeFile(i) {
       uploadedFiles.splice(i, 1);
       renderUploadedFiles();
     }
-    function resetVoucherForm() {
-      document.getElementById('ctNCC').value = '';
-      document.getElementById('ctGhiChu').value = '';
+
+    function resetChungTuForm() {
+      const ncc = document.getElementById('ctNCC'); if (ncc) ncc.value = '';
+      const giao = document.getElementById('ctNguoiGiao'); if (giao) giao.value = '';
+      const nhan = document.getElementById('ctNguoiNhan'); if (nhan) nhan.value = '';
+      const ghiChu = document.getElementById('ctGhiChu'); if (ghiChu) ghiChu.value = '';
+      const fileInput = document.getElementById('ctFile'); if (fileInput) fileInput.value = '';
       uploadedFiles = [];
       renderUploadedFiles();
+      showToast('Đã làm mới form chứng từ');
     }
-    async function saveVoucher() {
-      const site = document.getElementById('ctSite').value;
-      const loai = document.getElementById('ctLoai').value;
-      const ngayXuat = document.getElementById('ctNgayXuat').value;
-      const ngayNhan = document.getElementById('ctNgayNhan').value;
 
-      if (!site || !loai || !ngayXuat || !ngayNhan) {
-        showToast('Vui lòng điền đủ các trường (*)');
-        return;
-      }
-      showLoading('Lưu chứng từ...');
+    function resetVoucherForm() {
+      resetChungTuForm();
+    }
+
+    async function luuChungTuForm() {
+      const site = document.getElementById('ctSite') ? document.getElementById('ctSite').value : '';
+      const loai = document.getElementById('ctLoai') ? document.getElementById('ctLoai').value : '';
+      const ngayXuat = document.getElementById('ctNgayXuat') ? document.getElementById('ctNgayXuat').value : '';
+      const ngayNhan = document.getElementById('ctNgayNhan') ? document.getElementById('ctNgayNhan').value : '';
+
+      if (!site) { showToast('Vui lòng chọn Site áp dụng!'); return; }
+      if (!loai) { showToast('Vui lòng chọn Loại hóa đơn / chứng từ!'); return; }
+      if (!ngayXuat || !ngayNhan) { showToast('Vui lòng nhập Ngày xuất và Ngày nhận!'); return; }
+
+      showLoading('Đang lưu chứng từ & tệp đính kèm...');
+      const btn = document.getElementById('btnLuuCT');
+      if (btn) btn.disabled = true;
+
       try {
         const payload = {
-          site, loaiHoaDon: loai, ngayXuat, ngayNhan,
-          nhaCungCap: document.getElementById('ctNCC').value,
-          nguoiNhan: document.getElementById('ctNguoiNhan').value,
-          ghiChu: document.getElementById('ctGhiChu').value,
+          site,
+          loaiHoaDon: loai,
+          ngayXuat,
+          ngayNhan,
+          nhaCungCap: document.getElementById('ctNCC') ? document.getElementById('ctNCC').value.trim() : '',
+          nguoiGiao: document.getElementById('ctNguoiGiao') ? document.getElementById('ctNguoiGiao').value.trim() : '',
+          nguoiNhan: document.getElementById('ctNguoiNhan') ? document.getElementById('ctNguoiNhan').value.trim() : '',
+          ghiChu: document.getElementById('ctGhiChu') ? document.getElementById('ctGhiChu').value.trim() : '',
           nguoiNhap: App.user ? App.user.email : 'Thủ kho Site',
           files: uploadedFiles.map(f => ({ name: f.name, url: 'https://drive.google.com/sample', type: f.type }))
         };
+
         const res = await fetch('/api/voucher', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1596,14 +1924,315 @@
         });
         const json = await res.json();
         if (json.success) {
-          showToast(`Lưu chứng từ thành công! Mã: ${json.data.maCT}`);
-          resetVoucherForm();
+          const maCT = json.data ? json.data.maCT : 'CT-SUCCESS';
+          openGeneralModal('Lưu Chứng Từ Thành Công', `
+            <div class="text-center py-4 space-y-3">
+              <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+              <div class="text-base font-extrabold text-slate-800">Chứng từ đã được lưu vào hệ thống!</div>
+              <div class="text-xs text-slate-500 font-mono">Mã chứng từ: <b class="text-brand-600 text-sm">${maCT}</b></div>
+              <div class="text-xs text-slate-600">Đã cập nhật cơ sở dữ liệu Cloudflare D1. Bạn có thể tra cứu tại tab "Tra Cứu Chứng Từ".</div>
+              <button onclick="closeGeneralModal(); switchTab('portal-search');" class="mt-2 px-5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">
+                Đến Trang Tra Cứu
+              </button>
+            </div>
+          `);
+          resetChungTuForm();
+        } else {
+          showToast('Lỗi: ' + (json.error || 'Không thể lưu chứng từ'));
         }
-      } catch (e) {
-        showToast('Lỗi: ' + e.message);
+      } catch (err) {
+        showToast('Lỗi kết nối: ' + err.message);
       } finally {
         hideLoading();
+        if (btn) btn.disabled = false;
       }
+    }
+
+    function saveVoucher() {
+      return luuChungTuForm();
+    }
+
+    // TẢI TEMPLATE EXCEL IMPORT CHỨNG TỪ (CHUẨN APTOS, NAVY #1F4E79)
+    function taiTemplateChungTu() {
+      const headers = [
+        'Mã Site', 'Tên Site', 'Loại hóa đơn', 'Ngày xuất hóa đơn (yyyy-mm-dd)',
+        'Ngày nhận hàng (yyyy-mm-dd)', 'Nhà cung cấp', 'Người giao', 'Người nhận',
+        'Ghi chú', 'Link ảnh (Drive)'
+      ];
+      const sampleRows = [
+        [
+          'K001', 'K001 - MN Bếp Ăn Đại Học Hùng Vương', 'Hóa đơn GTGT', '2026-11-15',
+          '2026-11-15', 'Công ty TNHH Thực Phẩm Sạch', 'Nguyễn Văn Giao', 'Trần Thị Nhận',
+          'Hàng giao đủ số lượng, bao bì nguyên vẹn', 'https://drive.google.com/file/d/1sample1/view'
+        ]
+      ];
+      exportStyledExcel('Template_Import_Chung_Tu.xlsx', 'ImportChungTu', headers, sampleRows, [], [0, 3, 4]);
+      showToast('Đã tải template Excel import chứng từ về máy!');
+    }
+
+    // IMPORT EXCEL HÀNG LOẠT
+    function importExcelChungTu(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const infoEl = document.getElementById('importInfo');
+      const resEl = document.getElementById('importResult');
+      if (infoEl) infoEl.textContent = `Đang đọc file: ${file.name}...`;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+          if (!rows.length) {
+            showToast('File Excel không có dòng dữ liệu nào!');
+            if (infoEl) infoEl.textContent = '';
+            input.value = '';
+            return;
+          }
+
+          // Map rows to schema
+          const items = rows.map(r => {
+            const siteVal = r['Tên Site'] || r['Site'] || r['Mã Site'] || '';
+            const loaiVal = r['Loại hóa đơn'] || r['Loại chứng từ'] || 'Hóa đơn GTGT';
+            const ngayXuat = r['Ngày xuất hóa đơn (yyyy-mm-dd)'] || r['Ngày xuất'] || '';
+            const ngayNhan = r['Ngày nhận hàng (yyyy-mm-dd)'] || r['Ngày nhận'] || '';
+            const ncc = r['Nhà cung cấp'] || '';
+            const giao = r['Người giao'] || '';
+            const nhan = r['Người nhận'] || '';
+            const ghiChu = r['Ghi chú'] || '';
+            const linkAnh = r['Link ảnh (Drive)'] || r['Link ảnh'] || '';
+
+            return {
+              site: siteVal,
+              loaiHoaDon: loaiVal,
+              ngayXuat,
+              ngayNhan,
+              nhaCungCap: ncc,
+              nguoiGiao: giao,
+              nguoiNhan: nhan,
+              ghiChu,
+              linkAnh,
+              nguoiNhap: App.user ? App.user.email : 'Import Excel'
+            };
+          }).filter(it => it.site && it.loaiHoaDon);
+
+          if (!items.length) {
+            showToast('Không tìm thấy dòng nào hợp lệ (cần có Site và Loại hóa đơn)!');
+            if (infoEl) infoEl.textContent = '';
+            input.value = '';
+            return;
+          }
+
+          showLoading(`Đang import ${items.length} chứng từ vào D1...`);
+          const resp = await fetch('/api/vouchers/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items })
+          });
+          const json = await resp.json();
+          if (json.success) {
+            if (infoEl) infoEl.textContent = '';
+            if (resEl) {
+              resEl.innerHTML = `
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
+                  <span>✓ <b>Thành công:</b> Đã import ${json.count} chứng từ vào hệ thống Cloudflare D1.</span>
+                  <button onclick="switchTab('portal-search')" class="underline font-bold">Xem danh sách</button>
+                </div>
+              `;
+            }
+            showToast(`Đã import thành công ${json.count} chứng từ!`);
+          } else {
+            showToast('Lỗi: ' + (json.error || 'Không thể import chứng từ'));
+          }
+        } catch (err) {
+          showToast('Lỗi đọc file Excel: ' + err.message);
+        } finally {
+          hideLoading();
+          input.value = '';
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ========================================================================
+    // PORTAL: BÁO CÁO SUẤT ĂN CA BẾP (8 CARDS ĐẦY ĐỦ NHƯ PORTAL CŨ)
+    // ========================================================================
+    let bcAnhFiles = [];
+
+    function bcNguoiBaoCaoChange() {
+      const sel = document.getElementById('bcNguoiBaoCao');
+      const khac = document.getElementById('bcNguoiBaoCaoKhac');
+      if (sel && khac) {
+        if (sel.value === 'Khác') {
+          khac.classList.remove('hidden');
+          khac.focus();
+        } else {
+          khac.classList.add('hidden');
+          khac.value = '';
+        }
+      }
+    }
+
+    function tinhTongSuat() {
+      const sang = parseFloat(document.getElementById('bcSang')?.value) || 0;
+      const trua = parseFloat(document.getElementById('bcTrua')?.value) || 0;
+      const chieu = parseFloat(document.getElementById('bcChieu')?.value) || 0;
+      const nv = parseFloat(document.getElementById('bcNhanVien')?.value) || 0;
+      const huy = parseFloat(document.getElementById('bcHuy')?.value) || 0;
+      const tong = sang + trua + chieu + nv + huy;
+      const tongEl = document.getElementById('bcTong');
+      if (tongEl) tongEl.value = fmtNum(tong);
+    }
+
+    function bcChonAnh(input) {
+      const files = Array.from(input.files || []);
+      const maxBytes = 20 * 1024 * 1024; // 20MB
+      files.forEach(f => {
+        if (f.size > maxBytes) {
+          showToast(`Ảnh "${f.name}" vượt quá 20MB, bỏ qua.`);
+          return;
+        }
+        const url = URL.createObjectURL(f);
+        bcAnhFiles.push({ name: f.name, size: f.size, previewUrl: url });
+      });
+      bcRenderAnh();
+      input.value = '';
+    }
+
+    function bcRenderAnh() {
+      const el = document.getElementById('bcAnhList');
+      if (!el) return;
+      if (!bcAnhFiles.length) {
+        el.innerHTML = '';
+        return;
+      }
+      el.innerHTML = bcAnhFiles.map((im, i) => `
+        <div class="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-square">
+          <img src="${im.previewUrl}" class="w-full h-full object-cover">
+          <button type="button" onclick="bcXoaAnh(${i})" class="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 opacity-90 hover:opacity-100 shadow-sm" title="Xóa ảnh">
+            <i data-lucide="x" class="w-3 h-3"></i>
+          </button>
+          <div class="absolute bottom-0 inset-x-0 bg-slate-900/60 text-[10px] text-white px-1.5 py-0.5 truncate font-mono">${im.name}</div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function bcXoaAnh(i) {
+      bcAnhFiles.splice(i, 1);
+      bcRenderAnh();
+    }
+
+    function resetBaoCao() {
+      const f = document.getElementById('bcForm');
+      if (f) f.reset();
+      const d = new Date();
+      const bcNgay = document.getElementById('bcNgay');
+      if (bcNgay) bcNgay.value = d.toISOString().split('T')[0];
+      const tongEl = document.getElementById('bcTong');
+      if (tongEl) tongEl.value = '0';
+      const khac = document.getElementById('bcNguoiBaoCaoKhac');
+      if (khac) { khac.classList.add('hidden'); khac.value = ''; }
+      bcAnhFiles = [];
+      bcRenderAnh();
+      showToast('Đã làm mới form báo cáo ca bếp');
+    }
+
+    async function guiBaoCao() {
+      const site = document.getElementById('bcSite') ? document.getElementById('bcSite').value : '';
+      if (!site) { showToast('Vui lòng chọn Site ở thanh lọc phía trên!'); return; }
+
+      const ngay = document.getElementById('bcNgay') ? document.getElementById('bcNgay').value : '';
+      if (!ngay) { showToast('Vui lòng chọn Ngày báo cáo!'); return; }
+
+      const nguoiSel = document.getElementById('bcNguoiBaoCao') ? document.getElementById('bcNguoiBaoCao').value : '';
+      const nguoiKhac = document.getElementById('bcNguoiBaoCaoKhac') ? document.getElementById('bcNguoiBaoCaoKhac').value.trim() : '';
+      const nguoiBC = (nguoiSel === 'Khác' ? nguoiKhac : nguoiSel);
+      if (!nguoiBC) { showToast('Vui lòng chọn hoặc nhập Người báo cáo!'); return; }
+
+      const sang = parseFloat(document.getElementById('bcSang')?.value) || 0;
+      const trua = parseFloat(document.getElementById('bcTrua')?.value) || 0;
+      const chieu = parseFloat(document.getElementById('bcChieu')?.value) || 0;
+      const nv = parseFloat(document.getElementById('bcNhanVien')?.value) || 0;
+      const huy = parseFloat(document.getElementById('bcHuy')?.value) || 0;
+      const luuMau = parseFloat(document.getElementById('bcLuuMau')?.value) || 0;
+      const tongXuat = sang + trua + chieu + nv + huy;
+
+      // Gom toàn bộ trường theo name từ form
+      const f = document.getElementById('bcForm');
+      const formData = {};
+      if (f) {
+        f.querySelectorAll('[name]').forEach(el => {
+          formData[el.getAttribute('name')] = el.value;
+        });
+      }
+
+      showLoading('Đang gửi báo cáo vận hành ca bếp...');
+      const btn = document.getElementById('btnGuiBaoCao');
+      if (btn) btn.disabled = true;
+
+      try {
+        const payload = {
+          site,
+          branchCode: site,
+          reportDate: ngay,
+          reporterName: nguoiBC,
+          plannedMeals: tongXuat,
+          actualMeals: tongXuat - huy,
+          wastedMeals: huy,
+          staffActual: parseFloat(document.getElementById('bcStaffCoMat')?.value) || 0,
+          staffStandard: (parseFloat(document.getElementById('bcStaffCoMat')?.value) || 0) + (parseFloat(document.getElementById('bcStaffVang')?.value) || 0),
+          foodQualityNote: document.getElementById('bcTinhTrangNVL') ? document.getElementById('bcTinhTrangNVL').value : '',
+          feedback: document.getElementById('bcChiTietPhanHoi') ? document.getElementById('bcChiTietPhanHoi').value : '',
+          extraCost: document.getElementById('bcPhatSinhChiPhi')?.value === 'Có' ? 1 : 0,
+          images: bcAnhFiles.map(im => ({ name: im.name })),
+          reportData: {
+            ...formData,
+            'Site': site,
+            'Người báo cáo': nguoiBC,
+            'Tổng suất ăn đã xuất': tongXuat,
+            'Ảnh đính kèm': bcAnhFiles.map(im => im.name)
+          }
+        };
+
+        const res = await fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          openGeneralModal('Gửi Báo Cáo Thành Công', `
+            <div class="text-center py-4 space-y-3">
+              <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+              <div class="text-base font-extrabold text-slate-800">Đã gửi báo cáo ca bếp thành công!</div>
+              <div class="text-xs text-slate-500">Site: <b>${site}</b> · Ngày: <b>${ngay}</b></div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 inline-block font-mono text-xs">
+                Tổng suất ăn đã xuất: <b class="text-emerald-700 text-sm font-extrabold">${fmtNum(tongXuat)} suất</b>
+              </div>
+              <div class="text-[11px] text-slate-500">Dữ liệu đã được lưu trữ an toàn trên Cloudflare D1.</div>
+              <button onclick="closeGeneralModal();" class="mt-2 px-6 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">
+                Đã Hiểu
+              </button>
+            </div>
+          `);
+          resetBaoCao();
+        } else {
+          showToast('Lỗi: ' + (json.error || 'Không thể lưu báo cáo'));
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối: ' + err.message);
+      } finally {
+        hideLoading();
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function submitCateringReport() {
+      return guiBaoCao();
     }
 
     async function searchVouchers() {
@@ -1834,32 +2463,7 @@
       }
     }
 
-    async function submitCateringReport() {
-      showLoading('Gửi báo cáo ca bếp...');
-      try {
-        const payload = {
-          branchCode: document.getElementById('bcSite').value,
-          reportDate: document.getElementById('bcDate').value,
-          plannedMeals: document.getElementById('bcPlanned').value,
-          actualMeals: document.getElementById('bcActual').value,
-          wastedMeals: document.getElementById('bcWasted').value,
-          staffActual: document.getElementById('bcStaff').value,
-          foodQualityNote: document.getElementById('bcQuality').value,
-          feedback: document.getElementById('bcFeedback').value
-        };
-        const res = await fetch('/api/report', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        if (json.success) showToast('Gửi báo cáo ca bếp thành công!');
-      } catch (e) {
-        showToast('Lỗi: ' + e.message);
-      } finally {
-        hideLoading();
-      }
-    }
+    
 
     // ========================================================================
     // WMS FAST RECEIPT & ISSUE MODAL OPERATIONS
