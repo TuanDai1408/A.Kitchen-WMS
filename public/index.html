@@ -2,7 +2,7 @@
 <html lang="vi" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
   
   <!-- Google Fonts: Be Vietnam Pro & JetBrains Mono (Theo quy chuẩn User) -->
@@ -62,6 +62,7 @@
       font-family: 'Be Vietnam Pro', sans-serif;
       --font-sans: 'Be Vietnam Pro', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       font-family: 'Be Vietnam Pro', sans-serif;
@@ -105,16 +106,46 @@
     .siba-card:hover {
       box-shadow: 0 10px 25px -5px rgba(237, 38, 58, 0.08), 0 8px 10px -6px rgba(237, 38, 58, 0.04);
     }
+
+    /* Mobile Sheet Transitions */
+    #mobileMenuHub.active {
+      display: flex !important;
+    }
+    #mobileMenuHub.active .sheet-backdrop {
+      opacity: 1 !important;
+    }
+    #mobileMenuHub.active .sheet-body {
+      transform: translateY(0) !important;
+    }
+    .sheet-body {
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sheet-backdrop {
+      transition: opacity 0.22s ease-out;
+    }
+    
+    /* Native Mobile Bottom Navigation */
+    .mob-nav-btn.active {
+      color: #ed263a !important;
+    }
+    .mob-nav-btn.active .mob-ic-wrap {
+      background-color: rgba(237, 38, 58, 0.12);
+      color: #ed263a;
+      transform: translateY(-2px);
+    }
+    .mob-nav-btn .mob-ic-wrap {
+      transition: all 0.2s ease-in-out;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased transition-colors duration-200">
+<body class="min-h-screen flex flex-col lg:flex-row antialiased transition-colors duration-200">
 
 
-  <!-- Mobile Overlay -->
-  <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 hidden md:hidden"></div>
+  <!-- Mobile / Tablet Drawer Overlay -->
+  <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden lg:hidden"></div>
 
-  <!-- Sidebar Component -->
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-[#161313] text-stone-800 dark:text-stone-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 md:static border-r border-stone-200 dark:border-stone-800 shadow-xl">
+  <!-- Sidebar Component (Desktop docked w-72, Tablet & Mobile off-canvas drawer) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#161313] text-stone-800 dark:text-stone-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static border-r border-stone-200 dark:border-stone-800 shadow-xl">
     
     <!-- Sidebar Header (Orbit Siba Food) -->
     <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30">
@@ -130,7 +161,7 @@
           <div class="text-[10px] font-medium text-stone-500 dark:text-stone-400 italic">Mọi việc, một quỹ đạo.</div>
         </div>
       </div>
-      <button onclick="toggleSidebar()" class="md:hidden text-stone-500 hover:text-stone-900 p-1 rounded-lg">
+      <button onclick="toggleSidebar()" class="lg:hidden text-stone-500 hover:text-stone-900 p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
@@ -266,27 +297,31 @@
   <!-- Main Container -->
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
-    <!-- Top Header Bar -->
-    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#161313]/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-      <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="md:hidden text-stone-600 dark:text-stone-300 hover:text-stone-900 p-1.5 rounded-lg border border-stone-200 dark:border-stone-700">
-          <i data-lucide="menu" class="w-5 h-5"></i>
+    <!-- Top Header Bar (Native Mobile & Tablet App Bar) -->
+    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#161313]/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-xs">
+      
+      <!-- Left: Mobile Brand & Active Tab Indicator -->
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <!-- Drawer Toggle Button (Tablet & Mobile) -->
+        <button onclick="openMobileMenuHub()" class="lg:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:scale-95 transition-transform shrink-0" title="Khởi chạy chức năng">
+          <i data-lucide="layout-grid" class="w-4 h-4 text-[#ed263a]"></i>
         </button>
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#ed263a] animate-pulse"></span>
-          <span class="font-extrabold text-stone-900 dark:text-white text-sm sm:text-base tracking-tight">ORBIT SIBA FOOD</span>
-          <span class="text-xs text-stone-400 hidden sm:inline">•</span>
-          <span class="text-xs font-semibold text-stone-600 dark:text-stone-300 hidden sm:inline">Quản Trị Chuỗi Căng Tin &amp; WMS</span>
+        
+        <!-- Brand Title / Mobile Indicator -->
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ed263a] animate-pulse shrink-0"></span>
+          <span class="font-extrabold text-stone-900 dark:text-white text-sm sm:text-base tracking-tight shrink-0">ORBIT</span>
+          <span id="mobileHeaderTitle" class="text-[11px] sm:text-xs font-bold text-[#ed263a] dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl border border-rose-200 dark:border-rose-900/60 truncate">🏆 Toàn Chuỗi</span>
         </div>
       </div>
 
-      <!-- Quick Global Filters & Controls -->
-      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <!-- Right: Mobile Quick Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         
-        <!-- Global Branch Selector -->
-        <div class="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800/80 rounded-xl px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ed263a]"></i>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-semibold text-stone-800 dark:text-stone-200 outline-none cursor-pointer text-xs max-w-[150px] sm:max-w-[200px]">
+        <!-- Global Branch Chip Selector -->
+        <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800/90 rounded-xl px-2 sm:px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs shadow-2xs">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ed263a] shrink-0"></i>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-bold text-stone-800 dark:text-stone-200 outline-none cursor-pointer text-[11px] sm:text-xs max-w-[100px] sm:max-w-[170px] truncate">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
             <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
@@ -305,22 +340,22 @@
           </select>
         </div>
 
-        <!-- Global Month Selector -->
-        <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 rounded-xl px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
+        <!-- Global Month Selector (Hidden on extra small phones, visible on sm+) -->
+        <div class="hidden sm:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/90 rounded-xl px-2 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-stone-500"></i>
           <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-stone-800 dark:text-stone-200 outline-none text-xs">
         </div>
 
         <!-- Theme Toggle Button -->
-        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 transition-colors">
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="p-1.5 sm:p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 active:scale-95 transition-all">
           <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
         </button>
 
       </div>
     </header>
 
-    <!-- Main Content Body -->
-    <main class="flex-1 p-3 sm:p-5 overflow-y-auto">
+    <!-- Main Content Body (pb-24 on mobile/tablet to clear the bottom navigation bar) -->
+    <main class="flex-1 p-3 sm:p-5 pb-24 lg:pb-8 overflow-y-auto">
 
 
       <!-- ====================================================================
@@ -1777,6 +1812,295 @@
         </div>
       </section>
 
+  <!-- ========================================================================
+       NATIVE MOBILE & TABLET BOTTOM NAVIGATION BAR
+       ======================================================================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white/95 dark:bg-[#161313]/95 backdrop-blur-xl border-t border-stone-200/90 dark:border-stone-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),6px)] pt-1 px-2 select-none">
+    <div class="flex items-center justify-around max-w-lg mx-auto">
+      
+      <!-- Tab 1: P&L Chuỗi -->
+      <button onclick="switchTab('fnb-chain')" id="mobTab-fnb-chain" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:scale-95 transition-all text-[#ed263a] font-bold">
+        <div class="mob-ic-wrap p-1.5 rounded-xl">
+          <i data-lucide="trophy" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] tracking-tight mt-0.5">Chuỗi F&amp;B</span>
+      </button>
+
+      <!-- Tab 2: Kho FEFO -->
+      <button onclick="switchTab('wh-stock')" id="mobTab-wh-stock" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:scale-95 transition-all text-stone-400 dark:text-stone-500 font-medium">
+        <div class="mob-ic-wrap p-1.5 rounded-xl">
+          <i data-lucide="package" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] tracking-tight mt-0.5">Kho FEFO</span>
+      </button>
+
+      <!-- Tab 3: Center Elevated FAB - Nhập Chứng Từ -->
+      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:scale-90 transition-transform px-2 group">
+        <div class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-[#ed263a] via-[#e0192e] to-[#ab0521] text-white shadow-lg shadow-rose-900/35 flex items-center justify-center border-4 border-white dark:border-[#161313] transition-all group-hover:scale-105">
+          <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
+        </div>
+        <span class="text-[9.5px] font-extrabold text-[#ed263a] dark:text-rose-400 mt-0.5">Nhập Từ</span>
+      </button>
+
+      <!-- Tab 4: Suất Ăn Ca Bếp -->
+      <button onclick="switchTab('portal-baocao')" id="mobTab-portal-baocao" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:scale-95 transition-all text-stone-400 dark:text-stone-500 font-medium">
+        <div class="mob-ic-wrap p-1.5 rounded-xl">
+          <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] tracking-tight mt-0.5">Suất Ăn</span>
+      </button>
+
+      <!-- Tab 5: Menu 9 Chấm / Launcher Hub -->
+      <button onclick="openMobileMenuHub()" id="mobTab-hub" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:scale-95 transition-all text-stone-400 dark:text-stone-500 font-medium">
+        <div class="mob-ic-wrap p-1.5 rounded-xl">
+          <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] tracking-tight mt-0.5">Tất Cả</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ========================================================================
+       NATIVE MOBILE & TABLET FEATURE LAUNCHER (BOTTOM SHEET / APP HUB)
+       ======================================================================== -->
+  <div id="mobileMenuHub" class="fixed inset-0 z-50 hidden flex-col justify-end select-none">
+    <!-- Backdrop Blur -->
+    <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-black/60 backdrop-blur-xs opacity-0"></div>
+    
+    <!-- Sheet Container -->
+    <div class="sheet-body relative z-10 w-full max-h-[90vh] bg-white dark:bg-[#161313] rounded-t-3xl border-t border-stone-200 dark:border-stone-800 shadow-2xl flex flex-col translate-y-full">
+      
+      <!-- Top Drag Handle & Header -->
+      <div class="px-5 pt-3 pb-3 border-b border-stone-100 dark:border-stone-800/80 shrink-0">
+        <div class="w-12 h-1.5 rounded-full bg-stone-300 dark:bg-stone-700 mx-auto mb-3 cursor-grab"></div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ed263a] to-[#d01a2f] text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-rose-900/20">
+              <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="font-extrabold text-stone-900 dark:text-white text-base leading-tight">Trung Tâm Ứng Dụng</div>
+              <div class="text-[11px] text-stone-500 dark:text-stone-400">Orbit Siba Food • 15 Chức năng vận hành</div>
+            </div>
+          </div>
+          <button onclick="closeMobileMenuHub()" class="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-full bg-stone-100 dark:bg-stone-800 active:scale-90 transition-transform">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Quick Live Search Input -->
+        <div class="mt-3 relative">
+          <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="mobileHubSearchInput" oninput="filterMobileHubFeatures(this.value)" placeholder="Tìm chức năng (P&amp;L, kho, FEFO, đặt hàng, báo cáo...)" class="w-full pl-10 pr-4 py-2 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 text-xs text-stone-900 dark:text-white outline-none focus:border-[#ed263a]">
+        </div>
+      </div>
+
+      <!-- Scrollable App Categories Grid -->
+      <div id="mobileHubScrollArea" class="p-4 overflow-y-auto space-y-5 custom-scrollbar text-xs">
+        
+        <!-- Category 1: P&L & Chuỗi Căn Tin -->
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-[#ed263a]">1. P&amp;L &amp; Chuỗi Căng Tin</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950 dark:text-rose-300">Orbit Model</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-[#ed263a] flex items-center justify-center shrink-0">
+                <i data-lucide="trophy" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Toàn Chuỗi</div>
+                <div class="text-[10px] text-stone-500 truncate">14 Điểm bán</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('fnb-pl')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">P&amp;L Điểm Bán</div>
+                <div class="text-[10px] text-stone-500 truncate">Prime Cost, EBITDA</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('fnb-pos')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Doanh Thu POS</div>
+                <div class="text-[10px] text-stone-500 truncate">Khung giờ vàng</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 2: Kho Gia Vị & Vận Hành Bếp -->
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-stone-500">2. Kho Vận &amp; Bếp Ăn (WMS)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300">WMS</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('wh-dashboard')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-stone-500/10 text-stone-700 dark:text-stone-300 flex items-center justify-center shrink-0">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Tổng Quan Kho</div>
+                <div class="text-[10px] text-stone-500 truncate">KPIs kho vận</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Hạn Dùng &amp; FEFO</div>
+                <div class="text-[10px] text-stone-500 truncate">Lô cận date</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-reorder')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Cảnh Báo ROP</div>
+                <div class="text-[10px] text-stone-500 truncate">Điểm đặt hàng</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-leadtime')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                <i data-lucide="truck" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Lead Time NCC</div>
+                <div class="text-[10px] text-stone-500 truncate">Độ trễ giao</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-posap')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
+                <i data-lucide="file-check-2" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Đơn PO SAP</div>
+                <div class="text-[10px] text-stone-500 truncate">Phân tích PPV</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 3: Vật Tư & Nghiệp Vụ Bếp -->
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-stone-500">3. Vật Tư &amp; Chứng Từ Ca Bếp</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950 dark:text-rose-300">Ca Bếp</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('portal-voucher')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-[#ed263a] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <i data-lucide="receipt" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-extrabold text-[#ed263a] dark:text-rose-400 truncate">Nhập Chứng Từ</div>
+                <div class="text-[10px] text-stone-500 truncate">Full Screen</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-search')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-stone-500/10 text-stone-700 dark:text-stone-300 flex items-center justify-center shrink-0">
+                <i data-lucide="search" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Tra Cứu Từ</div>
+                <div class="text-[10px] text-stone-500 truncate">Xem ảnh &amp; duyệt</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-order')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Đặt Hàng CCDC</div>
+                <div class="text-[10px] text-stone-500 truncate">Theo ngân sách</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-history')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-stone-500/10 text-stone-700 dark:text-stone-300 flex items-center justify-center shrink-0">
+                <i data-lucide="history" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Lịch Sử Đơn</div>
+                <div class="text-[10px] text-stone-500 truncate">Tiến độ giao</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-baocao')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
+                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Báo Cáo Suất Ăn</div>
+                <div class="text-[10px] text-stone-500 truncate">8 nhóm nghiệp vụ</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-kiemke')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
+                <i data-lucide="check-square" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Kiểm Kê Kỳ</div>
+                <div class="text-[10px] text-stone-500 truncate">So khớp tồn</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category 4: Hệ Thống & Quản Trị -->
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-stone-500">4. Hệ Thống &amp; Danh Mục</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('fnb-sites')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">14 Điểm Bán SAP</div>
+                <div class="text-[10px] text-stone-500 truncate">Danh mục chuẩn</div>
+              </div>
+            </button>
+            <button onclick="openAuthModal('login'); closeMobileMenuHub();" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Đăng Nhập Admin</div>
+                <div class="text-[10px] text-stone-500 truncate">Phân quyền bảo mật</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sheet Footer: Quick Actions -->
+      <div class="p-3 border-t border-stone-100 dark:border-stone-800/80 bg-stone-50 dark:bg-stone-900/40 flex items-center justify-between text-xs shrink-0">
+        <button onclick="toggleTheme()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-semibold text-stone-700 dark:text-stone-300 active:scale-95 transition-transform">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+          <span>Giao diện Sáng/Tối</span>
+        </button>
+        <button onclick="dangXuatAdmin(); closeMobileMenuHub();" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold active:scale-95 transition-transform">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>Đăng xuất</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+
 
     </main>
   </div>
@@ -1901,7 +2225,9 @@
        INTEGRATED APPLICATION JAVASCRIPT
        ======================================================================== -->
   
+
 <script>
+
 
     // Global App State
     let App = {
@@ -1963,12 +2289,22 @@
       }
 
       // Close mobile drawer on tab click
-      if (window.innerWidth < 768) {
-        document.getElementById('sidebar').classList.add('-translate-x-full');
-        document.getElementById('overlay').classList.add('hidden');
+      if (window.innerWidth < 1024) {
+        document.getElementById('sidebar')?.classList.add('-translate-x-full');
+        document.getElementById('overlay')?.classList.add('hidden');
       }
+      if (typeof updateMobileNavState === 'function') {
+        updateMobileNavState(tabId);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // Load specific tab data
+      
+      // Orbit Siba F&B Tab Hooks
+      if (tabId === 'fnb-chain') loadFnbChain();
+      if (tabId === 'fnb-pl') loadFnbPL();
+      if (tabId === 'fnb-pos') loadFnbPOS();
+      if (tabId === 'fnb-sites') loadFnbSites();
       
       // Orbit Siba F&B Tab Hooks
       if (tabId === 'fnb-chain') loadFnbChain();
@@ -3366,7 +3702,6 @@
     }
 
     window.addEventListener('DOMContentLoaded', initSystem);
-  
 
 // ============================================================================
 // ORBIT SIBA FOOD - CLIENT SCRIPT ENGINE & ENHANCEMENTS
@@ -3399,6 +3734,91 @@ function toggleTheme() {
     document.documentElement.classList.remove('dark');
   }
 })();
+
+// ============================================================================
+// NATIVE MOBILE & TABLET APP NAVIGATION SYSTEM
+// ============================================================================
+
+const TAB_META = {
+  'fnb-chain': { title: '🏆 Toàn Chuỗi', mobTab: 'fnb-chain' },
+  'fnb-pl': { title: '📊 Báo Cáo P&L', mobTab: 'fnb-chain' },
+  'fnb-pos': { title: '⚡ Doanh Thu POS', mobTab: 'fnb-chain' },
+  'fnb-sites': { title: '🏢 14 Điểm Bán SAP', mobTab: 'hub' },
+  'wh-dashboard': { title: '📈 Tổng Quan Kho', mobTab: 'wh-stock' },
+  'wh-stock': { title: '📦 Hạn Dùng & FEFO', mobTab: 'wh-stock' },
+  'wh-reorder': { title: '⚠️ Cảnh Báo ROP', mobTab: 'wh-stock' },
+  'wh-leadtime': { title: '⏱️ Lead Time NCC', mobTab: 'wh-stock' },
+  'wh-posap': { title: '📑 Đơn PO SAP', mobTab: 'wh-stock' },
+  'portal-voucher': { title: '🧾 Nhập Chứng Từ', mobTab: 'portal-voucher' },
+  'portal-search': { title: '🔍 Tra Cứu Chứng Từ', mobTab: 'portal-voucher' },
+  'portal-order': { title: '🛒 Đặt Hàng CCDC', mobTab: 'hub' },
+  'portal-history': { title: '📜 Lịch Sử Đơn', mobTab: 'hub' },
+  'portal-baocao': { title: '📋 Báo Cáo Suất Ăn', mobTab: 'portal-baocao' },
+  'portal-kiemke': { title: '⚖️ Kiểm Kê Tồn Kho', mobTab: 'hub' }
+};
+
+function openMobileMenuHub() {
+  const hub = document.getElementById('mobileMenuHub');
+  if (!hub) return;
+  hub.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    hub.classList.add('active');
+  });
+  document.body.classList.add('overflow-hidden');
+  const input = document.getElementById('mobileHubSearchInput');
+  if (input) {
+    input.value = '';
+    filterMobileHubFeatures('');
+  }
+  lucide.createIcons();
+}
+
+function closeMobileMenuHub() {
+  const hub = document.getElementById('mobileMenuHub');
+  if (!hub) return;
+  hub.classList.remove('active');
+  document.body.classList.remove('overflow-hidden');
+  setTimeout(() => {
+    hub.classList.add('hidden');
+  }, 260);
+}
+
+function filterMobileHubFeatures(val) {
+  const q = String(val || '').toLowerCase().trim();
+  document.querySelectorAll('.hub-item').forEach(el => {
+    if (!q || el.textContent.toLowerCase().includes(q)) {
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+function switchFromHub(tabId) {
+  closeMobileMenuHub();
+  switchTab(tabId);
+}
+
+function updateMobileNavState(tabId) {
+  // Update mobile header title badge
+  const titleEl = document.getElementById('mobileHeaderTitle');
+  if (titleEl && TAB_META[tabId]) {
+    titleEl.textContent = TAB_META[tabId].title;
+  }
+
+  // Update bottom navigation bar
+  const activeMobGroup = TAB_META[tabId]?.mobTab || 'hub';
+  document.querySelectorAll('.mob-nav-btn').forEach(btn => {
+    btn.classList.remove('active', 'text-[#ed263a]', 'font-bold');
+    btn.classList.add('text-stone-400', 'dark:text-stone-500', 'font-medium');
+  });
+
+  const activeBtn = document.getElementById(`mobTab-${activeMobGroup}`);
+  if (activeBtn) {
+    activeBtn.classList.remove('text-stone-400', 'dark:text-stone-500', 'font-medium');
+    activeBtn.classList.add('active', 'text-[#ed263a]', 'font-bold');
+  }
+}
 
 // Active F&B Chain State
 let gChainRankings = [];
@@ -3969,7 +4389,10 @@ function exportFnbPLExcel() {
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadFnbChain, 300);
+  setTimeout(() => {
+    loadFnbChain();
+    updateMobileNavState('fnb-chain');
+  }, 300);
 });
 </script>
 </body>
