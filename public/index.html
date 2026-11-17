@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A.Kitchen • Quản Trị Kho &amp; Vật Tư Tập Trung</title>
+  <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
   
-  <!-- Google Fonts: Be Vietnam Pro & JetBrains Mono -->
+  <!-- Google Fonts: Be Vietnam Pro & JetBrains Mono (Theo quy chuẩn User) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,6 +19,7 @@
 
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -26,14 +27,26 @@
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
+            siba: {
+              50: '#fff4f3',
+              100: '#ffe4e4',
+              200: '#ffcccc',
+              300: '#ff9999',
+              400: '#ff6666',
+              500: '#ed263a', // Siba Red Primary
+              600: '#d01a2f',
+              700: '#ab0521',
+              800: '#8c041b',
+              900: '#52020f'
+            },
             brand: {
-              50: '#F0FDFA',
-              100: '#CCFBF1',
-              500: '#14B8A6',
-              600: '#0D9488',
-              700: '#0F766E',
-              800: '#115E59',
-              900: '#134E4A'
+              50: '#fff4f3',
+              100: '#ffe4e4',
+              500: '#ed263a',
+              600: '#d01a2f',
+              700: '#ab0521',
+              800: '#8c041b',
+              900: '#52020f'
             }
           }
         }
@@ -42,22 +55,30 @@
   </script>
 
   <style>
+    @theme {
+      --font-sans: 'Be Vietnam Pro', sans-serif;
+    }
     :root {
+      font-family: 'Be Vietnam Pro', sans-serif;
       --font-sans: 'Be Vietnam Pro', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
     }
     body {
-      font-family: var(--font-sans);
-      background-color: #F8FAFC;
-      color: #0F172A;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #f6f5f3;
+      color: #1a1616;
+    }
+    .dark body {
+      background-color: #0f0d0d;
+      color: #f5f2f2;
     }
     .font-mono, .num, code, .pos-mono, .font-receipt {
-      font-family: var(--font-mono) !important;
-      font-feature-settings: 'tnum' 1;
+      font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
+      font-feature-settings: 'tnum' 1; /* Cố định độ rộng chữ số */
     }
     .tab-panel {
       display: none;
-      animation: fadeIn 0.2s ease-in-out;
+      animation: fadeIn 0.18s ease-in-out;
     }
     .tab-panel.active {
       display: block;
@@ -74,169 +95,819 @@
       background: #CBD5E1;
       border-radius: 4px;
     }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #3F3F46;
+    }
+    /* Siba Theme Card Transitions */
+    .siba-card {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .siba-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(237, 38, 58, 0.08), 0 8px 10px -6px rgba(237, 38, 58, 0.04);
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased overflow-x-hidden">
+<body class="min-h-screen flex flex-col md:flex-row antialiased transition-colors duration-200">
 
-  <!-- ========================================================================
-       SIDEBAR NAVIGATION (RESPONSIVE DRAWER ON MOBILE, FIXED ON DESKTOP)
-       ======================================================================== -->
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 md:static border-r border-slate-800 shadow-xl">
+
+  <!-- Mobile Overlay -->
+  <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 hidden md:hidden"></div>
+
+  <!-- Sidebar Component -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-[#161313] text-stone-800 dark:text-stone-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 md:static border-r border-stone-200 dark:border-stone-800 shadow-xl">
     
-    <!-- Sidebar Header -->
-    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+    <!-- Sidebar Header (Orbit Siba Food) -->
+    <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-brand-900/40">
-          AK
+        <div class="h-10 px-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 flex items-center justify-center shadow-xs">
+          <img src="https://sibafood.sudv.vn/uploads/upl_D1TuykW3Ib/comngonsiba-ngang-do%201.png" alt="Siba Food" class="h-6 object-contain" onerror="this.onerror=null;this.src='https://drive.google.com/thumbnail?id=1ec6FndqT-n4ki-4YzDbSwjS2_26caPLJ&sz=w160';">
         </div>
         <div>
-          <div class="font-extrabold text-white text-base leading-tight tracking-tight">A.Kitchen WMS</div>
-          <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Kho &amp; Vật Tư Đa Điểm</div>
+          <div class="font-extrabold text-stone-900 dark:text-white text-sm leading-tight tracking-tight flex items-center gap-1.5">
+            <span>A.Kitchen</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-[#ed263a] text-white">ORBIT</span>
+          </div>
+          <div class="text-[10px] font-medium text-stone-500 dark:text-stone-400 italic">Mọi việc, một quỹ đạo.</div>
         </div>
       </div>
-      <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+      <button onclick="toggleSidebar()" class="md:hidden text-stone-500 hover:text-stone-900 p-1 rounded-lg">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
 
     <!-- Navigation Links -->
-    <nav class="flex-1 overflow-y-auto p-3 space-y-6 custom-scrollbar text-xs">
+    <nav class="flex-1 overflow-y-auto p-3 space-y-5 custom-scrollbar text-xs">
       
-      <!-- PHÂN HỆ 1: QUẢN LÝ KHO & FEFO -->
+      <!-- PHÂN HỆ 1: P&L & CHUỖI CĂNG TIN (ORBIT SIBA FOOD) -->
       <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-slate-400 flex items-center justify-between">
-          <span>Quản Lý Kho &amp; FEFO</span>
-          <span class="text-[9px] px-1.5 py-0.5 rounded bg-brand-900/60 text-brand-300 font-mono">WMS</span>
+        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-[#ed263a] dark:text-[#ff6666] flex items-center justify-between">
+          <span>P&amp;L &amp; Chuỗi Căng Tin</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-100 text-[#d01a2f] dark:bg-rose-950/60 dark:text-rose-300 font-extrabold">NEW</span>
         </div>
         <div class="space-y-1">
-          <button onclick="switchTab('wh-dashboard', this)" class="nav-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all bg-brand-600 text-white shadow-md shadow-brand-900/30">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-            <span>Tổng Quan Điểm Kho</span>
+          <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-semibold transition-all duration-150 active bg-[#ed263a] text-white shadow-md shadow-rose-900/20">
+            <i data-lucide="trophy" class="w-4 h-4"></i>
+            <span>Toàn Chuỗi &amp; Xếp Hạng</span>
           </button>
-          <button onclick="switchTab('wh-stock', this)" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <div class="flex items-center gap-3">
-              <i data-lucide="hourglass" class="w-4 h-4 text-amber-400"></i>
-              <span>Hạn Dùng &amp; FEFO</span>
-            </div>
-            <span id="badgeCritNav" class="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-rose-500/20 text-rose-300">0</span>
+          <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-rose-500"></i>
+            <span>Báo Cáo P&amp;L Điểm Bán</span>
           </button>
-          <button onclick="switchTab('wh-reorder', this)" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <div class="flex items-center gap-3">
-              <i data-lucide="shopping-cart" class="w-4 h-4 text-blue-400"></i>
-              <span>Cảnh Báo Đặt Hàng (ROP)</span>
-            </div>
-            <span id="badgeRopNav" class="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-300">0</span>
-          </button>
-          <button onclick="switchTab('wh-leadtime', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="truck" class="w-4 h-4 text-emerald-400"></i>
-            <span>Lead Time &amp; SLA NCC</span>
-          </button>
-          <button onclick="switchTab('wh-posap', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="file-diff" class="w-4 h-4 text-purple-400"></i>
-            <span>Đơn PO &amp; Giá S (SAP)</span>
+          <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+            <span>Doanh Thu POS &amp; Bán Lẻ</span>
           </button>
         </div>
       </div>
 
-      <!-- PHÂN HỆ 2: VẬT TƯ & CHỨNG TỪ (PORTAL) -->
+      <!-- PHÂN HỆ 2: KHO GIA VỊ, FEFO & WMS -->
       <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-slate-400 flex items-center justify-between">
-          <span>Vật Tư &amp; Chứng Từ</span>
-          <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-mono">PORTAL</span>
+        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center justify-between">
+          <span>Kho Vận &amp; Bếp Ăn (WMS)</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold">WMS</span>
         </div>
         <div class="space-y-1">
-          <button onclick="switchTab('portal-order', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="clipboard-list" class="w-4 h-4 text-brand-400"></i>
-            <span>Đặt Hàng Vật Tư (CCDC)</span>
+          <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Tổng Quan Kho Vận</span>
           </button>
-          <button onclick="switchTab('portal-voucher', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="receipt" class="w-4 h-4 text-sky-400"></i>
-            <span>Nhập Chứng Từ Giao Nhận</span>
+          <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-500"></i>
+            <span>Hạn Dùng &amp; Xuất FEFO</span>
           </button>
-          <button onclick="switchTab('portal-search', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="search" class="w-4 h-4 text-indigo-400"></i>
-            <span>Tra Cứu Chứng Từ &amp; Tệp</span>
+          <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+            <span>Cảnh Báo Đặt Hàng (ROP)</span>
           </button>
-          <button onclick="switchTab('portal-history', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="history" class="w-4 h-4 text-teal-400"></i>
-            <span>Lịch Sử Đặt &amp; Quy Trình</span>
+          <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="truck" class="w-4 h-4 text-blue-500"></i>
+            <span>Lead Time Nhà Cung Cấp</span>
           </button>
-          <button onclick="switchTab('portal-baocao', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="utensils" class="w-4 h-4 text-orange-400"></i>
+          <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="file-check-2" class="w-4 h-4 text-purple-500"></i>
+            <span>Đơn PO SAP &amp; PPV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PHÂN HỆ 3: VẬT TƯ & CHỨNG TỪ CA BẾP -->
+      <div>
+        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center justify-between">
+          <span>Vật Tư &amp; Chứng Từ</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold">PORTAL</span>
+        </div>
+        <div class="space-y-1">
+          <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="receipt" class="w-4 h-4 text-rose-500"></i>
+            <span>Nhập Chứng Từ (Full Screen)</span>
+          </button>
+          <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Tra Cứu Chứng Từ</span>
+          </button>
+          <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-500"></i>
+            <span>Đặt Hàng CCDC / Vật Tư</span>
+          </button>
+          <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="history" class="w-4 h-4"></i>
+            <span>Lịch Sử Đặt Hàng</span>
+          </button>
+          <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-indigo-500"></i>
             <span>Báo Cáo Suất Ăn Ca Bếp</span>
           </button>
-          <button onclick="switchTab('portal-kiemke', this)" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:text-white text-slate-300">
-            <i data-lucide="boxes" class="w-4 h-4 text-rose-400"></i>
+          <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="check-square" class="w-4 h-4 text-sky-500"></i>
             <span>Kiểm Kê Tồn Kho Kỳ</span>
           </button>
         </div>
       </div>
+
+      <!-- PHÂN HỆ 4: HỆ THỐNG & DANH MỤC -->
+      <div>
+        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400">
+          <span>Hệ Thống &amp; Danh Mục</span>
+        </div>
+        <div class="space-y-1">
+          <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="building-2" class="w-4 h-4 text-blue-500"></i>
+            <span>Danh Mục 14 Điểm Bán</span>
+          </button>
+          <button onclick="openAuthModal('login')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+            <span id="navAuthLabel">Đăng Nhập Quản Trị</span>
+          </button>
+        </div>
+      </div>
+
     </nav>
 
-    <!-- Sidebar Admin Footer -->
-    <div class="p-3 border-t border-slate-800 bg-slate-950/40 text-xs">
-      <div id="adminLoggedOut" class="space-y-2">
-        <button onclick="openAuthModal('login')" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition-all">
-          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span>Đăng nhập Ban Quản Trị</span>
-        </button>
-      </div>
-      <div id="adminLoggedIn" class="hidden flex items-center justify-between p-2 rounded-xl bg-slate-800/80 border border-slate-700">
-        <div class="flex items-center gap-2.5 overflow-hidden">
-          <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs" id="adAva">A</div>
+    <!-- Sidebar Footer -->
+    <div class="p-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div id="userAvatar" class="w-8 h-8 rounded-full bg-[#ed263a] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            AD
+          </div>
           <div class="overflow-hidden">
-            <div class="font-bold text-slate-200 truncate" id="adName">Admin</div>
-            <div class="text-[10px] text-emerald-400 font-medium" id="adStatus">Quản trị viên</div>
+            <div id="sidebarUserName" class="font-bold text-xs text-stone-900 dark:text-white truncate">Ban Quản Trị Chuỗi</div>
+            <div id="sidebarUserRole" class="text-[10px] text-stone-500 dark:text-stone-400 truncate">Orbit Admin • Tân Long</div>
           </div>
         </div>
-        <button onclick="logoutAdmin()" class="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg transition-colors" title="Đăng xuất">
+        <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 text-stone-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-stone-800 transition-colors">
           <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
+
   </aside>
 
-  <!-- Mobile Backdrop Overlay -->
-  <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-30 hidden md:hidden"></div>
-
-  <!-- ========================================================================
-       MAIN APP CONTAINER
-       ======================================================================== -->
-  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+  <!-- Main Container -->
+  <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
-    <!-- Topbar -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 sm:px-6 py-3 flex items-center justify-between gap-4 shadow-2xs">
+    <!-- Top Header Bar -->
+    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#161313]/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
       <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg border border-slate-200">
+        <button onclick="toggleSidebar()" class="md:hidden text-stone-600 dark:text-stone-300 hover:text-stone-900 p-1.5 rounded-lg border border-stone-200 dark:border-stone-700">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
-        <div>
-          <span class="text-xs font-semibold text-slate-600 block">Địa Điểm / Chi Nhánh:</span>
-          <select id="branchSelector" onchange="onGlobalBranchChange(this.value)" class="font-bold text-sm text-slate-900 bg-transparent border-none p-0 focus:ring-0 cursor-pointer">
-            <option value="k505">K505 - Hub Đa Phúc</option>
-            <option value="k504">K504 - Hub An Khánh</option>
-            <option value="k001">K001 - Bếp Ăn ĐH Hùng Vương</option>
-            <option value="k004">K004 - A.Kitchen Thuận An</option>
-          </select>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ed263a] animate-pulse"></span>
+          <span class="font-extrabold text-stone-900 dark:text-white text-sm sm:text-base tracking-tight">ORBIT SIBA FOOD</span>
+          <span class="text-xs text-stone-400 hidden sm:inline">•</span>
+          <span class="text-xs font-semibold text-stone-600 dark:text-stone-300 hidden sm:inline">Quản Trị Chuỗi Căng Tin &amp; WMS</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Cloudflare D1 Live
-        </span>
-        <div class="hidden sm:block text-xs font-medium text-slate-600" id="currentDateDisplay">—</div>
+      <!-- Quick Global Filters & Controls -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        
+        <!-- Global Branch Selector -->
+        <div class="flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800/80 rounded-xl px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ed263a]"></i>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-semibold text-stone-800 dark:text-stone-200 outline-none cursor-pointer text-xs max-w-[150px] sm:max-w-[200px]">
+            <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
+            <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
+            <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
+            <option value="K003">K003 - MN A.Kitchen - Căn Tin Siba</option>
+            <option value="K004">K004 - MB Bếp Cơ Sở Hoàng Mai</option>
+            <option value="K005">K005 - MN A.Kitchen - Hub Thuận An</option>
+            <option value="K006">K006 - MN Bếp Ăn ĐH Văn Hiến Q.12</option>
+            <option value="K007">K007 - MN Bếp Ăn TH Vinschool GP</option>
+            <option value="K008">K008 - MN Bếp Ăn TH Nguyễn Khuyến</option>
+            <option value="K009">K009 - MN Bếp Trung Tâm Tân Bình</option>
+            <option value="K010">K010 - MB Căn Tin BV Bạch Mai</option>
+            <option value="K011">K011 - MN Bếp Vận Hành Thủ Đức</option>
+            <option value="K012">K012 - MN Căn Tin KCN Tân Tạo</option>
+            <option value="K013">K013 - MB Căn Tin ĐH Thăng Long</option>
+            <option value="K014">K014 - MN Bếp Ăn KCN VSIP 1</option>
+          </select>
+        </div>
+
+        <!-- Global Month Selector -->
+        <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800/80 rounded-xl px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-stone-500"></i>
+          <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-stone-800 dark:text-stone-200 outline-none text-xs">
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 transition-colors">
+          <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
       </div>
     </header>
 
-    <!-- CONTENT PANELS CONTAINER -->
-    <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
+    <!-- Main Content Body -->
+    <main class="flex-1 p-3 sm:p-5 overflow-y-auto">
+
 
       <!-- ====================================================================
-           1. WMS DASHBOARD
+           PHÂN HỆ F&B 1: TOÀN CHUỖI & XẾP HẠNG 14 ĐIỂM BÁN (ORBIT SIBA FOOD)
            ==================================================================== -->
-      <section id="wh-dashboard" class="tab-panel active space-y-5">
+      <section id="fnb-chain" class="tab-panel active space-y-5">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-rose-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#ed263a] text-white tracking-wide uppercase">Orbit Siba Food</span>
+                <span class="text-xs text-stone-300">Quản Trị Chuỗi Căng Tin &amp; F&amp;B</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Xếp Hạng &amp; Mục Tiêu Toàn Chuỗi</h1>
+              <p class="text-xs text-stone-300 mt-1">Giám sát doanh thu thuần, tỷ lệ Food Cost, Labor Cost (COL) và lợi nhuận EBITDA 14 điểm bán.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportFnbChainExcel()" class="px-3.5 py-2 rounded-xl bg-white text-stone-900 font-bold text-xs flex items-center gap-2 hover:bg-stone-100 shadow-md transition-all">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
+                <span>Xuất Excel Chuẩn (Aptos)</span>
+              </button>
+              <button onclick="loadFnbChain()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors" title="Tải lại dữ liệu">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Top KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
+              <span class="font-bold">Tổng Doanh Thu Chuỗi</span>
+              <div class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-[#ed263a]">
+                <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainTotalRevenue">6,347,000,000đ</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+              <span>Đạt 105.8% kế hoạch tháng (14 Điểm bán)</span>
+            </div>
+          </div>
+
+          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
+              <span class="font-bold">Lợi Nhuận EBITDA Chuỗi</span>
+              <div class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainTotalProfit">1,548,000,000đ</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-stone-500 dark:text-stone-400 font-medium mt-1">
+              <span>Biên EBITDA trung bình: </span>
+              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="chainAvgMargin">24.4%</span>
+            </div>
+          </div>
+
+          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
+              <span class="font-bold">Food Cost TB Chuỗi</span>
+              <div class="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600">
+                <i data-lucide="utensils" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainAvgFoodCost">42.4%</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-1">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              <span>Trong định mức mục tiêu (&le; 43.0%)</span>
+            </div>
+          </div>
+
+          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
+              <span class="font-bold">Labor Cost (COL) Chuỗi</span>
+              <div class="p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-600">
+                <i data-lucide="users" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainAvgLaborCost">18.2%</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-purple-600 dark:text-purple-400 font-semibold mt-1">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              <span>Tối ưu chi phí nhân sự (&le; 19.0%)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="bg-white dark:bg-[#161313] p-3 rounded-2xl border border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-stone-700 dark:text-stone-300">Vùng vận hành:</span>
+            <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
+              <button onclick="filterFnbChainByRegion('ALL')" id="filterRegALL" class="px-3 py-1 rounded-lg font-bold bg-[#ed263a] text-white shadow-xs">Tất Cả (14)</button>
+              <button onclick="filterFnbChainByRegion('Miền Nam')" id="filterRegMN" class="px-3 py-1 rounded-lg font-medium text-stone-600 dark:text-stone-300 hover:text-stone-900">Miền Nam (10)</button>
+              <button onclick="filterFnbChainByRegion('Miền Bắc')" id="filterRegMB" class="px-3 py-1 rounded-lg font-medium text-stone-600 dark:text-stone-300 hover:text-stone-900">Miền Bắc (4)</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="searchChainSiteInput" oninput="onSearchChainSite(this.value)" placeholder="Tìm mã SAP hoặc tên điểm bán..." class="pl-8 pr-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-stone-900 dark:text-white text-xs outline-none focus:border-[#ed263a] w-56">
+            </div>
+          </div>
+        </div>
+
+        <!-- Rankings Table -->
+        <div class="bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="list-ordered" class="w-4 h-4 text-[#ed263a]"></i>
+              <h2 class="font-extrabold text-sm text-stone-900 dark:text-white">Bảng Xếp Hạng 14 Điểm Bán Theo Doanh Thu &amp; Hiệu Quả Chi Phí</h2>
+            </div>
+            <span class="text-[11px] text-stone-500 dark:text-stone-400">Dữ liệu cập nhật thời gian thực</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-stone-50 dark:bg-stone-900/50 border-b border-stone-200 dark:border-stone-800 text-[11px] font-extrabold text-stone-600 dark:text-stone-400 uppercase tracking-wider">
+                  <th class="py-3 px-3 text-center w-12">Hạng</th>
+                  <th class="py-3 px-4">Điểm Bán &amp; Mã SAP</th>
+                  <th class="py-3 px-3 text-center">Vùng</th>
+                  <th class="py-3 px-3 text-right">Doanh Thu Thuần</th>
+                  <th class="py-3 px-3 text-right">Mục Tiêu</th>
+                  <th class="py-3 px-3 text-center">% Đạt</th>
+                  <th class="py-3 px-3 text-center">Food Cost %</th>
+                  <th class="py-3 px-3 text-center">Labor Cost %</th>
+                  <th class="py-3 px-3 text-right">EBITDA</th>
+                  <th class="py-3 px-3 text-center">Trạng Thái</th>
+                  <th class="py-3 px-3 text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="fnbChainTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/60 font-medium">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ====================================================================
+           PHÂN HỆ F&B 2: BÁO CÁO P&L CHI TIẾT ĐIỂM BÁN (SIBA FOOD MODEL)
+           ==================================================================== -->
+      <section id="fnb-pl" class="tab-panel space-y-5">
+        
+        <!-- P&L Header Controls -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950/60 dark:text-rose-300">P&amp;L REPORT</span>
+              <h1 class="text-base sm:text-lg font-extrabold text-stone-900 dark:text-white" id="plSiteTitle">Báo Cáo P&amp;L: K001 - MN Bếp Ăn ĐH Hùng Vương</h1>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Chi tiết doanh thu thuần, Prime Cost (Food Cost + Labor Cost), chi phí cố định và EBITDA.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="plSiteSelector" onchange="onSelectPLSite(this.value)" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-white font-semibold text-xs outline-none">
+              <!-- Dynamically populated 14 sites -->
+            </select>
+            <button onclick="exportFnbPLExcel()" class="px-3 py-1.5 rounded-xl bg-stone-900 text-white dark:bg-white dark:text-stone-900 font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-all">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-500"></i>
+              <span>Xuất Excel P&amp;L</span>
+            </button>
+            <button onclick="loadFnbPL()" class="p-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 KPI Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Doanh Thu Thuần</div>
+            <div class="text-base font-extrabold text-stone-900 dark:text-white font-mono mt-0.5" id="plNetRev">470,450,000đ</div>
+            <div class="text-[10px] text-emerald-600 font-semibold" id="plAchievement">102.3% Mục tiêu</div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Food Cost %</div>
+            <div class="text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono mt-0.5" id="plFoodCostPct">42.8%</div>
+            <div class="text-[10px] text-stone-400 font-mono" id="plFoodCostVal">201,352,600đ</div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Labor Cost (COL) %</div>
+            <div class="text-base font-extrabold text-purple-600 dark:text-purple-400 font-mono mt-0.5" id="plLaborCostPct">18.5%</div>
+            <div class="text-[10px] text-stone-400 font-mono" id="plLaborCostVal">87,033,250đ</div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Prime Cost %</div>
+            <div class="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono mt-0.5" id="plPrimeCostPct">61.3%</div>
+            <div class="text-[10px] text-emerald-600 font-semibold">&le; 62.0% Mục tiêu</div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Lợi Nhuận EBITDA</div>
+            <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5" id="plProfitVal">120,435,000đ</div>
+            <div class="text-[10px] text-emerald-600 font-mono font-bold" id="plProfitMargin">25.6% Doanh thu</div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase">Doanh Thu Hòa Vốn</div>
+            <div class="text-base font-extrabold text-stone-700 dark:text-stone-300 font-mono mt-0.5" id="plBreakEven">212,500,000đ</div>
+            <div class="text-[10px] text-stone-400">An toàn: 45.2%</div>
+          </div>
+
+        </div>
+
+        <!-- 2 Columns Grid: P&L Statement on Left, Analytics on Right -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Column Left: P&L Breakdown Table (7 Cols) -->
+          <div class="lg:col-span-7 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-[#ed263a]"></i>
+                <h2 class="font-extrabold text-sm text-stone-900 dark:text-white">Bảng Cơ Cấu Doanh Thu &amp; Chi Phí Chuỗi (P&amp;L Statement)</h2>
+              </div>
+              <span class="text-[11px] font-mono text-stone-500">Đơn vị: VNĐ</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-stone-50 dark:bg-stone-900/50 border-b border-stone-200 dark:border-stone-800 text-[10.5px] font-bold text-stone-600 dark:text-stone-400 uppercase">
+                    <th class="py-2.5 px-4">Khoản Mục P&amp;L</th>
+                    <th class="py-2.5 px-3 text-right">Số Tiền (VNĐ)</th>
+                    <th class="py-2.5 px-3 text-right">% Doanh Thu</th>
+                    <th class="py-2.5 px-3 text-center">Đánh Giá</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 dark:divide-stone-800/60 font-medium">
+                  
+                  <!-- Doanh thu gộp -->
+                  <tr class="hover:bg-stone-50/50 dark:hover:bg-stone-800/20">
+                    <td class="py-2 px-4 font-bold text-stone-900 dark:text-white">1. Doanh thu gộp (Gross Sales)</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold" id="plRowGross">485,000,000đ</td>
+                    <td class="py-2 px-3 text-right font-mono text-stone-500">103.1%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">Trước KM</span></td>
+                  </tr>
+
+                  <!-- Chiết khấu -->
+                  <tr class="hover:bg-stone-50/50 dark:hover:bg-stone-800/20 text-stone-500">
+                    <td class="py-1.5 px-4 pl-8">(-) Chiết khấu / Khuyến mãi POS</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowDiscount">-14,550,000đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">-3.1%</td>
+                    <td class="py-1.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-50 text-amber-700">Trong mức &lt;4%</span></td>
+                  </tr>
+
+                  <!-- Doanh thu thuần -->
+                  <tr class="bg-rose-50/40 dark:bg-rose-950/20 font-extrabold text-[#d01a2f] dark:text-rose-400 border-y border-rose-100 dark:border-rose-900/40">
+                    <td class="py-2.5 px-4 font-extrabold">2. DOANH THU THUẦN (Net Sales = 100%)</td>
+                    <td class="py-2.5 px-3 text-right font-mono font-extrabold" id="plRowNet">470,450,000đ</td>
+                    <td class="py-2.5 px-3 text-right font-mono font-extrabold">100.0%</td>
+                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-200">Chuẩn căn cứ</span></td>
+                  </tr>
+
+                  <!-- Kênh bán hàng -->
+                  <tr class="text-stone-500 text-[11px] bg-stone-50/30 dark:bg-stone-900/20">
+                    <td class="py-1.5 px-4 pl-8">• Kênh Ăn tại chỗ (Dine-in ~72%)</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowDineIn">338,724,000đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">72.0%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Chủ lực</td>
+                  </tr>
+                  <tr class="text-stone-500 text-[11px] bg-stone-50/30 dark:bg-stone-900/20">
+                    <td class="py-1.5 px-4 pl-8">• Kênh Mang đi (Takeaway ~20%)</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowTakeaway">94,090,000đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">20.0%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Ổn định</td>
+                  </tr>
+                  <tr class="text-stone-500 text-[11px] bg-stone-50/30 dark:bg-stone-900/20">
+                    <td class="py-1.5 px-4 pl-8">• Kênh Suất ăn công nghiệp / Hub (8%)</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowCatering">37,636,000đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">8.0%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Hợp đồng</td>
+                  </tr>
+
+                  <!-- Chi phí NVL Food Cost -->
+                  <tr class="hover:bg-stone-50/50 dark:hover:bg-stone-800/20">
+                    <td class="py-2 px-4 font-bold text-stone-900 dark:text-white">3. Chi phí Nguyên Vật Liệu (Food Cost)</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold text-blue-600 dark:text-blue-400" id="plRowFoodCost">201,352,600đ</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold text-blue-600 dark:text-blue-400" id="plRowFoodCostPct">42.8%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-blue-50 text-blue-700">Mục tiêu &le;43%</span></td>
+                  </tr>
+
+                  <!-- Chi phí Nhân công Labor Cost -->
+                  <tr class="hover:bg-stone-50/50 dark:hover:bg-stone-800/20">
+                    <td class="py-2 px-4 font-bold text-stone-900 dark:text-white">4. Chi phí Nhân công trực tiếp (Labor Cost)</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold text-purple-600 dark:text-purple-400" id="plRowLaborCost">87,033,250đ</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold text-purple-600 dark:text-purple-400" id="plRowLaborCostPct">18.5%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-50 text-purple-700">Mục tiêu &le;19%</span></td>
+                  </tr>
+
+                  <!-- PRIME COST -->
+                  <tr class="bg-amber-50/60 dark:bg-amber-950/20 font-extrabold text-amber-800 dark:text-amber-300 border-y border-amber-200 dark:border-amber-800">
+                    <td class="py-2.5 px-4">5. PRIME COST (Food Cost + Labor Cost)</td>
+                    <td class="py-2.5 px-3 text-right font-mono" id="plRowPrimeCost">288,385,850đ</td>
+                    <td class="py-2.5 px-3 text-right font-mono" id="plRowPrimeCostPct">61.3%</td>
+                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">ĐẠT CHỈ TIÊU (&le;62%)</span></td>
+                  </tr>
+
+                  <!-- Chi phí cố định & vận hành -->
+                  <tr class="text-stone-600 dark:text-stone-300">
+                    <td class="py-1.5 px-4 pl-8">6. Chi phí Mặt bằng &amp; Khấu hao</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowRent">28,000,000đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">5.9%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Cố định</td>
+                  </tr>
+                  <tr class="text-stone-600 dark:text-stone-300">
+                    <td class="py-1.5 px-4 pl-8">7. Điện, Nước &amp; Gas vận hành bếp</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowUtilities">15,054,400đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">3.2%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Định mức &le;3.5%</td>
+                  </tr>
+                  <tr class="text-stone-600 dark:text-stone-300">
+                    <td class="py-1.5 px-4 pl-8">8. Vật tư tiêu hao &amp; CCDC (Theo hạn mức)</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowSupplies">9,879,450đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">2.1%</td>
+                    <td class="py-1.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700">Dưới trần 10tr</span></td>
+                  </tr>
+                  <tr class="text-stone-600 dark:text-stone-300">
+                    <td class="py-1.5 px-4 pl-8">9. Hao hụt &amp; Hỏng hủy kiểm kê</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowWaste">3,763,600đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">0.8%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Chỉ tiêu &le;1%</td>
+                  </tr>
+                  <tr class="text-stone-600 dark:text-stone-300">
+                    <td class="py-1.5 px-4 pl-8">10. Tiếp thị &amp; Bán lẻ POS</td>
+                    <td class="py-1.5 px-3 text-right font-mono" id="plRowMarketing">5,645,400đ</td>
+                    <td class="py-1.5 px-3 text-right font-mono">1.2%</td>
+                    <td class="py-1.5 px-3 text-center text-stone-400">Chỉ tiêu &le;1.5%</td>
+                  </tr>
+
+                  <!-- TỔNG CHI PHÍ -->
+                  <tr class="bg-stone-100 dark:bg-stone-800/60 font-bold text-stone-900 dark:text-white">
+                    <td class="py-2 px-4">TỔNG CHI PHÍ HOẠT ĐỘNG</td>
+                    <td class="py-2 px-3 text-right font-mono" id="plRowTotalCost">350,728,700đ</td>
+                    <td class="py-2 px-3 text-right font-mono">74.5%</td>
+                    <td class="py-2 px-3 text-center text-stone-500">Toàn bộ chi phí</td>
+                  </tr>
+
+                  <!-- LỢI NHUẬN HOẠT ĐỘNG EBITDA -->
+                  <tr class="bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-extrabold border-t-2 border-emerald-500">
+                    <td class="py-3 px-4 text-sm">LỢI NHUẬN VẬN HÀNH (EBITDA)</td>
+                    <td class="py-3 px-3 text-right font-mono text-sm" id="plRowEBITDA">119,721,300đ</td>
+                    <td class="py-3 px-3 text-right font-mono text-sm" id="plRowEBITDAPct">25.5%</td>
+                    <td class="py-3 px-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-600 text-white">VƯỢT KẾ HOẠCH</span></td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Column Right: Analytics, Trends, Top Dishes & Actions (5 Cols) -->
+          <div class="lg:col-span-5 space-y-4">
+            
+            <!-- Weekly Trends -->
+            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-[#ed263a]"></i>
+                  <h3 class="font-extrabold text-xs text-stone-900 dark:text-white">Xu Hướng 8 Tuần Gần Nhất</h3>
+                </div>
+                <span class="text-[10px] text-stone-400">Doanh thu &amp; Food Cost %</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="text-[10px] font-bold text-stone-500 border-b border-stone-200 dark:border-stone-800">
+                      <th class="py-1.5 px-2">Tuần</th>
+                      <th class="py-1.5 px-2 text-right">Doanh Thu</th>
+                      <th class="py-1.5 px-2 text-center">FC %</th>
+                      <th class="py-1.5 px-2 text-center">COL %</th>
+                      <th class="py-1.5 px-2 text-right">EBITDA %</th>
+                    </tr>
+                  </thead>
+                  <tbody id="plWeeklyTrendBody" class="divide-y divide-stone-100 dark:divide-stone-800/40 text-[11px] font-mono">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Core Operational Metrics -->
+            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+              <div class="flex items-center gap-2 mb-3">
+                <i data-lucide="activity" class="w-4 h-4 text-blue-500"></i>
+                <h3 class="font-extrabold text-xs text-stone-900 dark:text-white">Chỉ Số Vận Hành Điểm Bán</h3>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800">
+                  <div class="text-[10.5px] text-stone-500 font-bold">Số Hóa Đơn / Ngày</div>
+                  <div class="text-base font-extrabold text-stone-900 dark:text-white font-mono mt-0.5" id="plOpBillCount">450 bill</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800">
+                  <div class="text-[10.5px] text-stone-500 font-bold">Giá Trị Bill TB (AOV)</div>
+                  <div class="text-base font-extrabold text-stone-900 dark:text-white font-mono mt-0.5" id="plOpAvgBill">35,000đ</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800">
+                  <div class="text-[10.5px] text-stone-500 font-bold">Doanh Thu / Ghế / Ngày</div>
+                  <div class="text-base font-extrabold text-stone-900 dark:text-white font-mono mt-0.5" id="plOpRevSeat">135,000đ</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800">
+                  <div class="text-[10.5px] text-stone-500 font-bold">Tỷ Lệ Lấp Đầy Giờ Vàng</div>
+                  <div class="text-base font-extrabold text-emerald-600 font-mono mt-0.5" id="plOpOccupancy">92.5%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Dishes & Action Plans -->
+            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+                  <h3 class="font-extrabold text-xs text-stone-900 dark:text-white">Top Món Bán Chạy Nhất Tại Điểm</h3>
+                </div>
+                <div id="plTopDishesList" class="space-y-1.5 text-xs">
+                  <!-- Dynamically rendered -->
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-stone-100 dark:border-stone-800">
+                <div class="flex items-center gap-2 mb-2">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+                  <h3 class="font-extrabold text-xs text-stone-900 dark:text-white">Kế Hoạch Hành Động Tuần Tới</h3>
+                </div>
+                <div id="plActionPlansList" class="space-y-1 text-xs text-stone-600 dark:text-stone-300">
+                  <!-- Dynamically rendered -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ====================================================================
+           PHÂN HỆ F&B 3: DOANH THU POS & BÁN LẺ (HOURLY / BILLS)
+           ==================================================================== -->
+      <section id="fnb-pos" class="tab-panel space-y-5">
+        
+        <!-- Header Banner -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">POS METRICS</span>
+              <h1 class="text-base sm:text-lg font-extrabold text-stone-900 dark:text-white">Doanh Thu Máy POS &amp; Hiệu Suất Bán Lẻ</h1>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Giám sát doanh số theo khung giờ cao điểm, lưu lượng hóa đơn và phương thức thanh toán.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" id="posDatePicker" value="2026-11-17" onchange="loadFnbPOS()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-white text-xs outline-none font-mono">
+            <button onclick="loadFnbPOS()" class="p-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 POS Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-xs text-stone-500 font-bold mb-1">Doanh Thu POS Hôm Nay</div>
+            <div class="text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="posDailyRevenue">16,850,000đ</div>
+            <div class="text-[11px] text-emerald-600 font-semibold mt-1">+12.4% so với trung bình tuần</div>
+          </div>
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-xs text-stone-500 font-bold mb-1">Tổng Số Hóa Đơn POS</div>
+            <div class="text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="posDailyBills">482 bill</div>
+            <div class="text-[11px] text-stone-500 font-semibold mt-1">Cao điểm trưa: 295 bill (61.2%)</div>
+          </div>
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <div class="text-xs text-stone-500 font-bold mb-1">Giá Trị Trung Bình / Bill</div>
+            <div class="text-2xl font-extrabold text-[#ed263a] font-mono" id="posDailyAOV">34,950đ</div>
+            <div class="text-[11px] text-stone-500 font-semibold mt-1">Chuẩn suất ăn trưa công sở</div>
+          </div>
+        </div>
+
+        <!-- Peak Hours Distribution & Payment Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white mb-3 flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-[#ed263a]"></i>
+              <span>Phân Bổ Doanh Thu Theo Khung Giờ</span>
+            </h3>
+            <div id="posHourlyList" class="space-y-3 text-xs">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white mb-3 flex items-center gap-2">
+              <i data-lucide="credit-card" class="w-4 h-4 text-emerald-500"></i>
+              <span>Cơ Cấu Phương Thức Thanh Toán</span>
+            </h3>
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between font-bold mb-1">
+                  <span>Mã QR VNPAY / MoMo / Ngân hàng</span>
+                  <span class="font-mono text-emerald-600">68.5% (11,540,000đ)</span>
+                </div>
+                <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 68.5%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-bold mb-1">
+                  <span>Tiền mặt (Cash)</span>
+                  <span class="font-mono text-stone-600 dark:text-stone-300">22.0% (3,707,000đ)</span>
+                </div>
+                <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-stone-400 h-2.5 rounded-full" style="width: 22%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between font-bold mb-1">
+                  <span>Thẻ ngân hàng (POS Napas/Visa)</span>
+                  <span class="font-mono text-blue-600">9.5% (1,603,000đ)</span>
+                </div>
+                <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-blue-500 h-2.5 rounded-full" style="width: 9.5%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ====================================================================
+           PHÂN HỆ F&B 4: DANH MỤC 14 ĐIỂM BÁN & MÃ SAP (ORBIT SIBA FOOD)
+           ==================================================================== -->
+      <section id="fnb-sites" class="tab-panel space-y-5">
+        
+        <!-- Header Banner -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">MASTER DATA</span>
+              <h1 class="text-base sm:text-lg font-extrabold text-stone-900 dark:text-white">Danh Mục 14 Điểm Bán / Bếp Ăn Vận Hành</h1>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Danh mục chính thức liên kết mã SAP, khu vực địa lý và hạn mức ngân sách vật tư tháng.</p>
+          </div>
+          <button onclick="loadFnbSites()" class="p-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Sites Master Table -->
+        <div class="bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-stone-50 dark:bg-stone-900/50 border-b border-stone-200 dark:border-stone-800 text-[11px] font-extrabold text-stone-600 dark:text-stone-400 uppercase tracking-wider">
+                  <th class="py-3 px-4">Mã SAP</th>
+                  <th class="py-3 px-4">Tên Điểm Bán / Bếp Vận Hành</th>
+                  <th class="py-3 px-3 text-center">Vùng Miền</th>
+                  <th class="py-3 px-4">Địa Chỉ Cơ Sở</th>
+                  <th class="py-3 px-3">Quản Lý &amp; Hotline</th>
+                  <th class="py-3 px-3 text-right">Ngân Sách CCDC</th>
+                  <th class="py-3 px-3 text-center">Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody id="fnbSitesMasterTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/60 font-medium">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+<section id="wh-dashboard" class="tab-panel active space-y-5">
         
         <!-- Welcome Hero -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -343,11 +1014,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           2. WMS TỒN KHO & CẬN DATE FEFO
-           ==================================================================== -->
-      <section id="wh-stock" class="tab-panel space-y-4">
+<section id="wh-stock" class="tab-panel space-y-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
             <div>
@@ -387,11 +1054,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           3. WMS ĐỀ XUẤT ĐẶT HÀNG ROP
-           ==================================================================== -->
-      <section id="wh-reorder" class="tab-panel space-y-4">
+<section id="wh-reorder" class="tab-panel space-y-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
             <div>
@@ -427,11 +1090,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           4. WMS LEAD TIME & SLA NCC
-           ==================================================================== -->
-      <section id="wh-leadtime" class="tab-panel space-y-4">
+<section id="wh-leadtime" class="tab-panel space-y-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div class="pb-4 border-b border-slate-100">
             <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -461,11 +1120,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           5. WMS ĐƠN PO & GIÁ CHUẨN SAP
-           ==================================================================== -->
-      <section id="wh-posap" class="tab-panel space-y-4">
+<section id="wh-posap" class="tab-panel space-y-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div class="pb-4 border-b border-slate-100">
             <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -495,112 +1150,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           6. PORTAL ĐẶT HÀNG VẬT TƯ (THEO ĐỊNH MỨC TỔNG TIỀN SITE)
-           ==================================================================== -->
-      <section id="portal-order" class="tab-panel space-y-5">
-        <!-- Filter Bar -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="flex-1 min-w-[160px]">
-            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
-            <select id="orderVung" onchange="onSelectVung('order')" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[200px]">
-            <label class="font-bold text-slate-700 block mb-1">SITE ĐẶT HÀNG</label>
-            <select id="orderSite" onchange="loadQuota()" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[140px]">
-            <label class="font-bold text-slate-700 block mb-1">THÁNG ÁP DỤNG</label>
-            <input type="month" id="orderMonth" onchange="loadQuota()" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
-          </div>
-          <button onclick="loadQuota()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải định mức
-          </button>
-        </div>
-
-        <!-- 4 Quota KPIs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="text-[11px] font-bold text-slate-400 uppercase">Ngân Sách Tháng</div>
-            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiNganSach">0đ</div>
-            <div class="text-[11px] text-slate-500 mt-0.5" id="kpiSubSite">—</div>
-          </div>
-          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="text-[11px] font-bold text-amber-600 uppercase">Đã Đặt Lũy Kế</div>
-            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiDaDat">0đ</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">Các đơn trước trong tháng</div>
-          </div>
-          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="text-[11px] font-bold text-emerald-600 uppercase">Còn Lại (Sau Đơn Này)</div>
-            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiConLai">0đ</div>
-            <div class="text-[11px] text-slate-500 mt-0.5" id="kpiDangNhapSub">Đang nhập: 0đ</div>
-          </div>
-          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="text-[11px] font-bold text-rose-600 uppercase">Tỷ Lệ Ngân Sách</div>
-            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiTyLe">0%</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">Lũy kế + đang nhập</div>
-          </div>
-        </div>
-
-        <!-- Quota Progress Bar -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <div class="flex justify-between items-center text-xs mb-2">
-            <span class="font-bold text-slate-700">Tiến độ sử dụng ngân sách:</span>
-            <span class="font-mono text-slate-500"><b id="budUsed" class="text-brand-700 font-bold">0đ</b> / <span id="budTotal">0đ</span></span>
-          </div>
-          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-            <div id="budFill" class="h-full bg-brand-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
-          <div id="budNote" class="text-[11px] text-slate-400 mt-1.5">Chưa nhập số lượng mặt hàng.</div>
-        </div>
-
-        <!-- Material Table Card -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
-            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
-              Danh Sách Vật Tư &amp; Công Cụ Dụng Cụ
-            </h2>
-            <button onclick="reviewOrder()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
-              <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Gửi Đơn Hàng
-            </button>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="🔍 Tìm mã hoặc tên vật tư..." class="p-2 border border-slate-300 rounded-lg min-w-[200px]">
-            <select id="fLoai" onchange="filterItems()" class="p-2 border border-slate-300 rounded-lg bg-white"><option value="">Tất cả loại NVL</option></select>
-            <label class="inline-flex items-center gap-2 text-slate-600 cursor-pointer ml-auto">
-              <input type="checkbox" id="fChiNhap" onchange="filterItems()" class="rounded text-brand-600"> Chỉ hiện dòng đang nhập
-            </label>
-          </div>
-
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
-                <tr>
-                  <th class="p-3">Mã hàng</th>
-                  <th class="p-3">Tên sản phẩm</th>
-                  <th class="p-3">Loại</th>
-                  <th class="p-3">ĐVT</th>
-                  <th class="p-3 text-right">Đơn giá</th>
-                  <th class="p-3 text-right">Đã đặt lũy kế</th>
-                  <th class="p-3 text-right w-28">SL Đặt</th>
-                  <th class="p-3 text-right">Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody id="dinhMucBody" class="divide-y divide-slate-100">
-                <tr><td colspan="8" class="p-8 text-center text-slate-400">Chọn Site và Tháng rồi nhấn "Tải định mức".</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ====================================================================
-           7. PORTAL NHẬP CHỨNG TỪ GIAO NHẬN (FULL SCREEN & FULL INPUTS)
-           ==================================================================== -->
-      <section id="portal-voucher" class="tab-panel space-y-4">
+<section id="portal-voucher" class="tab-panel space-y-4">
         <!-- Top filter bar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
@@ -707,11 +1257,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           8. PORTAL TRA CỨU CHỨNG TỪ
-           ==================================================================== -->
-      <section id="portal-search" class="tab-panel space-y-4">
+<section id="portal-search" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
@@ -761,11 +1307,104 @@
           </div>
         </div>
       </section>
+<section id="portal-order" class="tab-panel space-y-5">
+        <!-- Filter Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+          <div class="flex-1 min-w-[160px]">
+            <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
+            <select id="orderVung" onchange="onSelectVung('order')" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <label class="font-bold text-slate-700 block mb-1">SITE ĐẶT HÀNG</label>
+            <select id="orderSite" onchange="loadQuota()" class="w-full p-2 border border-slate-300 rounded-lg bg-white"></select>
+          </div>
+          <div class="flex-1 min-w-[140px]">
+            <label class="font-bold text-slate-700 block mb-1">THÁNG ÁP DỤNG</label>
+            <input type="month" id="orderMonth" onchange="loadQuota()" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+          </div>
+          <button onclick="loadQuota()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải định mức
+          </button>
+        </div>
 
-      <!-- ====================================================================
-           9. PORTAL LỊCH SỬ ĐẶT HÀNG & TIMELINE
-           ==================================================================== -->
-      <section id="portal-history" class="tab-panel space-y-4">
+        <!-- 4 Quota KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Ngân Sách Tháng</div>
+            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiNganSach">0đ</div>
+            <div class="text-[11px] text-slate-500 mt-0.5" id="kpiSubSite">—</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="text-[11px] font-bold text-amber-600 uppercase">Đã Đặt Lũy Kế</div>
+            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiDaDat">0đ</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Các đơn trước trong tháng</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="text-[11px] font-bold text-emerald-600 uppercase">Còn Lại (Sau Đơn Này)</div>
+            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiConLai">0đ</div>
+            <div class="text-[11px] text-slate-500 mt-0.5" id="kpiDangNhapSub">Đang nhập: 0đ</div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="text-[11px] font-bold text-rose-600 uppercase">Tỷ Lệ Ngân Sách</div>
+            <div class="text-xl font-extrabold text-slate-900 font-mono mt-1" id="kpiTyLe">0%</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Lũy kế + đang nhập</div>
+          </div>
+        </div>
+
+        <!-- Quota Progress Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex justify-between items-center text-xs mb-2">
+            <span class="font-bold text-slate-700">Tiến độ sử dụng ngân sách:</span>
+            <span class="font-mono text-slate-500"><b id="budUsed" class="text-brand-700 font-bold">0đ</b> / <span id="budTotal">0đ</span></span>
+          </div>
+          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div id="budFill" class="h-full bg-brand-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+          <div id="budNote" class="text-[11px] text-slate-400 mt-1.5">Chưa nhập số lượng mặt hàng.</div>
+        </div>
+
+        <!-- Material Table Card -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
+              Danh Sách Vật Tư &amp; Công Cụ Dụng Cụ
+            </h2>
+            <button onclick="reviewOrder()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
+              <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Gửi Đơn Hàng
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="🔍 Tìm mã hoặc tên vật tư..." class="p-2 border border-slate-300 rounded-lg min-w-[200px]">
+            <select id="fLoai" onchange="filterItems()" class="p-2 border border-slate-300 rounded-lg bg-white"><option value="">Tất cả loại NVL</option></select>
+            <label class="inline-flex items-center gap-2 text-slate-600 cursor-pointer ml-auto">
+              <input type="checkbox" id="fChiNhap" onchange="filterItems()" class="rounded text-brand-600"> Chỉ hiện dòng đang nhập
+            </label>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-3">Mã hàng</th>
+                  <th class="p-3">Tên sản phẩm</th>
+                  <th class="p-3">Loại</th>
+                  <th class="p-3">ĐVT</th>
+                  <th class="p-3 text-right">Đơn giá</th>
+                  <th class="p-3 text-right">Đã đặt lũy kế</th>
+                  <th class="p-3 text-right w-28">SL Đặt</th>
+                  <th class="p-3 text-right">Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody id="dinhMucBody" class="divide-y divide-slate-100">
+                <tr><td colspan="8" class="p-8 text-center text-slate-400">Chọn Site và Tháng rồi nhấn "Tải định mức".</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+<section id="portal-history" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
@@ -810,11 +1449,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ====================================================================
-           10. PORTAL BÁO CÁO SUẤT ĂN CA BẾP HÀNG NGÀY (FULL SCREEN & 8 CARDS)
-           ==================================================================== -->
-      <section id="portal-baocao" class="tab-panel space-y-4">
+<section id="portal-baocao" class="tab-panel space-y-4">
         <!-- Top filter bar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
@@ -1099,11 +1734,7 @@
           </div>
         </form>
       </section>
-
-      <!-- ====================================================================
-           11. PORTAL KIỂM KÊ TỒN KHO KỲ
-           ==================================================================== -->
-      <section id="portal-kiemke" class="tab-panel space-y-4">
+<section id="portal-kiemke" class="tab-panel space-y-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-slate-700 block mb-1">VÙNG MIỀN</label>
@@ -1145,6 +1776,7 @@
           </div>
         </div>
       </section>
+
 
     </main>
   </div>
@@ -1268,7 +1900,9 @@
   <!-- ========================================================================
        INTEGRATED APPLICATION JAVASCRIPT
        ======================================================================== -->
-  <script>
+  
+<script>
+
     // Global App State
     let App = {
       currentBranch: 'k505',
@@ -1317,14 +1951,14 @@
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('active', 'bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-900/30');
+        b.classList.remove('active', 'bg-[#ed263a]', 'text-white', 'shadow-md', 'shadow-rose-900/20');
         b.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
       });
 
       const target = document.getElementById(tabId);
       if (target) target.classList.add('active');
       if (btn) {
-        btn.classList.add('active', 'bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-900/30');
+        btn.classList.add('active', 'bg-[#ed263a]', 'text-white', 'shadow-md', 'shadow-rose-900/20');
         btn.classList.remove('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
       }
 
@@ -1335,6 +1969,12 @@
       }
 
       // Load specific tab data
+      
+      // Orbit Siba F&B Tab Hooks
+      if (tabId === 'fnb-chain') loadFnbChain();
+      if (tabId === 'fnb-pl') loadFnbPL();
+      if (tabId === 'fnb-pos') loadFnbPOS();
+      if (tabId === 'fnb-sites') loadFnbSites();
       if (tabId === 'wh-dashboard') loadDashboardSummary();
       if (tabId === 'wh-stock') loadStockFEFO();
       if (tabId === 'wh-reorder') loadReorderROP();
@@ -2726,6 +3366,611 @@
     }
 
     window.addEventListener('DOMContentLoaded', initSystem);
-  </script>
+  
+
+// ============================================================================
+// ORBIT SIBA FOOD - CLIENT SCRIPT ENGINE & ENHANCEMENTS
+// ============================================================================
+
+// Theme Switcher (Orbit Siba Theme)
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  if (isDark) {
+    html.classList.remove('dark');
+    localStorage.setItem('orbit_theme', 'light');
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.setAttribute('data-lucide', 'moon');
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('orbit_theme', 'dark');
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.setAttribute('data-lucide', 'sun');
+  }
+  lucide.createIcons();
+}
+
+// Initialize theme on load
+(function initTheme() {
+  const saved = localStorage.getItem('orbit_theme') || 'light';
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+})();
+
+// Active F&B Chain State
+let gChainRankings = [];
+let gCurrentFilterRegion = 'ALL';
+
+// 1. Load F&B Chain Rankings
+async function loadFnbChain() {
+  try {
+    showLoading();
+    const month = document.getElementById('globalMonthPicker')?.value || '2026-11';
+    const resp = await fetch(`/api/fnb/chain?month=${encodeURIComponent(month)}`);
+    const res = await resp.json();
+    if (res.success && res.data) {
+      const d = res.data;
+      gChainRankings = d.rankings || [];
+
+      // Update KPI Cards
+      const revEl = document.getElementById('chainTotalRevenue');
+      if (revEl) revEl.textContent = fmtVND(d.totalChainRevenue);
+
+      const profitEl = document.getElementById('chainTotalProfit');
+      if (profitEl) profitEl.textContent = fmtVND(d.totalChainProfit);
+
+      const marginEl = document.getElementById('chainAvgMargin');
+      if (marginEl) marginEl.textContent = `${d.avgChainMargin}%`;
+
+      const fcEl = document.getElementById('chainAvgFoodCost');
+      if (fcEl) fcEl.textContent = `${d.avgFoodCostPct}%`;
+
+      const lcEl = document.getElementById('chainAvgLaborCost');
+      if (lcEl) lcEl.textContent = `${d.avgLaborCostPct}%`;
+
+      renderFnbChainTable(gChainRankings);
+    }
+  } catch (err) {
+    console.error('Error loadFnbChain:', err);
+    showToast('Lỗi tải dữ liệu toàn chuỗi: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    lucide.createIcons();
+  }
+}
+
+// Render F&B Chain Rankings Table
+function renderFnbChainTable(items) {
+  const tbody = document.getElementById('fnbChainTableBody');
+  if (!tbody) return;
+
+  if (!items || items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-stone-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map((s, idx) => {
+    let statusBadge = '';
+    if (s.status === 'VƯỢT CHỈ TIÊU') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+    } else if (s.status === 'TRONG MỨC') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+    } else {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+    }
+
+    let rankBadge = '';
+    if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-stone-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
+    else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-stone-300 text-stone-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
+    else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
+    else rankBadge = `<span class="font-mono text-stone-500 font-bold">${s.rank}</span>`;
+
+    return `
+      <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+        <td class="py-3 px-3 text-center">${rankBadge}</td>
+        <td class="py-3 px-4">
+          <div class="font-bold text-stone-900 dark:text-white">${s.name}</div>
+          <div class="text-[10.5px] font-mono text-stone-400">SAP: ${s.code}</div>
+        </td>
+        <td class="py-3 px-3 text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
+        </td>
+        <td class="py-3 px-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtVND(s.netRevenue)}</td>
+        <td class="py-3 px-3 text-right font-mono text-stone-500">${fmtVND(s.targetRevenue)}</td>
+        <td class="py-3 px-3 text-center">
+          <div class="font-mono font-bold text-stone-900 dark:text-white">${s.achievementPct}%</div>
+          <div class="w-16 bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 mx-auto mt-1 overflow-hidden">
+            <div class="${parseFloat(s.achievementPct) >= 100 ? 'bg-emerald-500' : 'bg-blue-500'} h-1.5 rounded-full" style="width: ${Math.min(100, parseFloat(s.achievementPct))}%"></div>
+          </div>
+        </td>
+        <td class="py-3 px-3 text-center font-mono ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${s.foodCostPct}%</td>
+        <td class="py-3 px-3 text-center font-mono text-purple-600 font-bold">${s.laborCostPct}%</td>
+        <td class="py-3 px-3 text-right font-mono font-bold text-emerald-600">${fmtVND(s.operatingProfit)}</td>
+        <td class="py-3 px-3 text-center">${statusBadge}</td>
+        <td class="py-3 px-3 text-center">
+          <button onclick="viewSitePL('${s.code}')" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-300 text-[11px] font-bold transition-all flex items-center gap-1 mx-auto">
+            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+            <span>P&amp;L</span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  lucide.createIcons();
+}
+
+// Filter Chain by Region
+function filterFnbChainByRegion(reg) {
+  gCurrentFilterRegion = reg;
+  ['filterRegALL', 'filterRegMN', 'filterRegMB'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.remove('bg-[#ed263a]', 'text-white', 'shadow-xs', 'font-bold');
+    btn.classList.add('font-medium', 'text-stone-600', 'dark:text-stone-300');
+  });
+
+  const activeBtnId = reg === 'ALL' ? 'filterRegALL' : (reg === 'Miền Nam' ? 'filterRegMN' : 'filterRegMB');
+  const activeBtn = document.getElementById(activeBtnId);
+  if (activeBtn) {
+    activeBtn.classList.remove('font-medium', 'text-stone-600', 'dark:text-stone-300');
+    activeBtn.classList.add('bg-[#ed263a]', 'text-white', 'shadow-xs', 'font-bold');
+  }
+
+  let filtered = gChainRankings;
+  if (reg !== 'ALL') {
+    filtered = gChainRankings.filter(s => s.region === reg);
+  }
+  renderFnbChainTable(filtered);
+}
+
+// Search Chain Site
+function onSearchChainSite(val) {
+  const query = String(val || '').toLowerCase().trim();
+  let filtered = gChainRankings;
+  if (gCurrentFilterRegion !== 'ALL') {
+    filtered = filtered.filter(s => s.region === gCurrentFilterRegion);
+  }
+  if (query) {
+    filtered = filtered.filter(s => 
+      s.code.toLowerCase().includes(query) || 
+      s.name.toLowerCase().includes(query) ||
+      s.region.toLowerCase().includes(query)
+    );
+  }
+  renderFnbChainTable(filtered);
+}
+
+// View Site P&L from Chain table
+function viewSitePL(siteCode) {
+  const sel = document.getElementById('plSiteSelector');
+  if (sel) {
+    sel.value = siteCode;
+  }
+  const globalSel = document.getElementById('globalBranchSelect');
+  if (globalSel) {
+    globalSel.value = siteCode;
+  }
+  switchTab('fnb-pl');
+  loadFnbPL();
+}
+
+// 2. Load Detailed P&L
+async function loadFnbPL() {
+  try {
+    showLoading();
+    const site = document.getElementById('plSiteSelector')?.value || document.getElementById('globalBranchSelect')?.value || 'K001';
+    const month = document.getElementById('globalMonthPicker')?.value || '2026-11';
+
+    const resp = await fetch(`/api/fnb/pl?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(month)}`);
+    const res = await resp.json();
+    if (res.success && res.data) {
+      renderFnbPL(res.data);
+    }
+  } catch (err) {
+    console.error('Error loadFnbPL:', err);
+    showToast('Lỗi tải P&L: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    lucide.createIcons();
+  }
+}
+
+// Render P&L Data
+function renderFnbPL(d) {
+  if (!d) return;
+
+  const titleEl = document.getElementById('plSiteTitle');
+  if (titleEl) titleEl.textContent = `Báo Cáo P&L: ${d.site}`;
+
+  // KPI Strip
+  const netEl = document.getElementById('plNetRev');
+  if (netEl) netEl.textContent = fmtVND(d.netRevenue);
+
+  const achEl = document.getElementById('plAchievement');
+  if (achEl) achEl.textContent = `${((d.netRevenue / d.targetRevenue) * 100).toFixed(1)}% Mục tiêu`;
+
+  const fcPctEl = document.getElementById('plFoodCostPct');
+  if (fcPctEl) fcPctEl.textContent = `${((d.foodCost / d.netRevenue) * 100).toFixed(1)}%`;
+
+  const fcValEl = document.getElementById('plFoodCostVal');
+  if (fcValEl) fcValEl.textContent = fmtVND(d.foodCost);
+
+  const lcPctEl = document.getElementById('plLaborCostPct');
+  if (lcPctEl) lcPctEl.textContent = `${((d.laborCost / d.netRevenue) * 100).toFixed(1)}%`;
+
+  const lcValEl = document.getElementById('plLaborCostVal');
+  if (lcValEl) lcValEl.textContent = fmtVND(d.laborCost);
+
+  const primePctEl = document.getElementById('plPrimeCostPct');
+  if (primePctEl) primePctEl.textContent = `${((d.primeCost / d.netRevenue) * 100).toFixed(1)}%`;
+
+  const profitValEl = document.getElementById('plProfitVal');
+  if (profitValEl) profitValEl.textContent = fmtVND(d.operatingProfit);
+
+  const profitMarginEl = document.getElementById('plProfitMargin');
+  if (profitMarginEl) profitMarginEl.textContent = `${d.profitMargin}% Doanh thu`;
+
+  const breakEvenEl = document.getElementById('plBreakEven');
+  if (breakEvenEl) breakEvenEl.textContent = fmtVND(d.breakEvenRevenue);
+
+  // P&L Statement rows
+  const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  setTxt('plRowGross', fmtVND(d.grossRevenue));
+  setTxt('plRowDiscount', '-' + fmtVND(d.discount));
+  setTxt('plRowNet', fmtVND(d.netRevenue));
+
+  if (d.channels) {
+    setTxt('plRowDineIn', fmtVND(d.channels.dineIn));
+    setTxt('plRowTakeaway', fmtVND(d.channels.takeaway));
+    setTxt('plRowCatering', fmtVND(d.channels.catering));
+  }
+
+  setTxt('plRowFoodCost', fmtVND(d.foodCost));
+  setTxt('plRowFoodCostPct', `${((d.foodCost / d.netRevenue) * 100).toFixed(1)}%`);
+
+  setTxt('plRowLaborCost', fmtVND(d.laborCost));
+  setTxt('plRowLaborCostPct', `${((d.laborCost / d.netRevenue) * 100).toFixed(1)}%`);
+
+  setTxt('plRowPrimeCost', fmtVND(d.primeCost));
+  setTxt('plRowPrimeCostPct', `${((d.primeCost / d.netRevenue) * 100).toFixed(1)}%`);
+
+  setTxt('plRowRent', fmtVND(d.rentCost));
+  setTxt('plRowUtilities', fmtVND(d.utilityCost));
+  setTxt('plRowSupplies', fmtVND(d.supplyCost));
+  setTxt('plRowWaste', fmtVND(d.wasteCost));
+  setTxt('plRowMarketing', fmtVND(d.marketingCost));
+  setTxt('plRowTotalCost', fmtVND(d.totalCost));
+  setTxt('plRowEBITDA', fmtVND(d.operatingProfit));
+  setTxt('plRowEBITDAPct', `${d.profitMargin}%`);
+
+  // Weekly Trends
+  const trendBody = document.getElementById('plWeeklyTrendBody');
+  if (trendBody && d.weeklyTrends) {
+    trendBody.innerHTML = d.weeklyTrends.map(w => `
+      <tr class="hover:bg-stone-50 dark:hover:bg-stone-800/30">
+        <td class="py-1 px-2 font-bold">${w.week}</td>
+        <td class="py-1 px-2 text-right">${fmtVND(w.netRevenue)}</td>
+        <td class="py-1 px-2 text-center text-blue-600 font-bold">${w.foodCostPct}%</td>
+        <td class="py-1 px-2 text-center text-purple-600 font-bold">${w.laborCostPct}%</td>
+        <td class="py-1 px-2 text-right text-emerald-600 font-bold">${w.profitMargin}%</td>
+      </tr>
+    `).join('');
+  }
+
+  // Operational metrics
+  if (d.opMetrics) {
+    setTxt('plOpBillCount', `${d.opMetrics.avgDailyBills} bill`);
+    setTxt('plOpAvgBill', fmtVND(d.opMetrics.avgSpendPerBill));
+    setTxt('plOpRevSeat', fmtVND(d.opMetrics.revenuePerSeatPerDay));
+    setTxt('plOpOccupancy', `${d.opMetrics.peakOccupancyPct}%`);
+  }
+
+  // Top dishes
+  const dishList = document.getElementById('plTopDishesList');
+  if (dishList && d.topDishes) {
+    dishList.innerHTML = d.topDishes.map((m, i) => `
+      <div class="flex items-center justify-between p-1.5 rounded-lg bg-stone-50 dark:bg-stone-900/40">
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-4 rounded-full bg-rose-100 dark:bg-rose-950 text-[#ed263a] font-bold text-[10px] flex items-center justify-center">${i + 1}</span>
+          <span class="font-bold text-stone-800 dark:text-stone-200">${m.name}</span>
+        </div>
+        <div class="flex items-center gap-3 font-mono text-[11px]">
+          <span class="text-stone-500">${m.qty} suất</span>
+          <span class="font-bold text-stone-900 dark:text-white">${fmtVND(m.revenue)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Action Plans
+  const actionList = document.getElementById('plActionPlansList');
+  if (actionList && d.actionPlans) {
+    actionList.innerHTML = d.actionPlans.map(act => `
+      <div class="flex items-start gap-2 py-0.5">
+        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i>
+        <span>${act}</span>
+      </div>
+    `).join('');
+  }
+}
+
+function onSelectPLSite(siteCode) {
+  const globalSel = document.getElementById('globalBranchSelect');
+  if (globalSel) globalSel.value = siteCode;
+  loadFnbPL();
+}
+
+// 3. Load POS Metrics
+async function loadFnbPOS() {
+  try {
+    showLoading();
+    const site = document.getElementById('globalBranchSelect')?.value || 'K001';
+    const date = document.getElementById('posDatePicker')?.value || '2026-11-17';
+    const resp = await fetch(`/api/fnb/pos?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`);
+    const res = await resp.json();
+    if (res.success && res.data) {
+      renderFnbPOS(res.data);
+    }
+  } catch (err) {
+    console.error('Error loadFnbPOS:', err);
+    showToast('Lỗi tải POS: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    lucide.createIcons();
+  }
+}
+
+function renderFnbPOS(d) {
+  if (!d) return;
+  const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  setTxt('posDailyRevenue', fmtVND(d.dailyRevenue));
+  setTxt('posDailyBills', `${d.totalBills} bill`);
+  setTxt('posDailyAOV', fmtVND(d.avgSpendPerBill));
+
+  const list = document.getElementById('posHourlyList');
+  if (list && d.hourlyDistribution) {
+    list.innerHTML = d.hourlyDistribution.map(h => `
+      <div>
+        <div class="flex justify-between font-bold mb-1">
+          <span>${h.hour} (${h.bills} bills)</span>
+          <span class="font-mono">${fmtVND(h.revenue)} (${h.pct}%)</span>
+        </div>
+        <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2 overflow-hidden">
+          <div class="bg-[#ed263a] h-2 rounded-full" style="width: ${h.pct}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// 4. Load 14 Master Sites
+async function loadFnbSites() {
+  try {
+    showLoading();
+    const resp = await fetch('/api/branches');
+    const res = await resp.json();
+    if (res.success && res.data) {
+      renderFnbSites(res.data);
+    }
+  } catch (err) {
+    console.error('Error loadFnbSites:', err);
+  } finally {
+    hideLoading();
+    lucide.createIcons();
+  }
+}
+
+function renderFnbSites(sites) {
+  const tbody = document.getElementById('fnbSitesMasterTableBody');
+  if (!tbody || !sites) return;
+
+  tbody.innerHTML = sites.map(s => `
+    <tr class="hover:bg-stone-50 dark:hover:bg-stone-800/40">
+      <td class="py-3 px-4 font-mono font-bold text-[#ed263a]">${s.code}</td>
+      <td class="py-3 px-4 font-bold text-stone-900 dark:text-white">${s.name}</td>
+      <td class="py-3 px-3 text-center">
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'}">${s.region || 'Miền Nam'}</span>
+      </td>
+      <td class="py-3 px-4 text-stone-500">${s.address || 'Hệ thống căn tin Tân Long Group'}</td>
+      <td class="py-3 px-3">
+        <div class="font-semibold text-stone-800 dark:text-stone-200">Quản Lý Cơ Sở</div>
+        <div class="text-[10.5px] font-mono text-stone-400">0903.xxx.xxx</div>
+      </td>
+      <td class="py-3 px-3 text-right font-mono font-bold text-stone-900 dark:text-white">10,000,000đ</td>
+      <td class="py-3 px-3 text-center">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">HOẠT ĐỘNG</span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================================
+// EXCEL EXPORT - QUY CHUẨN USER (FONT APTOS, NAVY #1F4E79, FREEZE, AUTOFILTER)
+// ============================================================================
+
+function exportFnbChainExcel() {
+  if (!gChainRankings || gChainRankings.length === 0) {
+    showToast('Chưa có dữ liệu xếp hạng để xuất Excel', 'warning');
+    return;
+  }
+
+  try {
+    const wb = XLSX.utils.book_new();
+
+    // Headers
+    const headers = [
+      'Hạng',
+      'Mã SAP',
+      'Điểm Bán & Bếp Ăn',
+      'Vùng Miền',
+      'Doanh Thu Thuần (VNĐ)',
+      'Mục Tiêu Tháng (VNĐ)',
+      '% Đạt Chỉ Tiêu',
+      'Food Cost %',
+      'Labor Cost %',
+      'Lợi Nhuận EBITDA (VNĐ)',
+      'Biên LN %',
+      'Trạng Thái'
+    ];
+
+    const dataRows = gChainRankings.map(s => [
+      s.rank,
+      s.code,
+      s.name,
+      s.region,
+      s.netRevenue,
+      s.targetRevenue,
+      parseFloat(s.achievementPct) / 100,
+      parseFloat(s.foodCostPct) / 100,
+      parseFloat(s.laborCostPct) / 100,
+      s.operatingProfit,
+      parseFloat(s.profitMargin) / 100,
+      s.status
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+
+    // Apply User Excel Rules: Aptos 11, Navy Header #1F4E79, White Text
+    const headerStyle = {
+      font: { name: 'Aptos', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+      fill: { fgColor: { rgb: '1F4E79' } },
+      alignment: { vertical: 'center', horizontal: 'center' }
+    };
+
+    const regularStyle = { font: { name: 'Aptos', sz: 11 } };
+    const centerStyle = { font: { name: 'Aptos', sz: 11 }, alignment: { horizontal: 'center' } };
+    const rightStyle = { font: { name: 'Aptos', sz: 11 }, alignment: { horizontal: 'right' } };
+
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellRef]) continue;
+
+        if (R === 0) {
+          ws[cellRef].s = headerStyle;
+        } else {
+          // Column alignments
+          if (C === 0 || C === 1 || C === 3 || C === 11) {
+            ws[cellRef].s = centerStyle;
+          } else if (C === 2) {
+            ws[cellRef].s = regularStyle;
+          } else if (C === 6 || C === 7 || C === 8 || C === 10) {
+            ws[cellRef].s = rightStyle;
+            ws[cellRef].z = '0.0%';
+          } else {
+            ws[cellRef].s = rightStyle;
+            ws[cellRef].z = '#,##0';
+          }
+        }
+      }
+    }
+
+    // Freeze panes: Dòng đầu tiên
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+    
+    // AutoFilter
+    ws['!autofilter'] = { ref: ws['!ref'] };
+
+    // Column widths
+    ws['!cols'] = [
+      { wch: 8 },  // Hạng
+      { wch: 10 }, // Mã SAP
+      { wch: 38 }, // Tên
+      { wch: 14 }, // Vùng
+      { wch: 22 }, // Doanh thu
+      { wch: 20 }, // Mục tiêu
+      { wch: 14 }, // % Đạt
+      { wch: 14 }, // Food Cost %
+      { wch: 14 }, // Labor Cost %
+      { wch: 22 }, // EBITDA
+      { wch: 12 }, // Biên LN
+      { wch: 16 }  // Trạng thái
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'XepHangChuoi');
+    const nowStr = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Orbit_Siba_Food_XepHangChuoi_${nowStr}.xlsx`);
+    showToast('Đã xuất file Excel xếp hạng toàn chuỗi thành công (chuẩn Aptos).', 'success');
+  } catch (err) {
+    console.error('Lỗi exportFnbChainExcel:', err);
+    showToast('Lỗi xuất Excel: ' + err.message, 'error');
+  }
+}
+
+function exportFnbPLExcel() {
+  try {
+    const site = document.getElementById('plSiteTitle')?.textContent || 'Báo Cáo P&L';
+    const wb = XLSX.utils.book_new();
+
+    const rows = [
+      ['KHOẢN MỤC BÁO CÁO P&L', 'SỐ TIỀN (VNĐ)', '% DOANH THU THUẦN', 'GHI CHÚ / ĐỊNH MỨC'],
+      ['1. Doanh thu gộp (Gross Sales)', 485000000, 1.031, 'Trước khuyến mãi'],
+      ['(-) Chiết khấu / Khuyến mãi POS', -14550000, -0.031, 'Trong mức cho phép <4%'],
+      ['2. DOANH THU THUẦN (Net Sales)', 470450000, 1.000, 'Doanh thu chuẩn 100%'],
+      ['• Ăn tại chỗ (Dine-in)', 338724000, 0.720, 'Kênh chủ lực'],
+      ['• Mang đi (Takeaway)', 94090000, 0.200, 'Kênh phụ trợ'],
+      ['• Suất ăn công nghiệp / Hub', 37636000, 0.080, 'Hợp đồng ngoài'],
+      ['3. Chi phí Nguyên Vật Liệu (Food Cost)', 201352600, 0.428, 'Mục tiêu <=43.0%'],
+      ['4. Chi phí Nhân công trực tiếp (Labor Cost)', 87033250, 0.185, 'Mục tiêu <=19.0%'],
+      ['5. PRIME COST (Food + Labor)', 288385850, 0.613, 'Mục tiêu <=62.0%'],
+      ['6. Chi phí Mặt bằng & Khấu hao', 28000000, 0.059, 'Chi phí cố định'],
+      ['7. Điện, Nước & Gas vận hành', 15054400, 0.032, 'Định mức <=3.5%'],
+      ['8. Vật tư tiêu hao & CCDC', 9879450, 0.021, 'Định mức trần 10 triệu/tháng'],
+      ['9. Hao hụt & Hỏng hủy', 3763600, 0.008, 'Chỉ tiêu <=1.0%'],
+      ['10. Tiếp thị & POS', 5645400, 0.012, 'Chỉ tiêu <=1.5%'],
+      ['TỔNG CHI PHÍ HOẠT ĐỘNG', 350728700, 0.745, 'Tổng chi phí vận hành'],
+      ['LỢI NHUẬN HOẠT ĐỘNG (EBITDA)', 119721300, 0.255, 'VƯỢT KẾ HOẠCH (>24%)']
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    // Apply User Aptos styling
+    const headerStyle = {
+      font: { name: 'Aptos', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+      fill: { fgColor: { rgb: '1F4E79' } },
+      alignment: { vertical: 'center', horizontal: 'center' }
+    };
+    const regStyle = { font: { name: 'Aptos', sz: 11 } };
+    const rightStyle = { font: { name: 'Aptos', sz: 11 }, alignment: { horizontal: 'right' } };
+
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellRef]) continue;
+        if (R === 0) {
+          ws[cellRef].s = headerStyle;
+        } else {
+          if (C === 0) ws[cellRef].s = regStyle;
+          else if (C === 1) { ws[cellRef].s = rightStyle; ws[cellRef].z = '#,##0'; }
+          else if (C === 2) { ws[cellRef].s = rightStyle; ws[cellRef].z = '0.0%'; }
+          else ws[cellRef].s = regStyle;
+        }
+      }
+    }
+
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+    ws['!autofilter'] = { ref: ws['!ref'] };
+    ws['!cols'] = [{ wch: 45 }, { wch: 22 }, { wch: 20 }, { wch: 30 }];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'PL_DiemBan');
+    XLSX.writeFile(wb, `Orbit_Siba_Food_PL_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    showToast('Đã xuất Báo Cáo P&L Điểm Bán thành công (chuẩn Aptos).', 'success');
+  } catch (err) {
+    showToast('Lỗi xuất P&L Excel: ' + err.message, 'error');
+  }
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadFnbChain, 300);
+});
+</script>
 </body>
 </html>

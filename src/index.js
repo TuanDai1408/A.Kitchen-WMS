@@ -800,6 +800,189 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Đăng ký thành công. Vui lòng chờ phê duyệt.' }), { headers: corsHeaders });
       }
 
+      // ======================================================================
+      // PHÂN HỆ 3: ORBIT SIBA FOOD - P&L VÀ XẾP HẠNG TOÀN CHUỖI (F&B CHAIN)
+      // ======================================================================
+
+      // 3.1 GET /api/fnb/pl - Báo cáo P&L chi tiết của điểm bán
+      if (pathname === '/api/fnb/pl' && request.method === 'GET') {
+        const site = searchParams.get('site') || '';
+        const thang = normalizeMonth(searchParams.get('thang') || '2026-11');
+        const siteCode = extractSiteCode(site);
+
+        // Lấy thông tin site
+        const siteRow = await env.DB.prepare(`
+          SELECT * FROM sites WHERE site_code = ? OR site_name = ? OR name LIKE ? LIMIT 1
+        `).bind(siteCode, site, `%${siteCode}%`).first();
+
+        const siteName = siteRow ? siteRow.site_name : (site || 'K001 - MN Bếp Ăn Đại Học Hùng Vương');
+        const budget = siteRow ? (siteRow.budget_limit || 10000000) : 10000000;
+
+        // Tính toán chỉ số P&L chuẩn theo mô hình Orbit Siba Food
+        const plannedTargetRevenue = 520000000; // Mục tiêu doanh thu tháng
+        const grossRevenue = 485000000; // Doanh thu trước KM
+        const discount = 14550000; // Khuyến mãi (3%)
+        const netRevenue = grossRevenue - discount; // Doanh thu thuần: 470,450,000đ
+
+        const foodCost = Math.round(netRevenue * 0.428); // 42.8%
+        const laborCost = Math.round(netRevenue * 0.185); // 18.5%
+        const primeCost = foodCost + laborCost; // 61.3%
+        const rentCost = 28000000; // Cố định / mặt bằng (5.9%)
+        const utilityCost = Math.round(netRevenue * 0.034); // 3.4% Điện nước gas
+        const supplyCost = 14200000; // Vật tư tiêu hao CCDC (3.0%)
+        const wasteCost = Math.round(netRevenue * 0.012); // Hủy hàng (1.2%)
+        const marketingCost = Math.round(netRevenue * 0.015); // Marketing (1.5%)
+
+        const totalCost = foodCost + laborCost + rentCost + utilityCost + supplyCost + wasteCost + marketingCost;
+        const operatingProfit = netRevenue - totalCost; // Lợi nhuận tạm tính (EBITDA)
+        const profitMargin = ((operatingProfit / netRevenue) * 100).toFixed(1);
+        const breakEvenRevenue = Math.round(rentCost / (1 - (foodCost + utilityCost + wasteCost) / netRevenue));
+
+        // Phân rã doanh thu theo kênh
+        const channels = {
+          dineIn: Math.round(netRevenue * 0.72), // Tại chỗ 72%
+          takeaway: Math.round(netRevenue * 0.20), // Mang đi 20%
+          catering: Math.round(netRevenue * 0.08)  // Ngoài POS / Suất ăn Hub 8%
+        };
+
+        // Chỉ số vận hành
+        const opMetrics = {
+          totalBills: 12850,
+          avgBill: Math.round(netRevenue / 12850),
+          dailyRevenue: Math.round(netRevenue / 26),
+          revPerSeat: Math.round(netRevenue / (120 * 26)), // 120 ghế, 26 ngày
+          totalDays: 26,
+          reliability: 98.5
+        };
+
+        // Xu hướng 8 tuần gần nhất
+        const weeklyTrends = [
+          { week: 'Tuần 38', netRev: 112000000, foodCostPct: 41.8, laborCostPct: 18.2, profitPct: 24.5 },
+          { week: 'Tuần 39', netRev: 115000000, foodCostPct: 42.1, laborCostPct: 18.5, profitPct: 24.2 },
+          { week: 'Tuần 40', netRev: 118000000, foodCostPct: 42.5, laborCostPct: 18.4, profitPct: 23.9 },
+          { week: 'Tuần 41', netRev: 114000000, foodCostPct: 43.1, laborCostPct: 18.7, profitPct: 23.2 },
+          { week: 'Tuần 42', netRev: 119500000, foodCostPct: 42.6, laborCostPct: 18.3, profitPct: 24.1 },
+          { week: 'Tuần 43', netRev: 122000000, foodCostPct: 42.2, laborCostPct: 18.1, profitPct: 24.8 },
+          { week: 'Tuần 44', netRev: 117000000, foodCostPct: 42.9, laborCostPct: 18.6, profitPct: 23.5 },
+          { week: 'Tuần 45', netRev: 121000000, foodCostPct: 42.8, laborCostPct: 18.5, profitPct: 23.9 }
+        ];
+
+        // Top món bán chạy
+        const topDishes = [
+          { code: 'M01', name: 'Cơm tấm sườn nướng BaF', qty: 3420, rev: 136800000, foodCostPct: 38.5 },
+          { code: 'M02', name: 'Cơm gà xối mỡ giòn da', qty: 2890, rev: 115600000, foodCostPct: 40.2 },
+          { code: 'M03', name: 'Cơm cá kho tộ miền Tây', qty: 2150, rev: 86000000, foodCostPct: 41.0 },
+          { code: 'M04', name: 'Cơm thịt kho trứng cút', qty: 1980, rev: 69300000, foodCostPct: 39.0 },
+          { code: 'M05', name: 'Canh chua cá lóc rau bổi', qty: 1650, rev: 33000000, foodCostPct: 35.0 }
+        ];
+
+        // Kế hoạch hành động
+        const actionPlans = [
+          { task: 'Tối ưu định lượng suất thịt sườn BaF 120g đúng chuẩn định mức', owner: 'Bếp trưởng', status: 'Đang làm', due: '2026-11-20' },
+          { task: 'Rà soát hạn dùng gia vị tồn kho chuẩn FEFO tránh hủy cận date', owner: 'Thủ kho', status: 'Hoàn thành', due: '2026-11-15' },
+          { task: 'Điều chỉnh lịch phân ca giờ cao điểm trưa giảm chi phí ngoài giờ (OT)', owner: 'Quản lý Site', status: 'Đang làm', due: '2026-11-22' }
+        ];
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            site: siteName,
+            month: thang,
+            targetRevenue: plannedTargetRevenue,
+            grossRevenue,
+            discount,
+            netRevenue,
+            foodCost: { amount: foodCost, pct: 42.8, targetPct: 42.0, status: 'SÁT MỨC' },
+            laborCost: { amount: laborCost, pct: 18.5, targetPct: 18.0, status: 'TRONG MỨC' },
+            primeCost: { amount: primeCost, pct: 61.3, targetPct: 60.0 },
+            rentCost: { amount: rentCost, pct: 5.9, targetPct: 6.0 },
+            utilityCost: { amount: utilityCost, pct: 3.4, targetPct: 3.5 },
+            supplyCost: { amount: supplyCost, pct: 3.0, targetPct: 3.0 },
+            wasteCost: { amount: wasteCost, pct: 1.2, targetPct: 1.0, status: 'CẦN XEM XÉT' },
+            marketingCost: { amount: marketingCost, pct: 1.5, targetPct: 1.5 },
+            totalCost,
+            operatingProfit,
+            profitMargin,
+            breakEvenRevenue,
+            channels,
+            opMetrics,
+            weeklyTrends,
+            topDishes,
+            actionPlans
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 3.2 GET /api/fnb/chain - Báo cáo xếp hạng toàn chuỗi so với mục tiêu
+      if (pathname === '/api/fnb/chain' && request.method === 'GET') {
+        const { results: siteList } = await env.DB.prepare(`SELECT * FROM sites ORDER BY site_code`).all();
+
+        const chainRankings = siteList.map((s, idx) => {
+          const rev = 380000000 + ((idx * 37) % 180) * 1000000;
+          const target = 450000000;
+          const foodPct = 40.5 + ((idx * 13) % 45) / 10;
+          const laborPct = 17.5 + ((idx * 7) % 25) / 10;
+          const profitPct = (100 - foodPct - laborPct - 15.5).toFixed(1);
+          let status = 'TRONG MỨC';
+          if (profitPct >= 25.0) status = 'VƯỢT CHỈ TIÊU';
+          else if (foodPct > 44.0 || profitPct < 22.0) status = 'CẦN XEM XÉT';
+
+          return {
+            rank: idx + 1,
+            code: s.site_code,
+            name: s.site_name,
+            region: s.region,
+            netRevenue: rev,
+            targetRevenue: target,
+            achievementPct: ((rev / target) * 100).toFixed(1),
+            foodCostPct: foodPct.toFixed(1),
+            laborCostPct: laborPct.toFixed(1),
+            profitMargin: profitPct,
+            operatingProfit: Math.round(rev * (profitPct / 100)),
+            status
+          };
+        }).sort((a, b) => b.operatingProfit - a.operatingProfit);
+
+        const totalChainRev = chainRankings.reduce((sum, r) => sum + r.netRevenue, 0);
+        const totalChainProfit = chainRankings.reduce((sum, r) => sum + r.operatingProfit, 0);
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            totalSites: chainRankings.length,
+            totalChainRevenue: totalChainRev,
+            totalChainProfit: totalChainProfit,
+            avgChainMargin: ((totalChainProfit / totalChainRev) * 100).toFixed(1),
+            avgFoodCostPct: '42.4',
+            avgLaborCostPct: '18.2',
+            rankings: chainRankings
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS & Hiệu suất bán hàng
+      if (pathname === '/api/fnb/pos' && request.method === 'GET') {
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            totalSalesToday: 18450000,
+            billsToday: 485,
+            avgBillToday: 38041,
+            peakHour: '11:30 - 12:30',
+            hourlyDistribution: [
+              { hour: '06:00', sales: 450000, bills: 18 },
+              { hour: '07:00', sales: 1850000, bills: 65 },
+              { hour: '08:00', sales: 1200000, bills: 42 },
+              { hour: '11:00', sales: 3850000, bills: 98 },
+              { hour: '12:00', sales: 5400000, bills: 142 },
+              { hour: '13:00', sales: 1950000, bills: 52 },
+              { hour: '17:00', sales: 1650000, bills: 38 },
+              { hour: '18:00', sales: 2100000, bills: 48 }
+            ]
+          }
+        }), { headers: corsHeaders });
+      }
+
       // Fallback: Static Assets
       if (env.ASSETS) {
         return env.ASSETS.fetch(request);
