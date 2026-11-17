@@ -725,7 +725,24 @@ export default {
         }
       }
 
-      // 2.10 POST /api/report & /api/daily-report
+      // 2.10 GET & POST /api/report & /api/daily-report
+      if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'GET') {
+        const branch = searchParams.get('branch') || 'ALL';
+        let query = `
+          SELECT r.*, b.name as branch_name, b.code as branch_code
+          FROM daily_catering_reports r
+          LEFT JOIN branches b ON r.branch_id = b.id
+        `;
+        let bindings = [];
+        if (branch && branch !== 'ALL') {
+          query += ` WHERE b.code = ? OR r.branch_id = ? `;
+          bindings.push(branch, branch);
+        }
+        query += ` ORDER BY r.report_date DESC, r.created_at DESC LIMIT 100`;
+        const { results } = await env.DB.prepare(query).bind(...bindings).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
       if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'POST') {
         const body = await request.json();
         const {
