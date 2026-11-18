@@ -373,182 +373,255 @@
   <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden lg:hidden"></div>
 
   <!-- Sidebar Component (Desktop docked w-72, Tablet & Mobile off-canvas drawer) -->
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#161313] text-stone-800 dark:text-stone-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static border-r border-stone-200 dark:border-stone-800 shadow-xl">
+    <!-- =====================================================================
+       ORBIT SIBA FOOD: MODERN MINIMALIST ERP SIDEBAR (PC & TABLET)
+       ===================================================================== -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#141111] text-stone-800 dark:text-stone-200 flex flex-col transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static border-r border-stone-200/80 dark:border-stone-800/80 shadow-2xl lg:shadow-none select-none">
     
-    <!-- Sidebar Header (Orbit Siba Food) -->
-    <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30">
+    <!-- Sidebar Brand Header -->
+    <div class="p-4 border-b border-stone-100 dark:border-stone-800/80 flex items-center justify-between bg-stone-50/60 dark:bg-stone-900/40">
       <div class="flex items-center gap-3">
-        <div class="h-10 px-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 flex items-center justify-center shadow-xs">
-          <img src="https://sibafood.sudv.vn/uploads/upl_D1TuykW3Ib/comngonsiba-ngang-do%201.png" alt="Siba Food" class="h-6 object-contain" onerror="this.onerror=null;this.src='https://drive.google.com/thumbnail?id=1ec6FndqT-n4ki-4YzDbSwjS2_26caPLJ&sz=w160';">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ed263a] to-[#d01a2f] flex items-center justify-center text-white shadow-md shadow-rose-900/20 shrink-0">
+          <i data-lucide="chef-hat" class="w-5 h-5"></i>
         </div>
-        <div>
-          <div class="font-extrabold text-stone-900 dark:text-white text-sm leading-tight tracking-tight flex items-center gap-1.5">
+        <div class="min-w-0">
+          <div class="font-extrabold text-stone-900 dark:text-white text-sm tracking-tight flex items-center gap-1.5">
             <span>A.Kitchen</span>
-            <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-[#ed263a] text-white">ORBIT</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded-full font-black bg-[#ed263a] text-white tracking-wide">ORBIT</span>
           </div>
-          <div class="text-[10px] font-medium text-stone-500 dark:text-stone-400 italic">Mọi việc, một quỹ đạo.</div>
+          <div class="text-[10.5px] text-stone-400 dark:text-stone-500 font-medium truncate">Siba Food • Chuỗi F&amp;B</div>
         </div>
       </div>
-      <button onclick="toggleSidebar()" class="lg:hidden text-stone-500 hover:text-stone-900 p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800">
+      <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 active:scale-95 transition-transform">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
 
-    <!-- Navigation Links -->
-    <nav class="flex-1 overflow-y-auto p-3 space-y-5 custom-scrollbar text-xs">
+    <!-- Quick Live Filter Box in Sidebar -->
+    <div class="px-3 pt-3 pb-1">
+      <div class="relative">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="sidebarMenuSearch" oninput="filterSidebarMenu(this.value)" placeholder="Tìm chức năng..." class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200/80 dark:border-stone-700/80 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-[#ed263a] transition-all">
+      </div>
+    </div>
+
+    <!-- Navigation Scrollable Area -->
+    <nav class="flex-1 overflow-y-auto px-3 py-2 space-y-4 custom-scrollbar text-xs">
       
-      <!-- PHÂN HỆ 1: P&L & CHUỖI CĂNG TIN (ORBIT SIBA FOOD) -->
-      <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-[#ed263a] dark:text-[#ff6666] flex items-center justify-between">
-          <span>P&amp;L &amp; Chuỗi Căng Tin</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-100 text-[#d01a2f] dark:bg-rose-950/60 dark:text-rose-300 font-extrabold">NEW</span>
+      <!-- NHÓM 1: P&L & HIỆU QUẢ CHUỖI -->
+      <div class="sidebar-category" data-cat="fnb-finance">
+        <div class="px-2.5 mb-1.5 font-bold text-[10.5px] uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="line-chart" class="w-3.5 h-3.5"></i> Hiệu Quả &amp; Doanh Thu</span>
         </div>
-        <div class="space-y-1">
-          <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-semibold transition-all duration-150 active bg-[#ed263a] text-white shadow-md shadow-rose-900/20">
-            <i data-lucide="trophy" class="w-4 h-4"></i>
-            <span>Toàn Chuỗi &amp; Xếp Hạng</span>
+        <div class="space-y-0.5">
+          <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-semibold transition-all active bg-[#ed263a] text-white shadow-sm shadow-rose-900/20">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="trophy" class="w-4 h-4 shrink-0 text-white"></i>
+              <span class="truncate">Toàn Chuỗi &amp; Xếp Hạng</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="pie-chart" class="w-4 h-4 text-rose-500"></i>
-            <span>Báo Cáo P&amp;L Điểm Bán</span>
+          <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="pie-chart" class="w-4 h-4 shrink-0 text-rose-500"></i>
+              <span class="truncate">Báo Cáo P&amp;L Điểm Bán</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
-            <span>Doanh Thu POS &amp; Bán Lẻ</span>
-          </button>
-          
-        </div>
-      </div>
-
-      <!-- PHÂN HỆ QUẢN LÝ TỒN KHO & BẾP F&B -->
-      <div class="mt-4">
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
-          <span>Quản Lý Tồn Kho F&amp;B</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Kho Bếp</span>
-        </div>
-        <div class="space-y-1">
-          <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i>
-            <span>Tồn Kho Chuỗi (Matrix)</span>
-          </button>
-          <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i>
-            <span>Kiểm Kê Hằng Ngày</span>
-          </button>
-          <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i>
-            <span>Nhập Hàng Điểm Bán</span>
-          </button>
-          <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
-            <span>Hủy Hàng &amp; Hao Hụt</span>
+          <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="zap" class="w-4 h-4 shrink-0 text-amber-500"></i>
+              <span class="truncate">Doanh Thu POS &amp; Bán Lẻ</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
         </div>
       </div>
 
-
-      <!-- PHÂN HỆ 2: KHO GIA VỊ, FEFO & WMS -->
-      <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center justify-between">
-          <span>Kho Vận &amp; Bếp Ăn (WMS)</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold">WMS</span>
+      <!-- NHÓM 2: VẬN HÀNH KHO BẾP F&B -->
+      <div class="sidebar-category" data-cat="fnb-inventory">
+        <div class="px-2.5 mb-1.5 font-bold text-[10.5px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="boxes" class="w-3.5 h-3.5"></i> Vận Hành Kho Bếp</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Bếp</span>
         </div>
-        <div class="space-y-1">
-          <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-            <span>Tổng Quan Kho Vận</span>
+        <div class="space-y-0.5">
+          <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="boxes" class="w-4 h-4 shrink-0 text-emerald-500"></i>
+              <span class="truncate">Tồn Kho Chuỗi (Matrix)</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-500"></i>
-            <span>Hạn Dùng &amp; Xuất FEFO</span>
+          <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="clipboard-check" class="w-4 h-4 shrink-0 text-blue-500"></i>
+              <span class="truncate">Kiểm Kê Hằng Ngày</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
-            <span>Cảnh Báo Đặt Hàng (ROP)</span>
+          <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="package-plus" class="w-4 h-4 shrink-0 text-indigo-500"></i>
+              <span class="truncate">Nhập Hàng Điểm Bán</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="truck" class="w-4 h-4 text-blue-500"></i>
-            <span>Lead Time Nhà Cung Cấp</span>
-          </button>
-          <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="file-check-2" class="w-4 h-4 text-purple-500"></i>
-            <span>Đơn PO SAP &amp; PPV</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- PHÂN HỆ 3: VẬT TƯ & CHỨNG TỪ CA BẾP -->
-      <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center justify-between">
-          <span>Vật Tư &amp; Chứng Từ</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold">PORTAL</span>
-        </div>
-        <div class="space-y-1">
-          <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="receipt" class="w-4 h-4 text-rose-500"></i>
-            <span>Nhập Chứng Từ (Full Screen)</span>
-          </button>
-          <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="search" class="w-4 h-4"></i>
-            <span>Tra Cứu Chứng Từ</span>
-          </button>
-          <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-500"></i>
-            <span>Đặt Hàng CCDC / Vật Tư</span>
-          </button>
-          <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="history" class="w-4 h-4"></i>
-            <span>Lịch Sử Đặt Hàng</span>
-          </button>
-          <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="clipboard-list" class="w-4 h-4 text-indigo-500"></i>
-            <span>Báo Cáo Suất Ăn Ca Bếp</span>
-          </button>
-          <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="check-square" class="w-4 h-4 text-sky-500"></i>
-            <span>Kiểm Kê Tồn Kho Kỳ</span>
+          <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="trash-2" class="w-4 h-4 shrink-0 text-rose-500"></i>
+              <span class="truncate">Hủy Hàng &amp; Hao Hụt</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
         </div>
       </div>
 
-      <!-- PHÂN HỆ 4: HỆ THỐNG & DANH MỤC -->
-      <div>
-        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-stone-500 dark:text-stone-400">
-          <span>Hệ Thống &amp; Danh Mục</span>
+      <!-- NHÓM 3: KHO VẬN FEFO & WMS -->
+      <div class="sidebar-category" data-cat="wh-wms">
+        <div class="px-2.5 mb-1.5 font-bold text-[10.5px] uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="archive" class="w-3.5 h-3.5"></i> Kho Vận &amp; WMS</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">WMS</span>
         </div>
-        <div class="space-y-1">
-          <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="building-2" class="w-4 h-4 text-blue-500"></i>
-            <span>Danh Mục 14 Điểm Bán</span>
+        <div class="space-y-0.5">
+          <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 text-amber-500"></i>
+              <span class="truncate">Tổng Quan Kho Vận</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
-          <button onclick="openAuthModal('login')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-            <span id="navAuthLabel">Đăng Nhập Quản Trị</span>
+          <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="calendar-clock" class="w-4 h-4 shrink-0 text-emerald-500"></i>
+              <span class="truncate">Hạn Dùng &amp; Xuất FEFO</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-rose-500"></i>
+              <span class="truncate">Cảnh Báo Tồn ROP</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="truck" class="w-4 h-4 shrink-0 text-blue-500"></i>
+              <span class="truncate">Lead Time &amp; NCC</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="file-check-2" class="w-4 h-4 shrink-0 text-purple-500"></i>
+              <span class="truncate">Đơn Hàng PO SAP</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- NHÓM 4: CHỨNG TỪ & BẾP ĂN -->
+      <div class="sidebar-category" data-cat="portal-ops">
+        <div class="px-2.5 mb-1.5 font-bold text-[10.5px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="receipt" class="w-3.5 h-3.5"></i> Chứng Từ &amp; Bếp Ăn</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">Portal</span>
+        </div>
+        <div class="space-y-0.5">
+          <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="receipt" class="w-4 h-4 shrink-0 text-rose-500"></i>
+              <span class="truncate">Nhập Chứng Từ (Full)</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="search" class="w-4 h-4 shrink-0 text-stone-400"></i>
+              <span class="truncate">Tra Cứu Chứng Từ</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="shopping-cart" class="w-4 h-4 shrink-0 text-emerald-500"></i>
+              <span class="truncate">Đặt Hàng CCDC / Vật Tư</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="history" class="w-4 h-4 shrink-0 text-stone-400"></i>
+              <span class="truncate">Lịch Sử Đặt Hàng</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="clipboard-list" class="w-4 h-4 shrink-0 text-indigo-500"></i>
+              <span class="truncate">Báo Cáo Suất Ăn Ca</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+          <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="check-square" class="w-4 h-4 shrink-0 text-sky-500"></i>
+              <span class="truncate">Kiểm Kê Tồn Kho Kỳ</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- NHÓM 5: HỆ THỐNG & ĐIỂM BÁN -->
+      <div class="sidebar-category" data-cat="system-settings">
+        <div class="px-2.5 mb-1.5 font-bold text-[10.5px] uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i data-lucide="settings" class="w-3.5 h-3.5"></i> Hệ Thống</span>
+        </div>
+        <div class="space-y-0.5">
+          <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i data-lucide="building-2" class="w-4 h-4 shrink-0 text-blue-500"></i>
+              <span class="truncate">Danh Mục 14 Điểm Bán</span>
+            </div>
+            <span class="lock-icon hidden text-stone-400"><i data-lucide="lock" class="w-3 h-3"></i></span>
           </button>
         </div>
       </div>
 
     </nav>
 
-    <!-- Sidebar Footer -->
-    <div class="p-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div id="userAvatar" class="w-8 h-8 rounded-full bg-[#ed263a] text-white flex items-center justify-center font-bold text-xs shadow-xs">
-            AD
+    <!-- Sidebar Modern User Profile Footer (Google Auth & RBAC Indicator) -->
+    <div class="p-3 border-t border-stone-200/80 dark:border-stone-800/80 bg-stone-50/70 dark:bg-stone-900/60">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="openAuthModal('google')">
+          <div class="relative shrink-0">
+            <img id="userAvatarImg" src="https://lh3.googleusercontent.com/a/ACg8ocIS_SampleAdmin=s96-c" alt="Avatar" class="w-9 h-9 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shadow-xs" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Orbit+Admin&background=ed263a&color=fff';">
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#141111]"></span>
           </div>
-          <div class="overflow-hidden">
-            <div id="sidebarUserName" class="font-bold text-xs text-stone-900 dark:text-white truncate">Ban Quản Trị Chuỗi</div>
-            <div id="sidebarUserRole" class="text-[10px] text-stone-500 dark:text-stone-400 truncate">Orbit Admin • Tân Long</div>
+          <div class="min-w-0">
+            <div id="sidebarUserName" class="font-extrabold text-xs text-stone-900 dark:text-white truncate">Tuấn Đại</div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="sidebarUserRoleBadge" class="text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase bg-rose-100 text-[#ed263a] dark:bg-rose-950 dark:text-rose-300 truncate">ADMIN</span>
+              <span id="sidebarUserEmail" class="text-[10px] text-stone-400 truncate max-w-[90px]">admin@...</span>
+            </div>
           </div>
         </div>
-        <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 text-stone-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-stone-800 transition-colors">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
+        
+        <!-- Actions: Quick Switch Role / Login / Logout -->
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="openRoleSwitcherModal()" title="Chuyển vai trò thử nghiệm" class="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-200/60 dark:hover:bg-stone-800 active:scale-90 transition-transform">
+            <i data-lucide="shield" class="w-4 h-4 text-[#ed263a]"></i>
+          </button>
+          <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-stone-800 active:scale-90 transition-transform">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
     </div>
 
   </aside>
+
 
   <!-- Main Container -->
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
@@ -3147,6 +3220,155 @@
       <div class="px-5 py-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
         <button onclick="closeInvDetailModal()" class="px-4 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs">
           Đóng Lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- =====================================================================
+       ORBIT SIBA FOOD: GOOGLE AUTH & RBAC LOGIN MODAL
+       ===================================================================== -->
+  <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeGoogleAuthModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+      
+      <!-- Modal Header -->
+      <div class="p-6 pb-4 border-b border-stone-100 dark:border-stone-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ed263a] to-[#d01a2f] flex items-center justify-center text-white shadow-md shadow-rose-900/20">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-stone-900 dark:text-white leading-tight">Đăng Nhập Hệ Thống</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Orbit Siba Food • Phân Quyền Vai Trò</p>
+          </div>
+        </div>
+        <button onclick="closeGoogleAuthModal()" class="p-2 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 bg-stone-100 dark:bg-stone-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-4 text-xs">
+        
+        <!-- Google Sign In Button (Official Branding) -->
+        <button onclick="loginWithGoogle()" class="w-full py-2.5 px-4 rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/80 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-800 dark:text-white font-bold text-xs flex items-center justify-center gap-3 shadow-xs hover:border-[#ed263a] active:scale-98 transition-all">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Tiếp tục với tài khoản Google</span>
+        </button>
+
+        <!-- Demo 1-Click Role Accounts -->
+        <div class="pt-2">
+          <div class="flex items-center gap-2 my-2">
+            <div class="flex-1 h-px bg-stone-200 dark:bg-stone-800"></div>
+            <span class="text-[10px] uppercase font-bold text-stone-400">Hoặc chọn nhanh tài khoản vai trò</span>
+            <div class="flex-1 h-px bg-stone-200 dark:bg-stone-800"></div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-2 pt-1">
+            <button onclick="quickLoginRole('admin@sibafood.vn')" class="flex items-center justify-between p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 hover:border-rose-500 bg-stone-50/50 dark:bg-stone-900/40 text-left active:scale-98 transition-all">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold flex items-center justify-center text-xs">AD</div>
+                <div>
+                  <div class="font-bold text-stone-900 dark:text-white">Tuấn Đại (Admin)</div>
+                  <div class="text-[10px] text-stone-400">admin@sibafood.vn • Toàn quyền 19 tab</div>
+                </div>
+              </div>
+              <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+            </button>
+
+            <button onclick="quickLoginRole('beptruong.k001@sibafood.vn')" class="flex items-center justify-between p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 hover:border-blue-500 bg-stone-50/50 dark:bg-stone-900/40 text-left active:scale-98 transition-all">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold flex items-center justify-center text-xs">BT</div>
+                <div>
+                  <div class="font-bold text-stone-900 dark:text-white">Nguyễn Văn Hùng (Bếp Trưởng)</div>
+                  <div class="text-[10px] text-stone-400">beptruong.k001@sibafood.vn • Kho bếp, Kiểm kê, Nhập hủy</div>
+                </div>
+              </div>
+              <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">BẾP TRƯỞNG</span>
+            </button>
+
+            <button onclick="quickLoginRole('khotong@sibafood.vn')" class="flex items-center justify-between p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 hover:border-amber-500 bg-stone-50/50 dark:bg-stone-900/40 text-left active:scale-98 transition-all">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-bold flex items-center justify-center text-xs">KT</div>
+                <div>
+                  <div class="font-bold text-stone-900 dark:text-white">Phan Văn Đức (Kho WMS)</div>
+                  <div class="text-[10px] text-stone-400">khotong@sibafood.vn • FEFO, ROP, PO SAP</div>
+                </div>
+              </div>
+              <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">KHO WMS</span>
+            </button>
+
+            <button onclick="quickLoginRole('ketoan@sibafood.vn')" class="flex items-center justify-between p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 hover:border-emerald-500 bg-stone-50/50 dark:bg-stone-900/40 text-left active:scale-98 transition-all">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-bold flex items-center justify-center text-xs">KT</div>
+                <div>
+                  <div class="font-bold text-stone-900 dark:text-white">Trần Thị Mai (Kế Toán)</div>
+                  <div class="text-[10px] text-stone-400">ketoan@sibafood.vn • P&amp;L, POS, Chứng từ</div>
+                </div>
+              </div>
+              <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">KẾ TOÁN</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Form Email/Password Fallback -->
+        <div class="pt-2">
+          <div class="space-y-2.5">
+            <div>
+              <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Email Doanh Nghiệp</label>
+              <input type="email" id="authEmailInput" placeholder="ten@sibafood.vn" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-[#ed263a]">
+            </div>
+            <div>
+              <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Mật Khẩu</label>
+              <input type="password" id="authPassInput" placeholder="••••••••" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-[#ed263a]">
+            </div>
+            <button onclick="submitManualLogin()" class="w-full py-2.5 rounded-xl bg-stone-900 dark:bg-white text-white dark:text-stone-900 font-bold text-xs shadow-md active:scale-98 transition-all">
+              Đăng Nhập Bằng Mật Khẩu
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
+  <div id="roleSwitcherModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-sm rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
+        <div>
+          <h4 class="font-extrabold text-sm text-stone-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
+          <p class="text-[10.5px] text-stone-400">Kiểm tra ngay giao diện phân quyền từng vị trí</p>
+        </div>
+        <button onclick="closeRoleSwitcherModal()" class="p-1.5 rounded-full text-stone-400 bg-stone-100 dark:bg-stone-800"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="space-y-1.5 text-xs">
+        <button onclick="switchRoleAction('ADMIN')" class="w-full p-2.5 rounded-xl text-left border border-stone-200 dark:border-stone-800 hover:border-rose-500 flex items-center justify-between">
+          <div><div class="font-bold text-rose-600">Ban Quản Trị (ADMIN)</div><div class="text-[10px] text-stone-400">Toàn quyền 19/19 chức năng</div></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+        </button>
+        <button onclick="switchRoleAction('BEP_TRUONG')" class="w-full p-2.5 rounded-xl text-left border border-stone-200 dark:border-stone-800 hover:border-blue-500 flex items-center justify-between">
+          <div><div class="font-bold text-blue-600">Bếp Trưởng / Quản Lý Điểm</div><div class="text-[10px] text-stone-400">Kho bếp, Kiểm kê, Nhập hủy, Suất ăn</div></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+        </button>
+        <button onclick="switchRoleAction('KHO_TRUONG')" class="w-full p-2.5 rounded-xl text-left border border-stone-200 dark:border-stone-800 hover:border-amber-500 flex items-center justify-between">
+          <div><div class="font-bold text-amber-600">Quản Lý Kho WMS</div><div class="text-[10px] text-stone-400">Kho FEFO, ROP, PO SAP, Tồn chuỗi</div></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+        </button>
+        <button onclick="switchRoleAction('KE_TOAN')" class="w-full p-2.5 rounded-xl text-left border border-stone-200 dark:border-stone-800 hover:border-emerald-500 flex items-center justify-between">
+          <div><div class="font-bold text-emerald-600">Kế Toán Kiểm Soát</div><div class="text-[10px] text-stone-400">P&amp;L, POS, Chứng từ hóa đơn</div></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+        </button>
+        <button onclick="switchRoleAction('NHAN_VIEN')" class="w-full p-2.5 rounded-xl text-left border border-stone-200 dark:border-stone-800 hover:border-stone-500 flex items-center justify-between">
+          <div><div class="font-bold text-stone-600 dark:text-stone-300">Nhân Viên Vận Hành</div><div class="text-[10px] text-stone-400">Chỉ nhập kiểm kê &amp; suất ăn</div></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
         </button>
       </div>
     </div>
@@ -9192,6 +9414,224 @@ window.viewCountDetail = async function(countId) {
 window.closeInvDetailModal = function() {
   document.getElementById('invDetailModal')?.classList.add('hidden');
 };
+
+
+
+
+// ============================================================================
+// ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
+// ============================================================================
+
+let gCurrentUser = {
+  email: 'admin@sibafood.vn',
+  fullName: 'Tuấn Đại - Giám Đốc Hệ Thống',
+  avatarUrl: 'https://lh3.googleusercontent.com/a/ACg8ocIS_SampleAdmin=s96-c',
+  role: 'ADMIN',
+  roleName: 'Ban Quản Trị Hệ Thống',
+  badgeColor: 'rose',
+  permissions: null // null means full access (ADMIN)
+};
+
+// 1. Khởi tạo phiên làm việc từ LocalStorage
+function initRbacAuth() {
+  try {
+    const saved = localStorage.getItem('orbit_user');
+    if (saved) {
+      gCurrentUser = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error loading saved user:', e);
+  }
+  applyUserSessionToUI();
+}
+
+// 2. Cập nhật giao diện theo User Session & Phân Quyền
+function applyUserSessionToUI() {
+  const nameEl = document.getElementById('sidebarUserName');
+  const roleEl = document.getElementById('sidebarUserRoleBadge');
+  const emailEl = document.getElementById('sidebarUserEmail');
+  const avImg = document.getElementById('userAvatarImg');
+
+  if (nameEl) nameEl.textContent = gCurrentUser.fullName || 'Người dùng';
+  if (emailEl) emailEl.textContent = gCurrentUser.email || '';
+  if (avImg && gCurrentUser.avatarUrl) avImg.src = gCurrentUser.avatarUrl;
+
+  if (roleEl) {
+    roleEl.textContent = gCurrentUser.role || 'ADMIN';
+    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase truncate ${
+      gCurrentUser.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
+      gCurrentUser.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
+      gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+      gCurrentUser.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+      'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300'
+    }`;
+  }
+
+  // Enforce permissions on all navigation buttons
+  document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
+    const tabId = btn.getAttribute('data-tab');
+    if (!tabId) return;
+
+    const lockIcon = btn.querySelector('.lock-icon');
+    const hasPerm = canAccessTab(tabId);
+
+    if (hasPerm) {
+      btn.classList.remove('opacity-40', 'cursor-not-allowed');
+      if (lockIcon) lockIcon.classList.add('hidden');
+    } else {
+      btn.classList.add('opacity-40');
+      if (lockIcon) lockIcon.classList.remove('hidden');
+    }
+  });
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// 3. Kiểm tra quyền truy cập tab
+function canAccessTab(tabId) {
+  if (gCurrentUser.role === 'ADMIN' || !gCurrentUser.permissions) return true;
+  const perm = gCurrentUser.permissions[tabId];
+  return !!(perm && perm.canView);
+}
+
+// 4. Hook switchTab để chặn quyền truy cập trái phép
+const _origSwitchTab = window.switchTab;
+window.switchTab = function(tabId, btn) {
+  if (!canAccessTab(tabId)) {
+    if (typeof showToast === 'function') {
+      showToast(`Chức năng này không thuộc phân quyền của vai trò ${gCurrentUser.roleName || gCurrentUser.role}!`);
+    }
+    return;
+  }
+  if (typeof _origSwitchTab === 'function') {
+    _origSwitchTab(tabId, btn);
+  }
+};
+
+// 5. Mở và đóng Google Auth Modal
+window.openAuthModal = function() {
+  document.getElementById('googleAuthModal')?.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeGoogleAuthModal = function() {
+  document.getElementById('googleAuthModal')?.classList.add('hidden');
+};
+
+// 6. Đăng nhập Google (Giả lập hoặc Google Identity)
+window.loginWithGoogle = async function() {
+  // Có thể gắn Google OAuth Token nếu có Client ID, mặc định đăng nhập tài khoản Google mẫu của người dùng
+  quickLoginRole('admin@sibafood.vn');
+};
+
+window.quickLoginRole = async function(email) {
+  try {
+    if (typeof showLoading === 'function') showLoading('Xác thực tài khoản Google...');
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi đăng nhập');
+
+    gCurrentUser = json.data;
+    localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    applyUserSessionToUI();
+    closeGoogleAuthModal();
+    if (typeof showToast === 'function') showToast(`Xin chào ${gCurrentUser.fullName}! (${gCurrentUser.roleName})`);
+  } catch (err) {
+    console.error('quickLoginRole error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.submitManualLogin = async function() {
+  const email = document.getElementById('authEmailInput')?.value;
+  if (!email) {
+    if (typeof showToast === 'function') showToast('Vui lòng nhập email');
+    return;
+  }
+  quickLoginRole(email);
+};
+
+// 7. Role Switcher Modal Actions
+window.openRoleSwitcherModal = function() {
+  document.getElementById('roleSwitcherModal')?.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeRoleSwitcherModal = function() {
+  document.getElementById('roleSwitcherModal')?.classList.add('hidden');
+};
+
+window.switchRoleAction = async function(roleCode) {
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch('/api/auth/switch-role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: roleCode })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error('Không chuyển được vai trò');
+
+    gCurrentUser.role = json.data.role;
+    gCurrentUser.roleName = json.data.roleName;
+    gCurrentUser.badgeColor = json.data.badgeColor;
+    gCurrentUser.permissions = json.data.permissions;
+
+    localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    applyUserSessionToUI();
+    closeRoleSwitcherModal();
+    if (typeof showToast === 'function') showToast(`Đã chuyển sang vai trò: ${json.data.roleName}`);
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi: ' + e.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.dangXuatAdmin = function() {
+  localStorage.removeItem('orbit_user');
+  gCurrentUser = {
+    email: 'khach@sibafood.vn',
+    fullName: 'Khách Xem Báo Cáo',
+    avatarUrl: 'https://ui-avatars.com/api/?name=Guest&background=666&color=fff',
+    role: 'NHAN_VIEN',
+    roleName: 'Nhân Viên Vận Hành',
+    badgeColor: 'stone',
+    permissions: null
+  };
+  applyUserSessionToUI();
+  if (typeof showToast === 'function') showToast('Đã đăng xuất tài khoản!');
+};
+
+// 8. Quick Filter Sidebar Menu on PC
+window.filterSidebarMenu = function(query) {
+  const q = (query || '').toLowerCase().trim();
+  document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
+    let catHasVisible = false;
+    cat.querySelectorAll('.nav-btn').forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if (!q || text.includes(q)) {
+        btn.classList.remove('hidden');
+        catHasVisible = true;
+      } else {
+        btn.classList.add('hidden');
+      }
+    });
+    if (catHasVisible) cat.classList.remove('hidden');
+    else cat.classList.add('hidden');
+  });
+};
+
+// Initialize RBAC on DOM Ready
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initRbacAuth, 300);
+});
 
 </script>
 </body>

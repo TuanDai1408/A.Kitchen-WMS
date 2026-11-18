@@ -793,6 +793,155 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      
+      // 2.11.1 GOOGLE AUTHENTICATION & RBAC (/api/auth/google)
+      if (pathname === '/api/auth/google' && request.method === 'POST') {
+        try {
+          const body = await request.json();
+          let { email, fullName, avatarUrl, googleId, credential } = body;
+
+          // Nếu gửi credential dạng JWT token từ Google One Tap / GSI
+          if (credential && !email) {
+            try {
+              const parts = credential.split('.');
+              if (parts.length === 3) {
+                const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                const decodedJson = JSON.parse(atob(payloadBase64));
+                email = decodedJson.email;
+                fullName = decodedJson.name || decodedJson.given_name;
+                avatarUrl = decodedJson.picture;
+                googleId = decodedJson.sub;
+              }
+            } catch (errDec) {
+              console.error('Error decoding Google JWT credential:', errDec);
+            }
+          }
+
+          if (!email) {
+            return new Response(JSON.stringify({ success: false, error: 'Không nhận được thông tin email từ Google' }), { status: 400, headers: corsHeaders });
+          }
+
+          // 1. Tìm kiếm user trong app_users
+          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+
+          if (!user) {
+            // Xác định vai trò mặc định
+            let defaultRole = 'NHAN_VIEN';
+            if (email.includes('admin') || email.includes('daitt') || email.includes('tuandai')) defaultRole = 'ADMIN';
+            else if (email.includes('bep') || email.includes('chef')) defaultRole = 'BEP_TRUONG';
+            else if (email.includes('kho') || email.includes('stock')) defaultRole = 'KHO_TRUONG';
+            else if (email.includes('ketoan') || email.includes('account')) defaultRole = 'KE_TOAN';
+
+            const insertRes = await env.DB.prepare(`
+              INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
+              VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', datetime('now'))
+            `).bind(email, fullName || email.split('@')[0], avatarUrl || '', googleId || '', defaultRole).run();
+
+            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(insertRes.meta.last_row_id).first();
+          } else {
+            // Cập nhật thông tin Google và last_login
+            await env.DB.prepare(`
+              UPDATE app_users
+              SET last_login = datetime('now'),
+                  avatar_url = COALESCE(?, avatar_url),
+                  google_id = COALESCE(?, google_id),
+                  updated_at = datetime('now')
+              WHERE id = ?
+            `).bind(avatarUrl || user.avatar_url, googleId || user.google_id, user.id).run();
+            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(user.id).first();
+          }
+
+          // 2. Lấy thông tin Role & Permissions
+          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first() || {
+            role_code: user.role_code,
+            role_name: user.role_code,
+            badge_color: 'stone'
+          };
+
+          const { results: permRows } = await env.DB.prepare(`
+            SELECT feature_code, can_view, can_create, can_edit, can_delete
+            FROM role_permissions
+            WHERE role_code = ?
+          `).bind(user.role_code).all();
+
+          const permissions = {};
+          permRows.forEach(p => {
+            permissions[p.feature_code] = {
+              canView: p.can_view === 1,
+              canCreate: p.can_create === 1,
+              canEdit: p.can_edit === 1,
+              canDelete: p.can_delete === 1
+            };
+          });
+
+          return new Response(JSON.stringify({
+            success: true,
+            message: 'Đăng nhập bằng Google thành công!',
+            data: {
+              id: user.id,
+              email: user.email,
+              fullName: user.full_name,
+              avatarUrl: user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=ed263a&color=fff`,
+              role: user.role_code,
+              roleName: roleInfo.role_name,
+              badgeColor: roleInfo.badge_color,
+              authProvider: user.auth_provider,
+              permissions
+            }
+          }), { headers: corsHeaders });
+        } catch (err) {
+          console.error('Google Auth API Error:', err);
+          return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+
+      // 2.11.2 LẤY QUYỀN & VAI TRÒ HỆ THỐNG (/api/auth/roles-permissions)
+      if (pathname === '/api/auth/roles-permissions' && request.method === 'GET') {
+        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
+        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
+        const { results: users } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: { roles, perms, users }
+        }), { headers: corsHeaders });
+      }
+
+      // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)
+      if (pathname === '/api/auth/switch-role' && request.method === 'POST') {
+        const { role } = await request.json();
+        const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(role).first();
+        if (!roleInfo) {
+          return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
+        }
+
+        const { results: permRows } = await env.DB.prepare(`
+          SELECT feature_code, can_view, can_create, can_edit, can_delete
+          FROM role_permissions
+          WHERE role_code = ?
+        `).bind(role).all();
+
+        const permissions = {};
+        permRows.forEach(p => {
+          permissions[p.feature_code] = {
+            canView: p.can_view === 1,
+            canCreate: p.can_create === 1,
+            canEdit: p.can_edit === 1,
+            canDelete: p.can_delete === 1
+          };
+        });
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            role: roleInfo.role_code,
+            roleName: roleInfo.role_name,
+            badgeColor: roleInfo.badge_color,
+            permissions
+          }
+        }), { headers: corsHeaders });
+      }
+
       // 2.11 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
         const { email, password } = await request.json();
