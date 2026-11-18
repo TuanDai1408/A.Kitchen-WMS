@@ -288,6 +288,82 @@
       color: #f5f2f2 !important;
       border-color: #2b2626 !important;
     }
+
+    /* =======================================================================
+       ORBIT SIBA COMPREHENSIVE DARK THEME RULES (No white tables/cards)
+       ======================================================================= */
+    .dark, .dark body {
+      background-color: #0f0d0d !important;
+      color: #f5f2f2 !important;
+    }
+    .dark .bg-white {
+      background-color: #161313 !important;
+      color: #f5f2f2 !important;
+    }
+    .dark .bg-stone-50, .dark .bg-stone-50 dark:bg-stone-900/50 {
+      background-color: #1a1717 !important;
+    }
+    .dark .bg-stone-100, .dark .bg-stone-100 dark:bg-stone-800/80 {
+      background-color: #242020 !important;
+    }
+    .dark .bg-stone-200, .dark .bg-stone-200 dark:bg-stone-700 {
+      background-color: #2e2929 !important;
+    }
+    .dark .border-stone-100, .dark .border-stone-100 dark:border-stone-800,
+    .dark .border-stone-200, .dark .border-stone-200 dark:border-stone-800,
+    .dark .border-stone-300, .dark .border-stone-300 dark:border-stone-700 {
+      border-color: #2b2626 !important;
+    }
+    .dark .text-stone-900, .dark .text-stone-900 dark:text-white,
+    .dark .text-stone-800, .dark .text-stone-800 dark:text-stone-100 {
+      color: #fafaf9 !important;
+    }
+    .dark .text-stone-700, .dark .text-stone-700 dark:text-stone-200,
+    .dark .text-stone-600, .dark .text-stone-600 dark:text-stone-300 {
+      color: #d6d3d1 !important;
+    }
+    .dark .text-stone-500, .dark .text-stone-500 dark:text-stone-400,
+    .dark .text-stone-400, .dark .text-stone-400 dark:text-stone-500 {
+      color: #a8a29e !important;
+    }
+    .dark table {
+      color: #e7e5e4 !important;
+    }
+    .dark thead, .dark thead tr, .dark thead th {
+      background-color: #1e1a1a !important;
+      color: #e7e5e4 !important;
+      border-color: #2b2626 !important;
+    }
+    .dark tbody tr {
+      background-color: #161313 !important;
+      border-color: #2b2626 !important;
+    }
+    .dark tbody td {
+      border-color: #2b2626 !important;
+    }
+    .dark tbody tr:hover,
+    .dark tr.hover\:bg-stone-50 dark:bg-stone-900/50:hover,
+    .dark tr.hover\:bg-stone-50:hover,
+    .dark tr.hover\:bg-stone-50\/70:hover {
+      background-color: #242020 !important;
+    }
+    .dark input:not([type="checkbox"]):not([type="radio"]),
+    .dark select,
+    .dark textarea {
+      background-color: #1a1717 !important;
+      color: #f5f2f2 !important;
+      border-color: #383232 !important;
+    }
+    .dark input:focus, .dark select:focus, .dark textarea:focus {
+      border-color: #ed263a !important;
+    }
+    .dark #generalModal > div,
+    .dark #authModal > div,
+    .dark #loadingModal > div {
+      background-color: #161313 !important;
+      color: #f5f2f2 !important;
+      border-color: #2b2626 !important;
+    }
 </style>
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row antialiased transition-colors duration-200">
@@ -339,6 +415,10 @@
           <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
             <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
             <span>Doanh Thu POS &amp; Bán Lẻ</span>
+          </button>
+          <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i>
+            <span>Tồn Kho Chuỗi F&amp;B</span>
           </button>
         </div>
       </div>
@@ -495,7 +575,7 @@
         <!-- Global Month Selector (Hidden on extra small phones, visible on sm+) -->
         <div class="hidden sm:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/90 rounded-xl px-2 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-stone-500"></i>
-          <span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-stone-500 dark:text-stone-400 mr-2"></span><input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-stone-800 dark:text-stone-200 outline-none text-xs">
+          <span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-stone-500 dark:text-stone-400 mr-2"></span><span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-stone-500 dark:text-stone-400 mr-2"></span><input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-stone-800 dark:text-stone-200 outline-none text-xs">
         </div>
 
         <!-- Theme Toggle Button -->
@@ -1100,7 +1180,161 @@
 
       </section>
 
-<section id="wh-dashboard" class="tab-panel active space-y-5">
+
+      <!-- =====================================================================
+           SECTION: TỒN KHO TOÀN CHUỖI F&B (MATRIX VIEW - Siba Food Standard)
+           ===================================================================== -->
+      <section id="fnb-stock" class="tab-panel space-y-5">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-emerald-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white tracking-wide uppercase">Orbit Siba Food</span>
+                <span class="text-xs text-stone-300">Quản Trị Tồn Kho Chuỗi F&amp;B</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Tồn Kho Chuỗi Điểm Bán</h1>
+              <p class="text-xs text-stone-300 mt-1">Tồn của từng mặt hàng tại từng điểm: số kiểm gần nhất + nhập – định mức đã bán – hủy. Số trong ngoặc là lần đếm gần nhất.</p>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="exportFnbStockExcel()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs border border-white/15 flex items-center gap-2 transition-all shadow-xs backdrop-blur-sm">
+                <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
+                <span>Xuất Excel Aptos</span>
+              </button>
+              <button onclick="loadFnbStock()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-emerald-900/30">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Tải Lại</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards (4 Cards) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <!-- Card 1: Tổng Mặt Hàng -->
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Tổng Mặt Hàng F&amp;B</p>
+                <h3 id="fnbStockKpiTotalItems" class="text-xl sm:text-2xl font-extrabold font-mono text-stone-900 dark:text-white mt-1">--</h3>
+                <p class="text-[10px] text-stone-400 mt-0.5">5 nhóm hàng danh mục</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center shrink-0">
+                <i data-lucide="boxes" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+          </div>
+
+          <!-- Card 2: Tổng Giá Trị Tồn Chuỗi -->
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Tổng Giá Trị Tồn Chuỗi</p>
+                <h3 id="fnbStockKpiTotalValue" class="text-xl sm:text-2xl font-extrabold font-mono text-stone-900 dark:text-white mt-1">--</h3>
+                <p class="text-[10px] text-stone-400 mt-0.5">14 điểm bán toàn hệ thống</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center shrink-0">
+                <i data-lucide="circle-dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+          </div>
+
+          <!-- Card 3: Cảnh Báo Âm Tồn -->
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Cảnh Báo Âm Tồn</p>
+                <h3 id="fnbStockKpiNegative" class="text-xl sm:text-2xl font-extrabold font-mono text-rose-600 dark:text-rose-400 mt-1">--</h3>
+                <p class="text-[10px] text-stone-400 mt-0.5">Vượt định mức hoặc chưa ghi nhận nhập</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+          </div>
+
+          <!-- Card 4: Chưa Có Tồn Đầu -->
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Chưa Có Tồn Đầu</p>
+                <h3 id="fnbStockKpiNoOpening" class="text-xl sm:text-2xl font-extrabold font-mono text-amber-600 dark:text-amber-400 mt-1">--</h3>
+                <p class="text-[10px] text-stone-400 mt-0.5">Cần cập nhật số dư ban đầu</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Filter Vùng -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Vùng:</span>
+                <select id="fnbStockFilterRegion" onchange="onFnbStockFilterChange()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-semibold text-stone-800 dark:text-stone-200 outline-none focus:border-emerald-500">
+                  <option value="ALL">Tất cả vùng (14 điểm)</option>
+                  <option value="MN">Miền Nam (8 điểm)</option>
+                  <option value="MB">Miền Bắc (6 điểm)</option>
+                </select>
+              </div>
+
+              <!-- Filter Nhóm Hàng -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Nhóm:</span>
+                <select id="fnbStockFilterGroup" onchange="onFnbStockFilterChange()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-semibold text-stone-800 dark:text-stone-200 outline-none focus:border-emerald-500">
+                  <option value="ALL">Tất cả nhóm</option>
+                  <option value="NVL">Nguyên liệu (NVL)</option>
+                  <option value="BTP">Bán thành phẩm (BTP)</option>
+                  <option value="HANG_BAN">Hàng bán</option>
+                  <option value="BAO_BI">Bao bì</option>
+                  <option value="VTTH">Vật tư tiêu hao</option>
+                </select>
+              </div>
+
+              <!-- Toggle Hiển Thị Giá Trị VNĐ -->
+              <label class="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+                <input type="checkbox" id="fnbStockShowValueToggle" onchange="onFnbStockToggleValue(this.checked)" class="rounded text-emerald-600 focus:ring-0">
+                <span class="text-xs font-semibold text-stone-700 dark:text-stone-300">Xem giá trị (VNĐ)</span>
+              </label>
+            </div>
+
+            <!-- Search Input -->
+            <div class="relative w-full lg:w-72">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="fnbStockSearchInput" oninput="onFnbStockSearch(this.value)" placeholder="Tìm mã hàng, tên hàng..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs text-stone-900 dark:text-stone-100 outline-none focus:border-emerald-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Matrix Table (Sticky Item column & dynamic Sites columns) -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-[#161313] shadow-xs">
+          <table class="w-full border-collapse text-left text-xs" id="fnbStockDesktopTable">
+            <thead class="bg-stone-50 dark:bg-[#1e1a1a] text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800 sticky top-0 z-30" id="fnbStockTableHead">
+              <!-- Dynamically populated headers -->
+            </thead>
+            <tbody id="fnbStockTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/80">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Native Mobile Card View (No horizontal scrolling on phones) -->
+        <div id="fnbStockMobileCards" class="block lg:hidden space-y-3 mt-4">
+          <!-- Dynamically populated mobile cards -->
+        </div>
+
+      </section>
+
+      <section id="wh-dashboard" class="tab-panel active space-y-5">
         
         <!-- Welcome Hero -->
         <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -2088,6 +2322,15 @@
             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950 dark:text-rose-300">Orbit Model</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('fnb-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                <i data-lucide="boxes" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Tồn Kho Chuỗi</div>
+                <div class="text-[10px] text-stone-500 truncate">Ma trận 14 điểm</div>
+              </div>
+            </button>
             <button onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
               <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-[#ed263a] flex items-center justify-center shrink-0">
                 <i data-lucide="trophy" class="w-5 h-5"></i>
@@ -2348,6 +2591,34 @@
     </div>
   </div>
 
+  
+  <!-- =====================================================================
+       ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
+       ===================================================================== -->
+  <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
+    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 transition-all shadow-lg" title="Đóng (ESC)">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
+      <div id="lightboxFileName" class="text-white text-xs sm:text-sm font-bold text-center px-4 drop-shadow max-w-full truncate"></div>
+      <img id="lightboxImg" src="" alt="Hình ảnh chứng từ" loading="lazy"
+           class="max-w-full max-h-[78dvh] object-contain rounded-2xl shadow-2xl hidden border border-white/10">
+      <iframe id="lightboxIframe" src="" frameborder="0" allowfullscreen
+              class="w-full rounded-2xl shadow-2xl hidden border border-white/10 bg-white"
+              style="height:78dvh; min-height:320px;"></iframe>
+      <div class="flex items-center gap-2 pt-1">
+        <button onclick="const src=document.getElementById('lightboxImg').src||document.getElementById('lightboxIframe').src; if(src)window.open(src,'_blank')"
+                class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-sm transition-all flex items-center gap-1.5">
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Mở Drive Tab Mới
+        </button>
+        <button onclick="closeImageLightbox()"
+                class="px-4 py-2 rounded-xl bg-[#ed263a] hover:bg-[#d01a2f] text-white text-xs font-bold transition-all flex items-center gap-1.5">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i> Đóng Lại
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
       <div class="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50 dark:bg-stone-900/50">
@@ -2542,6 +2813,7 @@
       if (tabId === 'fnb-chain') loadFnbChain();
       if (tabId === 'fnb-pl') loadFnbPL();
       if (tabId === 'fnb-pos') loadFnbPOS();
+      if (tabId === 'fnb-stock') loadFnbStock();
       if (tabId === 'fnb-sites') loadFnbSites();
       
       // Orbit Siba F&B Tab Hooks
@@ -3985,6 +4257,7 @@ const TAB_META = {
   'fnb-chain': { title: '🏆 Toàn Chuỗi', mobTab: 'fnb-chain' },
   'fnb-pl': { title: '📊 Báo Cáo P&L', mobTab: 'fnb-chain' },
   'fnb-pos': { title: '⚡ Doanh Thu POS', mobTab: 'fnb-chain' },
+  'fnb-stock': { title: '📦 Tồn Kho Chuỗi F&B', mobTab: 'fnb-chain' },
   'fnb-sites': { title: '🏢 14 Điểm Bán SAP', mobTab: 'hub' },
   'wh-dashboard': { title: '📈 Tổng Quan Kho', mobTab: 'wh-stock' },
   'wh-stock': { title: '📦 Hạn Dùng & FEFO', mobTab: 'wh-stock' },
@@ -6179,6 +6452,1183 @@ window.renderFnbSites = function(sites) {
   }
 
   if (window.lucide) lucide.createIcons();
+};
+
+// 12. Fix async issues on older functions
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (typeof loadFnbChain === 'function') loadFnbChain();
+    if (typeof updateMobileNavState === 'function') updateMobileNavState('fnb-chain');
+    if (window.lucide) lucide.createIcons();
+  }, 250);
+});
+
+
+
+
+// ============================================================================
+// ORBIT SIBA FOOD: MASTER UPGRADES (MOBILE CARDS, DARK MODE, REAL DB, LIGHTBOX)
+// ============================================================================
+
+// 1. Image / File Lightbox Engine
+function openImageLightbox(fileLink, fileName, fileType) {
+  const lb = document.getElementById('imageLightbox');
+  if (!lb) {
+    window.open(fileLink, '_blank');
+    return;
+  }
+  const img = document.getElementById('lightboxImg');
+  const iframe = document.getElementById('lightboxIframe');
+  const titleEl = document.getElementById('lightboxFileName');
+  if (titleEl) titleEl.textContent = fileName || 'Xem tệp đính kèm';
+
+  const driveMatch = fileLink && fileLink.match(/\/d\/([^/\?]+)/);
+  const driveId = driveMatch ? driveMatch[1] : null;
+
+  const isImg = (fileType && fileType.startsWith('image/')) ||
+                /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileName || '') ||
+                /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileLink || '');
+
+  if (driveId) {
+    if (isImg) {
+      img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+      img.classList.remove('hidden');
+      iframe.classList.add('hidden');
+      iframe.src = '';
+    } else {
+      iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+      iframe.classList.remove('hidden');
+      img.classList.add('hidden');
+      img.src = '';
+    }
+  } else {
+    if (isImg) {
+      img.src = fileLink;
+      img.classList.remove('hidden');
+      iframe.classList.add('hidden');
+      iframe.src = '';
+    } else {
+      window.open(fileLink, '_blank');
+      return;
+    }
+  }
+  lb.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeImageLightbox() {
+  const lb = document.getElementById('imageLightbox');
+  if (lb) lb.classList.add('hidden');
+  const img = document.getElementById('lightboxImg');
+  const iframe = document.getElementById('lightboxIframe');
+  if (img) img.src = '';
+  if (iframe) iframe.src = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeImageLightbox();
+});
+
+// 2. Upgraded searchVouchers (Desktop Table + Mobile Cards + Lightbox)
+window.searchVouchers = async function() {
+  const site = document.getElementById('scSite') ? document.getElementById('scSite').value : '';
+  const loai = document.getElementById('scLoai') ? document.getElementById('scLoai').value : '';
+  showLoading('Tra cứu chứng từ...');
+  try {
+    const res = await fetch(`/api/vouchers?site=${encodeURIComponent(site)}&loaiHoaDon=${encodeURIComponent(loai)}`);
+    const json = await res.json();
+    const tbody = document.getElementById('scBody');
+    const mobContainer = document.getElementById('scMobileCards');
+
+    if (!json.success || !json.data || !json.data.length) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-stone-400">Không tìm thấy chứng từ nào</td></tr>';
+      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không tìm thấy chứng từ nào</div>';
+      return;
+    }
+
+    const items = json.data;
+
+    // Desktop Table
+    if (tbody) {
+      tbody.innerHTML = items.map(r => `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.maCT}</td>
+          <td class="p-3 text-stone-900 dark:text-stone-100 font-medium">${r.site}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-mono text-[11px] border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span></td>
+          <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
+          <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</td>
+          <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${r.nhaCungCap || '—'}</td>
+          <td class="p-3 text-stone-600 dark:text-stone-300">${r.nguoiNhap}</td>
+          <td class="p-3 text-center">
+            ${r.soFile ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">📎 ${r.soFile} file</span>` : '<span class="text-stone-400 text-xs">—</span>'}
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="viewVoucherDetail('${r.maCT}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
+              Xem
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Mobile Cards
+    if (mobContainer) {
+      mobContainer.innerHTML = items.map(r => `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${r.maCT}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span>
+          </div>
+          <div class="font-bold text-xs text-stone-900 dark:text-white leading-snug">${r.site}</div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/60 text-stone-600 dark:text-stone-400">
+            <div>Ngày nhận: <b class="font-mono text-stone-900 dark:text-white">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</b></div>
+            <div>NCC: <b class="text-stone-900 dark:text-white truncate block">${r.nhaCungCap || '—'}</b></div>
+            <div>Người nhập: <b class="text-stone-900 dark:text-white">${r.nguoiNhap}</b></div>
+            <div>Đính kèm: <b class="${r.soFile ? 'text-rose-600 dark:text-rose-400' : 'text-stone-400'}">${r.soFile ? `📎 ${r.soFile} file` : 'Không có'}</b></div>
+          </div>
+          <button onclick="viewVoucherDetail('${r.maCT}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="eye" class="w-3.5 h-3.5 text-[#ed263a]"></i> Xem Chi Tiết &amp; Ảnh Đính Kèm
+          </button>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('searchVouchers error:', err);
+    showToast('Lỗi tra cứu chứng từ: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+// 3. Upgraded viewVoucherDetail (Image Gallery, Click to Zoom Lightbox)
+window.viewVoucherDetail = async function(maCT) {
+  showLoading('Tải chi tiết chứng từ...');
+  try {
+    const res = await fetch(`/api/voucher-detail?maCT=${encodeURIComponent(maCT)}`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      const v = json.data;
+
+      let galleryHtml = '';
+      if (v.files && v.files.length) {
+        galleryHtml = `
+          <div class="mt-4 pt-4 border-t border-stone-200 dark:border-stone-800">
+            <div class="font-bold text-xs text-stone-800 dark:text-stone-200 mb-2 flex items-center gap-1.5">
+              <span>🖼️ Tệp đính kèm &amp; Hình ảnh</span>
+              <span class="px-2 py-0.2 rounded-full text-[10px] font-mono bg-rose-100 text-[#ed263a] dark:bg-rose-950 dark:text-rose-300 font-bold">${v.files.length}</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              ${v.files.map((f, i) => {
+                const driveMatch = f.file_link && f.file_link.match(/\/d\/([^/\?]+)/);
+                const driveId = driveMatch ? driveMatch[1] : null;
+                const isImg = (f.file_type && f.file_type.startsWith('image/')) ||
+                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_name || '') ||
+                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_link || '');
+                const thumbUrl = (driveId && isImg) ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w600` : '';
+
+                return `
+                  <div class="p-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/60 flex flex-col justify-between gap-2 shadow-2xs">
+                    ${thumbUrl ? `
+                      <div class="w-full h-36 rounded-lg overflow-hidden bg-stone-200 dark:bg-stone-800 relative cursor-pointer group" onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')">
+                        <img src="${thumbUrl}" alt="${f.file_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity">
+                          🔍 Phóng to xem ảnh
+                        </div>
+                      </div>
+                    ` : ''}
+                    <div class="flex items-center justify-between gap-2 min-w-0">
+                      <div class="truncate text-xs font-medium text-stone-800 dark:text-stone-200" title="${f.file_name}">
+                        ${isImg ? '🖼️' : '📄'} ${f.file_name}
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')" class="px-2.5 py-1 rounded-lg bg-[#ed263a] hover:bg-[#d01a2f] text-white text-[11px] font-bold transition-all shadow-2xs">
+                          Xem
+                        </button>
+                        <a href="${f.file_link}" target="_blank" class="p-1 rounded-lg bg-stone-200 hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-[11px]" title="Mở Drive tab mới">
+                          ↗
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        galleryHtml = `<div class="mt-3 p-3 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-center text-xs text-stone-400 italic">Không có tệp đính kèm hoặc hình ảnh nào</div>`;
+      }
+
+      const html = `
+        <div class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-stone-50 dark:bg-stone-900/60 rounded-2xl border border-stone-200 dark:border-stone-800">
+            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#ed263a] dark:text-rose-400">${v.voucher_code}</b></div>
+            <div><span class="text-stone-400">Loại hóa đơn:</span><br><b class="text-stone-800 dark:text-stone-200">${v.invoice_type}</b></div>
+            <div><span class="text-stone-400">Điểm bán:</span><br><b class="text-stone-800 dark:text-stone-200">${v.site_name}</b></div>
+            <div><span class="text-stone-400">Nhà cung cấp:</span><br><b class="text-stone-800 dark:text-stone-200">${v.supplier_name || '—'}</b></div>
+            <div><span class="text-stone-400">Người giao:</span><br><b class="text-stone-800 dark:text-stone-200">${v.deliverer_name || '—'}</b></div>
+            <div><span class="text-stone-400">Người nhận:</span><br><b class="text-stone-800 dark:text-stone-200">${v.receiver_name || '—'}</b></div>
+            <div><span class="text-stone-400">Ngày xuất HĐ:</span><br><b class="font-mono text-stone-800 dark:text-stone-200">${v.invoice_date || '—'}</b></div>
+            <div><span class="text-stone-400">Ngày nhận hàng:</span><br><b class="font-mono text-stone-800 dark:text-stone-200">${v.receive_date || '—'}</b></div>
+          </div>
+          <div>
+            <span class="text-stone-400">Ghi chú nghiệp vụ:</span>
+            <div class="p-2.5 mt-1 rounded-xl bg-stone-50 dark:bg-stone-900/40 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300">${v.note || 'Không có ghi chú thêm.'}</div>
+          </div>
+          ${galleryHtml}
+        </div>
+      `;
+      openGeneralModal(`Chi Tiết Chứng Từ: ${maCT}`, html);
+    }
+  } catch (err) {
+    console.error('viewVoucherDetail error:', err);
+    showToast('Lỗi tải chi tiết: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+// 4. Upgraded renderFefoRows (Desktop Table + Mobile Cards)
+window.renderFefoRows = function(items) {
+  const tbody = document.getElementById('fefoTableBody');
+  const mob = document.getElementById('fefoMobileCards');
+
+  if (!items || !items.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-stone-400">Không có tồn kho gia vị nào.</td></tr>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không có tồn kho gia vị nào.</div>';
+    return;
+  }
+
+  // Desktop Table
+  if (tbody) {
+    tbody.innerHTML = items.map(r => {
+      let badgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800';
+      if (r.danger_level === 'red') badgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800 animate-pulse';
+      else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
+
+      return `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="p-3"><span class="w-6 h-6 rounded-full bg-stone-800 dark:bg-stone-700 text-white flex items-center justify-center font-mono font-bold text-[11px]">${r.fefo_priority}</span></td>
+          <td class="p-3 font-mono font-bold text-stone-900 dark:text-white">${r.sku}</td>
+          <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${r.item_name}</td>
+          <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.batch_no}</td>
+          <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.exp_date}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span></td>
+          <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${r.qty}</td>
+          <td class="p-3 font-mono text-stone-500">${r.uom}</td>
+          <td class="p-3 font-mono text-stone-500">${r.location_bin || 'KHO-GIAVI'}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Mobile Cards
+  if (mob) {
+    mob.innerHTML = items.map(r => {
+      let badgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800';
+      if (r.danger_level === 'red') badgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800 animate-pulse';
+      else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
+
+      return `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-stone-800 dark:bg-stone-700 text-white flex items-center justify-center font-mono font-bold text-xs">P${r.fefo_priority}</span>
+              <span class="font-extrabold text-xs text-stone-900 dark:text-white">${r.item_name}</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400">
+            <div>SKU: <b class="font-mono text-stone-900 dark:text-white">${r.sku}</b></div>
+            <div>Số lô: <b class="font-mono text-stone-900 dark:text-white">${r.batch_no}</b></div>
+            <div>Hạn dùng: <b class="font-mono text-stone-900 dark:text-white">${r.exp_date}</b></div>
+            <div>Vị trí kệ: <b class="font-mono text-stone-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
+            <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
+              <span class="text-stone-500 font-medium">Tồn khả dụng:</span>
+              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.qty} ${r.uom}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+};
+
+// 5. Upgraded loadReorderROP (Desktop Table + Mobile Cards)
+window.loadReorderROP = async function() {
+  try {
+    const res = await fetch(`/api/reorder?branch=${App.currentBranch}`);
+    const json = await res.json();
+    if (json.success) {
+      App.ropItems = json.data;
+      const tbody = document.getElementById('ropTableBody');
+      const mob = document.getElementById('ropMobileCards');
+
+      if (tbody) {
+        tbody.innerHTML = App.ropItems.map(r => `
+          <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+            <td class="p-3 font-mono font-bold text-stone-900 dark:text-white">${r.sku}</td>
+            <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${r.item_name}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.daily_usage}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.lead_time_days}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.safety_stock}</td>
+            <td class="p-3 text-right font-mono font-bold text-amber-600">${r.rop}</td>
+            <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${r.current_stock}</td>
+            <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.suggested_order}</td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (mob) {
+        mob.innerHTML = App.ropItems.map(r => `
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-extrabold text-xs text-stone-900 dark:text-white">${r.item_name}</div>
+                <div class="text-[10.5px] font-mono text-stone-400">SKU: ${r.sku}</div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400">
+              <div>Tồn hiện tại: <b class="font-mono text-stone-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
+              <div>Điểm ROP: <b class="font-mono text-amber-600">${r.rop} ${r.uom}</b></div>
+              <div>Lead time: <b class="font-mono text-stone-900 dark:text-white">${r.lead_time_days} ngày</b></div>
+              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.suggested_order} ${r.uom}</b></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// 6. Upgraded loadLeadTime (Desktop Table + Mobile Cards)
+window.loadLeadTime = async function() {
+  try {
+    const res = await fetch('/api/leadtime');
+    const json = await res.json();
+    if (json.success) {
+      const tbody = document.getElementById('leadTimeTableBody');
+      const mob = document.getElementById('leadTimeMobileCards');
+
+      if (tbody) {
+        tbody.innerHTML = json.data.map(r => `
+          <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+            <td class="p-3 font-mono font-bold text-stone-900 dark:text-white">${r.po_number}</td>
+            <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${r.supplier_name}</td>
+            <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.order_date}</td>
+            <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.actual_delivery_date || '—'}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.committed_lead_time_days} ngày</td>
+            <td class="p-3 text-right font-mono font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (mob) {
+        mob.innerHTML = json.data.map(r => `
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-extrabold text-xs text-stone-900 dark:text-white">${r.supplier_name}</div>
+                <div class="text-[10.5px] font-mono text-stone-400">PO: ${r.po_number}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400">
+              <div>Ngày đặt: <b class="font-mono text-stone-900 dark:text-white">${r.order_date}</b></div>
+              <div>Giao thực tế: <b class="font-mono text-stone-900 dark:text-white">${r.actual_delivery_date || '—'}</b></div>
+              <div>Cam kết: <b class="font-mono text-stone-900 dark:text-white">${r.committed_lead_time_days} ngày</b></div>
+              <div>Thực tế: <b class="font-mono font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</b></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// 7. Upgraded loadPoSap (Desktop Table + Mobile Cards)
+window.loadPoSap = async function() {
+  try {
+    const res = await fetch('/api/po-sap');
+    const json = await res.json();
+    if (json.success) {
+      const tbody = document.getElementById('poSapTableBody');
+      const mob = document.getElementById('poSapMobileCards');
+
+      if (tbody) {
+        tbody.innerHTML = json.data.map(r => `
+          <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+            <td class="p-3 font-mono font-bold text-stone-900 dark:text-white">${r.sku}</td>
+            <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${r.item_name}</td>
+            <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.supplier_name}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${fmtVND(r.contract_price)}</td>
+            <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${fmtVND(r.actual_price)}</td>
+            <td class="p-3 text-right font-mono font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (mob) {
+        mob.innerHTML = json.data.map(r => `
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-extrabold text-xs text-stone-900 dark:text-white">${r.item_name}</div>
+                <div class="text-[10.5px] font-mono text-stone-400">SKU: ${r.sku} • NCC: ${r.supplier_name}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400">
+              <div>Giá HĐ: <br><b class="font-mono text-stone-900 dark:text-white">${fmtVND(r.contract_price)}</b></div>
+              <div>Giá thực: <br><b class="font-mono text-stone-900 dark:text-white">${fmtVND(r.actual_price)}</b></div>
+              <div>Chênh lệch: <br><b class="font-mono font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</b></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// 8. Upgraded loadHistory (Desktop Table + Mobile Cards)
+window.loadHistory = async function() {
+  const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
+  const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
+  let thang = '';
+  if (monthInput) {
+    const p = monthInput.split('-');
+    thang = `${p[1]}/${p[0]}`;
+  }
+  try {
+    showLoading('Tải lịch sử đơn hàng...');
+    const res = await fetch(`/api/orders?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
+    const json = await res.json();
+    const tbody = document.getElementById('hsBody');
+    const mob = document.getElementById('hsMobileCards');
+
+    if (!json.success || !json.data || !json.data.length) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-stone-400">Không có đơn hàng nào trong kỳ.</td></tr>';
+      if (mob) mob.innerHTML = '<div class="p-8 text-center text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không có đơn hàng nào trong kỳ.</div>';
+      return;
+    }
+
+    // Desktop Table
+    if (tbody) {
+      tbody.innerHTML = json.data.map(o => `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${o.maDon}</td>
+          <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
+          <td class="p-3 font-bold text-stone-900 dark:text-white">${o.site}</td>
+          <td class="p-3 text-stone-700 dark:text-stone-300">${o.nguoiDat}</td>
+          <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${o.soDong}</td>
+          <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</td>
+          <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span></td>
+          <td class="p-3 text-right">
+            <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
+              Chi tiết
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Mobile Cards
+    if (mob) {
+      mob.innerHTML = json.data.map(o => `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${o.maDon}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span>
+          </div>
+          <div class="font-bold text-xs text-stone-900 dark:text-white">${o.site}</div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400">
+            <div>Ngày đặt: <b class="font-mono text-stone-900 dark:text-white">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</b></div>
+            <div>Người đặt: <b class="text-stone-900 dark:text-white">${o.nguoiDat}</b></div>
+            <div>Số loại mặt hàng: <b class="font-mono text-stone-900 dark:text-white">${o.soDong} dòng</b></div>
+            <div>Tổng số lượng: <b class="font-mono text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
+            <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
+              <span class="text-stone-500 font-medium">Tổng giá trị đơn:</span>
+              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</span>
+            </div>
+          </div>
+          <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-[#ed263a]"></i> Xem Chi Tiết Đơn
+          </button>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+// 9. Upgraded loadAudit (Desktop Table + Mobile Cards)
+window.loadAudit = async function() {
+  const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
+  showLoading('Tải bảng kiểm kê...');
+  try {
+    const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);
+    const json = await res.json();
+    const tbody = document.getElementById('kkBody');
+    const mob = document.getElementById('kkMobileCards');
+
+    if (json.success && json.data.length) {
+      App.auditItems = json.data;
+
+      // Desktop Table
+      if (tbody) {
+        tbody.innerHTML = App.auditItems.map(it => {
+          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+          const tonCuoi = tonTruoc - suDung;
+          return `
+            <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+              <td class="p-3 font-mono font-bold text-stone-900 dark:text-white">${it.item_code}</td>
+              <td class="p-3 font-bold text-stone-800 dark:text-stone-200">${it.item_name}</td>
+              <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${it.warehouse_code || 'Kho'}</td>
+              <td class="p-3 text-stone-600 dark:text-stone-300">${it.unit}</td>
+              <td class="p-3 text-right font-mono text-stone-900 dark:text-white">${fmtNum(tonTruoc)}</td>
+              <td class="p-3 text-right">
+                <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white rounded font-mono text-right text-xs"
+                  oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
+              </td>
+              <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Mobile Cards
+      if (mob) {
+        mob.innerHTML = App.auditItems.map(it => {
+          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+          const tonCuoi = tonTruoc - suDung;
+          return `
+            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-extrabold text-xs text-stone-900 dark:text-white">${it.item_name}</div>
+                  <div class="text-[10.5px] font-mono text-stone-400">Mã: ${it.item_code} • ĐVT: ${it.unit}</div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">${it.warehouse_code || 'Kho'}</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/50">
+                <div class="text-center">
+                  <div class="text-[10px] text-stone-400">Tồn đầu kỳ</div>
+                  <div class="font-mono font-bold text-stone-900 dark:text-white">${fmtNum(tonTruoc)}</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-[10px] text-stone-400">Sử dụng kỳ</div>
+                  <input type="number" min="0" value="${suDung}"
+                         class="w-full text-center p-1 border border-stone-300 dark:border-stone-700 rounded-lg font-mono text-xs bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
+                         oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0));">
+                </div>
+                <div class="text-center">
+                  <div class="text-[10px] text-stone-400">Tồn cuối kỳ</div>
+                  <div class="font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+// 10. Upgraded renderFnbChainTable (Desktop Table + Mobile Cards)
+window.renderFnbChainTable = function(items) {
+  const tbody = document.getElementById('fnbChainTableBody');
+  const mob = document.getElementById('fnbChainMobileCards');
+
+  if (!items || items.length === 0) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-stone-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
+    if (mob) mob.innerHTML = `<div class="text-center py-8 text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
+    return;
+  }
+
+  // Desktop Table
+  if (tbody) {
+    tbody.innerHTML = items.map((s, idx) => {
+      let statusBadge = '';
+      if (s.status === 'VƯỢT CHỈ TIÊU') {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+      } else if (s.status === 'TRONG MỨC') {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+      } else {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+      }
+
+      let rankBadge = '';
+      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-stone-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
+      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-stone-300 text-stone-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
+      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
+      else rankBadge = `<span class="font-mono text-stone-500 font-bold">${s.rank}</span>`;
+
+      return `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="py-3 px-3 text-center">${rankBadge}</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-stone-900 dark:text-white">${s.name}</div>
+            <div class="text-[10.5px] font-mono text-stone-400">SAP: ${s.code}</div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
+          </td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtVND(s.netRevenue)}</td>
+          <td class="py-3 px-3 text-right font-mono text-stone-500">${fmtVND(s.targetRevenue)}</td>
+          <td class="py-3 px-3 text-center">
+            <div class="font-mono font-bold text-stone-900 dark:text-white">${s.achievementPct}%</div>
+            <div class="w-16 bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 mx-auto mt-1 overflow-hidden">
+              <div class="${parseFloat(s.achievementPct) >= 100 ? 'bg-emerald-500' : 'bg-blue-500'} h-1.5 rounded-full" style="width: ${Math.min(100, parseFloat(s.achievementPct))}%"></div>
+            </div>
+          </td>
+          <td class="py-3 px-3 text-center font-mono ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${s.foodCostPct}%</td>
+          <td class="py-3 px-3 text-center font-mono text-purple-600 font-bold">${s.laborCostPct}%</td>
+          <td class="py-3 px-3 text-right font-mono font-bold ${s.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${fmtVND(s.ebitda)}</td>
+          <td class="py-3 px-3 text-center font-mono font-bold text-stone-700 dark:text-stone-300">${s.margin}%</td>
+          <td class="py-3 px-3 text-center">${statusBadge}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Mobile Cards (No horizontal scroll)
+  if (mob) {
+    mob.innerHTML = items.map((s, idx) => {
+      let statusBadge = '';
+      if (s.status === 'VƯỢT CHỈ TIÊU') {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+      } else if (s.status === 'TRONG MỨC') {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+      } else {
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+      }
+
+      let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
+
+      return `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#ed263a] dark:text-rose-400' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
+              <div>
+                <div class="font-extrabold text-xs sm:text-sm text-stone-900 dark:text-white leading-tight">${s.name}</div>
+                <div class="text-[10px] font-mono text-stone-400">Mã: ${s.code} • ${s.region}</div>
+              </div>
+            </div>
+            ${statusBadge}
+          </div>
+          <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-stone-50 dark:bg-stone-900/60 text-xs text-stone-600 dark:text-stone-400">
+            <div>
+              <span class="text-[10.5px] text-stone-400">Doanh thu thuần:</span><br>
+              <b class="font-mono text-sm text-stone-900 dark:text-white">${fmtVND(s.netRevenue)}</b>
+            </div>
+            <div>
+              <span class="text-[10.5px] text-stone-400">Đạt mục tiêu:</span><br>
+              <b class="font-mono text-sm text-emerald-600">${s.achievementPct}%</b>
+            </div>
+            <div>
+              <span class="text-[10.5px] text-stone-400">Food Cost %:</span><br>
+              <b class="font-mono ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600' : 'text-rose-600'} font-bold">${s.foodCostPct}%</b>
+            </div>
+            <div>
+              <span class="text-[10.5px] text-stone-400">EBITDA:</span><br>
+              <b class="font-mono text-emerald-600 font-bold">${fmtVND(s.ebitda)} (${s.margin}%)</b>
+            </div>
+          </div>
+          <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#ed263a]"></i> Xem Chi Tiết Báo Cáo P&amp;L
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+// 11. Upgraded renderFnbSites (Desktop Table + Mobile Cards)
+window.renderFnbSites = function(sites) {
+  const tbody = document.getElementById('fnbSitesMasterTableBody');
+  const mob = document.getElementById('fnbSitesMobileCards');
+
+  if (!sites || !sites.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-stone-400">Không có điểm bán nào.</td></tr>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không có điểm bán nào.</div>';
+    return;
+  }
+
+  if (tbody) {
+    tbody.innerHTML = sites.map(s => `
+      <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+        <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${s.code}</td>
+        <td class="p-3 font-bold text-stone-900 dark:text-white">${s.name}</td>
+        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
+        <td class="p-3 text-stone-600 dark:text-stone-300">${s.address || '—'}</td>
+        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-stone-100 text-stone-500'}">${s.is_active ? 'Đang hoạt động' : 'Tạm ngưng'}</span></td>
+        <td class="p-3 text-right">
+          <button onclick="viewSiteDetail('${s.code}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
+            Chi tiết
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  if (mob) {
+    mob.innerHTML = sites.map(s => `
+      <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${s.code}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-stone-100 text-stone-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
+        </div>
+        <div class="font-bold text-xs text-stone-900 dark:text-white">${s.name}</div>
+        <div class="text-[11px] text-stone-500 dark:text-stone-400 flex items-start gap-1">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5"></i>
+          <span>${s.address || 'Chưa cập nhật địa chỉ'}</span>
+        </div>
+        <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#ed263a]"></i> Xem Báo Cáo P&amp;L Điểm Này
+        </button>
+      </div>
+    `).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+
+// ============================================================================
+// 13. F&B CHAIN STOCK MATRIX ENGINE (Siba Food Standard - /fnb/stock)
+// ============================================================================
+let gFnbStockData = null;
+let gFnbStockFilter = {
+  region: 'ALL',
+  group: 'ALL',
+  search: '',
+  showValue: false
+};
+let gFnbStockSearchTerm = '';
+
+window.loadFnbStock = async function() {
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const url = new URL('/api/fnb/stock', window.location.origin);
+    if (gFnbStockFilter.region && gFnbStockFilter.region !== 'ALL') {
+      url.searchParams.set('regionId', gFnbStockFilter.region);
+    }
+    if (gFnbStockFilter.group && gFnbStockFilter.group !== 'ALL') {
+      url.searchParams.set('group', gFnbStockFilter.group);
+    }
+    const res = await fetch(url.toString());
+    const json = await res.json();
+    if (!json.success || !json.data) {
+      throw new Error(json.error || 'Không tải được dữ liệu tồn kho F&B');
+    }
+    gFnbStockData = json.data;
+    renderFnbStock();
+  } catch (err) {
+    console.error('Error loadFnbStock:', err);
+    if (typeof showToast === 'function') showToast('Lỗi tải tồn kho F&B: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.renderFnbStock = function() {
+  if (!gFnbStockData) return;
+  
+  const sites = gFnbStockData.sites || [];
+  const allRows = gFnbStockData.rows || [];
+  const groupMap = gFnbStockData.groups || {};
+  const query = (gFnbStockSearchTerm || '').trim().toLowerCase();
+  
+  // Filter rows by search term
+  const filteredRows = allRows.filter(r => {
+    if (!query) return true;
+    const nameMatch = (r.name || '').toLowerCase().includes(query);
+    const codeMatch = (r.code || '').toLowerCase().includes(query);
+    return nameMatch || codeMatch;
+  });
+  
+  // Calculate KPI metrics
+  let totalChainValue = 0;
+  let negativeCount = 0;
+  let noOpeningCount = 0;
+  
+  filteredRows.forEach(r => {
+    sites.forEach(s => {
+      const cell = r.cells[s.id];
+      if (cell) {
+        if (cell.value) totalChainValue += cell.value;
+        if (cell.book < 0) negativeCount++;
+        if (cell.noOpening) noOpeningCount++;
+      }
+    });
+  });
+  
+  // Update KPI displays
+  const kpiItems = document.getElementById('fnbStockKpiTotalItems');
+  const kpiValue = document.getElementById('fnbStockKpiTotalValue');
+  const kpiNeg = document.getElementById('fnbStockKpiNegative');
+  const kpiNoOp = document.getElementById('fnbStockKpiNoOpening');
+  
+  if (kpiItems) kpiItems.textContent = filteredRows.length.toLocaleString('vi-VN');
+  if (kpiValue) kpiValue.textContent = Math.round(totalChainValue).toLocaleString('vi-VN') + ' đ';
+  if (kpiNeg) kpiNeg.textContent = negativeCount.toLocaleString('vi-VN');
+  if (kpiNoOp) kpiNoOp.textContent = noOpeningCount.toLocaleString('vi-VN');
+  
+  // 1. Render Desktop Table Head
+  const thead = document.getElementById('fnbStockTableHead');
+  if (thead) {
+    let headHtml = `
+      <tr>
+        <th class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px] border-b border-stone-200 dark:border-stone-800">STT</th>
+        <th class="py-3 px-4 text-left font-bold uppercase tracking-wider text-[11px] border-b border-stone-200 dark:border-stone-800 sticky left-0 z-20 bg-stone-50 dark:bg-[#1e1a1a] min-w-[240px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Mặt Hàng F&amp;B</th>
+        <th class="py-3 px-3 text-center w-16 font-bold uppercase tracking-wider text-[11px] border-b border-stone-200 dark:border-stone-800">ĐVT</th>
+    `;
+    sites.forEach(s => {
+      const isMN = s.region === 'Miền Nam';
+      headHtml += `
+        <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] border-b border-stone-200 dark:border-stone-800 min-w-[125px]">
+          <div class="flex items-center justify-end gap-1.5">
+            <span class="text-[9px] px-1.5 py-0.2 rounded font-extrabold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
+            <span title="${s.name}" class="text-stone-800 dark:text-stone-200">${s.code}</span>
+          </div>
+          <div class="text-[10px] font-normal text-stone-400 truncate max-w-[115px]" title="${s.name}">${s.name}</div>
+        </th>
+      `;
+    });
+    headHtml += `</tr>`;
+    thead.innerHTML = headHtml;
+  }
+  
+  // 2. Render Desktop Table Body
+  const tbody = document.getElementById('fnbStockTableBody');
+  if (tbody) {
+    if (filteredRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${sites.length + 3}" class="text-center py-12 text-stone-400">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</td></tr>`;
+    } else {
+      tbody.innerHTML = filteredRows.map((r, idx) => {
+        const groupLabel = groupMap[r.group] || r.group;
+        let rowHtml = `
+          <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+            <td class="py-3 px-3 text-center font-mono text-stone-400 text-xs">${idx + 1}</td>
+            <td class="py-3 px-4 sticky left-0 z-10 bg-white dark:bg-[#161313] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
+              <div class="flex items-center gap-2">
+                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300">${groupLabel}</span>
+                <span class="font-bold text-stone-900 dark:text-white truncate max-w-[180px]">${r.name}</span>
+              </div>
+              <div class="text-[10.5px] font-mono text-stone-400 mt-0.5 flex items-center gap-2">
+                <span>${r.code}</span>
+                <span>•</span>
+                <span>Giá: ${r.price ? Number(r.price).toLocaleString('vi-VN') + ' đ' : '--'}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-center font-medium text-stone-600 dark:text-stone-300 text-xs">${r.unit}</td>
+        `;
+        
+        sites.forEach(s => {
+          const cell = r.cells[s.id] || { book: 0, lastCount: null, noOpening: true, value: 0 };
+          const isNegative = cell.book < 0;
+          const bookClass = isNegative
+            ? 'text-rose-600 dark:text-rose-400 font-extrabold'
+            : (cell.book > 0 ? 'text-stone-900 dark:text-white font-bold' : 'text-stone-400 dark:text-stone-600 font-medium');
+          
+          let lastCountHtml = '';
+          if (cell.lastCount !== null && cell.lastCount !== undefined) {
+            const countFormatted = Number.isInteger(cell.lastCount) ? cell.lastCount.toLocaleString('vi-VN') : cell.lastCount.toFixed(1);
+            lastCountHtml = ` <span class="text-stone-400 dark:text-stone-500 font-normal text-[10.5px]" title="Đếm gần nhất (${cell.lastDate || 'N/A'}): ${countFormatted}">(${countFormatted})</span>`;
+          }
+          
+          let alertBadge = '';
+          if (cell.noOpening) {
+            alertBadge = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1" title="Chưa có tồn đầu"></span>`;
+          }
+          
+          let valHtml = '';
+          if (gFnbStockFilter.showValue && cell.value) {
+            valHtml = `<div class="text-[10px] text-stone-400 dark:text-stone-500 font-mono mt-0.5">${Math.round(cell.value).toLocaleString('vi-VN')} đ</div>`;
+          }
+          
+          const bookFormatted = Number.isInteger(cell.book) ? cell.book.toLocaleString('vi-VN') : cell.book.toFixed(1);
+          
+          rowHtml += `
+            <td class="py-3 px-3 text-right font-mono text-xs select-all">
+              <div class="flex items-center justify-end">
+                ${alertBadge}
+                <span class="${bookClass}">${bookFormatted}</span>${lastCountHtml}
+              </div>
+              ${valHtml}
+            </td>
+          `;
+        });
+        
+        rowHtml += `</tr>`;
+        return rowHtml;
+      }).join('');
+    }
+  }
+  
+  // 3. Render Native Mobile Card View
+  const mob = document.getElementById('fnbStockMobileCards');
+  if (mob) {
+    if (filteredRows.length === 0) {
+      mob.innerHTML = `<div class="text-center py-10 text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</div>`;
+    } else {
+      mob.innerHTML = filteredRows.map((r, idx) => {
+        const groupLabel = groupMap[r.group] || r.group;
+        
+        const siteCards = sites.map(s => {
+          const cell = r.cells[s.id] || { book: 0, lastCount: null, noOpening: true, value: 0 };
+          const isNeg = cell.book < 0;
+          const isZero = cell.book === 0;
+          const bookFormatted = Number.isInteger(cell.book) ? cell.book.toLocaleString('vi-VN') : cell.book.toFixed(1);
+          let countText = '';
+          if (cell.lastCount !== null && cell.lastCount !== undefined) {
+            const countFormatted = Number.isInteger(cell.lastCount) ? cell.lastCount.toLocaleString('vi-VN') : cell.lastCount.toFixed(1);
+            countText = `(${countFormatted})`;
+          }
+          return {
+            site: s,
+            cell,
+            isNeg,
+            isZero,
+            bookFormatted,
+            countText
+          };
+        });
+        
+        return `
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+            <!-- Item Header -->
+            <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-stone-100 dark:border-stone-800/80">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300">${groupLabel}</span>
+                  <span class="text-xs font-mono text-stone-400 font-bold">${r.code}</span>
+                </div>
+                <h4 class="font-bold text-sm text-stone-900 dark:text-white mt-1 leading-snug">${r.name}</h4>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="px-2 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-semibold font-mono">${r.unit}</span>
+                <div class="text-[10px] text-stone-400 font-mono mt-1">${r.price ? Number(r.price).toLocaleString('vi-VN') + ' đ' : ''}</div>
+              </div>
+            </div>
+            
+            <!-- Sites Stock Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+              ${siteCards.map(sc => {
+                const isMN = sc.site.region === 'Miền Nam';
+                return `
+                  <div class="p-2.5 rounded-xl ${sc.isNeg ? 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40' : (sc.isZero ? 'bg-stone-50 dark:bg-stone-900/40 border border-stone-200/60 dark:border-stone-800/60' : 'bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700/60')}">
+                    <div class="flex items-center justify-between gap-1 mb-1">
+                      <span class="font-bold text-stone-800 dark:text-stone-200 text-[11px]">${sc.site.code}</span>
+                      <span class="text-[8.5px] px-1 rounded font-extrabold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
+                    </div>
+                    <div class="flex items-baseline justify-between font-mono">
+                      <span class="text-[10px] text-stone-400">Tồn:</span>
+                      <span class="${sc.isNeg ? 'text-rose-600 dark:text-rose-400 font-extrabold text-sm' : (sc.isZero ? 'text-stone-400 font-medium' : 'text-stone-900 dark:text-white font-bold text-sm')}">${sc.bookFormatted} <span class="text-[10px] text-stone-400 font-normal">${sc.countText}</span></span>
+                    </div>
+                    ${sc.cell.noOpening ? '<div class="text-[9px] text-amber-500 font-semibold mt-0.5">⚠️ Chưa có tồn đầu</div>' : ''}
+                    ${gFnbStockFilter.showValue && sc.cell.value ? `<div class="text-[9.5px] text-stone-400 dark:text-stone-500 font-mono text-right mt-0.5">${Math.round(sc.cell.value).toLocaleString('vi-VN')} đ</div>` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+  
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onFnbStockFilterChange = function() {
+  const regEl = document.getElementById('fnbStockFilterRegion');
+  const grpEl = document.getElementById('fnbStockFilterGroup');
+  if (regEl) gFnbStockFilter.region = regEl.value;
+  if (grpEl) gFnbStockFilter.group = grpEl.value;
+  loadFnbStock();
+};
+
+window.onFnbStockSearch = function(val) {
+  gFnbStockSearchTerm = val;
+  renderFnbStock();
+};
+
+window.onFnbStockToggleValue = function(checked) {
+  gFnbStockFilter.showValue = checked;
+  renderFnbStock();
+};
+
+// 14. Excel Exporter for F&B Chain Stock Matrix (Compliant with Aptos Font & User Standards)
+window.exportFnbStockExcel = function() {
+  if (!gFnbStockData || !gFnbStockData.rows || gFnbStockData.rows.length === 0) {
+    if (typeof showToast === 'function') showToast('Chưa có dữ liệu tồn kho để xuất Excel!');
+    return;
+  }
+  
+  try {
+    const sites = gFnbStockData.sites || [];
+    const rows = gFnbStockData.rows || [];
+    const groupMap = gFnbStockData.groups || {};
+    
+    // Header row
+    const headers = ['STT', 'Mã Hàng', 'Tên Hàng', 'Nhóm Hàng', 'ĐVT', 'Đơn Giá (đ)'];
+    sites.forEach(s => {
+      headers.push(`${s.code} - ${s.name}`);
+    });
+    
+    // Prepare aoa
+    const dataAOA = [headers];
+    
+    rows.forEach((r, idx) => {
+      const groupName = groupMap[r.group] || r.group;
+      const rowData = [
+        idx + 1,
+        r.code,
+        r.name,
+        groupName,
+        r.unit,
+        r.price || 0
+      ];
+      sites.forEach(s => {
+        const cell = r.cells[s.id];
+        rowData.push(cell ? (cell.book || 0) : 0);
+      });
+      dataAOA.push(rowData);
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(dataAOA);
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    
+    // Set Column Widths
+    const colWidths = [
+      { wch: 6 },  // STT
+      { wch: 14 }, // Mã Hàng
+      { wch: 32 }, // Tên Hàng
+      { wch: 18 }, // Nhóm Hàng
+      { wch: 8 },  // ĐVT
+      { wch: 14 }, // Đơn Giá
+    ];
+    sites.forEach(() => colWidths.push({ wch: 16 }));
+    ws['!cols'] = colWidths;
+    
+    // Styling all cells according to user preferences: Aptos font, Navy Header (#1F4E79), etc.
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellRef]) continue;
+        
+        const isHeader = (R === 0);
+        
+        if (isHeader) {
+          ws[cellRef].s = {
+            font: { name: 'Aptos', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+            fill: { fgColor: { rgb: '1F4E79' } },
+            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+            border: {
+              top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+              bottom: { style: 'medium', color: { rgb: '000000' } },
+              left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+              right: { style: 'thin', color: { rgb: 'CCCCCC' } }
+            }
+          };
+        } else {
+          // Data rows
+          let alignH = 'left';
+          let numFmt = undefined;
+          
+          if (C === 0 || C === 1 || C === 4) {
+            alignH = 'center'; // STT, Mã Hàng, ĐVT
+          } else if (C === 5 || C >= 6) {
+            alignH = 'right';  // Đơn giá, Số lượng tồn
+            numFmt = '#,##0.00';
+          }
+          
+          // Check if negative stock
+          const isNegative = (C >= 6 && typeof ws[cellRef].v === 'number' && ws[cellRef].v < 0);
+          
+          ws[cellRef].s = {
+            font: {
+              name: 'Aptos',
+              sz: 11,
+              bold: isNegative,
+              color: { rgb: isNegative ? 'C00000' : '000000' }
+            },
+            alignment: { horizontal: alignH, vertical: 'center' },
+            border: {
+              top: { style: 'thin', color: { rgb: 'E5E5E5' } },
+              bottom: { style: 'thin', color: { rgb: 'E5E5E5' } },
+              left: { style: 'thin', color: { rgb: 'E5E5E5' } },
+              right: { style: 'thin', color: { rgb: 'E5E5E5' } }
+            }
+          };
+          if (numFmt && typeof ws[cellRef].v === 'number') {
+            ws[cellRef].z = numFmt;
+          }
+        }
+      }
+    }
+    
+    // AutoFilter
+    ws['!autofilter'] = { ref: ws['!ref'] };
+    
+    // Freeze Panes (Freeze Header and Item Code/Name columns)
+    ws['!freeze'] = {
+      xSplit: 3,
+      ySplit: 1,
+      topLeftCell: 'D2',
+      activePane: 'bottomRight',
+      state: 'frozen'
+    };
+    
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tồn Kho Chuỗi F&B');
+    
+    const dStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    XLSX.writeFile(wb, `Ton_Kho_F&B_Chuoi_${dStr}.xlsx`);
+    if (typeof showToast === 'function') showToast('Xuất báo cáo tồn kho F&B thành công (Font Aptos)!');
+  } catch (err) {
+    console.error('Export Excel error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi xuất Excel: ' + err.message);
+  }
 };
 
 // 12. Fix async issues on older functions

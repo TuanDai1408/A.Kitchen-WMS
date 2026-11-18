@@ -1010,6 +1010,105 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 3.4 GET /api/fnb/stock & /fnb/stock - Báo cáo tồn kho toàn chuỗi F&B ma trận
+      if ((pathname === '/api/fnb/stock' || pathname === '/fnb/stock') && request.method === 'GET') {
+        const regionParam = searchParams.get('regionId') || 'all';
+        const groupParam = searchParams.get('group') || 'all';
+
+        // 1. Lấy danh sách điểm bán từ bảng sites
+        let sitesQuery = `SELECT site_code as id, site_code as code, site_name as name, region FROM sites`;
+        let sitesBinds = [];
+        if (regionParam && regionParam !== 'all') {
+          const regionName = regionParam === 'MN' ? 'Miền Nam' : (regionParam === 'MB' ? 'Miền Bắc' : regionParam);
+          sitesQuery += ` WHERE region = ?`;
+          sitesBinds.push(regionName);
+        }
+        sitesQuery += ` ORDER BY site_code`;
+        const { results: sites } = await env.DB.prepare(sitesQuery).bind(...sitesBinds).all();
+
+        // 2. Lấy danh mục mặt hàng F&B
+        let itemsQuery = `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
+        let itemsBinds = [];
+        if (groupParam && groupParam !== 'all') {
+          itemsQuery += ` AND item_group = ?`;
+          itemsBinds.push(groupParam);
+        }
+        itemsQuery += ` ORDER BY item_group, code`;
+        const { results: itemsList } = await env.DB.prepare(itemsQuery).bind(...itemsBinds).all();
+
+        // 3. Lấy toàn bộ số dư tồn kho
+        const { results: balances } = await env.DB.prepare(`
+          SELECT item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, last_count_qty, last_count_date, no_opening, total_value
+          FROM fnb_stock_balances
+        `).all();
+
+        // Tạo map (item_code -> site_code -> cell)
+        const cellMap = {};
+        for (const b of balances) {
+          if (!cellMap[b.item_code]) cellMap[b.item_code] = {};
+          cellMap[b.item_code][b.site_code] = {
+            book: b.book_qty,
+            lastCount: b.last_count_qty,
+            lastDate: b.last_count_date,
+            noOpening: b.no_opening === 1,
+            value: b.total_value,
+            opening: b.opening_qty,
+            receipt: b.receipt_qty,
+            salesBom: b.sales_bom_qty,
+            waste: b.waste_qty
+          };
+        }
+
+        // Tạo cấu trúc rows ma trận
+        const rows = itemsList.map(item => {
+          const cells = {};
+          for (const s of sites) {
+            cells[s.id] = cellMap[item.code]?.[s.id] || {
+              book: 0,
+              lastCount: null,
+              lastDate: null,
+              noOpening: true,
+              value: 0
+            };
+          }
+          return {
+            id: item.id,
+            code: item.code,
+            name: item.name,
+            group: item.item_group,
+            unit: item.unit,
+            price: item.unit_price,
+            minStock: item.min_stock,
+            cells
+          };
+        });
+
+        const groups = {
+          NVL: 'Nguyên liệu',
+          BTP: 'Bán thành phẩm',
+          HANG_BAN: 'Hàng bán',
+          BAO_BI: 'Bao bì',
+          VTTH: 'Vật tư tiêu hao'
+        };
+
+        const regions = [
+          { id: 'MN', name: 'Miền Nam' },
+          { id: 'MB', name: 'Miền Bắc' }
+        ];
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            regions,
+            groups,
+            sites,
+            showValue: true,
+            rows
+          }
+        }), { headers: corsHeaders });
+      }
+
+
       // Fallback: Static Assets
       if (env.ASSETS) {
         return env.ASSETS.fetch(request);
