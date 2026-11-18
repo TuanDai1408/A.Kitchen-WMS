@@ -416,12 +416,36 @@
             <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
             <span>Doanh Thu POS &amp; Bán Lẻ</span>
           </button>
+          
+        </div>
+      </div>
+
+      <!-- PHÂN HỆ QUẢN LÝ TỒN KHO & BẾP F&B -->
+      <div class="mt-4">
+        <div class="px-3 mb-2 font-bold text-[10.5px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+          <span>Quản Lý Tồn Kho F&amp;B</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Kho Bếp</span>
+        </div>
+        <div class="space-y-1">
           <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
             <i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i>
-            <span>Tồn Kho Chuỗi F&amp;B</span>
+            <span>Tồn Kho Chuỗi (Matrix)</span>
+          </button>
+          <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i>
+            <span>Kiểm Kê Hằng Ngày</span>
+          </button>
+          <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i>
+            <span>Nhập Hàng Điểm Bán</span>
+          </button>
+          <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all">
+            <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
+            <span>Hủy Hàng &amp; Hao Hụt</span>
           </button>
         </div>
       </div>
+
 
       <!-- PHÂN HỆ 2: KHO GIA VỊ, FEFO & WMS -->
       <div>
@@ -1185,6 +1209,7 @@
            SECTION: TỒN KHO TOÀN CHUỖI F&B (MATRIX VIEW - Siba Food Standard)
            ===================================================================== -->
       <section id="fnb-stock" class="tab-panel space-y-5">
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200/80 dark:border-stone-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('fnb-stock')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-[#1f1a1a] text-stone-900 dark:text-white shadow-xs border border-stone-200/60 dark:border-stone-700"><i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i><span>Ma Trận Tồn Kho</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
         
         <!-- Header Banner -->
         <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-emerald-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
@@ -1334,7 +1359,296 @@
 
       </section>
 
-      <section id="wh-dashboard" class="tab-panel active space-y-5">
+      
+      <!-- =====================================================================
+           SECTION: KIỂM KÊ HẰNG NGÀY & ĐỊNH KỲ (/fnb/counts)
+           ===================================================================== -->
+      <section id="fnb-counts" class="tab-panel space-y-5">
+        
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200/80 dark:border-stone-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('fnb-stock')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i><span>Ma Trận Tồn Kho</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-[#1f1a1a] text-stone-900 dark:text-white shadow-xs border border-stone-200/60 dark:border-stone-700"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
+
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-blue-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white tracking-wide uppercase">Orbit Siba Food</span>
+                <span class="text-xs text-stone-300">Vận Hành &amp; Kiểm Soát Bếp Ăn</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Kiểm Kê Tồn Kho Hằng Ngày</h1>
+              <p class="text-xs text-stone-300 mt-1">Kiểm ngày nhóm A trọng yếu (thịt, rau, gia vị), kiểm tuần/tháng toàn bộ kho. Chênh lệch tự động đối chiếu tồn sổ sách.</p>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="exportCountSheetExcel()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs border border-white/15 flex items-center gap-2 transition-all shadow-xs backdrop-blur-sm">
+                <i data-lucide="printer" class="w-4 h-4 text-blue-400"></i>
+                <span>Xuất Mẫu Kiểm Excel</span>
+              </button>
+              <button onclick="saveFnbCountAudit()" id="btnSaveFnbCount" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-blue-900/30">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Lưu Kiểm Kê Điểm</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls & Filter Bar -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Điểm bán:</span>
+                <select id="fnbCountSiteSelect" onchange="onFnbCountSiteChange()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-bold text-stone-800 dark:text-stone-200 outline-none focus:border-blue-500">
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Ngày kiểm:</span>
+                <input type="date" id="fnbCountDatePicker" onchange="onFnbCountDateChange()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-semibold text-stone-800 dark:text-stone-200 outline-none focus:border-blue-500">
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Chế độ:</span>
+                <select id="fnbCountTypeSelect" onchange="onFnbCountTypeChange()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-semibold text-stone-800 dark:text-stone-200 outline-none focus:border-blue-500">
+                  <option value="DAILY">Kiểm ngày (Nhóm A trọng yếu)</option>
+                  <option value="PERIODIC">Kiểm toàn bộ (28 mặt hàng)</option>
+                </select>
+              </div>
+
+              <label class="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700" title="Ẩn cột tồn sổ sách khi đang đếm">
+                <input type="checkbox" id="fnbCountBlindToggle" onchange="toggleBlindCount(this.checked)" class="rounded text-blue-600 focus:ring-0">
+                <span class="text-xs font-semibold text-stone-700 dark:text-stone-300">Kiểm mù (Ẩn tồn sách)</span>
+              </label>
+            </div>
+
+            <div class="relative w-full lg:w-64">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm món / mã kiểm..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs text-stone-900 dark:text-stone-100 outline-none focus:border-blue-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Count Metrics Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-stone-200 dark:border-stone-800">
+            <span class="text-[10.5px] uppercase font-bold text-stone-400">Mặt Hàng Kiểm</span>
+            <div id="fnbCountMetricTotal" class="text-xl font-extrabold font-mono text-stone-900 dark:text-white mt-0.5">--</div>
+          </div>
+          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-stone-200 dark:border-stone-800">
+            <span class="text-[10.5px] uppercase font-bold text-emerald-500">Khớp Sổ Sách</span>
+            <div id="fnbCountMetricMatched" class="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">--</div>
+          </div>
+          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-stone-200 dark:border-stone-800">
+            <span class="text-[10.5px] uppercase font-bold text-rose-500">Lệch Thừa / Thiếu</span>
+            <div id="fnbCountMetricDiff" class="text-xl font-extrabold font-mono text-rose-600 dark:text-rose-400 mt-0.5">--</div>
+          </div>
+          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-stone-200 dark:border-stone-800">
+            <span class="text-[10.5px] uppercase font-bold text-blue-500">Tổng Tiền Lệch</span>
+            <div id="fnbCountMetricDiffVal" class="text-xl font-extrabold font-mono text-blue-600 dark:text-blue-400 mt-0.5">--</div>
+          </div>
+        </div>
+
+        <!-- Desktop Counting Table -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-[#161313] shadow-xs">
+          <table class="w-full border-collapse text-left text-xs">
+            <thead class="bg-stone-50 dark:bg-[#1e1a1a] text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800">
+              <tr>
+                <th class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px]">STT</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px] min-w-[200px]">Mặt Hàng F&amp;B</th>
+                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-16">ĐVT</th>
+                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-28 fnb-count-book-col">Tồn Sách</th>
+                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-36 bg-blue-50/50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">SL Đếm Thực Tế</th>
+                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-28">Chênh Lệch</th>
+                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-32">Tiền Lệch</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Ghi Chú Lý Do</th>
+              </tr>
+            </thead>
+            <tbody id="fnbCountsTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/80">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div id="fnbCountsMobileCards" class="block lg:hidden space-y-3 mt-4">
+        </div>
+
+        <!-- Recent Audit History -->
+        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3 mt-6">
+          <div class="flex items-center justify-between">
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> Lịch Sử Các Đợt Kiểm Kê Gần Đây
+            </h3>
+            <span class="text-xs text-stone-400">Lưu tự động trên Cloudflare D1</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="bg-stone-50 dark:bg-stone-800/60 text-stone-500 border-b border-stone-200 dark:border-stone-800">
+                <tr>
+                  <th class="py-2.5 px-3">Mã Phiếu</th>
+                  <th class="py-2.5 px-3">Điểm Bán</th>
+                  <th class="py-2.5 px-3">Ngày Kiểm</th>
+                  <th class="py-2.5 px-3">Loại Phiếu</th>
+                  <th class="py-2.5 px-3 text-right">Tổng Món</th>
+                  <th class="py-2.5 px-3 text-right">Số Lệch</th>
+                  <th class="py-2.5 px-3 text-right">Giá Trị Lệch</th>
+                  <th class="py-2.5 px-3">Người Kiểm</th>
+                </tr>
+              </thead>
+              <tbody id="fnbCountsHistoryBody" class="divide-y divide-stone-100 dark:divide-stone-800/60">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================================
+           SECTION: NHẬP HÀNG ĐIỂM BÁN (/fnb/receipts)
+           ===================================================================== -->
+      <section id="fnb-receipts" class="tab-panel space-y-5">
+        
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200/80 dark:border-stone-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('fnb-stock')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i><span>Ma Trận Tồn Kho</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-[#1f1a1a] text-stone-900 dark:text-white shadow-xs border border-stone-200/60 dark:border-stone-700"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
+
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-indigo-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-600 text-white tracking-wide uppercase">Orbit Siba Food</span>
+                <span class="text-xs text-stone-300">Cung Ứng &amp; Nhập Kho Điểm Bán</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Quản Lý Nhập Hàng Điểm Bán</h1>
+              <p class="text-xs text-stone-300 mt-1">Ghi nhận phiếu nhập từ Kho tổng Siba Food hoặc NCC ngoài. Tự động tăng số lượng tồn sổ sách và tính toán giá trị tồn.</p>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="openCreateReceiptModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-indigo-900/30">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>+ Tạo Phiếu Nhập Hàng Mới</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Điểm bán:</span>
+              <select id="fnbReceiptFilterSite" onchange="loadFnbReceipts()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-bold text-stone-800 dark:text-stone-200 outline-none focus:border-indigo-500">
+                <option value="all">Tất cả 14 điểm</option>
+              </select>
+            </div>
+            <button onclick="loadFnbReceipts()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 text-xs font-semibold text-stone-700 dark:text-stone-300 flex items-center gap-1.5 transition-all">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
+            </button>
+          </div>
+          <div id="fnbReceiptsSummary" class="text-xs text-stone-500 font-mono">
+            Đang tải dữ liệu...
+          </div>
+        </div>
+
+        <!-- Receipts Table (Desktop) -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-[#161313] shadow-xs">
+          <table class="w-full border-collapse text-left text-xs">
+            <thead class="bg-stone-50 dark:bg-[#1e1a1a] text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800">
+              <tr>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Mã Phiếu</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Điểm Bán</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Ngày Nhập</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Nhà Cung Cấp / Nguồn</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Số HĐ / PO</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px] text-right">Tổng Tiền (VNĐ)</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Người Nhập</th>
+                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-24">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="fnbReceiptsTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/80">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Receipts Mobile Card View -->
+        <div id="fnbReceiptsMobileCards" class="block lg:hidden space-y-3 mt-4">
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================================
+           SECTION: HỦY HÀNG & HAO HỤT (/fnb/waste)
+           ===================================================================== -->
+      <section id="fnb-waste" class="tab-panel space-y-5">
+        
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200/80 dark:border-stone-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('fnb-stock')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i><span>Ma Trận Tồn Kho</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-[#1f1a1a] text-stone-900 dark:text-white shadow-xs border border-stone-200/60 dark:border-stone-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
+
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-rose-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white tracking-wide uppercase">Orbit Siba Food</span>
+                <span class="text-xs text-stone-300">Kiểm Soát Hao Hụt &amp; Chất Lượng</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Biên Bản Hủy Hàng &amp; Hao Hụt</h1>
+              <p class="text-xs text-stone-300 mt-1">Ghi nhận hàng hỏng, quá hạn, dập nát, cháy rách hoặc nấu dư cuối ngày. Tự động giảm số lượng tồn kho và ghi nhận chi phí hao hụt.</p>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="openCreateWasteModal()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-rose-900/30">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>+ Ghi Biên Bản Hủy Hàng</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Điểm bán:</span>
+              <select id="fnbWasteFilterSite" onchange="loadFnbWaste()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs font-bold text-stone-800 dark:text-stone-200 outline-none focus:border-rose-500">
+                <option value="all">Tất cả 14 điểm</option>
+              </select>
+            </div>
+            <button onclick="loadFnbWaste()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 text-xs font-semibold text-stone-700 dark:text-stone-300 flex items-center gap-1.5 transition-all">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
+            </button>
+          </div>
+          <div id="fnbWasteSummary" class="text-xs text-stone-500 font-mono">
+            Đang tải dữ liệu...
+          </div>
+        </div>
+
+        <!-- Waste Table (Desktop) -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-[#161313] shadow-xs">
+          <table class="w-full border-collapse text-left text-xs">
+            <thead class="bg-stone-50 dark:bg-[#1e1a1a] text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800">
+              <tr>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Mã Biên Bản</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Điểm Bán</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Ngày Hủy</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Lý Do Hủy</th>
+                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Người Xác Nhận</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px] text-right">Giá Trị Hủy (VNĐ)</th>
+                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Ghi Chú</th>
+                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-24">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="fnbWasteTableBody" class="divide-y divide-stone-100 dark:divide-stone-800/80">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Waste Mobile Card View -->
+        <div id="fnbWasteMobileCards" class="block lg:hidden space-y-3 mt-4">
+        </div>
+
+      </section>
+
+
+<section id="wh-dashboard" class="tab-panel active space-y-5">
         
         <!-- Welcome Hero -->
         <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -2331,6 +2645,34 @@
                 <div class="text-[10px] text-stone-500 truncate">Ma trận 14 điểm</div>
               </div>
             </button>
+            <button onclick="switchFromHub('fnb-counts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Kiểm Kê Ngày</div>
+                <div class="text-[10px] text-stone-500 truncate">Nhóm A & Thừa/thiếu</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('fnb-receipts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <i data-lucide="package-plus" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Nhập Hàng</div>
+                <div class="text-[10px] text-stone-500 truncate">Phiếu nhập kho điểm</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('fnb-waste')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 dark:text-white truncate">Hủy Hàng</div>
+                <div class="text-[10px] text-stone-500 truncate">Hao hụt & Hỏng thiu</div>
+              </div>
+            </button>
+            
             <button onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/70 dark:border-stone-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
               <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-[#ed263a] flex items-center justify-center shrink-0">
                 <i data-lucide="trophy" class="w-5 h-5"></i>
@@ -2619,6 +2961,197 @@
     </div>
   </div>
 
+  
+  <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
+  <div id="createReceiptModal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-2xl rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+      <!-- Header -->
+      <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 flex items-center justify-center font-bold">
+            <i data-lucide="package-plus" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white">Tạo Phiếu Nhập Hàng Điểm Bán</h3>
+            <p class="text-[10.5px] text-stone-400">Tự động cộng tồn kho và cập nhật số dư ma trận</p>
+          </div>
+        </div>
+        <button onclick="closeCreateReceiptModal()" class="p-1.5 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 bg-stone-100 dark:bg-stone-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Điểm bán nhận hàng *</label>
+            <select id="receiptModalSite" onchange="onReceiptModalSiteChange()" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-indigo-500">
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Ngày nhập hàng *</label>
+            <input type="date" id="receiptModalDate" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Nhà cung cấp / Nguồn nhập *</label>
+            <select id="receiptModalSupplier" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-indigo-500">
+              <option value="Kho Tổng Siba Food Bình Dương">Kho Tổng Siba Food Bình Dương</option>
+              <option value="NCC Rau Củ Quả Sạch Đà Lạt">NCC Rau Củ Quả Sạch Đà Lạt</option>
+              <option value="NCC Thịt Heo & Gà Sạch CP">NCC Thịt Heo & Gà Sạch CP</option>
+              <option value="NCC Gia Vị & Nông Sản Bắc Bộ">NCC Gia Vị & Nông Sản Bắc Bộ</option>
+              <option value="NCC Bao Bì Sinh Học EcoPack">NCC Bao Bì Sinh Học EcoPack</option>
+              <option value="Nguồn nhập tại chỗ khác">Nguồn nhập tại chỗ khác</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Số Hóa Đơn / Phiếu Giao / PO</label>
+            <input type="text" id="receiptModalInvoice" placeholder="Ví dụ: PO-89211, HD-1024..." class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <!-- Lines Header -->
+        <div class="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+          <span class="font-bold text-stone-800 dark:text-stone-200 text-xs">Danh Sách Mặt Hàng Nhập *</span>
+          <button onclick="addReceiptLineRow()" class="px-3 py-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-[11px] flex items-center gap-1 transition-all">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm Mặt Hàng
+          </button>
+        </div>
+
+        <div id="receiptLinesContainer" class="space-y-2.5">
+          <!-- Dynamically added line rows -->
+        </div>
+
+        <!-- Total & Notes -->
+        <div class="pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between font-mono">
+          <span class="font-bold text-stone-600 dark:text-stone-400">Tổng Tiền Phiếu Nhập:</span>
+          <span id="receiptModalTotalAmount" class="font-extrabold text-base text-indigo-600 dark:text-indigo-400">0 đ</span>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Ghi chú phiếu nhập</label>
+          <input type="text" id="receiptModalNotes" placeholder="Ghi chú người giao, kiểm đếm..." class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 outline-none focus:border-indigo-500">
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="px-5 py-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-end gap-2.5 bg-stone-50/50 dark:bg-stone-900/50">
+        <button onclick="closeCreateReceiptModal()" class="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold">
+          Hủy Bỏ
+        </button>
+        <button onclick="submitCreateReceipt()" id="btnSubmitReceipt" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5 transition-all shadow-md shadow-indigo-900/20">
+          <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Nhập Kho
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
+  <div id="createWasteModal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-2xl rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+      <!-- Header -->
+      <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center font-bold">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
+            <p class="text-[10.5px] text-stone-400">Tự động trừ số lượng tồn và hạch toán giá trị hủy</p>
+          </div>
+        </div>
+        <button onclick="closeCreateWasteModal()" class="p-1.5 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 bg-stone-100 dark:bg-stone-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Điểm bán *</label>
+            <select id="wasteModalSite" onchange="onWasteModalSiteChange()" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-rose-500">
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Ngày ghi hủy *</label>
+            <input type="date" id="wasteModalDate" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-rose-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Lý do hủy chính *</label>
+            <select id="wasteModalReason" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-rose-500">
+              <option value="Hàng hỏng / ôi thiu không đạt chuẩn">Hàng hỏng / ôi thiu không đạt chuẩn</option>
+              <option value="Quá hạn sử dụng (HSD)">Quá hạn sử dụng (HSD)</option>
+              <option value="Rách vỡ bao bì / đổ vỡ khi vận chuyển">Rách vỡ bao bì / đổ vỡ khi vận chuyển</option>
+              <option value="Dập nát hư hỏng sau sơ chế">Dập nát hư hỏng sau sơ chế</option>
+              <option value="Nấu thử món mới & mẫu lưu kiểm thực">Nấu thử món mới & mẫu lưu kiểm thực</option>
+              <option value="Nấu dư cuối ngày không bảo quản được">Nấu dư cuối ngày không bảo quản được</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Người xác nhận (Bếp trưởng / QL) *</label>
+            <input type="text" id="wasteModalConfirmedBy" value="Nguyễn Văn Hùng - Bếp trưởng" class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-semibold outline-none focus:border-rose-500">
+          </div>
+        </div>
+
+        <!-- Lines Header -->
+        <div class="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+          <span class="font-bold text-stone-800 dark:text-stone-200 text-xs">Mặt Hàng Cần Hủy *</span>
+          <button onclick="addWasteLineRow()" class="px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[11px] flex items-center gap-1 transition-all">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm Hàng Hủy
+          </button>
+        </div>
+
+        <div id="wasteLinesContainer" class="space-y-2.5">
+          <!-- Dynamically added waste rows -->
+        </div>
+
+        <!-- Total & Notes -->
+        <div class="pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between font-mono">
+          <span class="font-bold text-stone-600 dark:text-stone-400">Tổng Giá Trị Hủy:</span>
+          <span id="wasteModalTotalAmount" class="font-extrabold text-base text-rose-600 dark:text-rose-400">0 đ</span>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Ghi chú chi tiết biên bản</label>
+          <input type="text" id="wasteModalNotes" placeholder="Ghi chú nguyên nhân cụ thể, hướng xử lý..." class="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 outline-none focus:border-rose-500">
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="px-5 py-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-end gap-2.5 bg-stone-50/50 dark:bg-stone-900/50">
+        <button onclick="closeCreateWasteModal()" class="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold">
+          Hủy Bỏ
+        </button>
+        <button onclick="submitCreateWaste()" id="btnSubmitWaste" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 transition-all shadow-md shadow-rose-900/20">
+          <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Hủy Hàng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
+  <div id="invDetailModal" class="fixed inset-0 z-[130] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-xl rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+        <div>
+          <h3 id="invDetailModalTitle" class="font-extrabold text-sm text-stone-900 dark:text-white">Chi Tiết Chứng Từ</h3>
+          <p id="invDetailModalSub" class="text-[10.5px] text-stone-400">Orbit Siba Food Database</p>
+        </div>
+        <button onclick="closeInvDetailModal()" class="p-1.5 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 bg-stone-100 dark:bg-stone-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div id="invDetailModalBody" class="p-5 overflow-y-auto space-y-3 text-xs custom-scrollbar">
+      </div>
+      <div class="px-5 py-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+        <button onclick="closeInvDetailModal()" class="px-4 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs">
+          Đóng Lại
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
       <div class="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50 dark:bg-stone-900/50">
@@ -2814,6 +3347,9 @@
       if (tabId === 'fnb-pl') loadFnbPL();
       if (tabId === 'fnb-pos') loadFnbPOS();
       if (tabId === 'fnb-stock') loadFnbStock();
+      if (tabId === 'fnb-counts') loadFnbCounts();
+      if (tabId === 'fnb-receipts') loadFnbReceipts();
+      if (tabId === 'fnb-waste') loadFnbWaste();
       if (tabId === 'fnb-sites') loadFnbSites();
       
       // Orbit Siba F&B Tab Hooks
@@ -4258,6 +4794,9 @@ const TAB_META = {
   'fnb-pl': { title: '📊 Báo Cáo P&L', mobTab: 'fnb-chain' },
   'fnb-pos': { title: '⚡ Doanh Thu POS', mobTab: 'fnb-chain' },
   'fnb-stock': { title: '📦 Tồn Kho Chuỗi F&B', mobTab: 'fnb-chain' },
+  'fnb-counts': { title: '📋 Kiểm Kê Hằng Ngày', mobTab: 'fnb-chain' },
+  'fnb-receipts': { title: '📥 Nhập Hàng Điểm Bán', mobTab: 'fnb-chain' },
+  'fnb-waste': { title: '🗑️ Hủy Hàng & Hao Hụt', mobTab: 'fnb-chain' },
   'fnb-sites': { title: '🏢 14 Điểm Bán SAP', mobTab: 'hub' },
   'wh-dashboard': { title: '📈 Tổng Quan Kho', mobTab: 'wh-stock' },
   'wh-stock': { title: '📦 Hạn Dùng & FEFO', mobTab: 'wh-stock' },
@@ -7639,6 +8178,1020 @@ window.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) lucide.createIcons();
   }, 250);
 });
+
+
+
+
+// ============================================================================
+// ORBIT SIBA FOOD: FULL F&B INVENTORY OPERATIONS ENGINE (COUNTS, RECEIPTS, WASTE)
+// ============================================================================
+
+// --- 1. GLOBAL STATE & SITES CACHE ---
+let gFnbSitesList = [
+  { id: 'K001', code: 'K001', name: 'Điểm Bán K001', region: 'Miền Nam' },
+  { id: 'K002', code: 'K002', name: 'Điểm Bán K002', region: 'Miền Nam' },
+  { id: 'K003', code: 'K003', name: 'Điểm Bán K003', region: 'Miền Nam' },
+  { id: 'K004', code: 'K004', name: 'Điểm Bán K004', region: 'Miền Nam' },
+  { id: 'K005', code: 'K005', name: 'Điểm Bán K005', region: 'Miền Nam' },
+  { id: 'K006', code: 'K006', name: 'Điểm Bán K006', region: 'Miền Nam' },
+  { id: 'R515', code: 'R515', name: 'Điểm Bán R515', region: 'Miền Nam' },
+  { id: 'K800', code: 'K800', name: 'Điểm Bán K800', region: 'Miền Nam' },
+  { id: 'K500', code: 'K500', name: 'Điểm Bán K500', region: 'Miền Bắc' },
+  { id: 'K501', code: 'K501', name: 'Điểm Bán K501', region: 'Miền Bắc' },
+  { id: 'K502', code: 'K502', name: 'Điểm Bán K502', region: 'Miền Bắc' },
+  { id: 'K503', code: 'K503', name: 'Điểm Bán K503', region: 'Miền Bắc' },
+  { id: 'K504', code: 'K504', name: 'Điểm Bán K504', region: 'Miền Bắc' },
+  { id: 'K505', code: 'K505', name: 'Điểm Bán K505', region: 'Miền Bắc' }
+];
+
+let gFnbAllItems = [];
+let gCurrentCountItems = [];
+let gFnbBlindCount = false;
+
+// --- 2. POPULATE SITE SELECTORS ONCE ---
+function initFnbSiteSelectors() {
+  const selectors = ['fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
+  selectors.forEach(sid => {
+    const el = document.getElementById(sid);
+    if (!el || el.options.length > 2) return;
+    const isFilter = sid.includes('Filter');
+    let opts = isFilter ? '<option value="all">Tất cả 14 điểm</option>' : '';
+    gFnbSitesList.forEach(s => {
+      opts += `<option value="${s.code}">${s.code} - ${s.name} (${s.region === 'Miền Nam' ? 'MN' : 'MB'})</option>`;
+    });
+    el.innerHTML = opts;
+  });
+
+  // Set default dates to today
+  const today = new Date().toISOString().slice(0, 10);
+  const dp = document.getElementById('fnbCountDatePicker');
+  if (dp && !dp.value) dp.value = today;
+  const rp = document.getElementById('receiptModalDate');
+  if (rp && !rp.value) rp.value = today;
+  const wp = document.getElementById('wasteModalDate');
+  if (wp && !wp.value) wp.value = today;
+}
+
+// --- 3. KIỂM KÊ HẰNG NGÀY (DAILY COUNTS) ---
+window.loadFnbCounts = async function() {
+  initFnbSiteSelectors();
+  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
+  const countType = document.getElementById('fnbCountTypeSelect')?.value || 'DAILY';
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    // 1. Fetch items with current book balance for this site
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${siteCode}`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      gFnbAllItems = json.data.items || [];
+      // Filter for Daily (Category NVL, BTP, HANG_BAN) vs Periodic (All)
+      if (countType === 'DAILY') {
+        gCurrentCountItems = gFnbAllItems.filter(i => ['NVL', 'BTP'].includes(i.item_group));
+      } else {
+        gCurrentCountItems = [...gFnbAllItems];
+      }
+      renderFnbCountsTable();
+    }
+
+    // 2. Load recent counts history
+    loadFnbCountsHistory(siteCode);
+  } catch (err) {
+    console.error('loadFnbCounts error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi tải dữ liệu kiểm kê: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.renderFnbCountsTable = function() {
+  const tbody = document.getElementById('fnbCountsTableBody');
+  const mob = document.getElementById('fnbCountsMobileCards');
+  const query = (document.getElementById('fnbCountSearchInput')?.value || '').trim().toLowerCase();
+
+  const filtered = gCurrentCountItems.filter(i => {
+    if (!query) return true;
+    return (i.name || '').toLowerCase().includes(query) || (i.code || '').toLowerCase().includes(query);
+  });
+
+  // Calculate metrics
+  let matchedCount = 0;
+  let diffCount = 0;
+  let totalDiffVal = 0;
+
+  filtered.forEach(i => {
+    const book = i.book_qty || 0;
+    const count = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null ? i.last_count_qty : book);
+    const diff = count - book;
+    const diffVal = diff * (i.unit_price || 0);
+    if (Math.abs(diff) < 0.001) matchedCount++;
+    else diffCount++;
+    totalDiffVal += diffVal;
+  });
+
+  document.getElementById('fnbCountMetricTotal').textContent = filtered.length;
+  document.getElementById('fnbCountMetricMatched').textContent = matchedCount;
+  document.getElementById('fnbCountMetricDiff').textContent = diffCount;
+  document.getElementById('fnbCountMetricDiffVal').textContent = (totalDiffVal > 0 ? '+' : '') + Math.round(totalDiffVal).toLocaleString('vi-VN') + ' đ';
+
+  // Desktop Table
+  if (tbody) {
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-stone-400">Không có mặt hàng nào phù hợp.</td></tr>`;
+    } else {
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const book = item.book_qty || 0;
+        const count = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null ? item.last_count_qty : book);
+        const diff = count - book;
+        const diffVal = diff * (item.unit_price || 0);
+
+        let diffBadge = `<span class="text-stone-400 font-mono">0</span>`;
+        if (diff > 0) diffBadge = `<span class="text-emerald-600 dark:text-emerald-400 font-extrabold font-mono">+${diff.toFixed(1)}</span>`;
+        else if (diff < 0) diffBadge = `<span class="text-rose-600 dark:text-rose-400 font-extrabold font-mono">${diff.toFixed(1)}</span>`;
+
+        let diffValText = `<span class="text-stone-400 font-mono">0 đ</span>`;
+        if (diffVal > 0) diffValText = `<span class="text-emerald-600 dark:text-emerald-400 font-bold font-mono">+${Math.round(diffVal).toLocaleString('vi-VN')} đ</span>`;
+        else if (diffVal < 0) diffValText = `<span class="text-rose-600 dark:text-rose-400 font-bold font-mono">${Math.round(diffVal).toLocaleString('vi-VN')} đ</span>`;
+
+        const bookDisplay = gFnbBlindCount ? '<span class="text-stone-300 dark:text-stone-700 italic font-mono text-[11px] select-none">••••</span>' : `<span class="font-bold font-mono ${book < 0 ? 'text-rose-600' : 'text-stone-800 dark:text-stone-200'}">${book.toFixed(1)}</span>`;
+
+        return `
+          <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+            <td class="py-3 px-3 text-center font-mono text-stone-400 text-xs">${idx + 1}</td>
+            <td class="py-3 px-4">
+              <div class="font-bold text-stone-900 dark:text-white">${item.name}</div>
+              <div class="text-[10.5px] font-mono text-stone-400 flex items-center gap-1.5 mt-0.5">
+                <span>${item.code}</span>
+                <span>•</span>
+                <span>Giá: ${Number(item.unit_price).toLocaleString('vi-VN')} đ</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-center font-semibold text-stone-600 dark:text-stone-300">${item.unit}</td>
+            <td class="py-3 px-3 text-right fnb-count-book-col">${bookDisplay}</td>
+            <td class="py-2.5 px-3 bg-blue-50/30 dark:bg-blue-950/10">
+              <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
+                     class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-[#1a1616] font-extrabold font-mono text-stone-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
+            </td>
+            <td class="py-3 px-3 text-right select-all">${diffBadge}</td>
+            <td class="py-3 px-3 text-right select-all">${diffValText}</td>
+            <td class="py-2.5 px-4">
+              <input type="text" placeholder="Lý do chênh lệch (nếu có)..." value="${item.userNote || ''}" oninput="onCountNoteChange('${item.code}', this.value)"
+                     class="w-full py-1 px-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-transparent text-[11px] outline-none focus:border-blue-500">
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  // Mobile Card View
+  if (mob) {
+    if (filtered.length === 0) {
+      mob.innerHTML = `<div class="text-center py-8 text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Không có mặt hàng nào phù hợp.</div>`;
+    } else {
+      mob.innerHTML = filtered.map((item, idx) => {
+        const book = item.book_qty || 0;
+        const count = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null ? item.last_count_qty : book);
+        const diff = count - book;
+        const diffVal = diff * (item.unit_price || 0);
+
+        return `
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${item.item_group}</span>
+                <h4 class="font-bold text-sm text-stone-900 dark:text-white mt-1">${item.name}</h4>
+                <div class="text-[10px] text-stone-400 font-mono">${item.code} • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${item.unit}</div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-stone-400">Tồn sách:</span>
+                <div class="font-bold font-mono text-xs ${book < 0 ? 'text-rose-600' : 'text-stone-800 dark:text-stone-200'}">${gFnbBlindCount ? '••••' : book.toFixed(1)} ${item.unit}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1 border-t border-stone-100 dark:border-stone-800">
+              <div class="flex-1">
+                <label class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-0.5">SL Đếm Thực Tế (${item.unit})</label>
+                <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
+                       class="w-full text-center py-2 px-3 rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 font-extrabold font-mono text-base text-stone-900 dark:text-white outline-none">
+              </div>
+              <div class="w-32 text-right">
+                <span class="text-[10px] text-stone-400">Lệch:</span>
+                <div class="font-extrabold font-mono text-sm ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-stone-400')}">
+                  ${diff > 0 ? '+' : ''}${diff.toFixed(1)} ${item.unit}
+                </div>
+                <div class="text-[9.5px] font-mono text-stone-400">${Math.round(diffVal).toLocaleString('vi-VN')} đ</div>
+              </div>
+            </div>
+
+            <input type="text" placeholder="Ghi chú lý do chênh lệch..." value="${item.userNote || ''}" oninput="onCountNoteChange('${item.code}', this.value)"
+                   class="w-full py-1.5 px-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-xs outline-none">
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onCountInputChange = function(code, val) {
+  const item = gCurrentCountItems.find(i => i.code === code);
+  if (item) {
+    item.userCount = val === '' ? 0 : Number(val);
+    renderFnbCountsTable();
+  }
+};
+
+window.onCountNoteChange = function(code, val) {
+  const item = gCurrentCountItems.find(i => i.code === code);
+  if (item) item.userNote = val;
+};
+
+window.onFnbCountSiteChange = function() {
+  loadFnbCounts();
+};
+
+window.onFnbCountDateChange = function() {
+  loadFnbCounts();
+};
+
+window.onFnbCountTypeChange = function() {
+  loadFnbCounts();
+};
+
+window.onFnbCountSearch = function() {
+  renderFnbCountsTable();
+};
+
+window.toggleBlindCount = function(checked) {
+  gFnbBlindCount = checked;
+  renderFnbCountsTable();
+};
+
+// Lưu kết quả kiểm kê vào D1
+window.saveFnbCountAudit = async function() {
+  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
+  const countDate = document.getElementById('fnbCountDatePicker')?.value || new Date().toISOString().slice(0, 10);
+  const countType = document.getElementById('fnbCountTypeSelect')?.value || 'DAILY';
+
+  if (!gCurrentCountItems.length) {
+    if (typeof showToast === 'function') showToast('Không có mặt hàng nào để lưu kiểm kê!');
+    return;
+  }
+
+  const lines = gCurrentCountItems.map(i => {
+    const book = i.book_qty || 0;
+    const count = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null ? i.last_count_qty : book);
+    const diff = count - book;
+    const unitPrice = i.unit_price || 0;
+    return {
+      item_code: i.code,
+      book_qty: book,
+      count_qty: count,
+      diff_qty: diff,
+      unit_price: unitPrice,
+      diff_val: diff * unitPrice,
+      note: i.userNote || ''
+    };
+  });
+
+  const payload = {
+    site_code: siteCode,
+    count_date: countDate,
+    count_type: countType,
+    notes: `Kiểm kê ${countType === 'DAILY' ? 'hằng ngày' : 'định kỳ'} điểm ${siteCode}`,
+    created_by: App?.user?.fullName || 'Bếp trưởng',
+    lines
+  };
+
+  const btn = document.getElementById('btnSaveFnbCount');
+  if (btn) btn.disabled = true;
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch('/api/fnb/counts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi khi lưu phiếu kiểm kê');
+
+    if (typeof showToast === 'function') showToast(`Đã lưu phiếu kiểm kê ${json.data.count_code} thành công!`);
+    loadFnbCounts();
+  } catch (err) {
+    console.error('saveFnbCountAudit error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi lưu kiểm kê: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.loadFnbCountsHistory = async function(siteCode) {
+  try {
+    const res = await fetch(`/api/fnb/counts?site_code=${siteCode}`);
+    const json = await res.json();
+    const tbody = document.getElementById('fnbCountsHistoryBody');
+    if (tbody && json.success) {
+      const counts = json.data.counts || [];
+      if (!counts.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-stone-400">Chưa có phiếu kiểm kê nào cho điểm này.</td></tr>`;
+      } else {
+        tbody.innerHTML = counts.map(c => `
+          <tr class="hover:bg-stone-50 dark:hover:bg-stone-800/40">
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${c.count_code}</td>
+            <td class="py-2.5 px-3 font-semibold">${c.site_code}</td>
+            <td class="py-2.5 px-3 font-mono">${c.count_date}</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
+            <td class="py-2.5 px-3 text-right font-mono">${c.total_items}</td>
+            <td class="py-2.5 px-3 text-right font-mono ${c.diff_items > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${c.diff_items}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold ${c.total_diff_val < 0 ? 'text-rose-600' : (c.total_diff_val > 0 ? 'text-emerald-600' : 'text-stone-400')}">${c.total_diff_val > 0 ? '+' : ''}${Math.round(c.total_diff_val).toLocaleString('vi-VN')} đ</td>
+            <td class="py-2.5 px-3 text-stone-500">${c.created_by || '--'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+  } catch (e) {
+    console.error('loadFnbCountsHistory error:', e);
+  }
+};
+
+// Xuất biểu mẫu kiểm kê Excel (Aptos)
+window.exportCountSheetExcel = function() {
+  if (!gCurrentCountItems.length) {
+    if (typeof showToast === 'function') showToast('Không có dữ liệu mặt hàng để xuất phiếu kiểm!');
+    return;
+  }
+  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
+  const countDate = document.getElementById('fnbCountDatePicker')?.value || new Date().toISOString().slice(0, 10);
+
+  const headers = ['STT', 'Mã Hàng', 'Tên Hàng', 'Nhóm Hàng', 'ĐVT', 'Đơn Giá (đ)', 'Tồn Sổ Sách', 'Số Đếm Thực Tế', 'Chênh Lệch', 'Ghi Chú'];
+  const rows = [headers];
+
+  gCurrentCountItems.forEach((i, idx) => {
+    const book = i.book_qty || 0;
+    const count = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null ? i.last_count_qty : book);
+    const diff = count - book;
+    rows.push([
+      idx + 1,
+      i.code,
+      i.name,
+      i.item_group,
+      i.unit,
+      i.unit_price || 0,
+      book,
+      count,
+      diff,
+      i.userNote || ''
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cellRef]) continue;
+      const isHeader = (R === 0);
+      if (isHeader) {
+        ws[cellRef].s = {
+          font: { name: 'Aptos', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+          fill: { fgColor: { rgb: '1F4E79' } },
+          alignment: { horizontal: 'center', vertical: 'center' }
+        };
+      } else {
+        let alignH = 'left';
+        if (C === 0 || C === 1 || C === 4) alignH = 'center';
+        else if (C >= 5 && C <= 8) alignH = 'right';
+        ws[cellRef].s = {
+          font: { name: 'Aptos', sz: 11 },
+          alignment: { horizontal: alignH, vertical: 'center' }
+        };
+      }
+    }
+  }
+
+  ws['!autofilter'] = { ref: ws['!ref'] };
+  ws['!freeze'] = { xSplit: 3, ySplit: 1, topLeftCell: 'D2', activePane: 'bottomRight', state: 'frozen' };
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `Phieu_Kiem_${siteCode}`);
+  XLSX.writeFile(wb, `Phieu_Kiem_Ke_${siteCode}_${countDate.replace(/-/g, '')}.xlsx`);
+  if (typeof showToast === 'function') showToast('Đã xuất phiếu kiểm kê Excel chuẩn Aptos!');
+};
+
+// --- 4. NHẬP HÀNG (GOODS RECEIPTS) ---
+let gReceiptLineCounter = 0;
+
+window.loadFnbReceipts = async function() {
+  initFnbSiteSelectors();
+  const siteCode = document.getElementById('fnbReceiptFilterSite')?.value || 'all';
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch(`/api/fnb/receipts?site_code=${siteCode}`);
+    const json = await res.json();
+    if (json.success) {
+      const receipts = json.data.receipts || [];
+      renderFnbReceiptsTable(receipts);
+    }
+  } catch (err) {
+    console.error('loadFnbReceipts error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi tải phiếu nhập: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.renderFnbReceiptsTable = function(receipts) {
+  const tbody = document.getElementById('fnbReceiptsTableBody');
+  const mob = document.getElementById('fnbReceiptsMobileCards');
+  const summaryEl = document.getElementById('fnbReceiptsSummary');
+
+  let totalSum = 0;
+  receipts.forEach(r => totalSum += (r.total_amount || 0));
+
+  if (summaryEl) {
+    summaryEl.innerHTML = `Tổng số: <b>${receipts.length}</b> phiếu • Tổng giá trị: <b class="text-indigo-600 dark:text-indigo-400">${Math.round(totalSum).toLocaleString('vi-VN')} đ</b>`;
+  }
+
+  // Desktop Table
+  if (tbody) {
+    if (!receipts.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-stone-400">Chưa có phiếu nhập hàng nào.</td></tr>`;
+    } else {
+      tbody.innerHTML = receipts.map(r => `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer" onclick="viewReceiptDetail(${r.id})">${r.receipt_code}</td>
+          <td class="py-3 px-3 font-semibold text-stone-900 dark:text-white">${r.site_code}</td>
+          <td class="py-3 px-3 font-mono text-stone-600 dark:text-stone-300">${r.receipt_date}</td>
+          <td class="py-3 px-4 font-medium text-stone-800 dark:text-stone-200">${r.supplier}</td>
+          <td class="py-3 px-3 font-mono text-stone-500">${r.invoice_no || '--'}</td>
+          <td class="py-3 px-4 text-right font-mono font-extrabold text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
+          <td class="py-3 px-3 text-stone-500">${r.created_by || '--'}</td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="viewReceiptDetail(${r.id})" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-[11px] transition-all">
+              Chi tiết
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // Mobile Cards
+  if (mob) {
+    if (!receipts.length) {
+      mob.innerHTML = `<div class="text-center py-8 text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Chưa có phiếu nhập hàng nào.</div>`;
+    } else {
+      mob.innerHTML = receipts.map(r => `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">${r.receipt_code}</span>
+              <h4 class="font-bold text-sm text-stone-900 dark:text-white mt-0.5">${r.supplier}</h4>
+              <div class="text-[10px] text-stone-400 font-mono">Điểm: ${r.site_code} • Ngày: ${r.receipt_date}</div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-stone-400">Tổng tiền:</span>
+              <div class="font-extrabold font-mono text-sm text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-stone-800 text-[11px]">
+            <span class="text-stone-400">HĐ/PO: ${r.invoice_no || 'N/A'}</span>
+            <button onclick="viewReceiptDetail(${r.id})" class="px-3 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 font-bold text-xs">Xem Chi Tiết</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.openCreateReceiptModal = async function() {
+  initFnbSiteSelectors();
+  const modal = document.getElementById('createReceiptModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    // Ensure all items are fetched
+    if (!gFnbAllItems.length) {
+      const res = await fetch('/api/fnb/stock/items-for-site?site_code=K001');
+      const json = await res.json();
+      if (json.success) gFnbAllItems = json.data.items || [];
+    }
+    // Clear and add first line
+    document.getElementById('receiptLinesContainer').innerHTML = '';
+    gReceiptLineCounter = 0;
+    addReceiptLineRow();
+    recalcReceiptModalTotal();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.closeCreateReceiptModal = function() {
+  document.getElementById('createReceiptModal')?.classList.add('hidden');
+};
+
+window.addReceiptLineRow = function() {
+  const container = document.getElementById('receiptLinesContainer');
+  if (!container) return;
+  gReceiptLineCounter++;
+  const rowId = `rcLine_${gReceiptLineCounter}`;
+
+  let itemOptions = '<option value="">-- Chọn mặt hàng nhập --</option>';
+  gFnbAllItems.forEach(i => {
+    itemOptions += `<option value="${i.code}" data-price="${i.unit_price}" data-unit="${i.unit}">${i.code} - ${i.name} (${i.unit})</option>`;
+  });
+
+  const rowHtml = `
+    <div id="${rowId}" class="p-2.5 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 flex flex-col sm:flex-row items-center gap-2">
+      <div class="flex-1 w-full sm:w-auto">
+        <select onchange="onReceiptLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-semibold text-xs rc-item-code outline-none">
+          ${itemOptions}
+        </select>
+      </div>
+      <div class="w-24">
+        <input type="number" step="0.1" placeholder="SL" oninput="recalcReceiptModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-bold font-mono rc-qty outline-none" value="1">
+      </div>
+      <div class="w-28">
+        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcReceiptModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-bold font-mono rc-price outline-none" value="0">
+      </div>
+      <div class="w-28 text-right font-mono font-bold text-indigo-600 dark:text-indigo-400 rc-line-total">
+        0 đ
+      </div>
+      <button onclick="document.getElementById('${rowId}').remove(); recalcReceiptModalTotal()" class="p-1 text-stone-400 hover:text-rose-500">
+        <i data-lucide="trash" class="w-4 h-4"></i>
+      </button>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', rowHtml);
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onReceiptLineItemChange = function(rowId, selectEl) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const opt = selectEl.selectedOptions[0];
+  const price = opt?.dataset?.price || 0;
+  const priceInput = row.querySelector('.rc-price');
+  if (priceInput) priceInput.value = price;
+  recalcReceiptModalTotal();
+};
+
+window.recalcReceiptModalTotal = function() {
+  let grandTotal = 0;
+  document.querySelectorAll('#receiptLinesContainer > div').forEach(row => {
+    const qty = Number(row.querySelector('.rc-qty')?.value) || 0;
+    const price = Number(row.querySelector('.rc-price')?.value) || 0;
+    const total = qty * price;
+    grandTotal += total;
+    const totalEl = row.querySelector('.rc-line-total');
+    if (totalEl) totalEl.textContent = Math.round(total).toLocaleString('vi-VN') + ' đ';
+  });
+  const grandEl = document.getElementById('receiptModalTotalAmount');
+  if (grandEl) grandEl.textContent = Math.round(grandTotal).toLocaleString('vi-VN') + ' đ';
+};
+
+window.submitCreateReceipt = async function() {
+  const siteCode = document.getElementById('receiptModalSite')?.value;
+  const receiptDate = document.getElementById('receiptModalDate')?.value;
+  const supplier = document.getElementById('receiptModalSupplier')?.value;
+  const invoiceNo = document.getElementById('receiptModalInvoice')?.value;
+  const notes = document.getElementById('receiptModalNotes')?.value;
+
+  const lines = [];
+  document.querySelectorAll('#receiptLinesContainer > div').forEach(row => {
+    const itemCode = row.querySelector('.rc-item-code')?.value;
+    const qty = Number(row.querySelector('.rc-qty')?.value) || 0;
+    const unitPrice = Number(row.querySelector('.rc-price')?.value) || 0;
+    if (itemCode && qty > 0) {
+      lines.push({ item_code: itemCode, qty, unit_price: unitPrice });
+    }
+  });
+
+  if (!siteCode || !supplier || !lines.length) {
+    if (typeof showToast === 'function') showToast('Vui lòng chọn ít nhất 1 mặt hàng có số lượng > 0!');
+    return;
+  }
+
+  const payload = {
+    site_code: siteCode,
+    receipt_date: receiptDate,
+    supplier,
+    invoice_no: invoiceNo,
+    notes,
+    created_by: App?.user?.fullName || 'Bếp trưởng',
+    lines
+  };
+
+  const btn = document.getElementById('btnSubmitReceipt');
+  if (btn) btn.disabled = true;
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch('/api/fnb/receipts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi khi nhập kho');
+
+    if (typeof showToast === 'function') showToast(`Đã nhập hàng thành công: ${json.data.receipt_code}!`);
+    closeCreateReceiptModal();
+    loadFnbReceipts();
+  } catch (err) {
+    console.error('submitCreateReceipt error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi nhập hàng: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+// --- 5. HỦY HÀNG & HAO HỤT (WASTE & DISPOSAL) ---
+let gWasteLineCounter = 0;
+
+window.loadFnbWaste = async function() {
+  initFnbSiteSelectors();
+  const siteCode = document.getElementById('fnbWasteFilterSite')?.value || 'all';
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch(`/api/fnb/wastes?site_code=${siteCode}`);
+    const json = await res.json();
+    if (json.success) {
+      const wastes = json.data.wastes || [];
+      renderFnbWasteTable(wastes);
+    }
+  } catch (err) {
+    console.error('loadFnbWaste error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi tải biên bản hủy: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.renderFnbWasteTable = function(wastes) {
+  const tbody = document.getElementById('fnbWasteTableBody');
+  const mob = document.getElementById('fnbWasteMobileCards');
+  const summaryEl = document.getElementById('fnbWasteSummary');
+
+  let totalSum = 0;
+  wastes.forEach(w => totalSum += (w.total_amount || 0));
+
+  if (summaryEl) {
+    summaryEl.innerHTML = `Tổng số: <b>${wastes.length}</b> biên bản • Tổng giá trị hủy: <b class="text-rose-600 dark:text-rose-400">${Math.round(totalSum).toLocaleString('vi-VN')} đ</b>`;
+  }
+
+  // Desktop Table
+  if (tbody) {
+    if (!wastes.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-stone-400">Chưa có biên bản hủy hàng nào.</td></tr>`;
+    } else {
+      tbody.innerHTML = wastes.map(w => `
+        <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-rose-600 dark:text-rose-400 cursor-pointer" onclick="viewWasteDetail(${w.id})">${w.waste_code}</td>
+          <td class="py-3 px-3 font-semibold text-stone-900 dark:text-white">${w.site_code}</td>
+          <td class="py-3 px-3 font-mono text-stone-600 dark:text-stone-300">${w.waste_date}</td>
+          <td class="py-3 px-4 font-medium text-stone-800 dark:text-stone-200">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">${w.reason}</span>
+          </td>
+          <td class="py-3 px-3 font-medium text-stone-700 dark:text-stone-300">${w.confirmed_by}</td>
+          <td class="py-3 px-4 text-right font-mono font-extrabold text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</td>
+          <td class="py-3 px-4 text-stone-500 truncate max-w-[150px]">${w.notes || '--'}</td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="viewWasteDetail(${w.id})" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[11px] transition-all">
+              Chi tiết
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // Mobile Cards
+  if (mob) {
+    if (!wastes.length) {
+      mob.innerHTML = `<div class="text-center py-8 text-stone-400 bg-white dark:bg-[#161313] rounded-2xl border border-stone-200 dark:border-stone-800">Chưa có biên bản hủy hàng nào.</div>`;
+    } else {
+      mob.innerHTML = wastes.map(w => `
+        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs font-mono font-bold text-rose-600 dark:text-rose-400">${w.waste_code}</span>
+              <div class="mt-1">
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300">${w.reason}</span>
+              </div>
+              <div class="text-[10px] text-stone-400 font-mono mt-1">Điểm: ${w.site_code} • Ngày: ${w.waste_date}</div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-stone-400">Giá trị hủy:</span>
+              <div class="font-extrabold font-mono text-sm text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-stone-800 text-[11px]">
+            <span class="text-stone-400">Xác nhận: ${w.confirmed_by}</span>
+            <button onclick="viewWasteDetail(${w.id})" class="px-3 py-1 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 font-bold text-xs">Xem Chi Tiết</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.openCreateWasteModal = async function() {
+  initFnbSiteSelectors();
+  const modal = document.getElementById('createWasteModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (!gFnbAllItems.length) {
+      const res = await fetch('/api/fnb/stock/items-for-site?site_code=K001');
+      const json = await res.json();
+      if (json.success) gFnbAllItems = json.data.items || [];
+    }
+    document.getElementById('wasteLinesContainer').innerHTML = '';
+    gWasteLineCounter = 0;
+    addWasteLineRow();
+    recalcWasteModalTotal();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.closeCreateWasteModal = function() {
+  document.getElementById('createWasteModal')?.classList.add('hidden');
+};
+
+window.addWasteLineRow = function() {
+  const container = document.getElementById('wasteLinesContainer');
+  if (!container) return;
+  gWasteLineCounter++;
+  const rowId = `wsLine_${gWasteLineCounter}`;
+
+  let itemOptions = '<option value="">-- Chọn mặt hàng cần hủy --</option>';
+  gFnbAllItems.forEach(i => {
+    itemOptions += `<option value="${i.code}" data-price="${i.unit_price}" data-unit="${i.unit}">${i.code} - ${i.name} (${i.unit})</option>`;
+  });
+
+  const rowHtml = `
+    <div id="${rowId}" class="p-2.5 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 flex flex-col sm:flex-row items-center gap-2">
+      <div class="flex-1 w-full sm:w-auto">
+        <select onchange="onWasteLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-semibold text-xs ws-item-code outline-none">
+          ${itemOptions}
+        </select>
+      </div>
+      <div class="w-24">
+        <input type="number" step="0.1" placeholder="SL Hủy" oninput="recalcWasteModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-bold font-mono ws-qty outline-none" value="1">
+      </div>
+      <div class="w-28">
+        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcWasteModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1616] font-bold font-mono ws-price outline-none" value="0">
+      </div>
+      <div class="w-28 text-right font-mono font-bold text-rose-600 dark:text-rose-400 ws-line-total">
+        0 đ
+      </div>
+      <button onclick="document.getElementById('${rowId}').remove(); recalcWasteModalTotal()" class="p-1 text-stone-400 hover:text-rose-500">
+        <i data-lucide="trash" class="w-4 h-4"></i>
+      </button>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', rowHtml);
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onWasteLineItemChange = function(rowId, selectEl) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const opt = selectEl.selectedOptions[0];
+  const price = opt?.dataset?.price || 0;
+  const priceInput = row.querySelector('.ws-price');
+  if (priceInput) priceInput.value = price;
+  recalcWasteModalTotal();
+};
+
+window.recalcWasteModalTotal = function() {
+  let grandTotal = 0;
+  document.querySelectorAll('#wasteLinesContainer > div').forEach(row => {
+    const qty = Number(row.querySelector('.ws-qty')?.value) || 0;
+    const price = Number(row.querySelector('.ws-price')?.value) || 0;
+    const total = qty * price;
+    grandTotal += total;
+    const totalEl = row.querySelector('.ws-line-total');
+    if (totalEl) totalEl.textContent = Math.round(total).toLocaleString('vi-VN') + ' đ';
+  });
+  const grandEl = document.getElementById('wasteModalTotalAmount');
+  if (grandEl) grandEl.textContent = Math.round(grandTotal).toLocaleString('vi-VN') + ' đ';
+};
+
+window.submitCreateWaste = async function() {
+  const siteCode = document.getElementById('wasteModalSite')?.value;
+  const wasteDate = document.getElementById('wasteModalDate')?.value;
+  const reason = document.getElementById('wasteModalReason')?.value;
+  const confirmedBy = document.getElementById('wasteModalConfirmedBy')?.value;
+  const notes = document.getElementById('wasteModalNotes')?.value;
+
+  const lines = [];
+  document.querySelectorAll('#wasteLinesContainer > div').forEach(row => {
+    const itemCode = row.querySelector('.ws-item-code')?.value;
+    const qty = Number(row.querySelector('.ws-qty')?.value) || 0;
+    const unitPrice = Number(row.querySelector('.ws-price')?.value) || 0;
+    if (itemCode && qty > 0) {
+      lines.push({ item_code: itemCode, qty, unit_price: unitPrice, reason_detail: reason });
+    }
+  });
+
+  if (!siteCode || !lines.length) {
+    if (typeof showToast === 'function') showToast('Vui lòng chọn ít nhất 1 mặt hàng có số lượng hủy > 0!');
+    return;
+  }
+
+  const payload = {
+    site_code: siteCode,
+    waste_date: wasteDate,
+    reason,
+    confirmed_by: confirmedBy,
+    notes,
+    created_by: App?.user?.fullName || 'Bếp trưởng',
+    lines
+  };
+
+  const btn = document.getElementById('btnSubmitWaste');
+  if (btn) btn.disabled = true;
+
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch('/api/fnb/wastes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi khi ghi biên bản hủy');
+
+    if (typeof showToast === 'function') showToast(`Đã ghi biên bản hủy thành công: ${json.data.waste_code}!`);
+    closeCreateWasteModal();
+    loadFnbWaste();
+  } catch (err) {
+    console.error('submitCreateWaste error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi ghi biên bản hủy: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+// --- 6. VIEW DETAILS MODAL ---
+window.viewReceiptDetail = async function(receiptId) {
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch(`/api/fnb/receipts?id=${receiptId}`);
+    const json = await res.json();
+    if (!json.success) throw new Error('Không tải được phiếu');
+
+    const lines = json.data.lines || [];
+    const modal = document.getElementById('invDetailModal');
+    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Phiếu Nhập #${receiptId}`;
+    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng nhập kho`;
+
+    let html = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-stone-50 dark:bg-stone-800 text-stone-500 border-b border-stone-200 dark:border-stone-800">
+            <tr>
+              <th class="py-2 px-3">Mặt Hàng</th>
+              <th class="py-2 px-3 text-center">ĐVT</th>
+              <th class="py-2 px-3 text-right">SL Nhập</th>
+              <th class="py-2 px-3 text-right">Đơn Giá</th>
+              <th class="py-2 px-3 text-right">Thành Tiền</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100 dark:divide-stone-800/60 font-mono">
+            ${lines.map(l => `
+              <tr>
+                <td class="py-2 px-3 font-sans font-bold text-stone-900 dark:text-white">${l.item_name || l.item_code}</td>
+                <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
+                <td class="py-2 px-3 text-right font-bold text-indigo-600">${l.qty}</td>
+                <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 text-right font-extrabold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('invDetailModalBody').innerHTML = html;
+    modal.classList.remove('hidden');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.viewWasteDetail = async function(wasteId) {
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch(`/api/fnb/wastes?id=${wasteId}`);
+    const json = await res.json();
+    if (!json.success) throw new Error('Không tải được biên bản');
+
+    const lines = json.data.lines || [];
+    const modal = document.getElementById('invDetailModal');
+    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Biên Bản Hủy #${wasteId}`;
+    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng hao hụt / hủy`;
+
+    let html = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-stone-50 dark:bg-stone-800 text-stone-500 border-b border-stone-200 dark:border-stone-800">
+            <tr>
+              <th class="py-2 px-3">Mặt Hàng</th>
+              <th class="py-2 px-3 text-center">ĐVT</th>
+              <th class="py-2 px-3 text-right">SL Hủy</th>
+              <th class="py-2 px-3 text-right">Đơn Giá</th>
+              <th class="py-2 px-3 text-right">Thành Tiền</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100 dark:divide-stone-800/60 font-mono">
+            ${lines.map(l => `
+              <tr>
+                <td class="py-2 px-3 font-sans font-bold text-stone-900 dark:text-white">${l.item_name || l.item_code}</td>
+                <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
+                <td class="py-2 px-3 text-right font-bold text-rose-600">${l.qty}</td>
+                <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 text-right font-extrabold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('invDetailModalBody').innerHTML = html;
+    modal.classList.remove('hidden');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.viewCountDetail = async function(countId) {
+  try {
+    if (typeof showLoading === 'function') showLoading();
+    const res = await fetch(`/api/fnb/counts?id=${countId}`);
+    const json = await res.json();
+    if (!json.success) throw new Error('Không tải được phiếu');
+
+    const lines = json.data.lines || [];
+    const modal = document.getElementById('invDetailModal');
+    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Phiếu Kiểm Kê #${countId}`;
+    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng kiểm kê`;
+
+    let html = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-stone-50 dark:bg-stone-800 text-stone-500 border-b border-stone-200 dark:border-stone-800">
+            <tr>
+              <th class="py-2 px-3">Mặt Hàng</th>
+              <th class="py-2 px-3 text-right">Tồn Sách</th>
+              <th class="py-2 px-3 text-right">SL Đếm</th>
+              <th class="py-2 px-3 text-right">Lệch</th>
+              <th class="py-2 px-3 text-right">Tiền Lệch</th>
+              <th class="py-2 px-3">Ghi Chú</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100 dark:divide-stone-800/60 font-mono">
+            ${lines.map(l => `
+              <tr>
+                <td class="py-2 px-3 font-sans font-bold text-stone-900 dark:text-white">${l.item_name || l.item_code}</td>
+                <td class="py-2 px-3 text-right">${l.book_qty}</td>
+                <td class="py-2 px-3 text-right font-bold text-blue-600">${l.count_qty}</td>
+                <td class="py-2 px-3 text-right font-extrabold ${l.diff_qty < 0 ? 'text-rose-600' : (l.diff_qty > 0 ? 'text-emerald-600' : 'text-stone-400')}">${l.diff_qty > 0 ? '+' : ''}${l.diff_qty}</td>
+                <td class="py-2 px-3 text-right font-extrabold ${l.diff_val < 0 ? 'text-rose-600' : (l.diff_val > 0 ? 'text-emerald-600' : 'text-stone-400')}">${l.diff_val > 0 ? '+' : ''}${Math.round(l.diff_val).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 font-sans text-stone-500 text-[11px]">${l.note || '--'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('invDetailModalBody').innerHTML = html;
+    modal.classList.remove('hidden');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.closeInvDetailModal = function() {
+  document.getElementById('invDetailModal')?.classList.add('hidden');
+};
 
 </script>
 </body>

@@ -1109,6 +1109,338 @@ export default {
       }
 
 
+
+      // 3.5 GET /api/fnb/stock/items-for-site - Lấy danh mục & tồn sách cho 1 điểm bán
+      if ((pathname === '/api/fnb/stock/items-for-site' || pathname === '/fnb/stock/items-for-site') && request.method === 'GET') {
+        const siteCode = searchParams.get('site_code') || 'K001';
+        const groupParam = searchParams.get('group') || 'all';
+
+        let query = `
+          SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
+                 COALESCE(b.book_qty, 0) as book_qty,
+                 COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                 b.last_count_date,
+                 COALESCE(b.no_opening, 1) as no_opening,
+                 COALESCE(b.total_value, 0) as total_value
+          FROM fnb_stock_items i
+          LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
+          WHERE i.is_active = 1
+        `;
+        let binds = [siteCode];
+        if (groupParam && groupParam !== 'all') {
+          query += ` AND i.item_group = ?`;
+          binds.push(groupParam);
+        }
+        query += ` ORDER BY i.item_group, i.code`;
+
+        const { results } = await env.DB.prepare(query).bind(...binds).all();
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            site_code: siteCode,
+            items: results
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 3.6 KIỂM KÊ: GET & POST /api/fnb/counts
+      if ((pathname === '/api/fnb/counts' || pathname === '/fnb/counts')) {
+        if (request.method === 'GET') {
+          const siteCode = searchParams.get('site_code');
+          let q = `SELECT * FROM fnb_stock_counts`;
+          let b = [];
+          if (siteCode && siteCode !== 'all') {
+            q += ` WHERE site_code = ?`;
+            b.push(siteCode);
+          }
+          q += ` ORDER BY count_date DESC, id DESC LIMIT 50`;
+          const { results: counts } = await env.DB.prepare(q).bind(...b).all();
+
+          // Lấy chi tiết các dòng nếu cần
+          const countId = searchParams.get('id');
+          let lines = [];
+          if (countId) {
+            const { results: l } = await env.DB.prepare(`
+              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              FROM fnb_stock_count_lines l
+              LEFT JOIN fnb_stock_items i ON l.item_code = i.code
+              WHERE l.count_id = ?
+            `).bind(countId).all();
+            lines = l;
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: {
+              counts,
+              lines
+            }
+          }), { headers: corsHeaders });
+        }
+
+        if (request.method === 'POST') {
+          try {
+            const body = await request.json();
+            const { site_code, count_date, count_type = 'DAILY', notes = '', created_by = 'Bếp trưởng', lines = [] } = body;
+            if (!site_code || !lines.length) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán hoặc danh sách kiểm' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const randSuffix = Math.floor(1000 + Math.random() * 9000);
+            const countCode = `KK-${(count_date || '').replace(/-/g, '')}-${site_code}-${randSuffix}`;
+
+            let totalItems = lines.length;
+            let matchedItems = 0;
+            let diffItems = 0;
+            let totalDiffVal = 0;
+
+            for (const item of lines) {
+              const diff = (item.count_qty || 0) - (item.book_qty || 0);
+              const diffVal = diff * (item.unit_price || 0);
+              if (Math.abs(diff) < 0.001) matchedItems++;
+              else diffItems++;
+              totalDiffVal += diffVal;
+            }
+
+            // Insert Header
+            const insertHeader = await env.DB.prepare(`
+              INSERT INTO fnb_stock_counts (count_code, site_code, count_date, count_type, total_items, matched_items, diff_items, total_diff_val, notes, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(countCode, site_code, count_date, count_type, totalItems, matchedItems, diffItems, totalDiffVal, notes, created_by).run();
+
+            const countId = insertHeader.meta.last_row_id;
+
+            // Insert Lines & Update Balances
+            for (const item of lines) {
+              const countQty = Number(item.count_qty) || 0;
+              const bookQty = Number(item.book_qty) || 0;
+              const diffQty = countQty - bookQty;
+              const unitPrice = Number(item.unit_price) || 0;
+              const diffVal = diffQty * unitPrice;
+
+              await env.DB.prepare(`
+                INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+              `).bind(countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || '').run();
+
+              // Cập nhật số đếm thực tế gần nhất vào bảng số dư tồn kho
+              await env.DB.prepare(`
+                UPDATE fnb_stock_balances
+                SET last_count_qty = ?, last_count_date = ?
+                WHERE item_code = ? AND site_code = ?
+              `).bind(countQty, count_date, item.item_code, site_code).run();
+
+              // Ghi log giao dịch kiểm kê
+              if (Math.abs(diffQty) > 0.001) {
+                await env.DB.prepare(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                  VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
+                `).bind(countCode, count_date, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by).run();
+              }
+            }
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'Lưu phiếu kiểm kê thành công!',
+              data: { count_code: countCode, count_id: countId, total_diff_val: totalDiffVal }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+      }
+
+      // 3.7 NHẬP HÀNG: GET & POST /api/fnb/receipts
+      if ((pathname === '/api/fnb/receipts' || pathname === '/fnb/receipts')) {
+        if (request.method === 'GET') {
+          const siteCode = searchParams.get('site_code');
+          let q = `SELECT * FROM fnb_stock_receipts`;
+          let b = [];
+          if (siteCode && siteCode !== 'all') {
+            q += ` WHERE site_code = ?`;
+            b.push(siteCode);
+          }
+          q += ` ORDER BY receipt_date DESC, id DESC LIMIT 50`;
+          const { results: receipts } = await env.DB.prepare(q).bind(...b).all();
+
+          const receiptId = searchParams.get('id');
+          let lines = [];
+          if (receiptId) {
+            const { results: l } = await env.DB.prepare(`
+              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              FROM fnb_stock_receipt_lines l
+              LEFT JOIN fnb_stock_items i ON l.item_code = i.code
+              WHERE l.receipt_id = ?
+            `).bind(receiptId).all();
+            lines = l;
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: { receipts, lines }
+          }), { headers: corsHeaders });
+        }
+
+        if (request.method === 'POST') {
+          try {
+            const body = await request.json();
+            const { site_code, receipt_date, supplier = '', invoice_no = '', notes = '', attachment_url = '', created_by = 'Thủ kho / Bếp trưởng', lines = [] } = body;
+            if (!site_code || !supplier || !lines.length) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán, nhà cung cấp hoặc danh sách hàng nhập' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const randSuffix = Math.floor(1000 + Math.random() * 9000);
+            const receiptCode = `PN-${(receipt_date || '').replace(/-/g, '')}-${randSuffix}`;
+
+            let totalAmount = 0;
+            for (const item of lines) {
+              const qty = Number(item.qty) || 0;
+              const price = Number(item.unit_price) || 0;
+              totalAmount += (qty * price);
+            }
+
+            // Insert Header
+            const insertH = await env.DB.prepare(`
+              INSERT INTO fnb_stock_receipts (receipt_code, site_code, receipt_date, supplier, invoice_no, total_amount, notes, attachment_url, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(receiptCode, site_code, receipt_date, supplier, invoice_no, totalAmount, notes, attachment_url, created_by).run();
+
+            const receiptId = insertH.meta.last_row_id;
+
+            // Insert Lines & Update Balances
+            for (const item of lines) {
+              const qty = Number(item.qty) || 0;
+              const unitPrice = Number(item.unit_price) || 0;
+              const lineAmount = qty * unitPrice;
+
+              await env.DB.prepare(`
+                INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
+                VALUES (?, ?, ?, ?, ?, ?)
+              `).bind(receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '').run();
+
+              // Cập nhật tăng số lượng nhập và số tồn sổ sách
+              await env.DB.prepare(`
+                UPDATE fnb_stock_balances
+                SET receipt_qty = receipt_qty + ?,
+                    book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
+                    total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
+                WHERE item_code = ? AND site_code = ?
+              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code).run();
+
+              // Ghi log giao dịch nhập kho
+              await env.DB.prepare(`
+                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
+              `).bind(receiptCode, receipt_date, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by).run();
+            }
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'Nhập hàng vào kho thành công!',
+              data: { receipt_code: receiptCode, receipt_id: receiptId, total_amount: totalAmount }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+      }
+
+      // 3.8 HỦY HÀNG: GET & POST /api/fnb/wastes
+      if ((pathname === '/api/fnb/wastes' || pathname === '/fnb/wastes')) {
+        if (request.method === 'GET') {
+          const siteCode = searchParams.get('site_code');
+          let q = `SELECT * FROM fnb_stock_wastes`;
+          let b = [];
+          if (siteCode && siteCode !== 'all') {
+            q += ` WHERE site_code = ?`;
+            b.push(siteCode);
+          }
+          q += ` ORDER BY waste_date DESC, id DESC LIMIT 50`;
+          const { results: wastes } = await env.DB.prepare(q).bind(...b).all();
+
+          const wasteId = searchParams.get('id');
+          let lines = [];
+          if (wasteId) {
+            const { results: l } = await env.DB.prepare(`
+              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              FROM fnb_stock_waste_lines l
+              LEFT JOIN fnb_stock_items i ON l.item_code = i.code
+              WHERE l.waste_id = ?
+            `).bind(wasteId).all();
+            lines = l;
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: { wastes, lines }
+          }), { headers: corsHeaders });
+        }
+
+        if (request.method === 'POST') {
+          try {
+            const body = await request.json();
+            const { site_code, waste_date, reason = 'Hàng hỏng / rách', confirmed_by = 'Bếp trưởng', notes = '', attachment_url = '', created_by = 'Bếp trưởng', lines = [] } = body;
+            if (!site_code || !lines.length) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán hoặc danh sách hàng hủy' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const randSuffix = Math.floor(1000 + Math.random() * 9000);
+            const wasteCode = `BBH-${(waste_date || '').replace(/-/g, '')}-${randSuffix}`;
+
+            let totalAmount = 0;
+            for (const item of lines) {
+              const qty = Number(item.qty) || 0;
+              const price = Number(item.unit_price) || 0;
+              totalAmount += (qty * price);
+            }
+
+            // Insert Header
+            const insertH = await env.DB.prepare(`
+              INSERT INTO fnb_stock_wastes (waste_code, site_code, waste_date, reason, confirmed_by, total_amount, notes, attachment_url, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(wasteCode, site_code, waste_date, reason, confirmed_by, totalAmount, notes, attachment_url, created_by).run();
+
+            const wasteId = insertH.meta.last_row_id;
+
+            // Insert Lines & Update Balances
+            for (const item of lines) {
+              const qty = Number(item.qty) || 0;
+              const unitPrice = Number(item.unit_price) || 0;
+              const lineAmount = qty * unitPrice;
+
+              await env.DB.prepare(`
+                INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
+                VALUES (?, ?, ?, ?, ?, ?)
+              `).bind(wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason).run();
+
+              // Cập nhật tăng số lượng hủy và giảm số tồn sổ sách
+              await env.DB.prepare(`
+                UPDATE fnb_stock_balances
+                SET waste_qty = waste_qty + ?,
+                    book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
+                    total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
+                WHERE item_code = ? AND site_code = ?
+              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code).run();
+
+              // Ghi log giao dịch hủy hàng
+              await env.DB.prepare(`
+                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
+              `).bind(wasteCode, waste_date, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by).run();
+            }
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'Ghi nhận biên bản hủy hàng thành công!',
+              data: { waste_code: wasteCode, waste_id: wasteId, total_amount: totalAmount }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+      }
+
+
       // Fallback: Static Assets
       if (env.ASSETS) {
         return env.ASSETS.fetch(request);
