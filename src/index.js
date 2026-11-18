@@ -694,7 +694,17 @@ export default {
           SELECT file_name, file_link, file_type, upload_date FROM chung_tu_file WHERE voucher_code = ?
         `).bind(maCT).all();
 
-        return new Response(JSON.stringify({ success: true, data: { ...voucher, files } }), { headers: corsHeaders });
+        const allFiles = [...(files || [])];
+        if (voucher.attachment_link && !allFiles.some(f => f.file_link === voucher.attachment_link)) {
+          allFiles.unshift({
+            file_name: 'File_chung_tu_goc.jpg',
+            file_link: voucher.attachment_link,
+            file_type: 'image/jpeg',
+            upload_date: voucher.created_at || voucher.invoice_date || ''
+          });
+        }
+
+        return new Response(JSON.stringify({ success: true, data: { ...voucher, files: allFiles } }), { headers: corsHeaders });
       }
 
       // 2.9 GET /api/inventory-audit & POST
