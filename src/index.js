@@ -827,7 +827,7 @@ export default {
           if (!user) {
             // Xác định vai trò mặc định
             let defaultRole = 'NHAN_VIEN';
-            if (email.includes('admin') || email.includes('daitt') || email.includes('tuandai')) defaultRole = 'ADMIN';
+            if (email.includes('admin') || email.includes('daitt') || email.includes('tuandai') || email.includes('trantuandai')) defaultRole = 'ADMIN';
             else if (email.includes('bep') || email.includes('chef')) defaultRole = 'BEP_TRUONG';
             else if (email.includes('kho') || email.includes('stock')) defaultRole = 'KHO_TRUONG';
             else if (email.includes('ketoan') || email.includes('account')) defaultRole = 'KE_TOAN';
