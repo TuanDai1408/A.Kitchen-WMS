@@ -333,10 +333,10 @@
 
         <!-- Action Buttons -->
         <div class="flex items-center gap-1 shrink-0">
-          <button onclick="openRoleSwitcherModal()" title="Chuyển vai trò thử nghiệm" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/60 dark:hover:bg-white/5 active:scale-90 transition-all">
+          <button onclick="openRoleSwitcherModal()" title="Chuyển vai trò thử nghiệm" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/60 dark:hover:bg-white/5 active:translate-y-px transition-all">
             <i data-lucide="shield" class="w-4 h-4 text-brand-500"></i>
           </button>
-          <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-white/5 active:scale-90 transition-all">
+          <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-white/5 active:translate-y-px transition-all">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </div>
@@ -499,7 +499,7 @@
             </div>
             <div class="mt-4 min-w-0">
               <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Doanh Thu Chuỗi</span>
-              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalRevenue" title="6,347,000,000đ">6,347,000,000đ</h4>
+              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalRevenue" title="6,347,000,000đ">6,347,000,000đ</h4>
             </div>
             <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Đạt 105.8% kế hoạch tháng (14 Điểm bán)
@@ -518,7 +518,7 @@
             </div>
             <div class="mt-4 min-w-0">
               <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Lợi Nhuận EBITDA Chuỗi</span>
-              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalProfit" title="1,548,000,000đ">1,548,000,000đ</h4>
+              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalProfit" title="1,548,000,000đ">1,548,000,000đ</h4>
             </div>
             <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Biên EBITDA trung bình toàn chuỗi
@@ -538,7 +538,7 @@
             </div>
             <div class="mt-4 min-w-0">
               <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Food Cost TB Chuỗi</span>
-              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgFoodCost">42.4%</h4>
+              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgFoodCost">42.4%</h4>
             </div>
             <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Trong định mức mục tiêu (&le; 43.0%)
@@ -557,7 +557,7 @@
             </div>
             <div class="mt-4 min-w-0">
               <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Labor Cost (COL) Chuỗi</span>
-              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgLaborCost">18.2%</h4>
+              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgLaborCost">18.2%</h4>
             </div>
             <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Định mức nhân công chuẩn chuỗi (&le; 19.0%)
@@ -1737,7 +1737,7 @@
                   type="text" 
                   id="inventoryTrendDatePicker" 
                   placeholder="Chọn khoảng ngày..." 
-                  class="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#465FFF] shadow-xs cursor-pointer w-48"
+                  class="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 shadow-xs cursor-pointer w-48"
                   readonly
                 />
               </div>
@@ -1836,13 +1836,13 @@
                 id="fefoSearchInput" 
                 oninput="filterFefoLive()" 
                 placeholder="Tìm SKU, tên gia vị, mã lô..." 
-                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#465FFF] transition-all"
+                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all"
               />
             </div>
 
             <!-- Filter: Danh mục hàng -->
             <div class="lg:col-span-3">
-              <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#465FFF] transition-all">
+              <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all">
                 <option value="">Tất cả nhóm hàng</option>
                 <option value="Gia vị">Gia vị</option>
                 <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
@@ -1852,7 +1852,7 @@
 
             <!-- Filter: Trạng thái hạn dùng -->
             <div class="lg:col-span-3">
-              <select id="fefoStatusFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#465FFF] transition-all">
+              <select id="fefoStatusFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all">
                 <option value="">Tất cả trạng thái</option>
                 <option value="safe">An toàn</option>
                 <option value="yellow">Cận Date (≤ 15 ngày)</option>
@@ -2758,7 +2758,7 @@
       </button>
 
       <!-- Tab 3: Center Elevated FAB - Nhập Chứng Từ -->
-      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:scale-90 transition-transform px-2 group">
+      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:translate-y-px transition-transform px-2 group">
         <div class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-rose-900/35 flex items-center justify-center border-4 border-white dark:border-black transition-all group-hover:scale-105">
           <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
@@ -2807,7 +2807,7 @@
               <div class="text-[11px] text-gray-500 dark:text-gray-400">Orbit Siba Food • 15 Chức năng vận hành</div>
             </div>
           </div>
-          <button onclick="closeMobileMenuHub()" class="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full bg-gray-100 dark:bg-gray-800 active:scale-90 transition-transform">
+          <button onclick="closeMobileMenuHub()" class="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full bg-gray-100 dark:bg-gray-800 active:translate-y-px transition-transform">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -3098,7 +3098,7 @@
        ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
        ===================================================================== -->
   <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
-    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 transition-all shadow-lg" title="Đóng (ESC)">
+    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
       <i data-lucide="x" class="w-5 h-5"></i>
     </button>
     <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
@@ -3126,7 +3126,7 @@
        ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
        ===================================================================== -->
   <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
-    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 transition-all shadow-lg" title="Đóng (ESC)">
+    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
       <i data-lucide="x" class="w-5 h-5"></i>
     </button>
     <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
@@ -3154,7 +3154,7 @@
        ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
        ===================================================================== -->
   <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
-    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 transition-all shadow-lg" title="Đóng (ESC)">
+    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
       <i data-lucide="x" class="w-5 h-5"></i>
     </button>
     <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
@@ -3886,20 +3886,20 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Định Mức An Toàn (Min)</label>
-            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 tabular-nums focus:ring-2 focus:ring-[#465FFF] outline-none">
+            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 tabular-nums focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
           </div>
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Đơn Vị Tính</label>
-            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465FFF] outline-none">
+            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
           </div>
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị Trí Kệ / Lưu Trữ</label>
-          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465FFF] outline-none">
+          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi Chú Quản Lý</label>
-          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465FFF] outline-none">
+          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
         </div>
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
           <button onclick="closeModal('modalEditItem')" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
