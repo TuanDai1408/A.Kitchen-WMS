@@ -599,6 +599,7 @@
             placeholder="Search or type command..."
             class="h-full w-full min-w-0 border-0 bg-transparent px-3 text-xs sm:text-sm text-gray-800 dark:text-white/90 placeholder-gray-400 dark:placeholder-gray-500 outline-none"
           />
+          <kbd class="hidden sm:inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-mono text-gray-400 me-2.5 pointer-events-none select-none shadow-xs">Ctrl K</kbd>
         </div>
       </div>
 
@@ -4066,6 +4067,7 @@
 
       const target = document.getElementById(tabId);
       if (target) target.classList.add('active');
+      try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
       if (!btn) {
         btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
       }
@@ -6709,6 +6711,26 @@ function exportFnbPLExcel() {
 
 
 window.addEventListener('DOMContentLoaded', () => {
+  // Restore persisted active tab (Phase 2 App Shell)
+  try {
+    const savedActiveTab = localStorage.getItem('orbit_active_tab');
+    if (savedActiveTab && document.getElementById(savedActiveTab)) {
+      setTimeout(() => { switchTab(savedActiveTab); }, 50);
+    }
+  } catch(e) {}
+
+  // Global Ctrl+K / Cmd+K search shortcut listener
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      const searchInput = document.getElementById('globalHeaderSearch') || document.getElementById('sidebarMenuSearch');
+      if (searchInput) {
+        searchInput.focus();
+        if (typeof searchInput.select === 'function') searchInput.select();
+      }
+    }
+  });
+
   setTimeout(() => {
     loadFnbChain();
     updateMobileNavState('fnb-chain');
