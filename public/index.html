@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
   
-  <!-- Google Fonts: Outfit (100% TailAdmin) & JetBrains Mono -->
+  <!-- Google Fonts: Be Vietnam Pro (100% Vietnamese Typography) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +23,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Outfit"', 'sans-serif'],
+            sans: ['"Be Vietnam Pro"', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           width: {
@@ -93,11 +93,11 @@
 
   <style>
     @theme {
-      --font-sans: 'Outfit', sans-serif;
+      --font-sans: 'Be Vietnam Pro', sans-serif;
     }
     :root {
-      font-family: 'Outfit', sans-serif;
-      --font-sans: 'Outfit', sans-serif;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      --font-sans: 'Be Vietnam Pro', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
       -webkit-tap-highlight-color: transparent;
 
@@ -129,7 +129,7 @@
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Be Vietnam Pro', sans-serif;
       background-color: var(--app-bg);
       color: var(--text-main);
       transition: background-color 0.2s ease, color 0.2s ease;
@@ -661,7 +661,7 @@
         <!-- User Info (Click to open Auth Modal) -->
         <div class="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-90 transition-opacity" onclick="handleUserProfileClick()" role="button" title="Thông tin tài khoản & Chuyển đổi">
           <div class="relative shrink-0">
-            <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=Admin&background=ed263a&color=fff" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
+            <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
             <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black"></span>
           </div>
           <div class="min-w-0">
@@ -779,7 +779,7 @@
 
         <!-- TailAdmin User Profile Button -->
         <button onclick="handleUserProfileClick()" class="h-10 lg:h-11 flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
-          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
           <div class="hidden xl:flex flex-col text-left leading-tight">
             <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
             <span id="headerUserRoleBadge" class="text-[9px] font-bold text-[#465fff] uppercase">ADMIN</span>
@@ -3442,7 +3442,7 @@
         
         <!-- Main User Card -->
         <div class="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center gap-3.5">
-          <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#465fff]/30 shrink-0">
+          <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#465fff]/30 shrink-0">
           <div class="min-w-0 flex-1">
             <h4 id="profModalName" class="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
             <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">admin@sibafood.vn</div>
@@ -9828,6 +9828,19 @@ const FEATURE_TITLES = {
 // QUẢN LÝ LƯU TRỮ VÀ CHUYỂN ĐỔI NHIỀU TÀI KHOẢN GOOGLE TRÊN MÁY CÁ NHÂN
 // ============================================================================
 
+window.getCleanInitials = function(name) {
+  if (!name) return 'U';
+  try {
+    const cleaned = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+    const parts = cleaned.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  } catch (e) {
+    return 'U';
+  }
+};
+
 window.getSavedAccounts = function() {
   try {
     const raw = localStorage.getItem('orbit_saved_accounts');
@@ -9849,7 +9862,7 @@ window.saveAccountToList = function(user) {
     id: user.id,
     email: user.email,
     fullName: user.fullName || user.email.split('@')[0],
-    avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email)}&background=465fff&color=fff`,
+    avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${getCleanInitials(user.fullName || user.email)}&background=465fff&color=fff&bold=true`,
     role: user.role || 'NHAN_VIEN',
     roleName: user.roleName || 'Nhân Viên Vận Hành',
     badgeColor: user.badgeColor || 'gray',
@@ -9958,6 +9971,10 @@ window.renderSavedAccountsInLoginModal = function() {
       acc.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
       'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
 
+    const avSrc = (acc.avatarUrl && !acc.avatarUrl.includes('ui-avatars.com'))
+      ? acc.avatarUrl
+      : `https://ui-avatars.com/api/?name=${getCleanInitials(acc.fullName || acc.email)}&background=465fff&color=fff&bold=true`;
+
     return `
       <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
         isCurrent
@@ -9965,7 +9982,7 @@ window.renderSavedAccountsInLoginModal = function() {
           : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
       }">
         <div class="flex items-center gap-2.5 min-w-0">
-          <img src="${acc.avatarUrl}" alt="${acc.fullName}" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-gray-200 dark:ring-gray-700">
+          <img src="${avSrc}" alt="${acc.fullName}" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-gray-200 dark:ring-gray-700">
           <div class="min-w-0 text-left">
             <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-1.5">
               <span>${acc.fullName}</span>
@@ -10000,10 +10017,15 @@ window.renderSavedAccountsInProfileModal = function() {
     return;
   }
 
-  listEl.innerHTML = otherAccounts.map(acc => `
+  listEl.innerHTML = otherAccounts.map(acc => {
+    const avSrc = (acc.avatarUrl && !acc.avatarUrl.includes('ui-avatars.com'))
+      ? acc.avatarUrl
+      : `https://ui-avatars.com/api/?name=${getCleanInitials(acc.fullName || acc.email)}&background=465fff&color=fff&bold=true`;
+
+    return `
     <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-[#465fff] bg-white dark:bg-gray-800/40 flex items-center justify-between gap-2.5 cursor-pointer transition-all">
       <div class="flex items-center gap-2.5 min-w-0">
-        <img src="${acc.avatarUrl}" alt="${acc.fullName}" class="w-7 h-7 rounded-full object-cover shrink-0">
+        <img src="${avSrc}" alt="${acc.fullName}" class="w-7 h-7 rounded-full object-cover shrink-0">
         <div class="min-w-0">
           <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${acc.fullName}</div>
           <div class="text-[10px] text-gray-400 font-mono truncate">${acc.email}</div>
@@ -10014,7 +10036,8 @@ window.renderSavedAccountsInProfileModal = function() {
         <span class="text-xs text-[#465fff] font-bold">Chuyển ↗</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   if (window.lucide) lucide.createIcons();
 };
@@ -10048,7 +10071,10 @@ window.openUserProfileModal = function() {
 
   if (nameEl) nameEl.textContent = gCurrentUser.fullName || 'Người dùng';
   if (emailEl) emailEl.textContent = gCurrentUser.email;
-  if (avEl) avEl.src = gCurrentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(gCurrentUser.fullName || gCurrentUser.email)}&background=465fff&color=fff`;
+  const profAv = (gCurrentUser.avatarUrl && !gCurrentUser.avatarUrl.includes('ui-avatars.com'))
+    ? gCurrentUser.avatarUrl
+    : `https://ui-avatars.com/api/?name=${getCleanInitials(gCurrentUser.fullName || gCurrentUser.email)}&background=465fff&color=fff&bold=true`;
+  if (avEl) avEl.src = profAv;
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
@@ -10176,8 +10202,11 @@ function applyUserSessionToUI() {
   if (nameEl) nameEl.textContent = gCurrentUser.fullName || 'Người dùng';
   if (hdrName) hdrName.textContent = gCurrentUser.fullName || 'Người dùng';
   if (emailEl) emailEl.textContent = gCurrentUser.email || '';
-  if (avImg && gCurrentUser.avatarUrl) avImg.src = gCurrentUser.avatarUrl;
-  if (hdrAv && gCurrentUser.avatarUrl) hdrAv.src = gCurrentUser.avatarUrl;
+  const cleanAv = (gCurrentUser.avatarUrl && !gCurrentUser.avatarUrl.includes('ui-avatars.com'))
+    ? gCurrentUser.avatarUrl
+    : `https://ui-avatars.com/api/?name=${getCleanInitials(gCurrentUser.fullName || gCurrentUser.email)}&background=465fff&color=fff&bold=true`;
+  if (avImg) avImg.src = cleanAv;
+  if (hdrAv) hdrAv.src = cleanAv;
 
   const roleStyles = {
     ADMIN: { bg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300', text: 'text-rose-600 dark:text-rose-400' },

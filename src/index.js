@@ -874,6 +874,19 @@ export default {
             };
           });
 
+          function getCleanInitials(name) {
+            if (!name) return 'U';
+            try {
+              const cleaned = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+              const parts = cleaned.trim().split(/\s+/).filter(Boolean);
+              if (parts.length === 0) return 'U';
+              if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+              return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } catch (e) {
+              return 'U';
+            }
+          }
+
           return new Response(JSON.stringify({
             success: true,
             message: 'Đăng nhập bằng Google thành công!',
@@ -881,7 +894,7 @@ export default {
               id: user.id,
               email: user.email,
               fullName: user.full_name,
-              avatarUrl: user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=ed263a&color=fff`,
+              avatarUrl: user.avatar_url || `https://ui-avatars.com/api/?name=${getCleanInitials(user.full_name || user.email)}&background=465fff&color=fff&bold=true`,
               role: user.role_code,
               roleName: roleInfo.role_name,
               badgeColor: roleInfo.badge_color,
