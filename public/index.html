@@ -8,7 +8,7 @@
   <!-- Google Fonts: Be Vietnam Pro (100% Vietnamese Typography) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,21 +29,55 @@
     tailwind.config = {
       darkMode: 'class',
       theme: {
+        screens: {
+          '2xsm': '375px',
+          'xsm': '425px',
+          'sm': '640px',
+          'md': '768px',
+          'lg': '1024px',
+          'xl': '1280px',
+          '2xl': '1536px',
+          '3xl': '2000px',
+        },
         extend: {
           fontFamily: {
-            sans: ['"Be Vietnam Pro"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Be Vietnam Pro"', 'Outfit', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'SF Pro Text', 'Menlo', 'Consolas', 'monospace'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          fontSize: {
+            'heading-one': ['64px', { lineHeight: '80px' }],
+            'heading-two': ['56px', { lineHeight: '72px' }],
+            'heading-three': ['48px', { lineHeight: '60px' }],
+            'heading-four': ['40px', { lineHeight: '48px' }],
+            'heading-five': ['32px', { lineHeight: '40px' }],
+            'heading-six': ['24px', { lineHeight: '32px' }],
+            'title-lg': ['20px', { lineHeight: '30px' }],
+            'title-sm': ['18px', { lineHeight: '28px' }],
           },
           width: {
-            '72.5': '18.125rem', // 290px (TailAdmin Exact Width)
+            '22.5': '5.625rem',  // 90px (TailAdmin Collapsed Sidebar)
+            '72.5': '18.125rem', // 290px (TailAdmin Exact Sidebar Width)
             '107.5': '26.875rem', // 430px (TailAdmin Search Bar Width)
           },
           spacing: {
+            '22.5': '5.625rem',
             '72.5': '18.125rem',
             '107.5': '26.875rem',
           },
+          zIndex: {
+            '1': '1',
+            '9': '9',
+            '99': '99',
+            '999': '999',
+            '9999': '9999',
+            '99999': '99999',
+            '999999': '999999',
+          },
           colors: {
-            // TailAdmin 100% Official Brand Colors (Vivid Electric Blue / Indigo)
+            current: 'currentColor',
+            transparent: 'transparent',
+            // TailAdmin 100% Brand Scale (brand-500 = #465FFF)
             brand: {
               50: 'rgba(236, 243, 255, 1)',
               100: 'rgba(221, 233, 255, 1)',
@@ -69,6 +103,7 @@
               800: '#252dae',
               900: '#262e89'
             },
+            black: '#101828',
             dark: {
               bg: '#000000',        // TailAdmin Dark Body / Sidebar Background
               surface: '#101828',   // TailAdmin Dark Card / Surface
@@ -92,7 +127,10 @@
             'theme-xs': '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
             'theme-sm': '0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
             'theme-md': '0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)',
-            'theme-lg': '0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)'
+            'theme-lg': '0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)',
+            'theme-xl': '0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03)',
+            'focus-ring': '0px 0px 0px 4px rgba(70, 95, 255, 0.12)',
+            'tooltip': '0px 4px 6px -2px rgba(16, 24, 40, 0.05), -8px 0px 20px 8px rgba(16, 24, 40, 0.05)',
           }
         }
       }
@@ -101,11 +139,11 @@
 
   <style>
     @theme {
-      --font-sans: 'Be Vietnam Pro', sans-serif;
+      --font-sans: 'Be Vietnam Pro', 'Outfit', sans-serif;
     }
     :root {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      --font-sans: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Be Vietnam Pro', 'Outfit', sans-serif;
+      --font-sans: 'Be Vietnam Pro', 'Outfit', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
       -webkit-tap-highlight-color: transparent;
 
@@ -114,287 +152,112 @@
       --surface-bg: #ffffff;
       --surface-subtle: #f3f4f6;
       --border-main: #e5e7eb;
-      --border-subtle: #f1f5f9;
+      --border-subtle: #f3f4f6;
       --text-main: #101828;
-      --text-sub: #475467;
-      --text-muted: #98a2b3;
-      --color-brand-500: #465fff;
-      --card-shadow: 0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06);
+      --text-muted: #6b7280;
+      --brand-primary: #465fff;
     }
 
     .dark {
-      /* TailAdmin 100% Dark Mode Tokens (Pitch Black & Dark Slate) */
+      /* TailAdmin 100% Dark Mode Tokens */
       --app-bg: #000000;
       --surface-bg: #101828;
-      --surface-subtle: #161f30;
+      --surface-subtle: rgba(255, 255, 255, 0.03);
       --border-main: #1f2937;
-      --border-subtle: #242f42;
+      --border-subtle: #111827;
       --text-main: #ffffff;
-      --text-sub: #98a2b3;
-      --text-muted: #667085;
-      --color-brand-500: #465fff;
-      --card-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.4);
+      --text-muted: #94a3b8;
+      --brand-primary: #465fff;
     }
 
     body {
-      font-family: 'Be Vietnam Pro', sans-serif;
       background-color: var(--app-bg);
       color: var(--text-main);
-      transition: background-color 0.2s ease, color 0.2s ease;
+      font-family: var(--font-sans);
     }
 
-    /* Quy chuẩn hiển thị số cố định bề ngang (Tabular figures) */
-    .font-mono, .num, code, .pos-mono, .font-receipt {
-      font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
+    .font-mono, .tabular-nums, th.text-right, td.text-right {
+      font-family: var(--font-mono) !important;
       font-feature-settings: 'tnum' 1;
     }
 
-    /* Tab Switch Animations */
-    .tab-panel {
-      display: none;
-      animation: tailAdminFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .tab-panel.active {
-      display: block;
-    }
-    @keyframes tailAdminFadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* TailAdmin Exact Menu & Sidebar Specifications */
-    .w-72\.5 {
-      width: 18.125rem !important; /* 290px */
-    }
+    /* TailAdmin Utility Classes */
     .menu-item {
       position: relative;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      border-radius: 0.5rem; /* rounded-lg */
-      padding: 0.625rem 0.75rem; /* px-3 py-2.5 */
-      font-size: 0.875rem; /* text-sm */
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
       font-weight: 500;
-      transition: all 0.15s ease-in-out;
+      transition: all 0.2s;
     }
-    .menu-item.active, .menu-item-active {
-      background-color: rgba(236, 243, 255, 1) !important; /* bg-brand-50 */
-      color: #465fff !important; /* text-brand-500 */
-      font-weight: 600 !important;
-    }
-    .dark .menu-item.active, .dark .menu-item-active {
-      background-color: rgba(70, 95, 255, 0.12) !important; /* dark:bg-brand-500/[0.12] */
-      color: #7592ff !important; /* dark:text-brand-400 */
-    }
-    .menu-item.active .menu-icon {
+
+    .menu-item-active {
+      background-color: rgba(236, 243, 255, 1);
       color: #465fff !important;
+      font-weight: 600;
     }
-    .dark .menu-item.active .menu-icon {
+    .dark .menu-item-active {
+      background-color: rgba(70, 95, 255, 0.12);
       color: #7592ff !important;
     }
-    .menu-item:not(.active):hover {
-      background-color: #f3f4f6; /* hover:bg-gray-100 */
-      color: #101828;
+
+    .menu-item-inactive {
+      color: #374151;
     }
-    .dark .menu-item:not(.active):hover {
-      background-color: rgba(255, 255, 255, 0.05); /* dark:hover:bg-white/5 */
+    .menu-item-inactive:hover {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    .dark .menu-item-inactive {
+      color: #d1d5db;
+    }
+    .dark .menu-item-inactive:hover {
+      background-color: rgba(255, 255, 255, 0.05);
       color: #ffffff;
     }
-    .menu-item:not(.active):hover .menu-icon {
-      color: #101828;
-    }
-    .dark .menu-item:not(.active):hover .menu-icon {
-      color: #ffffff;
-    }
 
-    
-    /* TailAdmin Global Spacing & Layout Breathing Room */
-    .tab-panel.active {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 1.5rem !important; /* 24px gap between sections */
+    .menu-dropdown-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
     }
-    @media (min-width: 768px) {
-      .tab-panel.active {
-        gap: 1.875rem !important; /* 30px gap on tablet/desktop */
-      }
-    }
-    .siba-card, .tailadmin-card {
-      padding: 1.5rem !important; /* p-6 */
-      border-radius: 1rem !important; /* rounded-2xl */
-    }
-    @media (min-width: 768px) {
-      .siba-card, .tailadmin-card {
-        padding: 1.75rem !important;
-      }
-    }
-    /* TailAdmin Spacious Tables */
-    table thead th {
-      padding: 0.875rem 1.5rem !important; /* px-6 py-3.5 */
-      font-size: 0.75rem !important; /* text-xs */
-      font-weight: 500 !important;
-      letter-spacing: 0.05em !important;
-      text-transform: uppercase !important;
-      color: #667085 !important;
-      background-color: #ffffff !important;
-      border-bottom: 1px solid #f2f4f7 !important;
-    }
-    .dark table thead th {
-      background-color: #101828 !important;
-      color: #98a2b3 !important;
-      border-bottom: 1px solid #1f2937 !important;
-    }
-    table tbody td {
-      padding: 1rem 1.5rem !important; /* px-6 py-4 */
-      font-size: 0.875rem !important; /* text-sm */
-      border-bottom: 1px solid #f2f4f7 !important;
-      color: #344054 !important;
-    }
-    .dark table tbody td {
-      border-bottom: 1px solid #1f2937 !important;
-      color: #e4e7ec !important;
-    }
-    table tbody tr:hover {
-      background-color: #f9fafb !important;
-    }
-    .dark table tbody tr:hover {
-      background-color: rgba(255, 255, 255, 0.02) !important;
-    }
-
-    /* Custom Modern Slim Scrollbars */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #d1d5db;
-      border-radius: 9999px;
-    }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #374151;
-    }
-
-    /* TailAdmin Card Architecture */
-    .siba-card, .nextadmin-card, .tailadmin-card {
-      background-color: var(--surface-bg);
-      border: 1px solid var(--border-main);
-      border-radius: 0.75rem; /* rounded-xl */
-      box-shadow: var(--card-shadow);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .siba-card:hover, .tailadmin-card:hover {
-      box-shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06);
-    }
-    .dark .siba-card:hover, .dark .tailadmin-card:hover {
-      box-shadow: 0px 6px 12px -2px rgba(0, 0, 0, 0.5);
-    }
-
-    /* TailAdmin Table Architecture */
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-    thead th {
-      background-color: var(--surface-subtle);
-      color: var(--text-sub);
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--border-main);
-    }
-    tbody tr {
-      background-color: var(--surface-bg);
-      transition: background-color 0.15s ease;
-    }
-    tbody tr:hover {
-      background-color: var(--surface-subtle);
-    }
-    tbody td {
-      padding: 0.75rem 1rem;
-      font-size: 0.8125rem;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-main);
-    }
-
-    /* Form Inputs */
-    input:not([type="checkbox"]):not([type="radio"]),
-    select,
-    textarea {
-      background-color: var(--surface-bg);
-      color: var(--text-main);
-      border: 1px solid var(--border-main);
-      transition: all 0.15s ease;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #465fff !important; /* TailAdmin Brand 500 Focus */
-      box-shadow: 0px 0px 0px 4px rgba(70, 95, 255, 0.12) !important;
-    }
-    .dark input:not([type="checkbox"]):not([type="radio"]),
-    .dark select,
-    .dark textarea {
-      background-color: #101828;
-      color: #ffffff;
-      border-color: #1f2937;
-    }
-
-    /* Dark Mode Deep Blacks (TailAdmin Standards) */
-    .dark .bg-white {
-      background-color: #101828 !important;
-      color: #ffffff !important;
-    }
-    .dark .bg-gray-50, .dark .bg-gray-50 {
-      background-color: #0d1117 !important;
-    }
-    .dark .bg-gray-100, .dark .bg-gray-100 {
-      background-color: #161f30 !important;
-    }
-    .dark .border-gray-200, .dark .border-gray-200 {
-      border-color: #1f2937 !important;
-    }
-    .dark .text-gray-900, .dark .text-gray-900 {
-      color: #ffffff !important;
-    }
-    .dark .text-gray-700, .dark .text-gray-700 {
-      color: #d0d5dd !important;
-    }
-    .dark .text-gray-500, .dark .text-gray-500 {
-      color: #98a2b3 !important;
-    }
-
-    /* Mobile Sheet & Bottom Navigation */
-    #mobileMenuHub.active {
-      display: flex !important;
-    }
-    #mobileMenuHub.active .sheet-backdrop {
-      opacity: 1 !important;
-    }
-    #mobileMenuHub.active .sheet-body {
-      transform: translateY(0) !important;
-    }
-    .sheet-body {
-      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .sheet-backdrop {
-      transition: opacity 0.22s ease-out;
-    }
-    .mob-nav-btn.active {
+    .menu-dropdown-item-active {
+      background-color: rgba(236, 243, 255, 1);
       color: #465fff !important;
     }
-    .mob-nav-btn.active .mob-ic-wrap {
+    .dark .menu-dropdown-item-active {
       background-color: rgba(70, 95, 255, 0.12);
-      color: #465fff;
-      transform: translateY(-2px);
+      color: #7592ff !important;
     }
-    .mob-nav-btn .mob-ic-wrap {
-      transition: all 0.2s ease-in-out;
+
+    /* Scrollbars */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+
+    [x-cloak] { display: none !important; }
+
+    /* Focus Ring */
+    .focus-ring:focus-visible {
+      outline: none;
+      box-shadow: 0px 0px 0px 4px rgba(70, 95, 255, 0.12);
     }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
   </style>
   <!-- Google Identity Services (Real Google Sign-In) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -6166,12 +6029,12 @@ function toggleTheme() {
   const isDark = html.classList.contains('dark');
   if (isDark) {
     html.classList.remove('dark');
-    localStorage.setItem('orbit_theme', 'light');
+    localStorage.setItem('orbit_theme', 'light'); localStorage.setItem('darkMode', 'false');
     const icon = document.getElementById('themeIcon');
     if (icon) icon.setAttribute('data-lucide', 'moon');
   } else {
     html.classList.add('dark');
-    localStorage.setItem('orbit_theme', 'dark');
+    localStorage.setItem('orbit_theme', 'dark'); localStorage.setItem('darkMode', 'true');
     const icon = document.getElementById('themeIcon');
     if (icon) icon.setAttribute('data-lucide', 'sun');
   }
