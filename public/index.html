@@ -197,6 +197,60 @@
       color: #ffffff;
     }
 
+    
+    /* TailAdmin Global Spacing & Layout Breathing Room */
+    .tab-panel.active {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.5rem !important; /* 24px gap between sections */
+    }
+    @media (min-width: 768px) {
+      .tab-panel.active {
+        gap: 1.875rem !important; /* 30px gap on tablet/desktop */
+      }
+    }
+    .siba-card, .tailadmin-card {
+      padding: 1.5rem !important; /* p-6 */
+      border-radius: 1rem !important; /* rounded-2xl */
+    }
+    @media (min-width: 768px) {
+      .siba-card, .tailadmin-card {
+        padding: 1.75rem !important;
+      }
+    }
+    /* TailAdmin Spacious Tables */
+    table thead th {
+      padding: 0.875rem 1.5rem !important; /* px-6 py-3.5 */
+      font-size: 0.75rem !important; /* text-xs */
+      font-weight: 500 !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+      color: #667085 !important;
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #f2f4f7 !important;
+    }
+    .dark table thead th {
+      background-color: #101828 !important;
+      color: #98a2b3 !important;
+      border-bottom: 1px solid #1f2937 !important;
+    }
+    table tbody td {
+      padding: 1rem 1.5rem !important; /* px-6 py-4 */
+      font-size: 0.875rem !important; /* text-sm */
+      border-bottom: 1px solid #f2f4f7 !important;
+      color: #344054 !important;
+    }
+    .dark table tbody td {
+      border-bottom: 1px solid #1f2937 !important;
+      color: #e4e7ec !important;
+    }
+    table tbody tr:hover {
+      background-color: #f9fafb !important;
+    }
+    .dark table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+
     /* Custom Modern Slim Scrollbars */
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -635,7 +689,7 @@
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
     <!-- Top Header Bar (NextAdmin SaaS Architecture) -->
-    <header class="sticky top-0 z-30 h-16 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800/80 px-3 sm:px-6 flex items-center justify-between gap-3 shadow-xs">
+    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-4 md:px-6 2xl:px-8 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs">
       
       <!-- Left: Mobile Brand & Active Tab Indicator -->
       <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
@@ -713,7 +767,8 @@
     </header>
 
     <!-- Main Content Body (pb-24 on mobile/tablet to clear the bottom navigation bar) -->
-    <main class="flex-1 p-3 sm:p-5 pb-24 lg:pb-8 overflow-y-auto">
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/50 dark:bg-black">
+    <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6 lg:p-8 2xl:p-10 space-y-6 md:space-y-8 pb-24 md:pb-12">
 
 
       <!-- ====================================================================
@@ -744,62 +799,84 @@
           </div>
         </div>
 
-        <!-- 4 Top KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- 4 Top KPI Cards (TailAdmin Metric Items Layout) -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6 2xl:gap-7.5">
           
-          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
-            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
-              <span class="font-bold">Tổng Doanh Thu Chuỗi</span>
-              <div class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-[#ed263a]">
-                <i data-lucide="dollar-sign" class="w-4 h-4"></i>
-              </div>
+          <!-- Metric 1: Tổng Doanh Thu Chuỗi -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-[#465fff] dark:bg-brand-500/15 dark:text-[#7592ff]">
+              <i data-lucide="dollar-sign" class="w-6 h-6"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainTotalRevenue">6,347,000,000đ</div>
-            <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
-              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-              <span>Đạt 105.8% kế hoạch tháng (14 Điểm bán)</span>
+            <div class="mt-5 flex items-end justify-between gap-3">
+              <div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng Doanh Thu Chuỗi</span>
+                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-900 dark:text-white/90" id="chainTotalRevenue">6,347,000,000đ</h4>
+              </div>
+              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-600 dark:bg-green-500/15 dark:text-green-500">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                <span>105.8%</span>
+              </span>
+            </div>
+            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              Đạt 105.8% kế hoạch tháng (14 Điểm bán)
             </div>
           </div>
 
-          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
-            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
-              <span class="font-bold">Lợi Nhuận EBITDA Chuỗi</span>
-              <div class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600">
-                <i data-lucide="wallet" class="w-4 h-4"></i>
-              </div>
+          <!-- Metric 2: Lợi Nhuận EBITDA Chuỗi -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+              <i data-lucide="wallet" class="w-6 h-6"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainTotalProfit">1,548,000,000đ</div>
-            <div class="flex items-center gap-1.5 text-[11px] text-stone-500 dark:text-stone-400 font-medium mt-1">
-              <span>Biên EBITDA trung bình: </span>
-              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="chainAvgMargin">24.4%</span>
+            <div class="mt-5 flex items-end justify-between gap-3">
+              <div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Lợi Nhuận EBITDA Chuỗi</span>
+                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-900 dark:text-white/90" id="chainTotalProfit">1,548,000,000đ</h4>
+              </div>
+              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" id="chainAvgMargin">
+                24.4%
+              </span>
+            </div>
+            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              Biên EBITDA trung bình toàn chuỗi
             </div>
           </div>
 
-          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
-            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
-              <span class="font-bold">Food Cost TB Chuỗi</span>
-              <div class="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600">
-                <i data-lucide="utensils" class="w-4 h-4"></i>
-              </div>
+          <!-- Metric 3: Food Cost TB Chuỗi -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+              <i data-lucide="utensils" class="w-6 h-6"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainAvgFoodCost">42.4%</div>
-            <div class="flex items-center gap-1.5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-1">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-              <span>Trong định mức mục tiêu (&le; 43.0%)</span>
+            <div class="mt-5 flex items-end justify-between gap-3">
+              <div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Food Cost TB Chuỗi</span>
+                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90" id="chainAvgFoodCost">42.4%</h4>
+              </div>
+              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>Chuẩn</span>
+              </span>
+            </div>
+            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              Trong định mức mục tiêu (&le; 43.0%)
             </div>
           </div>
 
-          <div class="siba-card bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs">
-            <div class="flex items-center justify-between text-stone-500 dark:text-stone-400 text-xs mb-1">
-              <span class="font-bold">Labor Cost (COL) Chuỗi</span>
-              <div class="p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-600">
-                <i data-lucide="users" class="w-4 h-4"></i>
-              </div>
+          <!-- Metric 4: Labor Cost (COL) Chuỗi -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
+              <i data-lucide="users" class="w-6 h-6"></i>
             </div>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white font-mono" id="chainAvgLaborCost">18.2%</div>
-            <div class="flex items-center gap-1.5 text-[11px] text-purple-600 dark:text-purple-400 font-semibold mt-1">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-              <span>Tối ưu chi phí nhân sự (&le; 19.0%)</span>
+            <div class="mt-5 flex items-end justify-between gap-3">
+              <div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Labor Cost (COL) Chuỗi</span>
+                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90" id="chainAvgLaborCost">18.2%</h4>
+              </div>
+              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
+                <span>Tối ưu</span>
+              </span>
+            </div>
+            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              Định mức nhân công chuẩn chuỗi (&le; 19.0%)
             </div>
           </div>
 
@@ -2971,6 +3048,7 @@
 
 
 
+        </div>
     </main>
   </div>
 
