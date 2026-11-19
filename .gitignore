@@ -14,5 +14,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+*.bak
 .vscode/
 .idea/

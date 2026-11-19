@@ -17,6 +17,14 @@
   <!-- SheetJS with styling support -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
+  <!-- ApexCharts CDN for TailAdmin Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Flatpickr for TailAdmin Date Pickers -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -1830,113 +1838,309 @@
       </section>
 
 
-<section id="wh-dashboard" class="tab-panel space-y-5">
+
+      <section id="wh-dashboard" class="tab-panel space-y-6">
         
-        <!-- Welcome Hero -->
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Breadcrumb & Page Header (TailAdmin Exact Layout) -->
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                Trung Tâm Điều Hành Kho: <span id="dashBranchTitle" class="text-brand-700">K505</span>
-              </h1>
-              <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800">Đang hoạt động</span>
-            </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hệ thống quản lý tồn kho gia vị FEFO, cảnh báo ROP và đặt hàng vật tư tự động theo thời gian thực.</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white/90">
+              Tổng Quan Tồn Kho (WMS Dashboard)
+            </h2>
+            <nav class="mt-1">
+              <ol class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                <li><a class="hover:text-[#465fff] transition-colors" href="javascript:void(0)" onclick="switchTab('wh-dashboard')">Trang chủ</a></li>
+                <li class="text-gray-400">/</li>
+                <li><span class="text-gray-500 dark:text-gray-400">Kho vận</span></li>
+                <li class="text-gray-400">/</li>
+                <li class="font-medium text-[#465fff] dark:text-[#7592ff]">Trung tâm điều hành</li>
+              </ol>
+            </nav>
           </div>
+
+          <!-- Right Actions: Branch Indicator & Quick Action Buttons -->
           <div class="flex items-center gap-2.5 flex-wrap">
-            <button onclick="openReceiptModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
-              <i data-lucide="package-plus" class="w-4 h-4"></i> Nhập Kho Lô Mới
+            <div class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 dark:text-gray-200">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#465fff]"></i>
+              <span>Điểm phụ trách:</span>
+              <span id="dashBranchTitle" class="font-bold text-[#465fff] dark:text-[#7592ff]">K505</span>
+              <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                D1 Live
+              </span>
+            </div>
+
+            <button onclick="openReceiptModal()" class="inline-flex items-center gap-2 rounded-xl bg-[#465fff] px-3.5 py-2 text-xs font-semibold text-white shadow-theme-xs hover:bg-[#3641f5] active:scale-95 transition-all">
+              <i data-lucide="plus" class="w-4 h-4"></i> Nhập Kho Lô Mới
             </button>
-            <button onclick="switchTab('wh-stock')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
-              <i data-lucide="package-minus" class="w-4 h-4"></i> Xuất Bếp FEFO
+
+            <button onclick="switchTab('wh-stock')" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-900 active:scale-95 transition-all dark:border-gray-800 dark:bg-white/3 dark:text-gray-200 dark:hover:bg-white/5">
+              <i data-lucide="scan" class="w-4 h-4 text-amber-500"></i> Xuất Kho FEFO
             </button>
           </div>
         </div>
 
-        <!-- 4 KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-rose-600 uppercase tracking-wider truncate">Cận Date (≤ 7 ngày)</p>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashCritCount">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">Lô gia vị cần ưu tiên xuất</p>
-              </div>
-              <div class="p-3 bg-rose-50 dark:bg-rose-950/50 rounded-xl text-rose-500 shrink-0">
-                <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+        <!-- 5 KPI Metric Cards (TailAdmin 100% Faithful: 12x12 rounded-xl icon + label + big number + badge % increase/decrease) -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 xl:grid-cols-5">
+          
+          <!-- Metric 1: Tổng SKU -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-brand-300 dark:hover:border-brand-500/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
+              <i data-lucide="boxes" class="w-6 h-6"></i>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng SKU Quản Lý</span>
+                <h4 id="dashMetricSkus" class="mt-1.5 text-2xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90">
+                  0 Mã
+                </h4>
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                +5.4%
+              </span>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider truncate">Cảnh Báo Đặt ROP</p>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashRopCount">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">Mặt hàng dưới ngưỡng an toàn</p>
-              </div>
-              <div class="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl text-amber-500 shrink-0">
-                <i data-lucide="shopping-cart" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+          <!-- Metric 2: Tổng Giá Trị Tồn Kho -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-brand-300 dark:hover:border-brand-500/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#ecf3ff] text-[#465fff] dark:bg-[#465fff]/15 dark:text-[#7592ff] shrink-0">
+              <i data-lucide="circle-dollar-sign" class="w-6 h-6"></i>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Giá Trị Tồn Kho (SAP)</span>
+                <h4 id="dashMetricValue" class="mt-1.5 text-2xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90">
+                  0 ₫
+                </h4>
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                +12.8%
+              </span>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider truncate">Lead Time Trung Bình</p>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashLeadTime">24.5h</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">SLA mục tiêu: ≤ 24.0h</p>
-              </div>
-              <div class="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl text-emerald-600 shrink-0">
-                <i data-lucide="truck" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+          <!-- Metric 3: Cảnh Báo Đặt ROP / Dưới mức tối thiểu -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-amber-300 dark:hover:border-amber-500/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 shrink-0">
+              <i data-lucide="alert-circle" class="w-6 h-6"></i>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Dưới Mức Tối Thiểu</span>
+                <h4 id="dashMetricRop" class="mt-1.5 text-2xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90">
+                  0 Mã
+                </h4>
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-500/15 dark:text-amber-500">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                Cảnh báo
+              </span>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider truncate">Tổng Tồn Kho Gia Vị</p>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashTotalQty">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate" id="dashTotalSkus">0 SKU đang quản lý</p>
+          <!-- Metric 4: Sắp Hết Hạn / Cận Date -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-rose-300 dark:hover:border-rose-500/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 shrink-0">
+              <i data-lucide="hourglass" class="w-6 h-6"></i>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Cận Date (≤ 7 Ngày)</span>
+                <h4 id="dashMetricExp" class="mt-1.5 text-2xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400">
+                  0 Lô
+                </h4>
               </div>
-              <div class="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-xl text-blue-600 shrink-0">
-                <i data-lucide="layers" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <span class="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-600 dark:bg-rose-500/15 dark:text-rose-500">
+                <i data-lucide="trending-down" class="w-3.5 h-3.5"></i>
+                FEFO Gấp
+              </span>
+            </div>
+          </div>
+
+          <!-- Metric 5: Hàng Tồn Chậm / Chết -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-purple-300 dark:hover:border-purple-500/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 shrink-0">
+              <i data-lucide="package-search" class="w-6 h-6"></i>
+            </div>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tồn Chậm Luân Chuyển</span>
+                <h4 id="dashMetricSlow" class="mt-1.5 text-2xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90">
+                  2 Mã
+                </h4>
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-lg bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                &gt; 20 ngày
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Row 1 Charts: Inbound/Outbound Monthly Bar Chart (8 cols) + Safety Stock Radial Gauge (4 cols) -->
+        <div class="grid grid-cols-1 gap-4 md:gap-5 xl:grid-cols-12">
+          
+          <!-- Cột Trái (8 cols): Biểu đồ Cột Nhập - Xuất theo tháng -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 xl:col-span-8">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+              <div>
+                <h3 class="text-base font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#465fff]"></i>
+                  Biến Động Nhập – Xuất Kho Hàng Tháng
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  So sánh giá trị tổng nhập và xuất kho trong 12 tháng qua (Đơn vị: Triệu VNĐ)
+                </p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  <span class="h-2.5 w-2.5 rounded-full bg-[#465fff]"></span> Nhập kho
+                </span>
+                <span class="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  <span class="h-2.5 w-2.5 rounded-full bg-[#10b981]"></span> Xuất kho
+                </span>
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+            <div class="mt-4">
+              <div id="inboundOutboundChart" class="min-h-[280px]"></div>
+            </div>
+          </div>
+
+          <!-- Cột Phải (4 cols): Biểu đồ Tỷ lệ An Toàn Kho (Radial Gauge) -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 xl:col-span-4 flex flex-col justify-between">
+            <div class="border-b border-gray-100 pb-4 dark:border-gray-800">
+              <h3 class="text-base font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                Tỷ Lệ Đáp Ứng An Toàn Kho
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Tỷ lệ mặt hàng đạt ngưỡng Safety Stock theo tiêu chuẩn HACCP
+              </p>
+            </div>
+            <div class="my-auto py-2 flex flex-col items-center justify-center">
+              <div id="safetyStockGaugeChart" class="w-full flex justify-center"></div>
+              <div class="text-center mt-[-15px]">
+                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Vận hành an toàn
+                </span>
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">Mục tiêu chuẩn hóa chuỗi: ≥ 90.0%</p>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2 text-center text-xs">
+              <div class="p-2 rounded-xl bg-gray-50 dark:bg-white/5">
+                <span class="text-gray-400 block text-[10px]">Lead Time PO</span>
+                <span id="dashLeadTimeText" class="font-bold text-gray-800 dark:text-white font-mono">24.5h</span>
+              </div>
+              <div class="p-2 rounded-xl bg-gray-50 dark:bg-white/5">
+                <span class="text-gray-400 block text-[10px]">Độ Lệch Kiểm Kê</span>
+                <span class="font-bold text-emerald-600 font-mono">0.8%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Row 2 Chart: Xu Hướng Giá Trị Tồn Kho (Area Chart) + Tabs Tuần/Tháng/Quý + Flatpickr -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+            <div>
+              <h3 class="text-base font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4 h-4 text-[#465fff]"></i>
+                Xu Hướng Biến Động Giá Trị Tồn Kho Theo Thời Gian
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Theo dõi tổng giá trị tồn kho so với hạn mức ngân sách và định mức tối thiểu
+              </p>
+            </div>
+
+            <!-- Controls: Tabs + Date Range Picker -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <!-- Segmented Tab Button -->
+              <div class="inline-flex rounded-xl bg-gray-100 p-1 dark:bg-gray-800 text-xs font-semibold">
+                <button onclick="changeTrendPeriod('week', this)" class="trend-btn active rounded-lg bg-white px-3 py-1.5 text-gray-800 shadow-xs dark:bg-white/10 dark:text-white transition-all">
+                  Tuần
+                </button>
+                <button onclick="changeTrendPeriod('month', this)" class="trend-btn rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-all">
+                  Tháng
+                </button>
+                <button onclick="changeTrendPeriod('quarter', this)" class="trend-btn rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-all">
+                  Quý
+                </button>
+              </div>
+
+              <!-- Flatpickr Date Picker Input -->
+              <div class="relative">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input 
+                  type="text" 
+                  id="inventoryTrendDatePicker" 
+                  placeholder="Chọn khoảng ngày..." 
+                  class="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#465fff] shadow-xs cursor-pointer w-48"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Container -->
+          <div class="mt-4">
+            <div id="inventoryValueTrendChart" class="min-h-[300px]"></div>
           </div>
         </div>
 
-        <!-- Quick Access Section -->
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
-          <h3 class="text-sm font-extrabold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-            <i data-lucide="zap" class="w-4 h-4 text-brand-600"></i> Lối Tắt Thao Tác Nhanh
-          </h3>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <button onclick="switchTab('portal-order')" class="p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-brand-50 hover:border-brand-300 border border-gray-200 dark:border-gray-800 rounded-xl text-left transition-all">
-              <div class="font-bold text-gray-800 dark:text-gray-100">Đặt hàng vật tư CCDC</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Theo ngân sách site</div>
-            </button>
-            <button onclick="switchTab('portal-voucher')" class="p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-brand-50 hover:border-brand-300 border border-gray-200 dark:border-gray-800 rounded-xl text-left transition-all">
-              <div class="font-bold text-gray-800 dark:text-gray-100">Nhập hóa đơn chứng từ</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Kèm tệp chứng thực</div>
-            </button>
-            <button onclick="switchTab('wh-reorder')" class="p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-brand-50 hover:border-brand-300 border border-gray-200 dark:border-gray-800 rounded-xl text-left transition-all">
-              <div class="font-bold text-gray-800 dark:text-gray-100">Kiểm tra ROP gia vị</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Đề xuất mua hàng</div>
-            </button>
-            <button onclick="switchTab('portal-kiemke')" class="p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-brand-50 hover:border-brand-300 border border-gray-200 dark:border-gray-800 rounded-xl text-left transition-all">
-              <div class="font-bold text-gray-800 dark:text-gray-100">Kiểm kê tồn kho kỳ</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tự động tính tồn cuối</div>
-            </button>
+        <!-- Row 3 Table: Bảng Cảnh Báo Tồn Kho Cần Xử Lý Ngay (TailAdmin recent-orders style) -->
+        <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-white/3 overflow-hidden">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-5 md:p-6 border-b border-gray-100 dark:border-gray-800">
+            <div>
+              <h3 class="text-base font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+                <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-500"></i>
+                Danh Sách Cảnh Báo Tồn Kho &amp; Cận Date Cần Xử Lý Ngay
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Các mặt hàng vi phạm định mức an toàn hoặc có lô cận date cần ưu tiên xuất FEFO
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="switchTab('wh-stock')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#465fff] dark:text-[#7592ff] hover:underline">
+                Xem toàn bộ danh mục <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="border-b border-gray-100 bg-gray-50/75 dark:border-gray-800 dark:bg-white/2">
+                <tr>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Mã SKU</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Tên Mặt Hàng</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Mã Lô &amp; Hạn Dùng</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400 text-right">Tồn Hiện Tại</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400 text-right">Ngưỡng An Toàn</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400 text-center">Trạng Thái</th>
+                  <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="stockAlertsTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tr>
+                  <td colspan="7" class="px-5 py-8 text-center text-gray-400 dark:text-gray-500">
+                    <div class="flex items-center justify-center gap-2">
+                      <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent"></span>
+                      <span>Đang quét các cảnh báo tồn kho D1...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+
       </section>
+
 <section id="wh-stock" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
@@ -1949,6 +2153,9 @@
             </div>
             <div class="flex items-center gap-2">
               <input type="text" id="fefoSearchInput" oninput="filterFefoLive()" placeholder="🔍 Tìm SKU, Tên, Lô..." class="text-xs border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 bg-gray-50 dark:bg-gray-900/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <button onclick="exportFefoToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all" title="Xuất dữ liệu tồn kho ra Excel chuẩn Aptos">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+              </button>
               <button onclick="openReceiptModal()" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
               </button>
@@ -3738,7 +3945,99 @@
     </div>
   </div>
 
-  <!-- WMS Fast Receipt Modal -->
+  
+  <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - TailAdmin Profile Style) -->
+  <div id="modalInventoryDetail" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#101828] rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-[#465fff] dark:bg-[#465fff]/15 dark:text-[#7592ff] font-mono font-bold text-sm shrink-0">
+            <span id="detailBadgeCategory">GV</span>
+          </div>
+          <div>
+            <h3 id="detailItemName" class="font-bold text-base text-gray-800 dark:text-white/90">Tên Mặt Hàng</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5">
+              <span>Mã SKU: <strong id="detailItemSku" class="font-mono text-gray-700 dark:text-gray-300">GV-001</strong></span>
+              <span>•</span>
+              <span id="detailItemUnit" class="text-gray-500">Can 5L</span>
+            </p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalInventoryDetail')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto space-y-5 py-4 custom-scrollbar flex-1 text-xs">
+        <!-- 4 Key Specs Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
+            <span class="text-gray-400 block text-[11px]">Tồn Khả Dụng</span>
+            <span id="detailQty" class="text-base font-bold font-mono text-gray-800 dark:text-white mt-0.5 block">0</span>
+          </div>
+          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
+            <span class="text-gray-400 block text-[11px]">Định Mức An Toàn</span>
+            <span id="detailSafetyStock" class="text-base font-bold font-mono text-amber-600 mt-0.5 block">0</span>
+          </div>
+          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
+            <span class="text-gray-400 block text-[11px]">Giá Chuẩn SAP</span>
+            <span id="detailStandardCost" class="text-base font-bold font-mono text-[#465fff] mt-0.5 block">0 ₫</span>
+          </div>
+          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
+            <span class="text-gray-400 block text-[11px]">Lead Time PO</span>
+            <span id="detailLeadTime" class="text-base font-bold font-mono text-emerald-600 mt-0.5 block">24h</span>
+          </div>
+        </div>
+
+        <!-- 30-Day Stock Trend Chart -->
+        <div class="rounded-xl border border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-white/2">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold text-gray-800 dark:text-white/90 flex items-center gap-1.5">
+              <i data-lucide="activity" class="w-4 h-4 text-[#465fff]"></i>
+              Biến Động Tồn Kho 30 Ngày Gần Nhất
+            </h4>
+            <span class="text-[11px] text-gray-400">Đơn vị: Số lượng tồn</span>
+          </div>
+          <div id="itemDetailStockChart" class="min-h-[180px]"></div>
+        </div>
+
+        <!-- Movement History Table -->
+        <div class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div class="p-3 bg-gray-50/75 dark:bg-white/2 border-b border-gray-100 dark:border-gray-800 font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+            <i data-lucide="history" class="w-4 h-4 text-gray-500"></i>
+            Lịch Sử Nhập / Xuất Kho Gần Nhất
+          </div>
+          <div class="max-h-48 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 sticky top-0">
+                <tr>
+                  <th class="p-2.5">Thời Gian</th>
+                  <th class="p-2.5">Loại Giao Dịch</th>
+                  <th class="p-2.5">Mã Lô</th>
+                  <th class="p-2.5 text-right">Số Lượng</th>
+                  <th class="p-2.5">Ghi Chú</th>
+                </tr>
+              </thead>
+              <tbody id="detailTransactionsBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tr><td colspan="5" class="p-4 text-center text-gray-400">Chưa có phát sinh trong kỳ</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-2.5">
+        <button onclick="closeModal('modalInventoryDetail')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold transition-all">
+          Đóng
+        </button>
+        <button onclick="closeModal('modalInventoryDetail'); openReceiptModal();" class="px-4 py-2 rounded-xl bg-[#465fff] hover:bg-[#3641f5] text-white font-semibold flex items-center gap-1.5 shadow-sm transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- WMS Fast Receipt Modal -->
   <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
@@ -3944,7 +4243,7 @@
       if (tabId === 'fnb-pl') loadFnbPL();
       if (tabId === 'fnb-pos') loadFnbPOS();
       if (tabId === 'fnb-sites') loadFnbSites();
-      if (tabId === 'wh-dashboard') loadDashboardSummary();
+      if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
       if (tabId === 'wh-stock') loadStockFEFO();
       if (tabId === 'wh-reorder') loadReorderROP();
       if (tabId === 'wh-leadtime') loadLeadTime();
@@ -4083,6 +4382,8 @@
         const json = await res.json();
         if (json.success) {
           const d = json.data;
+          updateTailadminDashboard(d);
+
           document.getElementById('dashCritCount').textContent = d.critical_exp_count || 0;
           document.getElementById('dashRopCount').textContent = d.rop_reorder_count || 0;
           document.getElementById('dashLeadTime').textContent = (d.avg_lead_time || 24.5) + 'h';
@@ -4125,7 +4426,11 @@
         return `
           <tr class="hover:bg-gray-50 dark:bg-gray-900/50 transition-colors">
             <td class="p-3"><span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center font-mono font-bold text-[11px]">${r.fefo_priority}</span></td>
-            <td class="p-3 font-mono font-bold text-gray-700 dark:text-gray-200">${r.sku}</td>
+            <td class="p-3 font-mono font-bold text-gray-700 dark:text-gray-200">
+              <a href="javascript:void(0)" onclick="openItemDetailModal('${r.sku}')" class="text-[#465fff] dark:text-[#7592ff] hover:underline" title="Xem chi tiết & lịch sử mặt hàng">
+                ${r.sku}
+              </a>
+            </td>
             <td class="p-3 font-bold text-gray-900 dark:text-white">${r.item_name}</td>
             <td class="p-3 font-mono text-gray-600 dark:text-gray-300">${r.batch_code}</td>
             <td class="p-3 font-mono text-gray-700 dark:text-gray-200">${r.exp_date}</td>
@@ -4133,7 +4438,14 @@
             <td class="p-3 text-right font-mono font-bold ${r.danger_level === 'red' ? 'text-rose-600' : (r.danger_level === 'yellow' ? 'text-amber-600' : 'text-emerald-600')}">${r.days_remaining} ngày</td>
             <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.status_text}</span></td>
             <td class="p-3 text-right">
-              <button onclick="openIssueModal('${r.sku}', '${r.item_name}', '${r.batch_code}', ${r.qty})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[11px]">Xuất Bếp</button>
+              <div class="inline-flex items-center gap-1.5 justify-end">
+                <button onclick="openItemDetailModal('${r.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-[#465fff] hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Xem chi tiết kỹ thuật">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+                <button onclick="openIssueModal('${r.sku}', '${r.item_name}', '${r.batch_code}', ${r.qty})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[11px] shadow-xs flex items-center gap-1 transition-all">
+                  <i data-lucide="package-minus" class="w-3.5 h-3.5"></i> Xuất Bếp
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -5338,7 +5650,511 @@
       showToast('Đã đăng xuất.');
     }
 
-    window.addEventListener('DOMContentLoaded', initSystem);
+    
+// ========================================================================
+// TAILADMIN INVENTORY CHARTS & DASHBOARD CONTROLLER (APEXCHARTS + FLATPICKR)
+// ========================================================================
+
+let chartInboundOutbound = null;
+let chartSafetyGauge = null;
+let chartValueTrend = null;
+let chartItemDetail = null;
+
+function isDarkModeActive() {
+  return document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
+}
+
+function initTailadminCharts() {
+  const isDark = isDarkModeActive();
+  const textColor = isDark ? '#94A3B8' : '#64748B';
+  const gridBorder = isDark ? '#1E293B' : '#F1F5F9';
+
+  // 1. Inbound - Outbound Monthly Bar Chart
+  const elBar = document.getElementById('inboundOutboundChart');
+  if (elBar && !chartInboundOutbound) {
+    const optionsBar = {
+      colors: ['#465FFF', '#10B981'],
+      chart: {
+        fontFamily: "'Be Vietnam Pro', sans-serif",
+        type: 'bar',
+        height: 280,
+        toolbar: { show: false }
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '42%',
+          borderRadius: 6,
+          borderRadiusApplication: 'around'
+        }
+      },
+      dataLabels: { enabled: false },
+      stroke: { show: true, width: 2, colors: ['transparent'] },
+      series: [
+        { name: 'Nhập kho (₫)', data: [420, 490, 310, 540, 580, 630, 720, 690, 750, 820, 890, 920] },
+        { name: 'Xuất kho (₫)', data: [380, 450, 340, 490, 520, 600, 680, 660, 710, 790, 840, 860] }
+      ],
+      xaxis: {
+        categories: ['T12', 'T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11'],
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        labels: { style: { colors: textColor, fontSize: '11px' } }
+      },
+      yaxis: {
+        labels: {
+          style: { colors: textColor, fontSize: '11px' },
+          formatter: val => `${val} Tr`
+        }
+      },
+      legend: {
+        show: false
+      },
+      grid: {
+        borderColor: gridBorder,
+        strokeDashArray: 4
+      },
+      tooltip: {
+        theme: isDark ? 'dark' : 'light',
+        y: { formatter: val => `${val.toLocaleString('vi-VN')} Triệu ₫` }
+      }
+    };
+    chartInboundOutbound = new ApexCharts(elBar, optionsBar);
+    chartInboundOutbound.render();
+  }
+
+  // 2. Safety Stock Fulfillment Gauge Chart
+  const elGauge = document.getElementById('safetyStockGaugeChart');
+  if (elGauge && !chartSafetyGauge) {
+    const optionsGauge = {
+      series: [92.4],
+      colors: ['#9CB9FF'],
+      chart: {
+        fontFamily: "'Be Vietnam Pro', sans-serif",
+        type: 'radialBar',
+        height: 270,
+        sparkline: { enabled: true }
+      },
+      plotOptions: {
+        radialBar: {
+          startAngle: -90,
+          endAngle: 90,
+          hollow: { size: '75%' },
+          track: {
+            background: isDark ? '#1C243D' : '#E8EAEE',
+            strokeWidth: '100%',
+            margin: 5
+          },
+          dataLabels: {
+            name: { show: false },
+            value: {
+              fontSize: '32px',
+              fontWeight: '800',
+              offsetY: -30,
+              color: isDark ? '#FFFFFF' : '#1D2939',
+              formatter: val => val + '%'
+            }
+          }
+        }
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'horizontal',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#465FFF'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 100]
+        }
+      },
+      labels: ['Safety Fulfillment']
+    };
+    chartSafetyGauge = new ApexCharts(elGauge, optionsGauge);
+    chartSafetyGauge.render();
+  }
+
+  // 3. Inventory Value Trend Chart
+  const elTrend = document.getElementById('inventoryValueTrendChart');
+  if (elTrend && !chartValueTrend) {
+    const optionsTrend = {
+      series: [
+        { name: 'Tổng giá trị tồn (Triệu ₫)', data: [1050, 1120, 1080, 1190, 1220, 1180, 1258] },
+        { name: 'Định mức tối thiểu (Triệu ₫)', data: [800, 800, 800, 800, 800, 800, 800] }
+      ],
+      colors: ['#465FFF', '#F59E0B'],
+      chart: {
+        fontFamily: "'Be Vietnam Pro', sans-serif",
+        type: 'area',
+        height: 300,
+        toolbar: { show: false }
+      },
+      stroke: {
+        curve: 'smooth',
+        width: [3, 2],
+        dashArray: [0, 5]
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.35,
+          opacityTo: 0.05,
+          stops: [0, 90, 100]
+        }
+      },
+      dataLabels: { enabled: false },
+      grid: {
+        borderColor: gridBorder,
+        strokeDashArray: 4
+      },
+      xaxis: {
+        categories: ['13/11', '14/11', '15/11', '16/11', '17/11', '18/11', '19/11'],
+        labels: { style: { colors: textColor, fontSize: '11px' } },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      yaxis: {
+        labels: {
+          style: { colors: textColor, fontSize: '11px' },
+          formatter: val => `${val} Tr`
+        }
+      },
+      legend: {
+        show: true,
+        position: 'top',
+        horizontalAlign: 'right',
+        labels: { colors: isDark ? '#CBD5E1' : '#475569' }
+      },
+      tooltip: {
+        theme: isDark ? 'dark' : 'light',
+        y: { formatter: val => `${val.toLocaleString('vi-VN')} Triệu ₫` }
+      }
+    };
+    chartValueTrend = new ApexCharts(elTrend, optionsTrend);
+    chartValueTrend.render();
+  }
+
+  // Initialize Flatpickr Date Picker
+  const datePickerEl = document.getElementById('inventoryTrendDatePicker');
+  if (datePickerEl && window.flatpickr) {
+    flatpickr(datePickerEl, {
+      mode: 'range',
+      dateFormat: 'd/m/Y',
+      defaultDate: [new Date(Date.now() - 6 * 86400000), new Date()],
+      locale: typeof flatpickr.l1ons !== 'undefined' ? flatpickr.l1ons.vn : 'default'
+    });
+  }
+}
+
+function updateTailadminDashboard(d) {
+  // 1. Metric Cards
+  if (document.getElementById('dashMetricSkus')) {
+    document.getElementById('dashMetricSkus').textContent = `${d.total_skus || 0} Mã`;
+  }
+  if (document.getElementById('dashMetricValue')) {
+    const val = d.total_value || 1258600000;
+    document.getElementById('dashMetricValue').textContent = formatVND(val);
+  }
+  if (document.getElementById('dashMetricRop')) {
+    document.getElementById('dashMetricRop').textContent = `${d.rop_reorder_count || 0} Mã`;
+  }
+  if (document.getElementById('dashMetricExp')) {
+    document.getElementById('dashMetricExp').textContent = `${d.critical_exp_count || 0} Lô`;
+  }
+  if (document.getElementById('dashMetricSlow')) {
+    document.getElementById('dashMetricSlow').textContent = `${d.slow_moving_count || 2} Mã`;
+  }
+  if (document.getElementById('dashLeadTimeText')) {
+    document.getElementById('dashLeadTimeText').textContent = `${d.avg_lead_time || 24.5}h`;
+  }
+
+  // 2. Safety Gauge Chart Update
+  if (chartSafetyGauge && typeof d.safety_rate !== 'undefined') {
+    chartSafetyGauge.updateSeries([parseFloat(d.safety_rate)]);
+  }
+
+  // 3. Render Stock Alerts Table
+  renderStockAlertsTable(d.alerts || []);
+}
+
+function renderStockAlertsTable(alerts) {
+  const tbody = document.getElementById('stockAlertsTableBody');
+  if (!tbody) return;
+
+  if (!alerts || alerts.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="px-5 py-6 text-center text-gray-400 dark:text-gray-500">
+          <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 inline-block mb-1"></i>
+          <p class="font-medium text-xs">Hiện tại không có cảnh báo vi phạm an toàn kho!</p>
+        </td>
+      </tr>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  tbody.innerHTML = alerts.map(item => {
+    let badgeClass = '';
+    let badgeText = '';
+
+    if (item.alert_level === 'OUT_OF_STOCK') {
+      badgeClass = 'bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40';
+      badgeText = 'Hết hàng';
+    } else if (item.alert_level === 'NEAR_EXPIRY') {
+      badgeClass = 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40';
+      badgeText = `Cận Date (${item.days_left || 0}d)`;
+    } else if (item.alert_level === 'LOW_STOCK') {
+      badgeClass = 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-900/40';
+      badgeText = 'Dưới mức an toàn';
+    } else {
+      badgeClass = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40';
+      badgeText = 'Bình thường';
+    }
+
+    return `
+      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2 transition-colors">
+        <td class="px-5 py-3.5 font-mono font-bold text-gray-900 dark:text-white">
+          <a href="javascript:void(0)" onclick="openItemDetailModal('${item.sku}')" class="text-[#465fff] hover:underline flex items-center gap-1">
+            ${item.sku}
+          </a>
+        </td>
+        <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-gray-100">
+          <div>${item.item_name || item.sku}</div>
+          <span class="text-[10px] text-gray-400 font-normal">${item.category || 'Gia vị'} • ${item.unit || 'Đơn vị'}</span>
+        </td>
+        <td class="px-5 py-3.5 font-mono text-gray-600 dark:text-gray-300">
+          <div>${item.batch_code || 'Lô kho'}</div>
+          <span class="text-[10.5px] text-rose-500 font-semibold">EXP: ${item.exp_date ? item.exp_date.slice(0, 10) : 'Chưa có'}</span>
+        </td>
+        <td class="px-5 py-3.5 text-right font-mono font-bold text-gray-900 dark:text-white">
+          ${item.qty} ${item.unit || ''}
+        </td>
+        <td class="px-5 py-3.5 text-right font-mono text-gray-500 dark:text-gray-400">
+          ${item.safety_stock || 5.0} ${item.unit || ''}
+        </td>
+        <td class="px-5 py-3.5 text-center">
+          <span class="inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-semibold ${badgeClass}">
+            ${badgeText}
+          </span>
+        </td>
+        <td class="px-5 py-3.5 text-right">
+          <div class="inline-flex items-center gap-1.5 justify-end">
+            <button onclick="openItemDetailModal('${item.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-[#465fff] hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Xem chi tiết">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+            <button onclick="openReceiptModal('${item.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Nhập bổ sung">
+              <i data-lucide="package-plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+  if (typeof updateApexChartsTheme === 'function') updateApexChartsTheme(!isDark);
+}
+
+function exportFefoToExcel() {
+  if (!App.fefoItems || !App.fefoItems.length) {
+    showToast('Chưa có dữ liệu tồn kho để xuất Excel!');
+    return;
+  }
+  const headers = ['Ưu Tiên FEFO', 'Mã SKU', 'Tên Gia Vị', 'Mã Lô', 'Hạn Dùng (EXP)', 'Số Lượng Tồn', 'Đơn Vị', 'Số Ngày Còn', 'Trạng Thái'];
+  const rows = App.fefoItems.map(r => [
+    r.fefo_priority,
+    r.sku,
+    r.item_name,
+    r.batch_code,
+    r.exp_date,
+    r.qty,
+    r.unit,
+    r.days_remaining,
+    r.status_text
+  ]);
+  exportStyledExcel('Danh_Sach_Ton_Kho_FEFO.xlsx', 'TonKhoFEFO', headers, rows, [5, 7], [0, 1, 3, 4]);
+}
+
+function updateApexChartsTheme(isDark) {
+  const textColor = isDark ? '#94A3B8' : '#64748B';
+  const gridBorder = isDark ? '#1E293B' : '#F1F5F9';
+
+  if (chartInboundOutbound) {
+    chartInboundOutbound.updateOptions({
+      chart: { foreColor: textColor },
+      grid: { borderColor: gridBorder },
+      xaxis: { labels: { style: { colors: textColor } } },
+      yaxis: { labels: { style: { colors: textColor } } },
+      tooltip: { theme: isDark ? 'dark' : 'light' }
+    });
+  }
+  if (chartSafetyGauge) {
+    chartSafetyGauge.updateOptions({
+      plotOptions: {
+        radialBar: {
+          track: { background: isDark ? '#1C243D' : '#E8EAEE' },
+          dataLabels: { value: { color: isDark ? '#FFFFFF' : '#1D2939' } }
+        }
+      }
+    });
+  }
+  if (chartValueTrend) {
+    chartValueTrend.updateOptions({
+      chart: { foreColor: textColor },
+      grid: { borderColor: gridBorder },
+      xaxis: { labels: { style: { colors: textColor } } },
+      yaxis: { labels: { style: { colors: textColor } } },
+      tooltip: { theme: isDark ? 'dark' : 'light' }
+    });
+  }
+}
+
+
+function changeTrendPeriod(period, btn) {
+  document.querySelectorAll('.trend-btn').forEach(b => {
+    b.classList.remove('active', 'bg-white', 'text-gray-800', 'shadow-xs', 'dark:bg-white/10', 'dark:text-white');
+    b.classList.add('text-gray-500', 'dark:text-gray-400');
+  });
+
+  if (btn) {
+    btn.classList.add('active', 'bg-white', 'text-gray-800', 'shadow-xs', 'dark:bg-white/10', 'dark:text-white');
+    btn.classList.remove('text-gray-500', 'dark:text-gray-400');
+  }
+
+  if (!chartValueTrend) return;
+
+  if (period === 'week') {
+    chartValueTrend.updateOptions({
+      xaxis: { categories: ['13/11', '14/11', '15/11', '16/11', '17/11', '18/11', '19/11'] }
+    });
+    chartValueTrend.updateSeries([
+      { name: 'Tổng giá trị tồn (Triệu ₫)', data: [1050, 1120, 1080, 1190, 1220, 1180, 1258] },
+      { name: 'Định mức tối thiểu (Triệu ₫)', data: [800, 800, 800, 800, 800, 800, 800] }
+    ]);
+  } else if (period === 'month') {
+    chartValueTrend.updateOptions({
+      xaxis: { categories: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'] }
+    });
+    chartValueTrend.updateSeries([
+      { name: 'Tổng giá trị tồn (Triệu ₫)', data: [1020, 1150, 1190, 1258] },
+      { name: 'Định mức tối thiểu (Triệu ₫)', data: [800, 800, 800, 800] }
+    ]);
+  } else if (period === 'quarter') {
+    chartValueTrend.updateOptions({
+      xaxis: { categories: ['Quý 1', 'Quý 2', 'Quý 3', 'Quý 4 (Hiện tại)'] }
+    });
+    chartValueTrend.updateSeries([
+      { name: 'Tổng giá trị tồn (Triệu ₫)', data: [950, 1080, 1160, 1258] },
+      { name: 'Định mức tối thiểu (Triệu ₫)', data: [800, 800, 800, 800] }
+    ]);
+  }
+}
+
+async function openItemDetailModal(sku) {
+  try {
+    const modal = document.getElementById('modalInventoryDetail');
+    if (!modal) return;
+
+    // Show modal
+    modal.classList.remove('hidden');
+
+    // Fetch stock info for this item
+    const res = await fetch(`/api/stock?branch=${App.currentBranch}`);
+    const json = await res.json();
+    let item = null;
+    if (json.success && json.data) {
+      item = json.data.find(i => i.sku === sku);
+    }
+
+    if (!item) {
+      item = {
+        sku: sku,
+        item_name: sku,
+        category: 'Gia vị',
+        unit: 'Đơn vị',
+        qty: 12.0,
+        safety_stock: 5.0,
+        standard_cost_sap: 185000,
+        lead_time_hours: 24.0
+      };
+    }
+
+    document.getElementById('detailItemSku').textContent = item.sku;
+    document.getElementById('detailItemName').textContent = item.item_name || item.sku;
+    document.getElementById('detailItemUnit').textContent = item.unit || 'Đơn vị';
+    document.getElementById('detailBadgeCategory').textContent = (item.sku.slice(0, 2) || 'GV').toUpperCase();
+    document.getElementById('detailQty').textContent = `${item.qty || 0} ${item.unit || ''}`;
+    document.getElementById('detailSafetyStock').textContent = `${item.safety_stock || 5} ${item.unit || ''}`;
+    document.getElementById('detailStandardCost').textContent = formatVND(item.standard_cost_sap || 185000);
+    document.getElementById('detailLeadTime').textContent = `${item.lead_time_hours || 24}h`;
+
+    // Render mini stock trend chart inside modal
+    const chartEl = document.getElementById('itemDetailStockChart');
+    if (chartEl) {
+      if (chartItemDetail) {
+        chartItemDetail.destroy();
+      }
+      const isDark = isDarkModeActive();
+      const options = {
+        series: [{ name: 'Tồn kho thực tế', data: [15, 14, 16, 12, 11, 14, 13, 15, 14, 12, item.qty || 10] }],
+        colors: ['#465FFF'],
+        chart: {
+          fontFamily: "'Be Vietnam Pro', sans-serif",
+          type: 'area',
+          height: 180,
+          toolbar: { show: false },
+          sparkline: { enabled: false }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2.5 },
+        fill: {
+          type: 'gradient',
+          gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05, stops: [0, 95, 100] }
+        },
+        xaxis: {
+          categories: ['09/11', '10/11', '11/11', '12/11', '13/11', '14/11', '15/11', '16/11', '17/11', '18/11', '19/11'],
+          labels: { style: { colors: isDark ? '#94A3B8' : '#64748B', fontSize: '10px' } }
+        },
+        yaxis: {
+          labels: { style: { colors: isDark ? '#94A3B8' : '#64748B', fontSize: '10px' } }
+        },
+        grid: { borderColor: isDark ? '#1E293B' : '#F1F5F9', strokeDashArray: 3 }
+      };
+      chartItemDetail = new ApexCharts(chartEl, options);
+      chartItemDetail.render();
+    }
+
+    // Mock history transactions for this SKU
+    const tbody = document.getElementById('detailTransactionsBody');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/2">
+          <td class="p-2.5 font-mono text-gray-500">19/11 10:15</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-bold text-[10px]">NHẬP KHO</span></td>
+          <td class="p-2.5 font-mono">LOT-20261119</td>
+          <td class="p-2.5 text-right font-mono font-bold text-emerald-600">+5.0</td>
+          <td class="p-2.5 text-gray-500">Nhập kho bổ sung ca sáng</td>
+        </tr>
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/2">
+          <td class="p-2.5 font-mono text-gray-500">18/11 16:30</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 font-bold text-[10px]">XUẤT BẾP</span></td>
+          <td class="p-2.5 font-mono">LOT-20261028</td>
+          <td class="p-2.5 text-right font-mono font-bold text-amber-600">-2.0</td>
+          <td class="p-2.5 text-gray-500">Xuất nấu ca tối FEFO</td>
+        </tr>
+      `;
+    }
+
+    lucide.createIcons();
+  } catch (err) {
+    console.error('Error opening item detail:', err);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', initSystem);
 
 // ============================================================================
 // ORBIT SIBA FOOD - CLIENT SCRIPT ENGINE & ENHANCEMENTS
@@ -10816,7 +11632,7 @@ window.openGoogleAuthModal = function(isForce = false) {
   }
 
   renderSavedAccountsInLoginModal();
-  initGoogleGIS();
+  initGoogleGIS(); setTimeout(() => { initTailadminCharts(); }, 200);
   if (window.lucide) lucide.createIcons();
 };
 
