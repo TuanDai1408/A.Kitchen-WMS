@@ -436,8 +436,8 @@
     <!-- SIDEBAR NAVIGATION MENU (Scrollable Area) -->
     <div class="no-scrollbar flex flex-1 flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
       <nav class="space-y-4">
-        <!-- Group: Hiệu Quả & Doanh Thu -->
-        <div class="sidebar-category" data-cat="fnb-finance">
+        <!-- Group: Hiệu Quả & Doanh Thu (Chỉ hiển thị cho Admin) -->
+        <div class="sidebar-category hidden" data-cat="fnb-finance">
           <div class="mb-2 px-3 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hiệu Quả & Doanh Thu</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">P&L</span>
@@ -817,82 +817,82 @@
         </div>
 
         <!-- 4 Top KPI Cards (TailAdmin Metric Items Layout) -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6 2xl:gap-7.5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-5 2xl:gap-6">
           
           <!-- Metric 1: Tổng Doanh Thu Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-[#465fff] dark:bg-brand-500/15 dark:text-[#7592ff]">
-              <i data-lucide="dollar-sign" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-5 flex items-end justify-between gap-3">
-              <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Tổng Doanh Thu Chuỗi</span>
-                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-900 dark:text-white/90" id="chainTotalRevenue">6,347,000,000đ</h4>
+          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-blue-50 text-[#465fff] dark:bg-brand-500/15 dark:text-[#7592ff]">
+                <i data-lucide="dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
               <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-600 dark:bg-green-500/15 dark:text-green-500">
                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
                 <span>105.8%</span>
               </span>
             </div>
-            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+            <div class="mt-4 min-w-0">
+              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Doanh Thu Chuỗi</span>
+              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold font-mono tracking-tight text-gray-900 dark:text-white/90 truncate" id="chainTotalRevenue" title="6,347,000,000đ">6,347,000,000đ</h4>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Đạt 105.8% kế hoạch tháng (14 Điểm bán)
             </div>
           </div>
 
           <!-- Metric 2: Lợi Nhuận EBITDA Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-              <i data-lucide="wallet" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-5 flex items-end justify-between gap-3">
-              <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Lợi Nhuận EBITDA Chuỗi</span>
-                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-900 dark:text-white/90" id="chainTotalProfit">1,548,000,000đ</h4>
+          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <i data-lucide="wallet" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
               <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" id="chainAvgMargin">
                 24.4%
               </span>
             </div>
-            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+            <div class="mt-4 min-w-0">
+              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Lợi Nhuận EBITDA Chuỗi</span>
+              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold font-mono tracking-tight text-gray-900 dark:text-white/90 truncate" id="chainTotalProfit" title="1,548,000,000đ">1,548,000,000đ</h4>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Biên EBITDA trung bình toàn chuỗi
             </div>
           </div>
 
           <!-- Metric 3: Food Cost TB Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
-              <i data-lucide="utensils" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-5 flex items-end justify-between gap-3">
-              <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Food Cost TB Chuỗi</span>
-                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90" id="chainAvgFoodCost">42.4%</h4>
+          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                <i data-lucide="utensils" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
               <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                 <span>Chuẩn</span>
               </span>
             </div>
-            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+            <div class="mt-4 min-w-0">
+              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Food Cost TB Chuỗi</span>
+              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold font-mono tracking-tight text-gray-800 dark:text-white/90 truncate" id="chainAvgFoodCost">42.4%</h4>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Trong định mức mục tiêu (&le; 43.0%)
             </div>
           </div>
 
           <!-- Metric 4: Labor Cost (COL) Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
-              <i data-lucide="users" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-5 flex items-end justify-between gap-3">
-              <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Labor Cost (COL) Chuỗi</span>
-                <h4 class="mt-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-white/90" id="chainAvgLaborCost">18.2%</h4>
+          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
+                <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
               <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
                 <span>Tối ưu</span>
               </span>
             </div>
-            <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+            <div class="mt-4 min-w-0">
+              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Labor Cost (COL) Chuỗi</span>
+              <h4 class="mt-1 text-xl sm:text-2xl 2xl:text-3xl font-extrabold font-mono tracking-tight text-gray-800 dark:text-white/90 truncate" id="chainAvgLaborCost">18.2%</h4>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
               Định mức nhân công chuẩn chuỗi (&le; 19.0%)
             </div>
           </div>
@@ -986,42 +986,42 @@
         </div>
 
         <!-- 6 KPI Strip -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
           
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Doanh Thu Thuần</div>
-            <div class="text-base font-extrabold text-gray-900 dark:text-white font-mono mt-0.5" id="plNetRev">470,450,000đ</div>
-            <div class="text-[10px] text-emerald-600 font-semibold" id="plAchievement">102.3% Mục tiêu</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Thuần</div>
+            <div class="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white font-mono mt-0.5 truncate" id="plNetRev">470,450,000đ</div>
+            <div class="text-[10px] text-emerald-600 font-semibold truncate" id="plAchievement">102.3% Mục tiêu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Food Cost %</div>
-            <div class="text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono mt-0.5" id="plFoodCostPct">42.8%</div>
-            <div class="text-[10px] text-gray-400 font-mono" id="plFoodCostVal">201,352,600đ</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Food Cost %</div>
+            <div class="text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono mt-0.5 truncate" id="plFoodCostPct">42.8%</div>
+            <div class="text-[10px] text-gray-400 font-mono truncate" id="plFoodCostVal">201,352,600đ</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Labor Cost (COL) %</div>
-            <div class="text-base font-extrabold text-purple-600 dark:text-purple-400 font-mono mt-0.5" id="plLaborCostPct">18.5%</div>
-            <div class="text-[10px] text-gray-400 font-mono" id="plLaborCostVal">87,033,250đ</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Labor Cost (COL) %</div>
+            <div class="text-sm sm:text-base font-extrabold text-purple-600 dark:text-purple-400 font-mono mt-0.5 truncate" id="plLaborCostPct">18.5%</div>
+            <div class="text-[10px] text-gray-400 font-mono truncate" id="plLaborCostVal">87,033,250đ</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Prime Cost %</div>
-            <div class="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono mt-0.5" id="plPrimeCostPct">61.3%</div>
-            <div class="text-[10px] text-emerald-600 font-semibold">&le; 62.0% Mục tiêu</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Prime Cost %</div>
+            <div class="text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono mt-0.5 truncate" id="plPrimeCostPct">61.3%</div>
+            <div class="text-[10px] text-emerald-600 font-semibold truncate">&le; 62.0% Mục tiêu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Lợi Nhuận EBITDA</div>
-            <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5" id="plProfitVal">120,435,000đ</div>
-            <div class="text-[10px] text-emerald-600 font-mono font-bold" id="plProfitMargin">25.6% Doanh thu</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Lợi Nhuận EBITDA</div>
+            <div class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate" id="plProfitVal">120,435,000đ</div>
+            <div class="text-[10px] text-emerald-600 font-mono font-bold truncate" id="plProfitMargin">25.6% Doanh thu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase">Doanh Thu Hòa Vốn</div>
-            <div class="text-base font-extrabold text-gray-700 dark:text-gray-300 font-mono mt-0.5" id="plBreakEven">212,500,000đ</div>
-            <div class="text-[10px] text-gray-400">An toàn: 45.2%</div>
+          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Hòa Vốn</div>
+            <div class="text-sm sm:text-base font-extrabold text-gray-700 dark:text-gray-300 font-mono mt-0.5 truncate" id="plBreakEven">212,500,000đ</div>
+            <div class="text-[10px] text-gray-400 truncate">An toàn: 45.2%</div>
           </div>
 
         </div>
@@ -1283,20 +1283,20 @@
 
         <!-- 3 POS Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-xs text-gray-500 font-bold mb-1">Doanh Thu POS Hôm Nay</div>
-            <div class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono" id="posDailyRevenue">16,850,000đ</div>
-            <div class="text-[11px] text-emerald-600 font-semibold mt-1">+12.4% so với trung bình tuần</div>
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Doanh Thu POS Hôm Nay</div>
+            <div class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono truncate" id="posDailyRevenue">16,850,000đ</div>
+            <div class="text-[11px] text-emerald-600 font-semibold mt-1 truncate">+12.4% so với trung bình tuần</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-xs text-gray-500 font-bold mb-1">Tổng Số Hóa Đơn POS</div>
-            <div class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono" id="posDailyBills">482 bill</div>
-            <div class="text-[11px] text-gray-500 font-semibold mt-1">Cao điểm trưa: 295 bill (61.2%)</div>
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Tổng Số Hóa Đơn POS</div>
+            <div class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono truncate" id="posDailyBills">482 bill</div>
+            <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Cao điểm trưa: 295 bill (61.2%)</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
-            <div class="text-xs text-gray-500 font-bold mb-1">Giá Trị Trung Bình / Bill</div>
-            <div class="text-2xl font-extrabold text-[#ed263a] font-mono" id="posDailyAOV">34,950đ</div>
-            <div class="text-[11px] text-gray-500 font-semibold mt-1">Chuẩn suất ăn trưa công sở</div>
+          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Giá Trị Trung Bình / Bill</div>
+            <div class="text-xl sm:text-2xl font-extrabold text-[#465fff] font-mono truncate" id="posDailyAOV">34,950đ</div>
+            <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Chuẩn suất ăn trưa công sở</div>
           </div>
         </div>
 
@@ -1427,14 +1427,14 @@
         </div>
 
         <!-- KPI Summary Cards (4 Cards) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           <!-- Card 1: Tổng Mặt Hàng -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Tổng Mặt Hàng F&amp;B</p>
-                <h3 id="fnbStockKpiTotalItems" class="text-xl sm:text-2xl font-extrabold font-mono text-gray-900 dark:text-white mt-1">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5">5 nhóm hàng danh mục</p>
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Mặt Hàng F&amp;B</p>
+                <h3 id="fnbStockKpiTotalItems" class="text-xl sm:text-2xl font-extrabold font-mono text-gray-900 dark:text-white mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">5 nhóm hàng danh mục</p>
               </div>
               <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center shrink-0">
                 <i data-lucide="boxes" class="w-5 h-5 sm:w-6 sm:h-6"></i>
@@ -1444,12 +1444,12 @@
           </div>
 
           <!-- Card 2: Tổng Giá Trị Tồn Chuỗi -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Tổng Giá Trị Tồn Chuỗi</p>
-                <h3 id="fnbStockKpiTotalValue" class="text-xl sm:text-2xl font-extrabold font-mono text-gray-900 dark:text-white mt-1">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5">14 điểm bán toàn hệ thống</p>
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Giá Trị Tồn Chuỗi</p>
+                <h3 id="fnbStockKpiTotalValue" class="text-xl sm:text-2xl font-extrabold font-mono text-gray-900 dark:text-white mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">14 điểm bán toàn hệ thống</p>
               </div>
               <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center shrink-0">
                 <i data-lucide="circle-dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
@@ -1459,12 +1459,12 @@
           </div>
 
           <!-- Card 3: Cảnh Báo Âm Tồn -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Cảnh Báo Âm Tồn</p>
-                <h3 id="fnbStockKpiNegative" class="text-xl sm:text-2xl font-extrabold font-mono text-rose-600 dark:text-rose-400 mt-1">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5">Vượt định mức hoặc chưa ghi nhận nhập</p>
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Cảnh Báo Âm Tồn</p>
+                <h3 id="fnbStockKpiNegative" class="text-xl sm:text-2xl font-extrabold font-mono text-rose-600 dark:text-rose-400 mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Vượt định mức hoặc chưa ghi nhận nhập</p>
               </div>
               <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 flex items-center justify-center shrink-0">
                 <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
@@ -1474,12 +1474,12 @@
           </div>
 
           <!-- Card 4: Chưa Có Tồn Đầu -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Chưa Có Tồn Đầu</p>
-                <h3 id="fnbStockKpiNoOpening" class="text-xl sm:text-2xl font-extrabold font-mono text-amber-600 dark:text-amber-400 mt-1">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5">Cần cập nhật số dư ban đầu</p>
+          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Chưa Có Tồn Đầu</p>
+                <h3 id="fnbStockKpiNoOpening" class="text-xl sm:text-2xl font-extrabold font-mono text-amber-600 dark:text-amber-400 mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Cần cập nhật số dư ban đầu</p>
               </div>
               <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
@@ -1830,7 +1830,7 @@
       </section>
 
 
-<section id="wh-dashboard" class="tab-panel active space-y-5">
+<section id="wh-dashboard" class="tab-panel space-y-5">
         
         <!-- Welcome Hero -->
         <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1854,58 +1854,58 @@
         </div>
 
         <!-- 4 KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Cận Date (≤ 7 ngày)</p>
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="dashCritCount">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Lô gia vị cần ưu tiên xuất</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-rose-600 uppercase tracking-wider truncate">Cận Date (≤ 7 ngày)</p>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashCritCount">0</h3>
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">Lô gia vị cần ưu tiên xuất</p>
               </div>
-              <div class="p-3 bg-rose-50 rounded-xl text-rose-500">
-                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+              <div class="p-3 bg-rose-50 dark:bg-rose-950/50 rounded-xl text-rose-500 shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
             </div>
             <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider">Cảnh Báo Đặt ROP</p>
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="dashRopCount">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Mặt hàng dưới ngưỡng an toàn</p>
+          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider truncate">Cảnh Báo Đặt ROP</p>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashRopCount">0</h3>
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">Mặt hàng dưới ngưỡng an toàn</p>
               </div>
-              <div class="p-3 bg-amber-50 rounded-xl text-amber-500">
-                <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+              <div class="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl text-amber-500 shrink-0">
+                <i data-lucide="shopping-cart" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
             </div>
             <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Lead Time Trung Bình</p>
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="dashLeadTime">24.5h</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">SLA mục tiêu: ≤ 24.0h</p>
+          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider truncate">Lead Time Trung Bình</p>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashLeadTime">24.5h</h3>
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">SLA mục tiêu: ≤ 24.0h</p>
               </div>
-              <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
-                <i data-lucide="truck" class="w-6 h-6"></i>
+              <div class="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl text-emerald-600 shrink-0">
+                <i data-lucide="truck" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
             </div>
             <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tổng Tồn Kho Gia Vị</p>
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="dashTotalQty">0</h3>
-                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5" id="dashTotalSkus">0 SKU đang quản lý</p>
+          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider truncate">Tổng Tồn Kho Gia Vị</p>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono mt-1 truncate" id="dashTotalQty">0</h3>
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate" id="dashTotalSkus">0 SKU đang quản lý</p>
               </div>
-              <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
-                <i data-lucide="layers" class="w-6 h-6"></i>
+              <div class="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-xl text-blue-600 shrink-0">
+                <i data-lucide="layers" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
             </div>
             <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
@@ -3904,6 +3904,9 @@
 
       const target = document.getElementById(tabId);
       if (target) target.classList.add('active');
+      if (!btn) {
+        btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+      }
       if (btn) {
         btn.classList.add('active', 'menu-item-active', 'bg-[#ecf3ff]', 'text-[#465fff]', 'font-semibold', 'dark:bg-[#465fff]/[0.12]', 'dark:text-[#7592ff]');
         btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
@@ -10175,6 +10178,9 @@ function updateUIForUnauthenticated() {
     hdrRole.className = 'text-[9px] font-extrabold text-gray-400 uppercase';
   }
 
+  const financeCatUnauth = document.querySelector('.sidebar-category[data-cat="fnb-finance"]');
+  if (financeCatUnauth) financeCatUnauth.classList.add('hidden');
+
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     btn.classList.add('opacity-40');
     const lock = btn.querySelector('.lock-icon');
@@ -10236,6 +10242,47 @@ function applyUserSessionToUI() {
     }
   }
 
+  // Ẩn / Hiện mục "Hiệu Quả & Doanh Thu" (Chỉ hiển thị cho ADMIN)
+  const financeCategory = document.querySelector('.sidebar-category[data-cat="fnb-finance"]');
+  const isAdmin = gCurrentUser.role === 'ADMIN';
+  if (financeCategory) {
+    if (isAdmin) {
+      financeCategory.classList.remove('hidden');
+    } else {
+      financeCategory.classList.add('hidden');
+    }
+  }
+
+  // Đồng bộ nút điều hướng mobile cho tab đầu tiên
+  const mobFnbChainBtn = document.getElementById('mobTab-fnb-chain');
+  if (mobFnbChainBtn) {
+    if (isAdmin) {
+      mobFnbChainBtn.setAttribute('onclick', "switchTab('fnb-chain')");
+      const span = mobFnbChainBtn.querySelector('span');
+      if (span) span.textContent = 'Chuỗi F&B';
+      const ic = mobFnbChainBtn.querySelector('i');
+      if (ic) ic.setAttribute('data-lucide', 'trophy');
+    } else {
+      mobFnbChainBtn.setAttribute('onclick', "switchTab('fnb-stock')");
+      const span = mobFnbChainBtn.querySelector('span');
+      if (span) span.textContent = 'Tồn Kho';
+      const ic = mobFnbChainBtn.querySelector('i');
+      if (ic) ic.setAttribute('data-lucide', 'boxes');
+    }
+  }
+
+  // Tự động chuyển tab nếu người dùng hiện tại không phải ADMIN mà đang ở tab Hiệu Quả & Doanh Thu
+  const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
+  const curActivePanel = document.querySelector('.tab-panel.active');
+  const curTabId = curActivePanel ? curActivePanel.id : '';
+  if (!isAdmin && (!curTabId || financeTabs.includes(curTabId))) {
+    const defaultTab = (gCurrentUser.role === 'KHO_TRUONG') ? 'wh-dashboard' :
+                       (gCurrentUser.role === 'KE_TOAN') ? 'portal-voucher' : 'fnb-stock';
+    if (typeof _origSwitchTab === 'function') {
+      _origSwitchTab(defaultTab);
+    }
+  }
+
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     const tabId = btn.getAttribute('data-tab');
     if (!tabId) return;
@@ -10257,6 +10304,13 @@ function applyUserSessionToUI() {
 
 function canAccessTab(tabId) {
   if (!gCurrentUser) return false;
+
+  // Mục Hiệu Quả & Doanh Thu CHỈ hiển thị và cho phép ADMIN truy cập
+  const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
+  if (financeTabs.includes(tabId)) {
+    return gCurrentUser.role === 'ADMIN';
+  }
+
   if (gCurrentUser.role === 'ADMIN') return true;
 
   if (gCurrentUser.role === 'NHAN_VIEN') {
@@ -10276,7 +10330,7 @@ function canAccessTab(tabId) {
     return ['fnb-stock', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order'].includes(tabId);
   }
   if (gCurrentUser.role === 'KE_TOAN') {
-    return ['fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
+    return ['fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
   }
 
   return false;
