@@ -3123,67 +3123,13 @@
       </div>
     </div>
   </div>
-
-  
-  <!-- =====================================================================
-       ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
-       ===================================================================== -->
-  <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
-    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
-      <i data-lucide="x" class="w-5 h-5"></i>
-    </button>
-    <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
-      <div id="lightboxFileName" class="text-white text-xs sm:text-sm font-bold text-center px-4 drop-shadow max-w-full truncate"></div>
-      <img id="lightboxImg" src="" alt="Hình ảnh chứng từ" loading="lazy"
-           class="max-w-full max-h-[78dvh] object-contain rounded-2xl shadow-2xl hidden border border-white/10">
-      <iframe id="lightboxIframe" src="" frameborder="0" allowfullscreen
-              class="w-full rounded-2xl shadow-2xl hidden border border-white/10 bg-white"
-              style="height:78dvh; min-height:320px;"></iframe>
-      <div class="flex items-center gap-2 pt-1">
-        <button onclick="const src=document.getElementById('lightboxImg').src||document.getElementById('lightboxIframe').src; if(src)window.open(src,'_blank')"
-                class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-sm transition-all flex items-center gap-1.5">
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Mở Drive Tab Mới
-        </button>
-        <button onclick="closeImageLightbox()"
-                class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition-all flex items-center gap-1.5">
-          <i data-lucide="x" class="w-3.5 h-3.5"></i> Đóng Lại
-        </button>
-      </div>
-    </div>
   </div>
-
-  
-  <!-- =====================================================================
-       ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
-       ===================================================================== -->
-  <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
-    <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
-      <i data-lucide="x" class="w-5 h-5"></i>
-    </button>
-    <div class="max-w-4xl w-full max-h-[92dvh] flex flex-col items-center gap-3">
-      <div id="lightboxFileName" class="text-white text-xs sm:text-sm font-bold text-center px-4 drop-shadow max-w-full truncate"></div>
-      <img id="lightboxImg" src="" alt="Hình ảnh chứng từ" loading="lazy"
-           class="max-w-full max-h-[78dvh] object-contain rounded-2xl shadow-2xl hidden border border-white/10">
-      <iframe id="lightboxIframe" src="" frameborder="0" allowfullscreen
-              class="w-full rounded-2xl shadow-2xl hidden border border-white/10 bg-white"
-              style="height:78dvh; min-height:320px;"></iframe>
-      <div class="flex items-center gap-2 pt-1">
-        <button onclick="const src=document.getElementById('lightboxImg').src||document.getElementById('lightboxIframe').src; if(src)window.open(src,'_blank')"
-                class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold backdrop-blur-sm transition-all flex items-center gap-1.5">
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Mở Drive Tab Mới
-        </button>
-        <button onclick="closeImageLightbox()"
-                class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition-all flex items-center gap-1.5">
-          <i data-lucide="x" class="w-3.5 h-3.5"></i> Đóng Lại
-        </button>
-      </div>
-    </div>
   </div>
 
   
   <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
   <div id="createReceiptModal" class="fixed inset-0 z-[120] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -3267,7 +3213,7 @@
 
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
   <div id="createWasteModal" class="fixed inset-0 z-[120] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -3351,7 +3297,7 @@
 
   <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
   <div id="invDetailModal" class="fixed inset-0 z-[130] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
           <h3 id="invDetailModalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
@@ -3376,7 +3322,7 @@
        ORBIT SIBA FOOD: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
        ===================================================================== -->
   <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
-    <div class="bg-white dark:bg-white dark:bg-white/3 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Modal Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3455,7 +3401,7 @@
        POPUP THÔNG TIN USER & CHUYỂN ĐỔI TÀI KHOẢN (USER PROFILE MODAL)
        ===================================================================== -->
   <div id="userProfileModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3551,7 +3497,7 @@
        POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
        ===================================================================== -->
   <div id="siteSelectorModal" class="fixed inset-0 z-[155] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
-    <div class="bg-white dark:bg-white/3 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3613,7 +3559,7 @@
        POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (DÀNH CHO USER GỬI ADMIN)
        ===================================================================== -->
   <div id="requestAccessModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeRequestAccessModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -3690,7 +3636,7 @@
        POPUP 3: ADMIN PHÊ DUYỆT CẤP QUYỀN (DÀNH CHO ADMIN)
        ===================================================================== -->
   <div id="adminApprovalModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -3742,7 +3688,7 @@
 
 <!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
   <div id="roleSwitcherModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
         <div>
           <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
@@ -3777,7 +3723,7 @@
   </div>
 
   <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
         <h3 id="modalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi tiết</h3>
         <button onclick="closeGeneralModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 p-1 rounded-lg">
@@ -3791,7 +3737,7 @@
   
   <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - TailAdmin Profile Style) -->
   <div id="modalInventoryDetail" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-white dark:bg-white/3 rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[90vh] flex flex-col">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
         <div class="flex items-center gap-3">
           <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums font-bold text-sm shrink-0">
@@ -3883,7 +3829,7 @@
 
   <!-- Modal Chỉnh Sửa Định Mức Mặt Hàng (Edit Item Modal - TailAdmin Style) -->
   <div id="modalEditItem" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-white dark:bg-white/3 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-theme-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-theme-xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="edit-3" class="w-4 h-4 text-brand-500"></i>
@@ -3903,20 +3849,20 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Định Mức An Toàn (Min)</label>
-            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 tabular-nums focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 tabular-nums focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
           </div>
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Đơn Vị Tính</label>
-            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
           </div>
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị Trí Kệ / Lưu Trữ</label>
-          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi Chú Quản Lý</label>
-          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
         </div>
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
           <button onclick="closeModal('modalEditItem')" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
@@ -3932,7 +3878,7 @@
 
 <!-- WMS Fast Receipt Modal -->
   <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="package-plus" class="w-4 h-4 text-emerald-600"></i> Nhập Kho Lô Mới (Cloudflare D1)
@@ -3942,7 +3888,7 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt hàng gia vị</label>
-          <select id="recSku" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2 font-medium bg-white">
+          <select id="recSku" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 font-medium outline-none">
             <option value="GV-BBQ-01">GV-BBQ-01: Sốt Ướp BBQ Thượng Hạng</option>
             <option value="GV-BOT-CANH-01">GV-BOT-CANH-01: Bột Canh Vifon Tiêu Chuẩn</option>
             <option value="GV-DAU-HAO-01">GV-DAU-HAO-01: Dầu Hào Maggi Đậm Đặc</option>
@@ -3953,26 +3899,26 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mã Lô (Batch)</label>
-            <input type="text" id="recBatch" placeholder="VD: L2611-09" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2 tabular-nums">
+            <input type="text" id="recBatch" placeholder="VD: L2611-09" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
           </div>
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng nhập</label>
-            <input type="number" id="recQty" value="10" min="0.1" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2 tabular-nums">
+            <input type="number" id="recQty" value="10" min="0.1" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày SX (MFG)</label>
-            <input type="date" id="recMfg" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+            <input type="date" id="recMfg" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
           </div>
           <div>
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Hạn Dùng (EXP)</label>
-            <input type="date" id="recExp" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+            <input type="date" id="recExp" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
           </div>
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị trí lưu kho</label>
-          <input type="text" id="recLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+          <input type="text" id="recLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
         </div>
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
           <button onclick="closeModal('modalFastReceipt')" class="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-bold">Hủy</button>
@@ -3986,14 +3932,14 @@
 
   <!-- WMS Fast Issue Modal -->
   <div id="modalFastIssue" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="package-minus" class="w-4 h-4 text-amber-600"></i> Xuất Kho Gia Vị (Chuẩn FEFO)
         </h3>
         <button onclick="closeModal('modalFastIssue')" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
-      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs mb-3">
+      <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/60 text-xs mb-3">
         <span class="font-bold text-amber-900">Lô ưu tiên xuất:</span>
         <div class="mt-1 tabular-nums text-gray-700 dark:text-gray-200" id="issueBatchLabel">Đang tải...</div>
       </div>
@@ -4001,11 +3947,11 @@
         <input type="hidden" id="issueSku">
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng xuất ca nấu</label>
-          <input type="number" id="issueQty" value="1.0" min="0.1" step="0.1" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2 tabular-nums">
+          <input type="number" id="issueQty" value="1.0" min="0.1" step="0.1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
         </div>
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi chú ca bếp</label>
-          <input type="text" id="issueNote" value="Xuất bếp nấu ca trưa" class="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+          <input type="text" id="issueNote" value="Xuất bếp nấu ca trưa" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
         </div>
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
           <button onclick="closeModal('modalFastIssue')" class="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-bold">Hủy</button>
@@ -4024,7 +3970,7 @@
   </div>
 
   <!-- Loading Overlay -->
-  <div id="loading" class="fixed inset-0 bg-white/70 backdrop-blur-xs z-50 flex flex-col items-center justify-center gap-3 hidden">
+  <div id="loading" class="fixed inset-0 bg-white/70 dark:bg-gray-900/80 backdrop-blur-xs z-50 flex flex-col items-center justify-center gap-3 hidden">
     <div class="w-9 h-9 border-3 border-gray-200 dark:border-gray-800 border-t-brand-600 rounded-full animate-spin"></div>
     <span class="text-xs font-bold text-gray-700 dark:text-gray-200" id="loadingMsg">Đang tải dữ liệu Cloudflare D1...</span>
   </div>
@@ -10202,15 +10148,15 @@ window.addReceiptLineRow = function() {
   const rowHtml = `
     <div id="${rowId}" class="p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
       <div class="flex-1 w-full sm:w-auto">
-        <select onchange="onReceiptLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-semibold text-xs rc-item-code outline-none">
+        <select onchange="onReceiptLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs rc-item-code outline-none">
           ${itemOptions}
         </select>
       </div>
       <div class="w-24">
-        <input type="number" step="0.1" placeholder="SL" oninput="recalcReceiptModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-bold tabular-nums rc-qty outline-none" value="1">
+        <input type="number" step="0.1" placeholder="SL" oninput="recalcReceiptModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums rc-qty outline-none" value="1">
       </div>
       <div class="w-28">
-        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcReceiptModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-bold tabular-nums rc-price outline-none" value="0">
+        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcReceiptModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums rc-price outline-none" value="0">
       </div>
       <div class="w-28 text-right tabular-nums font-bold text-indigo-600 dark:text-indigo-400 rc-line-total">
         0 đ
@@ -10434,15 +10380,15 @@ window.addWasteLineRow = function() {
   const rowHtml = `
     <div id="${rowId}" class="p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
       <div class="flex-1 w-full sm:w-auto">
-        <select onchange="onWasteLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-semibold text-xs ws-item-code outline-none">
+        <select onchange="onWasteLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs ws-item-code outline-none">
           ${itemOptions}
         </select>
       </div>
       <div class="w-24">
-        <input type="number" step="0.1" placeholder="SL Hủy" oninput="recalcWasteModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-bold tabular-nums ws-qty outline-none" value="1">
+        <input type="number" step="0.1" placeholder="SL Hủy" oninput="recalcWasteModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums ws-qty outline-none" value="1">
       </div>
       <div class="w-28">
-        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcWasteModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/3 font-bold tabular-nums ws-price outline-none" value="0">
+        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcWasteModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums ws-price outline-none" value="0">
       </div>
       <div class="w-28 text-right tabular-nums font-bold text-rose-600 dark:text-rose-400 ws-line-total">
         0 đ

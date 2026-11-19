@@ -395,3 +395,18 @@
     margin-left: -18.125rem !important; /* -290px */
   }
 }
+
+/* TailAdmin dark translucent card and table surfaces */
+:is(.dark *) .dark\:bg-white\/3,
+.dark .dark\:bg-white\/3 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+:is(.dark *) .dark\:bg-white\/2,
+.dark .dark\:bg-white\/2 {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+:is(.dark *) .dark\:bg-white\/5,
+.dark .dark\:bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
