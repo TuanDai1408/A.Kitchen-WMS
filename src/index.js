@@ -942,6 +942,60 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 2.11.4 YÊU CẦU CẤP QUYỀN TRUY CẬP (/api/auth/request-access)
+      if (pathname === '/api/auth/request-access' && request.method === 'POST') {
+        const { email, fullName, requestedRole, requestedFeature, reason } = await request.json();
+        if (!email) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu email người yêu cầu' }), { status: 400, headers: corsHeaders });
+        }
+        await env.DB.prepare(`
+          INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, reason, status, created_at)
+          VALUES (?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
+        `).bind(email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '').run();
+
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Yêu cầu cấp quyền đã được gửi thành công đến Quản Trị Viên!'
+        }), { headers: corsHeaders });
+      }
+
+      // 2.11.5 DANH SÁCH YÊU CẦU CẤP QUYỀN (/api/auth/access-requests)
+      if (pathname === '/api/auth/access-requests' && request.method === 'GET') {
+        const { results } = await env.DB.prepare(`
+          SELECT * FROM access_requests ORDER BY id DESC LIMIT 50
+        `).all();
+        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+      }
+
+      // 2.11.6 PHÊ DUYỆT / TỪ CHỐI YÊU CẦU CẤP QUYỀN (/api/auth/approve-access-request)
+      if (pathname === '/api/auth/approve-access-request' && request.method === 'POST') {
+        const { requestId, action, reviewedBy } = await request.json();
+        const req = await env.DB.prepare(`SELECT * FROM access_requests WHERE id = ?`).bind(requestId).first();
+        if (!req) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy yêu cầu' }), { status: 404, headers: corsHeaders });
+        }
+
+        const newStatus = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+        await env.DB.prepare(`
+          UPDATE access_requests
+          SET status = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ?
+          WHERE id = ?
+        `).bind(newStatus, reviewedBy || 'Admin', requestId).run();
+
+        if (action === 'APPROVE') {
+          await env.DB.prepare(`
+            UPDATE app_users
+            SET role_code = ?
+            WHERE email = ?
+          `).bind(req.requested_role, req.user_email).run();
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          message: action === 'APPROVE' ? `Đã phê duyệt vai trò ${req.requested_role} cho ${req.user_email}` : `Đã từ chối yêu cầu của ${req.user_email}`
+        }), { headers: corsHeaders });
+      }
+
       // 2.11 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
         const { email, password } = await request.json();

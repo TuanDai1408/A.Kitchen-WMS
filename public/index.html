@@ -736,8 +736,10 @@
         
         <!-- Global Branch Selector -->
         <div class="h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2.5 sm:px-3 flex items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
-          <i data-lucide="map-pin" class="w-4 h-4 text-[#465fff] shrink-0 pointer-events-none"></i>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[125px] sm:max-w-[160px] xl:max-w-[190px] truncate border-none">
+          <button type="button" onclick="openSiteSelectorModal()" title="Bấm để đổi điểm bán / bếp phụ trách" class="text-[#465fff] hover:scale-110 active:scale-95 transition-all">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+          </button>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value); localStorage.setItem('orbit_user_site', this.value);" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[125px] sm:max-w-[160px] xl:max-w-[190px] truncate border-none">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
             <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
@@ -762,6 +764,13 @@
           <span id="currentDateDisplay" class="hidden 2xl:inline text-xs font-medium text-gray-500 dark:text-gray-400"></span>
           <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-gray-800 dark:text-gray-200 outline-none text-xs border-none cursor-pointer">
         </div>
+
+        <!-- Admin Pending Requests Button (Visible for Admin) -->
+        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="hidden h-10 lg:h-11 px-2.5 rounded-[10px] border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-theme-xs active:scale-95 transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+          <span class="hidden xl:inline">Duyệt Quyền</span>
+          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[9.5px] font-black bg-rose-600 text-white">0</span>
+        </button>
 
         <!-- TailAdmin Theme Toggler Button -->
         <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-10 lg:size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:scale-95 transition-all shrink-0">
@@ -3330,7 +3339,7 @@
   <!-- =====================================================================
        ORBIT SIBA FOOD: GOOGLE AUTH & RBAC LOGIN MODAL
        ===================================================================== -->
-  <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeGoogleAuthModal()">
+  <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
     <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Modal Header -->
@@ -3344,7 +3353,7 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Orbit Siba Food • Phân Quyền Vai Trò</p>
           </div>
         </div>
-        <button onclick="closeGoogleAuthModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
@@ -3491,7 +3500,186 @@
     </div>
   </div>
 
-  <!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
+    <!-- =====================================================================
+       POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
+       ===================================================================== -->
+  <div id="siteSelectorModal" class="fixed inset-0 z-[155] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#465fff] text-white flex items-center justify-center shadow-md">
+            <i data-lucide="map-pin" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Chọn Điểm Bán / Bếp Bạn Phụ Trách</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Lựa chọn sẽ lưu lại trên máy cá nhân để không phải chọn lại lần sau</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Notice -->
+      <div class="p-5 sm:p-6 pb-3 space-y-3">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="siteFilterSearch" oninput="filterSiteOptionCards(this.value)" placeholder="Tìm mã hoặc tên điểm bán..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 text-xs text-gray-800 dark:text-white outline-none focus:border-[#465fff]">
+        </div>
+        <p class="text-[11px] text-gray-400 dark:text-gray-500 italic">
+          💡 Lưu ý: Khi chọn site, toàn bộ dữ liệu Tồn kho, Kiểm kê, Nhập hủy và Suất ăn sẽ tự động chuyển về đúng cơ sở của bạn.
+        </p>
+      </div>
+
+      <!-- Sites Grid (Scrollable) -->
+      <div class="px-5 sm:px-6 overflow-y-auto flex-1 space-y-2 custom-scrollbar max-h-[360px]" id="sitesOptionsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-white/2 flex items-center justify-between gap-3">
+        <span id="selectedSiteLabel" class="text-xs font-semibold text-[#465fff] dark:text-[#7592ff] truncate max-w-[280px]">Chưa chọn điểm bán</span>
+        <button onclick="saveSiteSelection()" class="px-5 py-2.5 rounded-xl bg-[#465fff] hover:bg-[#3641f5] text-white font-bold text-xs flex items-center gap-2 shadow-theme-xs active:scale-95 transition-all shrink-0">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Xác Nhận & Tiếp Tục</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (DÀNH CHO USER GỬI ADMIN)
+       ===================================================================== -->
+  <div id="requestAccessModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeRequestAccessModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+      
+      <!-- Header -->
+      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md">
+            <i data-lucide="lock" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Yêu Cầu Cấp Quyền Truy Cập</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Gửi yêu cầu tới Ban Quản Trị Hệ Thống</p>
+          </div>
+        </div>
+        <button onclick="closeRequestAccessModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4 text-xs">
+        
+        <!-- Info Banner -->
+        <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300">
+          <div class="flex items-center gap-2 font-bold mb-1">
+            <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
+            <span id="reqFeatureName">Chức Năng Nâng Cao</span>
+          </div>
+          <p id="reqFeatureDesc" class="text-[11px] text-amber-700 dark:text-amber-400">
+            Tài khoản hiện tại chỉ có quyền xem các chức năng cơ bản. Vui lòng gửi yêu cầu để Admin cấp quyền sử dụng.
+          </p>
+        </div>
+
+        <!-- Current User Info -->
+        <div class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Người yêu cầu:</span>
+            <span id="reqUserName" class="font-bold text-gray-800 dark:text-white">--</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-400">Email:</span>
+            <span id="reqUserEmail" class="font-mono text-gray-700 dark:text-gray-300">--</span>
+          </div>
+        </div>
+
+        <!-- Request Role Select -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-gray-700 dark:text-gray-300 block">Vị trí / Quyền hạn mong muốn cấp:</label>
+          <select id="reqRoleSelect" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-[#465fff]">
+            <option value="BEP_TRUONG">Bếp Trưởng / Quản Lý Điểm (Nhập hàng, Hủy hàng, Kiểm kê)</option>
+            <option value="KHO_TRUONG">Quản Lý Kho WMS (Kho tổng gia vị, PO SAP, FEFO, ROP)</option>
+            <option value="KE_TOAN">Kế Toán Kiểm Soát (Báo cáo P&L, Doanh thu POS, Hóa đơn)</option>
+            <option value="ADMIN">Ban Quản Trị Hệ Thống (Toàn quyền quản trị)</option>
+          </select>
+        </div>
+
+        <!-- Reason -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-gray-700 dark:text-gray-300 block">Lý do xin cấp quyền:</label>
+          <textarea id="reqReasonInput" rows="3" placeholder="Ví dụ: Bếp trưởng mới phụ trách điểm K001 cần quyền nhập xuất hủy kho..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 text-xs text-gray-800 dark:text-white outline-none focus:border-[#465fff]"></textarea>
+        </div>
+
+        <!-- Action Button -->
+        <button onclick="submitRequestAccess()" class="w-full py-3 rounded-xl bg-[#465fff] hover:bg-[#3641f5] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm active:scale-98 transition-all">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Gửi Yêu Cầu Cấp Quyền Đến Admin</span>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       POPUP 3: ADMIN PHÊ DUYỆT CẤP QUYỀN (DÀNH CHO ADMIN)
+       ===================================================================== -->
+  <div id="adminApprovalModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#465fff] text-white flex items-center justify-center shadow-md">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Phê Duyệt Yêu Cầu Cấp Quyền</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Danh sách nhân viên xin cấp quyền truy cập chức năng nâng cao</p>
+          </div>
+        </div>
+        <button onclick="closeAdminApprovalModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Table Body -->
+      <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+        <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+              <tr>
+                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Nhân Viên</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Chức Năng Xin</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Vai Trò Đề Xuất</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Lý Do</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Thời Gian</th>
+                <th class="py-2.5 px-3 text-center font-bold uppercase text-[10px]">Trạng Thái / Xử Lý</th>
+              </tr>
+            </thead>
+            <tbody id="adminRequestsTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-gray-400">Đang tải danh sách yêu cầu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-white/2 flex items-center justify-between text-xs text-gray-400">
+        <span>Tự động lưu quyền vào Cloudflare D1 khi Admin duyệt.</span>
+        <button onclick="closeAdminApprovalModal()" class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 font-bold text-gray-800 dark:text-gray-200">Đóng</button>
+      </div>
+
+    </div>
+  </div>
+
+<!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
   <div id="roleSwitcherModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
     <div class="bg-white dark:bg-[#161313] w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
@@ -9585,38 +9773,124 @@ window.closeInvDetailModal = function() {
 // ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
 // ============================================================================
 
-let gCurrentUser = {
-  email: 'admin@sibafood.vn',
-  fullName: 'Tuấn Đại - Giám Đốc Hệ Thống',
-  avatarUrl: 'https://lh3.googleusercontent.com/a/ACg8ocIS_SampleAdmin=s96-c',
-  role: 'ADMIN',
-  roleName: 'Ban Quản Trị Hệ Thống',
-  badgeColor: 'rose',
-  permissions: null // null means full access (ADMIN)
+// Khởi tạo: Mặc định là null, BẮT BUỘC đăng nhập Gmail kể cả Admin
+let gCurrentUser = null;
+window.isForceAuthModal = false;
+
+// Danh sách 14 Điểm Bán / Bếp F&B Siba Food
+const SITES_LIST = [
+  { code: 'ALL', name: 'Tất Cả Điểm Bán (Toàn Chuỗi)', region: 'Toàn Quốc', desc: 'Dành cho Quản trị viên & Kế toán' },
+  { code: 'K001', name: 'K001 - MN Bếp Ăn ĐH Hùng Vương', region: 'Miền Nam', desc: 'ĐH Hùng Vương - Quận 5, TP.HCM' },
+  { code: 'K002', name: 'K002 - MN Trường MN Hoa Hồng Đỏ', region: 'Miền Nam', desc: 'Mầm Non Hoa Hồng Đỏ - TP.Thủ Đức' },
+  { code: 'K003', name: 'K003 - MN A.Kitchen - Căn Tin Siba', region: 'Miền Nam', desc: 'Căn Tin Nội Bộ Siba Food - Tân Bình' },
+  { code: 'K004', name: 'K004 - MB Bếp Cơ Sở Hoàng Mai', region: 'Miền Bắc', desc: 'Cơ Sở Hoàng Mai - Hà Nội' },
+  { code: 'K005', name: 'K005 - MN A.Kitchen - Hub Thuận An', region: 'Miền Nam', desc: 'Hub Vận Hành Thuận An - Bình Dương' },
+  { code: 'K006', name: 'K006 - MN Bếp Ăn ĐH Văn Hiến Q.12', region: 'Miền Nam', desc: 'ĐH Văn Hiến Campus Q.12, TP.HCM' },
+  { code: 'K007', name: 'K007 - MN Bếp Ăn TH Vinschool GP', region: 'Miền Nam', desc: 'Tiểu Học Vinschool Grand Park Q.9' },
+  { code: 'K008', name: 'K008 - MN Bếp Ăn TH Nguyễn Khuyến', region: 'Miền Nam', desc: 'THCS & THPT Nguyễn Khuyến - Tân Bình' },
+  { code: 'K009', name: 'K009 - MN Bếp Trung Tâm Tân Bình', region: 'Miền Nam', desc: 'Central Kitchen Tân Bình - TP.HCM' },
+  { code: 'K010', name: 'K010 - MB Căn Tin BV Bạch Mai', region: 'Miền Bắc', desc: 'Căn Tin Bệnh Viện Bạch Mai - Hà Nội' },
+  { code: 'K011', name: 'K011 - MN Bếp Vận Hành Thủ Đức', region: 'Miền Nam', desc: 'Bếp Vận Hành Suất Ăn Thủ Đức' },
+  { code: 'K012', name: 'K012 - MN Căn Tin KCN Tân Tạo', region: 'Miền Nam', desc: 'Căn Tin KCN Tân Tạo - Bình Tân' },
+  { code: 'K013', name: 'K013 - MB Căn Tin ĐH Thăng Long', region: 'Miền Bắc', desc: 'Căn Tin ĐH Thăng Long - Hoàng Mai, Hà Nội' },
+  { code: 'K014', name: 'K014 - MN Bếp Ăn KCN VSIP 1', region: 'Miền Nam', desc: 'Bếp Công Nghiệp KCN VSIP 1 - Bình Dương' },
+];
+
+const FEATURE_TITLES = {
+  'fnb-chain': { name: 'Toàn Chuỗi & P&L 14 Điểm Bán', role: 'ADMIN', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm' },
+  'fnb-pl': { name: 'Báo Cáo Lợi Nhuận P&L Chi Tiết', role: 'KE_TOAN', desc: 'Báo cáo lãi lỗ, kiểm soát định mức chi phí vận hành' },
+  'fnb-pos': { name: 'Doanh Thu POS Thời Gian Thực', role: 'KE_TOAN', desc: 'Tra cứu hóa đơn POS, dòng tiền và phân tích giờ cao điểm' },
+  'fnb-receipts': { name: 'Quản Lý Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Tạo phiếu nhập từ NCC ngoài, tăng tồn kho' },
+  'fnb-waste': { name: 'Biên Bản Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, giảm tồn kho và chi phí hao hụt' },
+  'fnb-sites': { name: 'Danh Mục 14 Điểm Bán & Mã SAP', role: 'KHO_TRUONG', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống' },
+  'wh-dashboard': { name: 'Kho Tổng WMS', role: 'KHO_TRUONG', desc: 'Trung tâm điều hành và cân đối kho gia vị tổng' },
+  'wh-stock': { name: 'Tồn Kho & FEFO Kho Tổng', role: 'KHO_TRUONG', desc: 'Kiểm soát hạn dùng, lô date và giá trị tồn kho tổng' },
+  'wh-reorder': { name: 'Cảnh Báo Điểm Đặt Hàng (ROP)', role: 'KHO_TRUONG', desc: 'Tính toán tồn an toàn và cảnh báo thiếu hàng tự động' },
+  'wh-leadtime': { name: 'Lead Time Nhà Cung Cấp', role: 'KHO_TRUONG', desc: 'Đánh giá độ trễ giao hàng của từng nhà cung cấp' },
+  'wh-posap': { name: 'Đơn Hàng SAP PO', role: 'KHO_TRUONG', desc: 'Đồng bộ đơn mua nguyên vật liệu từ SAP ERP' },
+  'portal-voucher': { name: 'Chứng Từ Thu Chi & Hóa Đơn', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
+  'portal-search': { name: 'Tra Cứu Báo Cáo Chuyên Sâu', role: 'KE_TOAN', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều' },
+  'portal-kiemke': { name: 'Kiểm Kê Kho Tổng', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' },
+  'portal-history': { name: 'Lịch Sử Nhập Xuất Kho Tổng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
 };
 
-// 1. Khởi tạo phiên làm việc từ LocalStorage
+// 1. Khởi tạo phiên làm việc từ LocalStorage (BẮT BUỘC ĐĂNG NHẬP)
 function initRbacAuth() {
+  let saved = null;
   try {
-    const saved = localStorage.getItem('orbit_user');
-    if (saved) {
-      gCurrentUser = JSON.parse(saved);
-    }
+    const raw = localStorage.getItem('orbit_user');
+    if (raw) saved = JSON.parse(raw);
   } catch (e) {
     console.error('Error loading saved user:', e);
   }
+
+  renderSitesOptions();
+
+  if (!saved || !saved.email) {
+    // CHƯA ĐĂNG NHẬP: Bắt buộc mở modal đăng nhập Google
+    gCurrentUser = null;
+    updateUIForUnauthenticated();
+    openGoogleAuthModal(true); // force mode
+    return;
+  }
+
+  // ĐÃ ĐĂNG NHẬP
+  gCurrentUser = saved;
   applyUserSessionToUI();
+
+  // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
+  checkAndPromptUserSite();
+
+  // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền từ nhân viên
+  if (gCurrentUser.role === 'ADMIN') {
+    checkPendingAccessRequests();
+  }
 }
 
-// 2. Cập nhật giao diện theo User Session & Phân Quyền
+// 2. Giao diện khi chưa đăng nhập
+function updateUIForUnauthenticated() {
+  const nameEl = document.getElementById('sidebarUserName');
+  const roleEl = document.getElementById('sidebarUserRoleBadge');
+  const emailEl = document.getElementById('sidebarUserEmail');
+  const hdrName = document.getElementById('headerUserName');
+  const hdrRole = document.getElementById('headerUserRoleBadge');
+
+  if (nameEl) nameEl.textContent = 'Chưa đăng nhập';
+  if (emailEl) emailEl.textContent = 'Bấm để đăng nhập Gmail';
+  if (hdrName) hdrName.textContent = 'Đăng nhập';
+  if (roleEl) {
+    roleEl.textContent = 'CHƯA ĐĂNG NHẬP';
+    roleEl.className = 'text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
+  }
+  if (hdrRole) {
+    hdrRole.textContent = 'CHƯA ĐĂNG NHẬP';
+    hdrRole.className = 'text-[9px] font-extrabold text-gray-400 uppercase';
+  }
+
+  // Khóa tất cả các tab
+  document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
+    btn.classList.add('opacity-40');
+    const lock = btn.querySelector('.lock-icon');
+    if (lock) lock.classList.remove('hidden');
+  });
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// 3. Cập nhật giao diện theo User Session & Phân Quyền
 function applyUserSessionToUI() {
+  if (!gCurrentUser) {
+    updateUIForUnauthenticated();
+    return;
+  }
+
   // Sync Sidebar Profile
   const nameEl = document.getElementById('sidebarUserName');
   const roleEl = document.getElementById('sidebarUserRoleBadge');
   const emailEl = document.getElementById('sidebarUserEmail');
   const avImg = document.getElementById('userAvatarImg');
 
-  // Sync NextAdmin Header Profile
+  // Sync Header Profile
   const hdrName = document.getElementById('headerUserName');
   const hdrRole = document.getElementById('headerUserRoleBadge');
   const hdrAv = document.getElementById('headerUserAvatar');
@@ -9627,29 +9901,37 @@ function applyUserSessionToUI() {
   if (avImg && gCurrentUser.avatarUrl) avImg.src = gCurrentUser.avatarUrl;
   if (hdrAv && gCurrentUser.avatarUrl) hdrAv.src = gCurrentUser.avatarUrl;
 
+  const roleStyles = {
+    ADMIN: { bg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300', text: 'text-rose-600 dark:text-rose-400' },
+    BEP_TRUONG: { bg: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300', text: 'text-blue-600 dark:text-blue-400' },
+    KHO_TRUONG: { bg: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300', text: 'text-amber-600 dark:text-amber-400' },
+    KE_TOAN: { bg: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300', text: 'text-emerald-600 dark:text-emerald-400' },
+    NHAN_VIEN: { bg: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', text: 'text-gray-500' }
+  };
+  const curStyle = roleStyles[gCurrentUser.role] || roleStyles.NHAN_VIEN;
+
   if (roleEl) {
-    roleEl.textContent = gCurrentUser.role || 'ADMIN';
-    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase truncate ${
-      gCurrentUser.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
-      gCurrentUser.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
-      gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
-      gCurrentUser.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
-      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-    }`;
+    roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
+    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase truncate ${curStyle.bg}`;
   }
 
   if (hdrRole) {
-    hdrRole.textContent = gCurrentUser.role || 'ADMIN';
-    hdrRole.className = `text-[9px] font-extrabold uppercase truncate ${
-      gCurrentUser.role === 'ADMIN' ? 'text-rose-600 dark:text-rose-400' :
-      gCurrentUser.role === 'BEP_TRUONG' ? 'text-blue-600 dark:text-blue-400' :
-      gCurrentUser.role === 'KHO_TRUONG' ? 'text-amber-600 dark:text-amber-400' :
-      gCurrentUser.role === 'KE_TOAN' ? 'text-emerald-600 dark:text-emerald-400' :
-      'text-gray-500'
-    }`;
+    hdrRole.textContent = gCurrentUser.role || 'USER';
+    hdrRole.className = `text-[9px] font-extrabold uppercase truncate ${curStyle.text}`;
   }
 
-  // Enforce permissions on all navigation buttons
+  // Quản lý nút Duyệt Quyền dành cho Admin trên Header
+  const adminBtn = document.getElementById('adminPendingReqBtn');
+  if (adminBtn) {
+    if (gCurrentUser.role === 'ADMIN') {
+      adminBtn.classList.remove('hidden');
+    } else {
+      adminBtn.classList.add('hidden');
+    }
+  }
+
+  // Phân quyền chi tiết trên Sidebar:
+  // User có quyền cơ bản (canAccessTab = true) sẽ mở, chức năng sâu hơn (canAccessTab = false) sẽ có lock-icon
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     const tabId = btn.getAttribute('data-tab');
     if (!tabId) return;
@@ -9669,20 +9951,47 @@ function applyUserSessionToUI() {
   if (window.lucide) lucide.createIcons();
 }
 
-// 3. Kiểm tra quyền truy cập tab
+// 4. Kiểm tra quyền truy cập tab
 function canAccessTab(tabId) {
-  if (gCurrentUser.role === 'ADMIN' || !gCurrentUser.permissions) return true;
-  const perm = gCurrentUser.permissions[tabId];
-  return !!(perm && perm.canView);
+  if (!gCurrentUser) return false;
+  if (gCurrentUser.role === 'ADMIN') return true;
+
+  // Nếu user là NHAN_VIEN (User thông thường): chỉ có 4 chức năng cơ bản
+  if (gCurrentUser.role === 'NHAN_VIEN') {
+    const basicTabs = ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'];
+    return basicTabs.includes(tabId);
+  }
+
+  // Nếu có bảng quyền chi tiết permissions
+  if (gCurrentUser.permissions) {
+    const perm = gCurrentUser.permissions[tabId];
+    return !!(perm && perm.canView);
+  }
+
+  // Phân quyền theo vai trò mặc định
+  if (gCurrentUser.role === 'BEP_TRUONG') {
+    return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].includes(tabId);
+  }
+  if (gCurrentUser.role === 'KHO_TRUONG') {
+    return ['fnb-stock', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order'].includes(tabId);
+  }
+  if (gCurrentUser.role === 'KE_TOAN') {
+    return ['fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
+  }
+
+  return false;
 }
 
-// 4. Hook switchTab để chặn quyền truy cập trái phép
+// 5. Hook switchTab để mở popup xin quyền nếu chưa được cấp
 const _origSwitchTab = window.switchTab;
 window.switchTab = function(tabId, btn) {
+  if (!gCurrentUser) {
+    openGoogleAuthModal(true);
+    return;
+  }
   if (!canAccessTab(tabId)) {
-    if (typeof showToast === 'function') {
-      showToast(`Chức năng này không thuộc phân quyền của vai trò ${gCurrentUser.roleName || gCurrentUser.role}!`);
-    }
+    // Chức năng sâu chưa được cấp quyền -> Mở popup xin quyền cho Admin duyệt
+    openRequestAccessModal(tabId);
     return;
   }
   if (typeof _origSwitchTab === 'function') {
@@ -9690,49 +9999,410 @@ window.switchTab = function(tabId, btn) {
   }
 };
 
-// 5. GOOGLE IDENTITY SERVICES (GIS) - CẤU HÌNH TỪ A.KITCHEN DASHBOARD PORTAL
+// ============================================================================
+// LOGIC POPUP 1: CHỌN SITE PHỤ TRÁCH & LƯU LOCALSTORAGE CÁ NHÂN
+// ============================================================================
+
+window.renderSitesOptions = function() {
+  const container = document.getElementById('sitesOptionsContainer');
+  if (!container) return;
+
+  const savedSite = localStorage.getItem('orbit_user_site') || 'K001';
+  window.tempSelectedSite = savedSite;
+
+  const html = SITES_LIST.map(site => {
+    const isSelected = site.code === savedSite;
+    return `
+      <div 
+        onclick="selectSiteOption('${site.code}')" 
+        data-site="${site.code}" 
+        class="site-option-card p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+          isSelected 
+            ? 'border-[#465fff] bg-[#ecf3ff] dark:bg-[#465fff]/15 ring-2 ring-[#465fff]' 
+            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
+        }"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+            site.code === 'ALL' ? 'bg-purple-100 dark:bg-purple-950 text-purple-600' : 'bg-blue-50 dark:bg-blue-950 text-[#465fff]'
+          }">
+            <i data-lucide="${site.code === 'ALL' ? 'globe' : 'store'}" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-2">
+              <span>${site.name}</span>
+              <span class="text-[9.5px] px-1.5 py-0.2 rounded font-semibold ${
+                site.region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+                site.region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+                'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+              }">${site.region}</span>
+            </div>
+            <div class="text-[10.5px] text-gray-400 truncate">${site.desc}</div>
+          </div>
+        </div>
+        <div class="site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+          isSelected ? 'border-[#465fff] bg-[#465fff] text-white' : 'border-gray-300 dark:border-gray-600'
+        }">
+          <i data-lucide="check" class="w-3 h-3 ${isSelected ? '' : 'hidden'}"></i>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+  updateSelectedSiteLabel(savedSite);
+  if (window.lucide) lucide.createIcons();
+};
+
+window.filterSiteOptionCards = function(query) {
+  const q = (query || '').toLowerCase().trim();
+  document.querySelectorAll('.site-option-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    if (!q || text.includes(q)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+};
+
+window.selectSiteOption = function(siteCode) {
+  window.tempSelectedSite = siteCode;
+  document.querySelectorAll('.site-option-card').forEach(card => {
+    const isThis = card.getAttribute('data-site') === siteCode;
+    const check = card.querySelector('.site-radio-check');
+    const checkIcon = check?.querySelector('i');
+
+    if (isThis) {
+      card.classList.add('border-[#465fff]', 'bg-[#ecf3ff]', 'dark:bg-[#465fff]/15', 'ring-2', 'ring-[#465fff]');
+      card.classList.remove('border-gray-200', 'dark:border-gray-800');
+      if (check) {
+        check.className = 'site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 border-[#465fff] bg-[#465fff] text-white';
+        if (checkIcon) checkIcon.classList.remove('hidden');
+      }
+    } else {
+      card.classList.remove('border-[#465fff]', 'bg-[#ecf3ff]', 'dark:bg-[#465fff]/15', 'ring-2', 'ring-[#465fff]');
+      card.classList.add('border-gray-200', 'dark:border-gray-800');
+      if (check) {
+        check.className = 'site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 border-gray-300 dark:border-gray-600';
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }
+    }
+  });
+
+  updateSelectedSiteLabel(siteCode);
+  if (window.lucide) lucide.createIcons();
+};
+
+function updateSelectedSiteLabel(siteCode) {
+  const lbl = document.getElementById('selectedSiteLabel');
+  if (!lbl) return;
+  const siteObj = SITES_LIST.find(s => s.code === siteCode);
+  lbl.textContent = siteObj ? `Đã chọn: ${siteObj.name}` : `Đã chọn: ${siteCode}`;
+}
+
+window.checkAndPromptUserSite = function(forceOpen = false) {
+  const savedSite = localStorage.getItem('orbit_user_site');
+  if (!savedSite || forceOpen) {
+    openSiteSelectorModal();
+  } else {
+    // Đã lưu -> tự động áp dụng vào Header dropdown và dữ liệu
+    const branchSel = document.getElementById('globalBranchSelect');
+    if (branchSel && branchSel.value !== savedSite) {
+      branchSel.value = savedSite;
+      if (typeof onGlobalBranchChange === 'function') {
+        onGlobalBranchChange(savedSite);
+      }
+    }
+  }
+};
+
+window.openSiteSelectorModal = function() {
+  const modal = document.getElementById('siteSelectorModal');
+  if (!modal) return;
+  renderSitesOptions();
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.saveSiteSelection = function() {
+  const site = window.tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
+  localStorage.setItem('orbit_user_site', site);
+  if (gCurrentUser) gCurrentUser.assignedSite = site;
+
+  const branchSel = document.getElementById('globalBranchSelect');
+  if (branchSel) {
+    branchSel.value = site;
+    if (typeof onGlobalBranchChange === 'function') {
+      onGlobalBranchChange(site);
+    }
+  }
+
+  document.getElementById('siteSelectorModal')?.classList.add('hidden');
+  const siteObj = SITES_LIST.find(s => s.code === site);
+  if (typeof showToast === 'function') {
+    showToast(`Đã lưu site phụ trách: ${siteObj ? siteObj.name : site} (sẽ tự động dùng cho các lần sau)`);
+  }
+};
+
+
+// ============================================================================
+// LOGIC POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (USER -> ADMIN)
+// ============================================================================
+
+window.openRequestAccessModal = function(tabId) {
+  if (!gCurrentUser) {
+    openGoogleAuthModal(true);
+    return;
+  }
+
+  const info = FEATURE_TITLES[tabId] || { name: tabId, role: 'BEP_TRUONG', desc: 'Chức năng quản lý nâng cao' };
+  window.pendingRequestFeature = tabId;
+  window.pendingRequestFeatureName = info.name;
+
+  const featEl = document.getElementById('reqFeatureName');
+  const descEl = document.getElementById('reqFeatureDesc');
+  const roleSel = document.getElementById('reqRoleSelect');
+  const userEl = document.getElementById('reqUserName');
+  const emailEl = document.getElementById('reqUserEmail');
+  const reasonEl = document.getElementById('reqReasonInput');
+
+  if (featEl) featEl.textContent = info.name;
+  if (descEl) descEl.textContent = `${info.desc}. Tài khoản nhân viên của bạn hiện chưa được mở quyền này.`;
+  if (roleSel) roleSel.value = info.role;
+  if (userEl) userEl.textContent = gCurrentUser.fullName || 'Người dùng';
+  if (emailEl) emailEl.textContent = gCurrentUser.email;
+  if (reasonEl) reasonEl.value = '';
+
+  document.getElementById('requestAccessModal')?.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeRequestAccessModal = function() {
+  document.getElementById('requestAccessModal')?.classList.add('hidden');
+};
+
+window.submitRequestAccess = async function() {
+  if (!gCurrentUser) return;
+  const requestedRole = document.getElementById('reqRoleSelect')?.value || 'BEP_TRUONG';
+  const reason = document.getElementById('reqReasonInput')?.value || '';
+
+  try {
+    if (typeof showLoading === 'function') showLoading('Đang gửi yêu cầu cấp quyền đến Admin...');
+    const res = await fetch('/api/auth/request-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: gCurrentUser.email,
+        fullName: gCurrentUser.fullName,
+        requestedRole: requestedRole,
+        requestedFeature: window.pendingRequestFeatureName || window.pendingRequestFeature,
+        reason: reason
+      })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Gửi thất bại');
+
+    closeRequestAccessModal();
+    if (typeof showToast === 'function') {
+      showToast('Đã gửi yêu cầu cấp quyền tới Quản Trị Viên! Vui lòng chờ phê duyệt.');
+    }
+  } catch (err) {
+    console.error('submitRequestAccess error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+
+// ============================================================================
+// LOGIC POPUP 3: ADMIN PHÊ DUYỆT YÊU CẦU CẤP QUYỀN (ADMIN)
+// ============================================================================
+
+window.cachedAccessRequests = [];
+
+window.checkPendingAccessRequests = async function() {
+  if (!gCurrentUser || gCurrentUser.role !== 'ADMIN') return;
+  try {
+    const res = await fetch('/api/auth/access-requests');
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data)) {
+      window.cachedAccessRequests = json.data;
+      const pending = json.data.filter(r => r.status === 'PENDING');
+      const btn = document.getElementById('adminPendingReqBtn');
+      const badge = document.getElementById('adminPendingReqCount');
+      if (btn) {
+        btn.classList.remove('hidden');
+        if (badge) {
+          badge.textContent = pending.length;
+          badge.className = `px-1.5 py-0.2 rounded-full text-[9.5px] font-black ${
+            pending.length > 0 ? 'bg-rose-600 text-white animate-pulse' : 'bg-gray-400 text-white'
+          }`;
+        }
+      }
+    }
+  } catch (e) {
+    console.error('checkPendingAccessRequests error:', e);
+  }
+};
+
+window.openAdminApprovalModal = async function() {
+  const modal = document.getElementById('adminApprovalModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  renderAdminRequestsTable();
+
+  try {
+    const res = await fetch('/api/auth/access-requests');
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data)) {
+      window.cachedAccessRequests = json.data;
+      renderAdminRequestsTable();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeAdminApprovalModal = function() {
+  document.getElementById('adminApprovalModal')?.classList.add('hidden');
+};
+
+function renderAdminRequestsTable() {
+  const tbody = document.getElementById('adminRequestsTableBody');
+  if (!tbody) return;
+
+  const list = window.cachedAccessRequests || [];
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Chưa có yêu cầu cấp quyền nào từ nhân viên.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(req => {
+    const isPending = req.status === 'PENDING';
+    const isApproved = req.status === 'APPROVED';
+
+    const statusBadge = isPending 
+      ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">ĐANG CHỜ DUYỆT</span>'
+      : isApproved
+      ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">ĐÃ DUYỆT</span>'
+      : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">TỪ CHỐI</span>';
+
+    const actions = isPending ? `
+      <div class="flex items-center justify-center gap-1.5">
+        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] flex items-center gap-1 shadow-xs active:scale-95 transition-all">
+          <i data-lucide="check" class="w-3 h-3"></i> Duyệt
+        </button>
+        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[10px] flex items-center gap-1 active:scale-95 transition-all">
+          <i data-lucide="x" class="w-3 h-3"></i> Từ chối
+        </button>
+      </div>
+    ` : `
+      <div class="text-center text-[10px] text-gray-400 font-mono">
+        ${req.reviewed_by || 'Admin'}<br>${(req.reviewed_at || '').substring(0, 16)}
+      </div>
+    `;
+
+    return `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="py-2.5 px-3">
+          <div class="font-bold text-gray-900 dark:text-white">${req.user_name || req.user_email}</div>
+          <div class="text-[10.5px] text-gray-400 font-mono">${req.user_email}</div>
+        </td>
+        <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">${req.requested_feature || '--'}</td>
+        <td class="py-2.5 px-3">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
+        </td>
+        <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-[11px] max-w-[200px] truncate" title="${req.reason || ''}">
+          ${req.reason || '--'}
+        </td>
+        <td class="py-2.5 px-3 text-[10px] text-gray-400 font-mono">
+          ${(req.created_at || '').substring(0, 16)}
+        </td>
+        <td class="py-2.5 px-3 text-center">
+          ${isPending ? actions : statusBadge}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+window.handleApproveRequest = async function(requestId, action) {
+  try {
+    if (typeof showLoading === 'function') showLoading(action === 'APPROVE' ? 'Đang phê duyệt...' : 'Đang từ chối...');
+    const res = await fetch('/api/auth/approve-access-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requestId: requestId,
+        action: action,
+        reviewedBy: gCurrentUser ? gCurrentUser.email : 'Admin'
+      })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Thao tác thất bại');
+
+    if (typeof showToast === 'function') showToast(json.message);
+    openAdminApprovalModal();
+    checkPendingAccessRequests();
+  } catch (err) {
+    console.error(err);
+    if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+
+// ============================================================================
+// GOOGLE GIS & AUTH MODAL ENGINE
+// ============================================================================
+
 const GOOGLE_CLIENT_ID = "241889016372-b7klaa5uff117fck5tl4ajj39ukvfftr.apps.googleusercontent.com";
 
 function initGoogleGIS() {
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-    try {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleLoginResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
+  if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+    setTimeout(initGoogleGIS, 400);
+    return;
+  }
 
-      const btnContainer = document.getElementById('googleSignInBtn');
-      if (btnContainer) {
-        btnContainer.innerHTML = '';
-        google.accounts.id.renderButton(btnContainer, {
-          theme: document.documentElement.classList.contains('dark') ? 'filled_black' : 'outline',
-          size: 'large',
-          width: 320,
-          text: 'continue_with',
-          locale: 'vi',
-          shape: 'pill'
-        });
-      }
-    } catch (err) {
-      console.warn('Google Identity Services render error:', err);
-      document.getElementById('googleSignInFallback')?.classList.remove('hidden');
+  try {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleLoginResponse,
+      auto_select: false,
+      cancel_on_tap_outside: !window.isForceAuthModal
+    });
+
+    const btnContainer = document.getElementById('googleSignInBtn');
+    if (btnContainer) {
+      btnContainer.innerHTML = '';
+      google.accounts.id.renderButton(btnContainer, {
+        theme: 'outline',
+        size: 'large',
+        text: 'signin_with',
+        shape: 'pill',
+        logo_alignment: 'left',
+        width: 280
+      });
     }
-  } else {
-    // Retry if GIS script is still loading
-    setTimeout(initGoogleGIS, 300);
+
+    const fallback = document.getElementById('googleSignInFallback');
+    if (fallback) fallback.classList.add('hidden');
+  } catch (e) {
+    console.warn('GIS initialize notice:', e);
+    const fallback = document.getElementById('googleSignInFallback');
+    if (fallback) fallback.classList.remove('hidden');
   }
 }
 
-// Xử lý callback khi người dùng chọn tài khoản Google thực tế
 async function handleGoogleLoginResponse(response) {
-  if (!response || !response.credential) {
-    if (typeof showToast === 'function') showToast('Không nhận được thông tin xác thực từ Google');
-    return;
-  }
   try {
-    if (typeof showLoading === 'function') showLoading('Đang xác thực tài khoản Google với hệ thống...');
+    if (typeof showLoading === 'function') showLoading('Đang xác thực thông tin tài khoản Google...');
     const res = await fetch('/api/auth/google', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -9743,10 +10413,20 @@ async function handleGoogleLoginResponse(response) {
 
     gCurrentUser = json.data;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
-    applyUserSessionToUI();
+    window.isForceAuthModal = false;
     closeGoogleAuthModal();
+    applyUserSessionToUI();
+
     if (typeof showToast === 'function') {
       showToast(`Đăng nhập Google thành công! Xin chào ${gCurrentUser.fullName} (${gCurrentUser.roleName})`);
+    }
+
+    // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
+    checkAndPromptUserSite();
+
+    // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền
+    if (gCurrentUser.role === 'ADMIN') {
+      checkPendingAccessRequests();
     }
   } catch (err) {
     console.error('handleGoogleLoginResponse error:', err);
@@ -9764,13 +10444,28 @@ window.promptGoogleOneTap = function() {
   }
 };
 
-window.openAuthModal = function() {
-  document.getElementById('googleAuthModal')?.classList.remove('hidden');
+window.openGoogleAuthModal = function(isForce = false) {
+  window.isForceAuthModal = !!isForce;
+  const modal = document.getElementById('googleAuthModal');
+  const closeBtn = document.getElementById('googleAuthCloseBtn');
+
+  if (modal) modal.classList.remove('hidden');
+  if (closeBtn) {
+    if (isForce) closeBtn.classList.add('hidden');
+    else closeBtn.classList.remove('hidden');
+  }
+
   initGoogleGIS();
   if (window.lucide) lucide.createIcons();
 };
 
 window.closeGoogleAuthModal = function() {
+  if (window.isForceAuthModal && !gCurrentUser) {
+    if (typeof showToast === 'function') {
+      showToast('Vui lòng đăng nhập bằng tài khoản Gmail để sử dụng hệ thống');
+    }
+    return;
+  }
   document.getElementById('googleAuthModal')?.classList.add('hidden');
 };
 
@@ -9805,9 +10500,19 @@ window.quickLoginRole = async function(email) {
 
     gCurrentUser = json.data;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
-    applyUserSessionToUI();
+    window.isForceAuthModal = false;
     closeGoogleAuthModal();
+    applyUserSessionToUI();
+
     if (typeof showToast === 'function') showToast(`Xin chào ${gCurrentUser.fullName}! (${gCurrentUser.roleName})`);
+
+    // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
+    checkAndPromptUserSite();
+
+    // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền
+    if (gCurrentUser.role === 'ADMIN') {
+      checkPendingAccessRequests();
+    }
   } catch (err) {
     console.error('quickLoginRole error:', err);
     if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
@@ -9825,7 +10530,16 @@ window.submitManualLogin = async function() {
   quickLoginRole(email);
 };
 
-// 7. Role Switcher Modal Actions
+// Đăng xuất
+window.dangXuatAdmin = function() {
+  localStorage.removeItem('orbit_user');
+  gCurrentUser = null;
+  updateUIForUnauthenticated();
+  openGoogleAuthModal(true); // bắt buộc đăng nhập lại
+  if (typeof showToast === 'function') showToast('Đã đăng xuất tài khoản! Vui lòng đăng nhập để tiếp tục.');
+};
+
+// Role Switcher Modal Actions (Kiểm thử nhanh vai trò)
 window.openRoleSwitcherModal = function() {
   document.getElementById('roleSwitcherModal')?.classList.remove('hidden');
   if (window.lucide) lucide.createIcons();
@@ -9846,6 +10560,12 @@ window.switchRoleAction = async function(roleCode) {
     const json = await res.json();
     if (!json.success) throw new Error('Không chuyển được vai trò');
 
+    if (!gCurrentUser) {
+      gCurrentUser = {
+        email: 'user@sibafood.vn',
+        fullName: 'Nhân Viên Test'
+      };
+    }
     gCurrentUser.role = json.data.role;
     gCurrentUser.roleName = json.data.roleName;
     gCurrentUser.badgeColor = json.data.badgeColor;
@@ -9862,23 +10582,7 @@ window.switchRoleAction = async function(roleCode) {
   }
 };
 
-window.dangXuatAdmin = function() {
-  localStorage.removeItem('orbit_user');
-  gCurrentUser = {
-    email: 'khach@sibafood.vn',
-    fullName: 'Khách Xem Báo Cáo',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Guest&background=666&color=fff',
-    role: 'NHAN_VIEN',
-    roleName: 'Nhân Viên Vận Hành',
-    badgeColor: 'stone',
-    permissions: null
-  };
-  applyUserSessionToUI();
-  if (typeof showToast === 'function') showToast('Đã đăng xuất tài khoản!');
-};
-
-// 8. Quick Filter Sidebar Menu on PC
-// Global Quick Search (NextAdmin Search Bar)
+// Global Quick Search
 window.filterGlobalQuickSearch = function(query) {
   const q = (query || '').toLowerCase().trim();
   const sidebarSearch = document.getElementById('sidebarMenuSearch');
@@ -9887,18 +10591,6 @@ window.filterGlobalQuickSearch = function(query) {
   }
   filterSidebarMenu(query);
 };
-
-// Keyboard Shortcut: Ctrl + K (or Cmd + K) to focus Global Search
-window.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    const searchInput = document.getElementById('globalHeaderSearch') || document.getElementById('sidebarMenuSearch');
-    if (searchInput) {
-      searchInput.focus();
-      searchInput.select();
-    }
-  }
-});
 
 window.filterSidebarMenu = function(query) {
   const q = (query || '').toLowerCase().trim();
