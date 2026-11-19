@@ -10506,7 +10506,34 @@ window.closeInvDetailModal = function() {
 // ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
 // ============================================================================
 
-let gCurrentUser = null;
+function loadPersistedUser() {
+  try {
+    if (sessionStorage.getItem('orbit_explicit_logout') === 'true') {
+      return null;
+    }
+    const raw = localStorage.getItem('orbit_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u && u.email) return u;
+    }
+    const savedListRaw = localStorage.getItem('orbit_saved_accounts');
+    if (savedListRaw) {
+      const list = JSON.parse(savedListRaw);
+      if (Array.isArray(list) && list.length > 0) {
+        list.sort((a, b) => (b.lastLogin || 0) - (a.lastLogin || 0));
+        if (list[0] && list[0].email) {
+          try { localStorage.setItem('orbit_user', JSON.stringify(list[0])); } catch(e){}
+          return list[0];
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error restoring gCurrentUser:', e);
+  }
+  return null;
+}
+
+let gCurrentUser = loadPersistedUser();
 window.isForceAuthModal = false;
 
 // Danh sách 14 Điểm Bán / Bếp F&B Siba Food
@@ -10633,6 +10660,7 @@ window.switchToSavedAccount = async function(email) {
 
     gCurrentUser = json.data;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    try { sessionStorage.removeItem('orbit_explicit_logout'); } catch(e){}
     saveAccountToList(gCurrentUser);
 
     window.isForceAuthModal = false;
@@ -10766,6 +10794,9 @@ window.renderSavedAccountsInProfileModal = function() {
 
 // Click vào User Profile (Header hoặc Sidebar)
 window.handleUserProfileClick = function() {
+  if (!gCurrentUser) {
+    gCurrentUser = loadPersistedUser();
+  }
   if (gCurrentUser && gCurrentUser.email) {
     openUserProfileModal();
   } else {
@@ -10774,6 +10805,9 @@ window.handleUserProfileClick = function() {
 };
 
 window.openUserProfileModal = function() {
+  if (!gCurrentUser) {
+    gCurrentUser = loadPersistedUser();
+  }
   if (!gCurrentUser) {
     openGoogleAuthModal(true);
     return;
@@ -10850,26 +10884,25 @@ window.closeUserProfileModal = function() {
 // ============================================================================
 
 function initRbacAuth() {
-  let saved = null;
-  try {
-    const raw = localStorage.getItem('orbit_user');
-    if (raw) saved = JSON.parse(raw);
-  } catch (e) {
-    console.error('Error loading saved user:', e);
+  if (!gCurrentUser) {
+    gCurrentUser = loadPersistedUser();
   }
 
   renderSitesOptions();
 
-  if (!saved || !saved.email) {
+  if (!gCurrentUser || !gCurrentUser.email) {
     gCurrentUser = null;
     updateUIForUnauthenticated();
     openGoogleAuthModal(true);
     return;
   }
 
-  gCurrentUser = saved;
   saveAccountToList(gCurrentUser);
   applyUserSessionToUI();
+
+  // Đảm bảo đóng modal đăng nhập nếu phiên đăng nhập hợp lệ
+  window.isForceAuthModal = false;
+  closeGoogleAuthModal(true);
 
   checkAndPromptUserSite();
 
@@ -11067,6 +11100,9 @@ function canAccessTab(tabId) {
 const _origSwitchTab = window.switchTab;
 window.switchTab = function(tabId, btn) {
   if (!gCurrentUser) {
+    gCurrentUser = loadPersistedUser();
+  }
+  if (!gCurrentUser) {
     openGoogleAuthModal(true);
     return;
   }
@@ -11182,8 +11218,17 @@ function updateSelectedSiteLabel(siteCode) {
 }
 
 window.checkAndPromptUserSite = function(forceOpen = false) {
-  const savedSite = localStorage.getItem('orbit_user_site');
-  if (!savedSite || forceOpen) {
+  let savedSite = localStorage.getItem('orbit_user_site');
+  if (!savedSite && gCurrentUser && gCurrentUser.assignedSite) {
+    savedSite = gCurrentUser.assignedSite;
+    try { localStorage.setItem('orbit_user_site', savedSite); } catch(e){}
+  }
+  if (!savedSite) {
+    savedSite = 'K001';
+    try { localStorage.setItem('orbit_user_site', savedSite); } catch(e){}
+  }
+
+  if (forceOpen) {
     openSiteSelectorModal();
   } else {
     const branchSel = document.getElementById('globalBranchSelect');
@@ -11492,6 +11537,7 @@ async function handleGoogleLoginResponse(response) {
 
     gCurrentUser = json.data;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    try { sessionStorage.removeItem('orbit_explicit_logout'); } catch(e){}
     saveAccountToList(gCurrentUser);
 
     window.isForceAuthModal = false;
@@ -11539,13 +11585,14 @@ window.openGoogleAuthModal = function(isForce = false) {
   if (window.lucide) lucide.createIcons();
 };
 
-window.closeGoogleAuthModal = function() {
-  if (window.isForceAuthModal && !gCurrentUser) {
+window.closeGoogleAuthModal = function(forceClose = false) {
+  if (!forceClose && window.isForceAuthModal && !gCurrentUser) {
     if (typeof showToast === 'function') {
       showToast('Vui lòng đăng nhập bằng tài khoản Gmail để sử dụng hệ thống');
     }
     return;
   }
+  window.isForceAuthModal = false;
   document.getElementById('googleAuthModal')?.classList.add('hidden');
 };
 
@@ -11556,6 +11603,7 @@ window.loginWithGoogle = function() {
 // Đăng xuất
 window.dangXuatAdmin = function() {
   localStorage.removeItem('orbit_user');
+  try { sessionStorage.setItem('orbit_explicit_logout', 'true'); } catch(e){}
   gCurrentUser = null;
   updateUIForUnauthenticated();
   openGoogleAuthModal(true);
@@ -11636,10 +11684,8 @@ window.filterSidebarMenu = function(query) {
 
 // Initialize RBAC on DOM Ready
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    initRbacAuth();
-    initGoogleGIS();
-  }, 300);
+  initRbacAuth();
+  initGoogleGIS();
 });
 
 
