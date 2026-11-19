@@ -3268,7 +3268,29 @@
 
 
         </div>
-    </main>
+    
+      <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
+      <section id="tab-404" class="tab-panel py-16 px-4 text-center">
+        <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
+          <div class="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-50 text-[#465fff] dark:bg-[#465fff]/15 dark:text-[#7592ff] font-mono font-black text-2xl shadow-inner">
+            404
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Không Tìm Thấy Trang Yêu Cầu</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+              Phân hệ hoặc đường dẫn bạn truy cập hiện không tồn tại hoặc đã được chuyển sang vị trí mới trong hệ thống WMS.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button onclick="switchTab('wh-dashboard')" class="inline-flex items-center gap-2 rounded-xl bg-[#465fff] px-4 py-2.5 text-xs font-semibold text-white shadow-theme-xs hover:bg-[#3641f5] active:scale-95 transition-all">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              Quay Về Tổng Quan Kho
+            </button>
+          </div>
+        </div>
+      </section>
+
+</main>
   </div>
 
   <!-- ========================================================================
@@ -3556,7 +3578,7 @@
        ORBIT SIBA FOOD: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
        ===================================================================== -->
   <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
-    <div class="bg-white dark:bg-white/3 w-full max-w-sm sm:max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-[#101828] w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Modal Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -4261,7 +4283,12 @@
       });
 
       const target = document.getElementById(tabId);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.add('active');
+      } else {
+        const notFound = document.getElementById('tab-404');
+        if (notFound) notFound.classList.add('active');
+      }
       try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
       if (!btn) {
         btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
