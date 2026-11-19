@@ -17,3 +17,6 @@ Thumbs.db
 *.bak
 .vscode/
 .idea/
+
+# Internal test files
+test-font.html
