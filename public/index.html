@@ -1889,7 +1889,7 @@
               <thead class="bg-gray-50/75 dark:bg-white/2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-100 dark:border-gray-800">
                 <tr>
                   <th class="p-3.5 text-center w-10">
-                    <input type="checkbox" id="selectAllStockCheckbox" onchange="toggleSelectAllStock(this.checked)" class="rounded border-gray-300 text-brand-500 focus:ring-[#465FFF] cursor-pointer">
+                    <input type="checkbox" id="selectAllStockCheckbox" onchange="toggleSelectAllStock(this.checked)" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer">
                   </th>
                   <th class="p-3.5 w-16 text-center cursor-pointer hover:text-gray-700" onclick="sortStockBy('fefo_priority')">Ưu Tiên</th>
                   <th class="p-3.5 cursor-pointer hover:text-gray-700" onclick="sortStockBy('sku')">Mã SKU</th>
@@ -3475,7 +3475,7 @@
         
         <!-- Main User Card -->
         <div class="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center gap-3.5">
-          <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#465FFF]/30 shrink-0">
+          <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-brand-500/30 shrink-0">
           <div class="min-w-0 flex-1">
             <h4 id="profModalName" class="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
             <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 tabular-nums truncate">admin@sibafood.vn</div>
@@ -4311,7 +4311,7 @@
         return `
           <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2 transition-colors">
             <td class="p-3.5 text-center">
-              <input type="checkbox" class="stock-row-checkbox rounded border-gray-300 text-brand-500 focus:ring-[#465FFF] cursor-pointer" data-sku="${r.sku}" onchange="toggleStockItemSelect('${r.sku}', this.checked)" ${isChecked ? 'checked' : ''}>
+              <input type="checkbox" class="stock-row-checkbox rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer" data-sku="${r.sku}" onchange="toggleStockItemSelect('${r.sku}', this.checked)" ${isChecked ? 'checked' : ''}>
             </td>
             <td class="p-3.5 text-center"><span class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center tabular-nums font-bold text-[11px] mx-auto">${r.fefo_priority}</span></td>
             <td class="p-3.5 tabular-nums font-bold text-gray-900 dark:text-white">
