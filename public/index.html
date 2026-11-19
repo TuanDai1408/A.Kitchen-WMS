@@ -2029,12 +2029,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="ctVung" class="hidden"></select>
           <select id="ctSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Áp dụng:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
           <button onclick="resetChungTuForm()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
@@ -2136,12 +2138,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="scVung" class="hidden"></select>
           <select id="scSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Áp dụng:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">LOẠI HÓA ĐƠN</label>
@@ -2191,18 +2195,20 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="orderVung" class="hidden"></select>
           <select id="orderSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Site đặt hàng:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Site đặt hàng:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
-          <div class="flex-1 min-w-[140px]">
+          <div class="w-full sm:flex-1 sm:min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">THÁNG ÁP DỤNG</label>
-            <input type="month" id="orderMonth" onchange="loadQuota()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white">
+            <input type="month" id="orderMonth" onchange="loadQuota()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs">
           </div>
-          <button onclick="loadQuota()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
+          <button onclick="loadQuota()" class="w-full sm:w-auto px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-theme-xs cursor-pointer transition-all">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải định mức
           </button>
         </div>
@@ -2291,12 +2297,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="hsVung" class="hidden"></select>
           <select id="hsSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Áp dụng:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[140px]">
             <div class="flex justify-between items-center mb-1">
@@ -2341,12 +2349,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="bcVung" class="hidden"></select>
           <select id="bcSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Báo cáo cho:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Báo cáo cho:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
           <button onclick="resetBaoCao()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
@@ -2626,12 +2636,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="kkVung" class="hidden"></select>
           <select id="kkSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-            <span class="text-gray-400 font-medium">Kiểm kê:</span>
-            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
+          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Kiểm kê:</span>
+              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            </div>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
@@ -4140,11 +4152,6 @@
       if (tabId === 'fnb-waste') loadFnbWaste();
       if (tabId === 'fnb-sites') loadFnbSites();
       
-      // Orbit Siba F&B Tab Hooks
-      if (tabId === 'fnb-chain') loadFnbChain();
-      if (tabId === 'fnb-pl') loadFnbPL();
-      if (tabId === 'fnb-pos') loadFnbPOS();
-      if (tabId === 'fnb-sites') loadFnbSites();
       if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
       if (tabId === 'wh-stock') loadStockFEFO();
       if (tabId === 'wh-reorder') loadReorderROP();
@@ -4207,8 +4214,10 @@
         const sel = document.getElementById(prefix + 'Site');
         if (sel) {
           if (code === 'ALL' && ['sc', 'hs', 'kk'].includes(prefix)) {
+            sel.innerHTML = '<option value="">-- Tất cả Site --</option>';
             sel.value = '';
           } else if (fullTen) {
+            sel.innerHTML = `<option value="${fullTen}">${fullTen}</option>`;
             sel.value = fullTen;
           }
         }
@@ -4303,10 +4312,18 @@
           populateSitesFor('sc');
           populateSitesFor('hs');
 
-          // Preload order quota for default site
+          // Preload order quota for default site and set default month
+          const orderMonthEl = document.getElementById('orderMonth');
+          if (orderMonthEl && !orderMonthEl.value) {
+            orderMonthEl.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          }
           if (App.siteObjs.length) {
             const orderSiteEl = document.getElementById('orderSite');
-            if (orderSiteEl && !orderSiteEl.value) orderSiteEl.value = App.siteObjs[0].ten;
+            const defaultSiteTen = App.siteObjs[0].ten;
+            if (orderSiteEl) {
+              orderSiteEl.innerHTML = `<option value="${defaultSiteTen}">${defaultSiteTen}</option>`;
+              orderSiteEl.value = defaultSiteTen;
+            }
             loadQuota();
           }
 
@@ -4500,9 +4517,29 @@
     // PORTAL: ĐẶT HÀNG VẬT TƯ (THEO ĐỊNH MỨC SITE)
     // ========================================================================
     async function loadQuota() {
-      const site = document.getElementById('orderSite').value;
-      const monthInput = document.getElementById('orderMonth').value;
+      // 1. Resolve site name with multi-tier fallback
+      let site = document.getElementById('orderSite')?.value;
+      if (!site) {
+        const savedCode = localStorage.getItem('orbit_user_site') || 'K001';
+        const sites = getAppSitesList();
+        const found = sites.find(s => s.code.toLowerCase() === savedCode.toLowerCase());
+        site = found ? (found.ten || found.name) : 'K001 - Bếp Ăn ĐH Hùng Vương';
+        const sel = document.getElementById('orderSite');
+        if (sel) {
+          sel.innerHTML = `<option value="${site}">${site}</option>`;
+          sel.value = site;
+        }
+      }
       if (!site) return;
+
+      // 2. Default Month to current Month if empty
+      let monthInput = document.getElementById('orderMonth')?.value;
+      if (!monthInput) {
+        const now = new Date();
+        monthInput = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const mEl = document.getElementById('orderMonth');
+        if (mEl) mEl.value = monthInput;
+      }
 
       let thang = '';
       if (monthInput) {
@@ -4510,26 +4547,31 @@
         thang = `${parts[1]}/${parts[0]}`;
       }
 
-      showLoading('Tải định mức vật tư...');
+      showLoading('Tải danh sách vật tư theo Site...');
       try {
         const res = await fetch(`/api/quota?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
         const json = await res.json();
         if (json.success) {
           App.items = json.data.items || [];
           document.getElementById('kpiNganSach').textContent = fmtVND(json.data.nganSach);
-          document.getElementById('kpiSubSite').textContent = site;
+          document.getElementById('kpiSubSite').textContent = json.data.site || site;
           document.getElementById('kpiDaDat').textContent = fmtVND(json.data.tienDaDat);
           document.getElementById('budTotal').textContent = fmtVND(json.data.nganSach);
 
           const types = Array.from(new Set(App.items.map(i => i.tenLoai).filter(Boolean)));
-          document.getElementById('fLoai').innerHTML = '<option value="">Tất cả loại NVL</option>' +
-            types.map(t => `<option value="${t}">${t}</option>`).join('');
+          const fLoaiEl = document.getElementById('fLoai');
+          if (fLoaiEl) {
+            fLoaiEl.innerHTML = '<option value="">Tất cả loại NVL</option>' +
+              types.map(t => `<option value="${t}">${t}</option>`).join('');
+          }
 
           renderOrderTable();
           calcBudget(json.data.nganSach, json.data.tienDaDat);
+        } else {
+          showToast('Lỗi tải định mức: ' + (json.error || ''));
         }
       } catch (err) {
-        showToast('Lỗi: ' + err.message);
+        showToast('Lỗi kết nối: ' + err.message);
       } finally {
         hideLoading();
       }
@@ -4537,9 +4579,10 @@
 
     function renderOrderTable() {
       const body = document.getElementById('dinhMucBody');
-      const search = document.getElementById('orderSearch').value.toLowerCase();
-      const type = document.getElementById('fLoai').value;
-      const onlyTyped = document.getElementById('fChiNhap').checked;
+      const mobileContainer = document.getElementById('orderMobileCards');
+      const search = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+      const type = document.getElementById('fLoai')?.value || '';
+      const onlyTyped = document.getElementById('fChiNhap')?.checked;
 
       let filtered = App.items.filter(it => {
         if (search && !it.maHang.toLowerCase().includes(search) && !it.tenSP.toLowerCase().includes(search)) return false;
@@ -4549,29 +4592,79 @@
       });
 
       if (!filtered.length) {
-        body.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400 dark:text-gray-500">Không có mặt hàng nào phù hợp.</td></tr>';
+        if (body) body.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400 dark:text-gray-500">Không có mặt hàng nào phù hợp với Site và Vùng đã chọn.</td></tr>';
+        if (mobileContainer) mobileContainer.innerHTML = '<div class="p-8 text-center text-gray-400 dark:text-gray-500 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với Site và Vùng đã chọn.</div>';
         return;
       }
 
-      body.innerHTML = filtered.map(it => {
-        const sl = it.soLuongDat || '';
-        const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
-        return `
-          <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-            <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${it.maHang}</td>
-            <td class="p-3 font-bold text-gray-900 dark:text-white">${it.tenSP}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 tabular-nums text-[11px]">${it.tenLoai || 'CCDC'}</span></td>
-            <td class="p-3">${it.dvt || 'Cái'}</td>
-            <td class="p-3 text-right tabular-nums">${fmtVND(it.donGia)}</td>
-            <td class="p-3 text-right tabular-nums">${fmtNum(it.daDat)}</td>
-            <td class="p-3 text-right">
-              <input type="number" min="0" value="${sl}" placeholder="0" class="w-20 p-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-right tabular-nums"
-                oninput="onQtyChange('${it.maHang}', this.value)">
-            </td>
-            <td class="p-3 text-right tabular-nums font-bold text-brand-800" id="subtotal-${it.maHang}">${fmtVND(thanhTien)}</td>
-          </tr>
-        `;
-      }).join('');
+      // 1. Render Desktop Table Rows
+      if (body) {
+        body.innerHTML = filtered.map(it => {
+          const sl = it.soLuongDat || '';
+          const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
+          return `
+            <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
+              <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${it.maHang}</td>
+              <td class="p-3 font-bold text-gray-900 dark:text-white">${it.tenSP}</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 tabular-nums text-[11px]">${it.tenLoai || 'CCDC'}</span></td>
+              <td class="p-3">${it.dvt || 'Cái'}</td>
+              <td class="p-3 text-right tabular-nums">${fmtVND(it.donGia)}</td>
+              <td class="p-3 text-right tabular-nums">${fmtNum(it.daDat)}</td>
+              <td class="p-3 text-right">
+                <input type="number" min="0" value="${sl}" placeholder="0" class="w-20 p-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-right tabular-nums"
+                  oninput="onQtyChange('${it.maHang}', this.value)">
+              </td>
+              <td class="p-3 text-right tabular-nums font-bold text-brand-800 dark:text-brand-400" id="subtotal-${it.maHang}">${fmtVND(thanhTien)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 2. Render Native Mobile Cards
+      if (mobileContainer) {
+        mobileContainer.innerHTML = filtered.map(it => {
+          const sl = it.soLuongDat || '';
+          const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
+          return `
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums">${it.maHang}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${it.tenLoai || 'CCDC'}</span>
+                    <span class="text-[10px] text-gray-400">ĐVT: ${it.dvt || 'Cái'}</span>
+                  </div>
+                  <h4 class="font-bold text-xs text-gray-900 dark:text-white leading-snug">${it.tenSP}</h4>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-gray-100 dark:border-gray-800/80 text-gray-500 dark:text-gray-400">
+                <div>
+                  <span class="text-[10.5px]">Đơn giá:</span>
+                  <div class="font-bold text-gray-800 dark:text-gray-200 tabular-nums">${fmtVND(it.donGia)}</div>
+                </div>
+                <div>
+                  <span class="text-[10.5px]">Đã đặt lũy kế:</span>
+                  <div class="font-bold text-gray-800 dark:text-gray-200 tabular-nums">${fmtNum(it.daDat)}</div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-800/80 bg-gray-50/70 dark:bg-gray-800/40 p-2.5 rounded-xl">
+                <div class="flex items-center gap-1.5">
+                  <label class="text-[11px] font-bold text-gray-700 dark:text-gray-300 shrink-0">SL Đặt:</label>
+                  <input type="number" min="0" value="${sl}" placeholder="0"
+                    class="w-20 p-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-center font-bold text-brand-600 dark:text-brand-400 tabular-nums text-xs"
+                    oninput="onQtyChange('${it.maHang}', this.value)">
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] text-gray-400">Thành tiền:</div>
+                  <div class="font-black text-xs text-brand-600 dark:text-brand-400 tabular-nums" id="subtotal-mob-${it.maHang}">${fmtVND(thanhTien)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     function filterItems() {
@@ -4584,6 +4677,13 @@
         it.soLuongDat = Number(val) || 0;
         const subtotalEl = document.getElementById(`subtotal-${sku}`);
         if (subtotalEl) subtotalEl.textContent = fmtVND(it.soLuongDat * (it.donGia || 0));
+        const subtotalMobEl = document.getElementById(`subtotal-mob-${sku}`);
+        if (subtotalMobEl) subtotalMobEl.textContent = fmtVND(it.soLuongDat * (it.donGia || 0));
+
+        // Sync inputs across desktop table and mobile cards
+        document.querySelectorAll(`input[oninput*="'${sku}'"]`).forEach(inp => {
+          if (inp.value !== val) inp.value = val;
+        });
       }
       calcBudget();
     }
