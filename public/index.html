@@ -5,260 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
   
-  <!-- Google Fonts: Be Vietnam Pro (100% Vietnamese Typography) & JetBrains Mono -->
+  <!-- Google Fonts: Outfit (Variable) & Be Vietnam Pro (Vietnamese Fallback) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS & Lucide Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
+  <link rel="stylesheet" href="/assets/app.css">
   
-  <!-- SheetJS with styling support -->
+  <!-- Pinned CDN Libraries -->
+  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.3.0/dist/apexcharts.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/vn.js"></script>
 
-  <!-- ApexCharts CDN for TailAdmin Charts -->
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-  <!-- Flatpickr for TailAdmin Date Pickers -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
-
+  <!-- TailAdmin Theme Manager (FOUC Prevention & Sync) -->
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        screens: {
-          '2xsm': '375px',
-          'xsm': '425px',
-          'sm': '640px',
-          'md': '768px',
-          'lg': '1024px',
-          'xl': '1280px',
-          '2xl': '1536px',
-          '3xl': '2000px',
-        },
-        extend: {
-          fontFamily: {
-            sans: ['"Be Vietnam Pro"', 'Outfit', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'SF Pro Text', 'Menlo', 'Consolas', 'monospace'],
-            outfit: ['Outfit', 'sans-serif'],
-          },
-          fontSize: {
-            'heading-one': ['64px', { lineHeight: '80px' }],
-            'heading-two': ['56px', { lineHeight: '72px' }],
-            'heading-three': ['48px', { lineHeight: '60px' }],
-            'heading-four': ['40px', { lineHeight: '48px' }],
-            'heading-five': ['32px', { lineHeight: '40px' }],
-            'heading-six': ['24px', { lineHeight: '32px' }],
-            'title-lg': ['20px', { lineHeight: '30px' }],
-            'title-sm': ['18px', { lineHeight: '28px' }],
-          },
-          width: {
-            '22.5': '5.625rem',  // 90px (TailAdmin Collapsed Sidebar)
-            '72.5': '18.125rem', // 290px (TailAdmin Exact Sidebar Width)
-            '107.5': '26.875rem', // 430px (TailAdmin Search Bar Width)
-          },
-          spacing: {
-            '22.5': '5.625rem',
-            '72.5': '18.125rem',
-            '107.5': '26.875rem',
-          },
-          zIndex: {
-            '1': '1',
-            '9': '9',
-            '99': '99',
-            '999': '999',
-            '9999': '9999',
-            '99999': '99999',
-            '999999': '999999',
-          },
-          colors: {
-            current: 'currentColor',
-            transparent: 'transparent',
-            // TailAdmin 100% Brand Scale (brand-500 = #465FFF)
-            brand: {
-              50: 'rgba(236, 243, 255, 1)',
-              100: 'rgba(221, 233, 255, 1)',
-              200: 'rgba(194, 214, 255, 1)',
-              300: 'rgba(156, 185, 255, 1)',
-              400: 'rgba(117, 146, 255, 1)',
-              500: 'rgba(70, 95, 255, 1)',   // #465FFF Primary
-              600: 'rgba(54, 65, 245, 1)',
-              700: 'rgba(42, 49, 216, 1)',
-              800: 'rgba(37, 45, 174, 1)',
-              900: 'rgba(38, 46, 137, 1)',
-              950: 'rgba(22, 25, 80, 1)'
-            },
-            primary: {
-              50: '#ecf3ff',
-              100: '#dde9ff',
-              200: '#c2d6ff',
-              300: '#9cb9ff',
-              400: '#7592ff',
-              500: '#465fff',
-              600: '#3641f5',
-              700: '#2a31d8',
-              800: '#252dae',
-              900: '#262e89'
-            },
-            black: '#101828',
-            dark: {
-              bg: '#000000',        // TailAdmin Dark Body / Sidebar Background
-              surface: '#101828',   // TailAdmin Dark Card / Surface
-              card: '#111827',
-              border: '#1f2937',
-              borderSoft: '#2d3748',
-              muted: '#6b7280',
-              text: '#ffffff'
-            },
-            light: {
-              bg: '#f9fafb',        // TailAdmin Light Background
-              surface: '#ffffff',
-              border: '#e5e7eb',
-              borderSoft: '#f3f4f6',
-              muted: '#9ca3af',
-              text: '#101828'
-            }
-          },
-          boxShadow: {
-            'card': '0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
-            'theme-xs': '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
-            'theme-sm': '0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
-            'theme-md': '0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)',
-            'theme-lg': '0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)',
-            'theme-xl': '0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03)',
-            'focus-ring': '0px 0px 0px 4px rgba(70, 95, 255, 0.12)',
-            'tooltip': '0px 4px 6px -2px rgba(16, 24, 40, 0.05), -8px 0px 20px 8px rgba(16, 24, 40, 0.05)',
-          }
-        }
+    (function () {
+      var stored = localStorage.getItem("darkMode") || localStorage.getItem("orbit_theme");
+      var isDark = stored !== null ? (stored === "dark" || stored === "true" || JSON.parse(stored || "false")) : false;
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+        document.documentElement.setAttribute("data-color-scheme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        document.documentElement.setAttribute("data-color-scheme", "light");
       }
-    };
+    })();
   </script>
-
-  <style>
-    @theme {
-      --font-sans: 'Be Vietnam Pro', 'Outfit', sans-serif;
-    }
-    :root {
-      font-family: 'Be Vietnam Pro', 'Outfit', sans-serif;
-      --font-sans: 'Be Vietnam Pro', 'Outfit', sans-serif;
-      --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
-      -webkit-tap-highlight-color: transparent;
-
-      /* TailAdmin 100% Light Mode Tokens */
-      --app-bg: #f9fafb;
-      --surface-bg: #ffffff;
-      --surface-subtle: #f3f4f6;
-      --border-main: #e5e7eb;
-      --border-subtle: #f3f4f6;
-      --text-main: #101828;
-      --text-muted: #6b7280;
-      --brand-primary: #465fff;
-    }
-
-    .dark {
-      /* TailAdmin 100% Dark Mode Tokens */
-      --app-bg: #000000;
-      --surface-bg: #101828;
-      --surface-subtle: rgba(255, 255, 255, 0.03);
-      --border-main: #1f2937;
-      --border-subtle: #111827;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --brand-primary: #465fff;
-    }
-
-    body {
-      background-color: var(--app-bg);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-    }
-
-    .font-mono, .tabular-nums, th.text-right, td.text-right {
-      font-family: var(--font-mono) !important;
-      font-feature-settings: 'tnum' 1;
-    }
-
-    /* TailAdmin Utility Classes */
-    .menu-item {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .menu-item-active {
-      background-color: rgba(236, 243, 255, 1);
-      color: #465fff !important;
-      font-weight: 600;
-    }
-    .dark .menu-item-active {
-      background-color: rgba(70, 95, 255, 0.12);
-      color: #7592ff !important;
-    }
-
-    .menu-item-inactive {
-      color: #374151;
-    }
-    .menu-item-inactive:hover {
-      background-color: #f3f4f6;
-      color: #111827;
-    }
-    .dark .menu-item-inactive {
-      color: #d1d5db;
-    }
-    .dark .menu-item-inactive:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-      color: #ffffff;
-    }
-
-    .menu-dropdown-item {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.15s;
-    }
-    .menu-dropdown-item-active {
-      background-color: rgba(236, 243, 255, 1);
-      color: #465fff !important;
-    }
-    .dark .menu-dropdown-item-active {
-      background-color: rgba(70, 95, 255, 0.12);
-      color: #7592ff !important;
-    }
-
-    /* Scrollbars */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
-
-    [x-cloak] { display: none !important; }
-
-    /* Focus Ring */
-    .focus-ring:focus-visible {
-      outline: none;
-      box-shadow: 0px 0px 0px 4px rgba(70, 95, 255, 0.12);
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-  </style>
+  
   <!-- Google Identity Services (Real Google Sign-In) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>

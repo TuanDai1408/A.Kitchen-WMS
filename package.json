@@ -5,14 +5,18 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "wrangler dev",
+    "build:css": "tailwindcss -i ./src/css/style.css -o ./public/assets/app.css --minify",
+    "dev:css": "tailwindcss -i ./src/css/style.css -o ./public/assets/app.css --watch",
     "db:init": "wrangler d1 execute akitchen_kho_db --local --file=./schema.sql",
     "db:seed": "wrangler d1 execute akitchen_kho_db --local --file=./seed.sql",
     "db:init:remote": "wrangler d1 execute akitchen_kho_db --remote --file=./schema.sql",
     "db:seed:remote": "wrangler d1 execute akitchen_kho_db --remote --file=./seed.sql",
     "deploy": "wrangler deploy"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "@tailwindcss/forms": "^0.5.11",
+    "tailwindcss": "^4.3.5",
     "wrangler": "^4.162.0"
   }
 }
