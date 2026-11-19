@@ -79,7 +79,7 @@
           <div class="text-xs text-gray-400 dark:text-gray-500 font-medium truncate">Siba Food • Chuỗi F&amp;B</div>
         </div>
       </div>
-      <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
+      <button onclick="toggleSidebar()" class="xl:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
@@ -401,28 +401,17 @@
       <!-- Right: Controls, Filters & User Profile (Properly Gapped, Never Overlapping) -->
       <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 shrink-0">
         
-        <!-- Global Branch Selector -->
-        <div class="h-9 sm:h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2 sm:px-3 flex items-center gap-1 sm:gap-1.5 shadow-theme-xs shrink-0">
-          <button type="button" onclick="openSiteSelectorModal()" title="Bấm để đổi điểm bán / bếp phụ trách" class="text-brand-500 hover:scale-110 active:translate-y-px transition-all">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-          </button>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value); localStorage.setItem('orbit_user_site', this.value);" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[80px] xs:max-w-[110px] sm:max-w-[150px] xl:max-w-[190px] truncate border-none">
-            <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
-            <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
-            <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
-            <option value="K003">K003 - MN A.Kitchen - Căn Tin Siba</option>
-            <option value="K004">K004 - MB Bếp Cơ Sở Hoàng Mai</option>
-            <option value="K005">K005 - MN A.Kitchen - Hub Thuận An</option>
-            <option value="K006">K006 - MN Bếp Ăn ĐH Văn Hiến Q.12</option>
-            <option value="K007">K007 - MN Bếp Ăn TH Vinschool GP</option>
-            <option value="K008">K008 - MN Bếp Ăn TH Nguyễn Khuyến</option>
-            <option value="K009">K009 - MN Bếp Trung Tâm Tân Bình</option>
-            <option value="K010">K010 - MB Căn Tin BV Bạch Mai</option>
-            <option value="K011">K011 - MN Bếp Vận Hành Thủ Đức</option>
-            <option value="K012">K012 - MN Căn Tin KCN Tân Tạo</option>
-            <option value="K013">K013 - MB Căn Tin ĐH Thăng Long</option>
-            <option value="K014">K014 - MN Bếp Ăn KCN VSIP 1</option>
-          </select>
+        <!-- Global Branch & Region Taskbar Display (Interactive Pill) -->
+        <div onclick="openSiteSelectorModal()" class="h-9 sm:h-10 lg:h-11 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-2 sm:px-3 flex items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
+          <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          </div>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">Miền Nam</span>
+            <span id="taskbarSiteName" class="font-bold text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
+          </div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
         </div>
 
         <!-- Global Month Picker -->
@@ -2038,13 +2027,14 @@
 <section id="portal-voucher" class="tab-panel space-y-4">
         <!-- Top filter bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="w-44">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="ctVung" onchange="onSelectVung('ct')" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[220px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE ÁP DỤNG <span class="text-rose-500">*</span></label>
-            <select id="ctSite" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
+          <select id="ctVung" class="hidden"></select>
+          <select id="ctSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Áp dụng:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <button onclick="resetChungTuForm()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
@@ -2144,13 +2134,14 @@
       </section>
 <section id="portal-search" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="w-44">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="scVung" onchange="onSelectVung('sc')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[180px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE</label>
-            <select id="scSite" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
+          <select id="scVung" class="hidden"></select>
+          <select id="scSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Áp dụng:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">LOẠI HÓA ĐƠN</label>
@@ -2198,13 +2189,14 @@
 <section id="portal-order" class="tab-panel space-y-5">
         <!-- Filter Bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="flex-1 min-w-[160px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="orderVung" onchange="onSelectVung('order')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[200px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE ĐẶT HÀNG</label>
-            <select id="orderSite" onchange="loadQuota()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
+          <select id="orderVung" class="hidden"></select>
+          <select id="orderSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Site đặt hàng:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">THÁNG ÁP DỤNG</label>
@@ -2297,13 +2289,14 @@
       </section>
 <section id="portal-history" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="w-44">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="hsVung" onchange="onSelectVung('hs')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[200px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE</label>
-            <select id="hsSite" onchange="loadHistory()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
+          <select id="hsVung" class="hidden"></select>
+          <select id="hsSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Áp dụng:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[140px]">
             <div class="flex justify-between items-center mb-1">
@@ -2346,13 +2339,14 @@
 <section id="portal-baocao" class="tab-panel space-y-4">
         <!-- Top filter bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="w-44">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="bcVung" onchange="onSelectVung('bc')" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[220px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE BÁO CÁO <span class="text-rose-500">*</span></label>
-            <select id="bcSite" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
+          <select id="bcVung" class="hidden"></select>
+          <select id="bcSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Báo cáo cho:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <button onclick="resetBaoCao()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
@@ -2630,13 +2624,14 @@
       </section>
 <section id="portal-kiemke" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="w-44">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
-            <select id="kkVung" onchange="onSelectVung('kk')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
-          </div>
-          <div class="flex-1 min-w-[200px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">SITE KIỂM KÊ</label>
-            <select id="kkSite" onchange="loadAudit()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
+          <select id="kkVung" class="hidden"></select>
+          <select id="kkSite" class="hidden"></select>
+          <div onclick="openSiteSelectorModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group shrink-0" title="Bấm để đổi Điểm bán & Khu vực">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+            <span class="text-gray-400 font-medium">Kiểm kê:</span>
+            <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
+            <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 max-w-[200px] sm:max-w-[260px] truncate">K001 - Bếp Ăn ĐH Hùng Vương</span>
+            <span class="text-brand-500 group-hover:underline font-bold text-[11px] ml-0.5">Đổi ↗</span>
           </div>
           <div class="flex-1 min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
@@ -2787,12 +2782,12 @@
   <!-- ========================================================================
        NATIVE MOBILE & TABLET FEATURE LAUNCHER (BOTTOM SHEET / APP HUB)
        ======================================================================== -->
-  <div id="mobileMenuHub" class="fixed inset-0 z-50 hidden flex-col justify-end select-none">
+  <div id="mobileMenuHub" class="fixed inset-0 z-99999 hidden flex-col justify-end select-none">
     <!-- Backdrop Blur -->
-    <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 opacity-0"></div>
+    <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-gray-900/60 backdrop-blur-sm z-10 opacity-0 transition-opacity duration-300"></div>
     
     <!-- Sheet Container -->
-    <div class="sheet-body relative z-10 w-full max-h-[90vh] bg-white dark:bg-white/3 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col translate-y-full">
+    <div class="sheet-body relative z-20 w-full max-h-[85vh] bg-white dark:bg-gray-900 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col translate-y-full transition-transform duration-300">
       
       <!-- Top Drag Handle & Header -->
       <div class="px-5 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
@@ -3563,6 +3558,20 @@
         </div>
       </div>
 
+      <!-- Region Filter Tabs -->
+      <div class="px-5 sm:px-6 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800/80">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn Vùng Miền:</label>
+          <span class="text-[10.5px] text-gray-400">Dữ liệu từ hệ thống</span>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap" id="modalRegionTabs">
+          <button type="button" onclick="selectModalRegion('ALL')" data-region="ALL" class="modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-brand-500 bg-brand-500 text-white shadow-theme-xs">Tất Cả Miền</button>
+          <button type="button" onclick="selectModalRegion('Miền Bắc')" data-region="Miền Bắc" class="modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300">Miền Bắc</button>
+          <button type="button" onclick="selectModalRegion('Miền Trung')" data-region="Miền Trung" class="modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300">Miền Trung</button>
+          <button type="button" onclick="selectModalRegion('Miền Nam')" data-region="Miền Nam" class="modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300">Miền Nam</button>
+        </div>
+      </div>
+
       <!-- Search & Notice -->
       <div class="p-5 sm:p-6 pb-3 space-y-3">
         <div class="relative">
@@ -4061,9 +4070,24 @@
     }
 
     function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-      document.getElementById('overlay').classList.toggle('hidden');
+      if (window.innerWidth >= 1280) {
+        document.body.classList.toggle('sidebar-collapsed');
+      } else {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        if (sidebar) sidebar.classList.toggle('-translate-x-full');
+        if (overlay) overlay.classList.toggle('hidden');
+      }
     }
+
+    // Auto-clean responsive sidebar on window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1280) {
+        document.getElementById('overlay')?.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        document.getElementById('sidebar')?.classList.remove('-translate-x-full');
+      }
+    });
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -4139,20 +4163,72 @@
     }
 
     function onGlobalBranchChange(code) {
-      App.currentBranch = code;
-      const opt = document.querySelector(`#branchSelector option[value="${code}"]`);
-      if (opt) {
-        document.getElementById('dashBranchTitle').textContent = opt.textContent;
+      if (!code) code = 'ALL';
+      App.currentBranch = code.toLowerCase();
+      
+      const sites = getAppSitesList();
+      const siteObj = sites.find(s => s.code.toLowerCase() === code.toLowerCase());
+      const region = siteObj ? siteObj.region : (code === 'ALL' ? 'Toàn Quốc' : 'Miền Nam');
+      const siteName = siteObj ? siteObj.name : (code === 'ALL' ? 'Tất Cả Điểm Bán (Chuỗi)' : code);
+
+      // 1. Update Taskbar Interactive Display Pill
+      const taskbarRegion = document.getElementById('taskbarRegionBadge');
+      const taskbarName = document.getElementById('taskbarSiteName');
+      if (taskbarRegion) {
+        taskbarRegion.textContent = region;
+        taskbarRegion.className = `hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0 ${
+          region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+          region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+          'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+        }`;
       }
-      loadDashboardSummary();
-      loadStockFEFO();
-      loadReorderROP();
-      // Sync with portal order site
-      const matchSite = App.siteObjs.find(s => s.code.toLowerCase() === code.toLowerCase());
-      if (matchSite) {
-        const orderSiteEl = document.getElementById('orderSite');
-        if (orderSiteEl) orderSiteEl.value = matchSite.ten;
+      if (taskbarName) {
+        taskbarName.textContent = siteName;
       }
+
+      // 2. Sync hidden #globalBranchSelect
+      const branchSel = document.getElementById('globalBranchSelect');
+      if (branchSel && branchSel.value !== code) {
+        branchSel.value = code;
+      }
+
+      // 3. Update all tab badges
+      document.querySelectorAll('.global-tab-region-badge').forEach(el => {
+        el.textContent = region;
+        el.className = `global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase ${
+          region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+          region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+          'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+        }`;
+      });
+      document.querySelectorAll('.global-tab-site-label').forEach(el => {
+        el.textContent = siteName;
+      });
+
+      // 4. Update hidden selects for data fetching in all tabs
+      const fullTen = siteObj ? (siteObj.ten || siteObj.name) : '';
+      ['order', 'ct', 'bc', 'sc', 'hs', 'kk'].forEach(prefix => {
+        const sel = document.getElementById(prefix + 'Site');
+        if (sel) {
+          if (code === 'ALL' && ['sc', 'hs', 'kk'].includes(prefix)) {
+            sel.value = '';
+          } else if (fullTen) {
+            sel.value = fullTen;
+          }
+        }
+      });
+
+      // 5. Trigger data reload for active views
+      try {
+        if (typeof loadQuota === 'function') loadQuota();
+        if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
+        if (typeof loadStockFEFO === 'function') loadStockFEFO();
+        if (typeof loadReorderROP === 'function') loadReorderROP();
+      } catch (e) {
+        console.warn('Reload notice:', e);
+      }
+
+      if (window.lucide) lucide.createIcons();
     }
 
     // ========================================================================
@@ -6101,16 +6177,17 @@ function openMobileMenuHub() {
   const hub = document.getElementById('mobileMenuHub');
   if (!hub) return;
   hub.classList.remove('hidden');
-  requestAnimationFrame(() => {
+  hub.classList.add('flex');
+  setTimeout(() => {
     hub.classList.add('active');
-  });
+  }, 20);
   document.body.classList.add('overflow-hidden');
   const input = document.getElementById('mobileHubSearchInput');
   if (input) {
     input.value = '';
     filterMobileHubFeatures('');
   }
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 function closeMobileMenuHub() {
@@ -6119,8 +6196,9 @@ function closeMobileMenuHub() {
   hub.classList.remove('active');
   document.body.classList.remove('overflow-hidden');
   setTimeout(() => {
+    hub.classList.remove('flex');
     hub.classList.add('hidden');
-  }, 260);
+  }, 320);
 }
 
 function filterMobileHubFeatures(val) {
@@ -10536,24 +10614,45 @@ function loadPersistedUser() {
 let gCurrentUser = loadPersistedUser();
 window.isForceAuthModal = false;
 
-// Danh sách 14 Điểm Bán / Bếp F&B Siba Food
-const SITES_LIST = [
-  { code: 'ALL', name: 'Tất Cả Điểm Bán (Toàn Chuỗi)', region: 'Toàn Quốc', desc: 'Dành cho Quản trị viên & Kế toán' },
-  { code: 'K001', name: 'K001 - MN Bếp Ăn ĐH Hùng Vương', region: 'Miền Nam', desc: 'ĐH Hùng Vương - Quận 5, TP.HCM' },
-  { code: 'K002', name: 'K002 - MN Trường MN Hoa Hồng Đỏ', region: 'Miền Nam', desc: 'Mầm Non Hoa Hồng Đỏ - TP.Thủ Đức' },
-  { code: 'K003', name: 'K003 - MN A.Kitchen - Căn Tin Siba', region: 'Miền Nam', desc: 'Căn Tin Nội Bộ Siba Food - Tân Bình' },
-  { code: 'K004', name: 'K004 - MB Bếp Cơ Sở Hoàng Mai', region: 'Miền Bắc', desc: 'Cơ Sở Hoàng Mai - Hà Nội' },
-  { code: 'K005', name: 'K005 - MN A.Kitchen - Hub Thuận An', region: 'Miền Nam', desc: 'Hub Vận Hành Thuận An - Bình Dương' },
-  { code: 'K006', name: 'K006 - MN Bếp Ăn ĐH Văn Hiến Q.12', region: 'Miền Nam', desc: 'ĐH Văn Hiến Campus Q.12, TP.HCM' },
-  { code: 'K007', name: 'K007 - MN Bếp Ăn TH Vinschool GP', region: 'Miền Nam', desc: 'Tiểu Học Vinschool Grand Park Q.9' },
-  { code: 'K008', name: 'K008 - MN Bếp Ăn TH Nguyễn Khuyến', region: 'Miền Nam', desc: 'THCS & THPT Nguyễn Khuyến - Tân Bình' },
-  { code: 'K009', name: 'K009 - MN Bếp Trung Tâm Tân Bình', region: 'Miền Nam', desc: 'Central Kitchen Tân Bình - TP.HCM' },
-  { code: 'K010', name: 'K010 - MB Căn Tin BV Bạch Mai', region: 'Miền Bắc', desc: 'Căn Tin Bệnh Viện Bạch Mai - Hà Nội' },
-  { code: 'K011', name: 'K011 - MN Bếp Vận Hành Thủ Đức', region: 'Miền Nam', desc: 'Bếp Vận Hành Suất Ăn Thủ Đức' },
-  { code: 'K012', name: 'K012 - MN Căn Tin KCN Tân Tạo', region: 'Miền Nam', desc: 'Căn Tin KCN Tân Tạo - Bình Tân' },
-  { code: 'K013', name: 'K013 - MB Căn Tin ĐH Thăng Long', region: 'Miền Bắc', desc: 'Căn Tin ĐH Thăng Long - Hoàng Mai, Hà Nội' },
-  { code: 'K014', name: 'K014 - MN Bếp Ăn KCN VSIP 1', region: 'Miền Nam', desc: 'Bếp Công Nghiệp KCN VSIP 1 - Bình Dương' },
-];
+// Hàm lấy danh sách Điểm Bán / Bếp F&B thực tế từ Backend Database D1
+window.getAppSitesList = function() {
+  if (window.App && Array.isArray(App.siteObjs) && App.siteObjs.length > 0) {
+    const list = [
+      { code: 'ALL', name: 'Tất Cả Điểm Bán (Toàn Chuỗi)', region: 'Toàn Quốc', desc: 'Dành cho Quản trị viên & Kế toán' }
+    ];
+    App.siteObjs.forEach(s => {
+      list.push({
+        code: s.code,
+        name: s.ten || `${s.code} - ${s.name}`,
+        ten: s.ten,
+        region: s.vungMien || 'Miền Nam',
+        desc: `${s.loai || 'Điểm Bán'} • ${s.name || ''}`,
+        budget: s.budget || 0
+      });
+    });
+    return list;
+  }
+  // Danh sách 14 Điểm bán thực tế trong CSDL
+  return [
+    { code: 'ALL', name: 'Tất Cả Điểm Bán (Toàn Chuỗi)', region: 'Toàn Quốc', desc: 'Dành cho Quản trị viên & Kế toán' },
+    { code: 'K001', name: 'K001 - MN Bếp Ăn Đại Học Hùng Vương', ten: 'K001 - MN Bếp Ăn Đại Học Hùng Vương', region: 'Miền Nam', desc: 'Trường học • MN Bếp Ăn Đại Học Hùng Vương' },
+    { code: 'K002', name: 'K002 - Bệnh viện Đại Học Quốc Tế Hồng Bàng', ten: 'K002 - Bệnh viện Đại Học Quốc Tế Hồng Bàng', region: 'Miền Nam', desc: 'Bệnh viện • Bệnh viện Đại Học Quốc Tế Hồng Bàng' },
+    { code: 'K003', name: 'K003 - A.Kitchen - Miền Nam', ten: 'K003 - A.Kitchen - Miền Nam', region: 'Miền Nam', desc: 'Site ảo • A.Kitchen - Miền Nam' },
+    { code: 'K004', name: 'K004 - MN A.Kitchen - Thuận An', ten: 'K004 - MN A.Kitchen - Thuận An', region: 'Miền Nam', desc: 'Trường học • MN A.Kitchen - Thuận An' },
+    { code: 'K005', name: 'K005 - MN A.Kitchen - Hub Thuận An', ten: 'K005 - MN A.Kitchen - Hub Thuận An', region: 'Miền Nam', desc: 'Trường học • MN A.Kitchen - Hub Thuận An' },
+    { code: 'K006', name: 'K006 - MN A.Kitchen - PTNT Quảng Trực', ten: 'K006 - MN A.Kitchen - PTNT Quảng Trực', region: 'Miền Nam', desc: 'Trường học • MN A.Kitchen - PTNT Quảng Trực' },
+    { code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', ten: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam', desc: 'Căn tin • MB Bếp ăn canteen G – Group' },
+    { code: 'K500', name: 'K500 - MB A Kitchen Hòa Bình', ten: 'K500 - MB A Kitchen Hòa Bình', region: 'Miền Bắc', desc: 'Căn tin • MB A Kitchen Hòa Bình' },
+    { code: 'K501', name: 'K501 - Công ty TNHH Julie sandlau', ten: 'K501 - Công ty TNHH Julie sandlau', region: 'Miền Bắc', desc: 'Doanh nghiệp • Công ty TNHH Julie sandlau' },
+    { code: 'K502', name: 'K502 - A.Kitchen - Miền Bắc', ten: 'K502 - A.Kitchen - Miền Bắc', region: 'Miền Bắc', desc: 'Site ảo • A.Kitchen - Miền Bắc' },
+    { code: 'K503', name: 'K503 - MB A.Kitchen - TTH An Thượng', ten: 'K503 - MB A.Kitchen - TTH An Thượng', region: 'Miền Bắc', desc: 'Trung tâm • MB A.Kitchen - TTH An Thượng' },
+    { code: 'K504', name: 'K504 - MB A.Kitchen - Hub An Khánh', ten: 'K504 - MB A.Kitchen - Hub An Khánh', region: 'Miền Bắc', desc: 'Hub • MB A.Kitchen - Hub An Khánh' },
+    { code: 'K505', name: 'K505 - MB A.Kitchen - Hub Đa Phúc', ten: 'K505 - MB A.Kitchen - Hub Đa Phúc', region: 'Miền Bắc', desc: 'Hub • MB A.Kitchen - Hub Đa Phúc' },
+    { code: 'K800', name: 'K800 - A.Kitchen - Miền Trung', ten: 'K800 - A.Kitchen - Miền Trung', region: 'Miền Trung', desc: 'Site ảo • A.Kitchen - Miền Trung' }
+  ];
+};
+
+const SITES_LIST = window.getAppSitesList();
 
 const FEATURE_TITLES = {
   'fnb-chain': { name: 'Toàn Chuỗi & P&L 14 Điểm Bán', role: 'ADMIN', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm' },
@@ -11141,19 +11240,43 @@ window.switchTab = function(tabId, btn) {
 // LOGIC POPUP CHỌN SITE PHỤ TRÁCH & LƯU LOCALSTORAGE CÁ NHÂN
 // ============================================================================
 
+window.selectedModalRegion = 'ALL';
+
+window.selectModalRegion = function(region) {
+  window.selectedModalRegion = region;
+  document.querySelectorAll('.modal-region-btn').forEach(btn => {
+    const isThis = btn.getAttribute('data-region') === region;
+    if (isThis) {
+      btn.className = 'modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-brand-500 bg-brand-500 text-white shadow-theme-xs';
+    } else {
+      btn.className = 'modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300';
+    }
+  });
+  renderSitesOptions();
+};
+
 window.renderSitesOptions = function() {
   const container = document.getElementById('sitesOptionsContainer');
   if (!container) return;
 
-  const savedSite = localStorage.getItem('orbit_user_site') || 'K001';
+  const savedSite = window.tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
   window.tempSelectedSite = savedSite;
 
-  const html = SITES_LIST.map(site => {
-    const isSelected = site.code === savedSite;
+  const sites = getAppSitesList();
+  const currentRegion = window.selectedModalRegion || 'ALL';
+
+  const filtered = sites.filter(s => {
+    if (currentRegion === 'ALL') return true;
+    return s.code === 'ALL' || s.region === currentRegion;
+  });
+
+  const html = filtered.map(site => {
+    const isSelected = site.code.toLowerCase() === savedSite.toLowerCase();
     return `
       <div 
         onclick="selectSiteOption('${site.code}')" 
         data-site="${site.code}" 
+        data-region="${site.region}"
         class="site-option-card p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
           isSelected 
             ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#465FFF]' 
@@ -11235,8 +11358,9 @@ window.selectSiteOption = function(siteCode) {
 function updateSelectedSiteLabel(siteCode) {
   const lbl = document.getElementById('selectedSiteLabel');
   if (!lbl) return;
-  const siteObj = SITES_LIST.find(s => s.code === siteCode);
-  lbl.textContent = siteObj ? `Đã chọn: ${siteObj.name}` : `Đã chọn: ${siteCode}`;
+  const sites = getAppSitesList();
+  const siteObj = sites.find(s => s.code.toLowerCase() === siteCode.toLowerCase());
+  lbl.textContent = siteObj ? `Đã chọn: [${siteObj.region}] ${siteObj.name}` : `Đã chọn: ${siteCode}`;
 }
 
 window.checkAndPromptUserSite = function(forceOpen = false) {

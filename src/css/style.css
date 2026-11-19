@@ -338,3 +338,31 @@
 .tab-panel.active {
   display: block;
 }
+
+/* ==========================================================================
+   MOBILE MENU HUB & RESPONSIVE SIDEBAR COLLAPSE
+   ========================================================================== */
+#mobileMenuHub {
+  z-index: 99999;
+}
+#mobileMenuHub .sheet-backdrop {
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+}
+#mobileMenuHub .sheet-body {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(100%);
+}
+#mobileMenuHub.active .sheet-backdrop {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+#mobileMenuHub.active .sheet-body {
+  transform: translateY(0) !important;
+}
+
+@media (min-width: 1280px) {
+  body.sidebar-collapsed #sidebar {
+    margin-left: -18.125rem !important; /* -290px */
+  }
+}
