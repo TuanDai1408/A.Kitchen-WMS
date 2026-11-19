@@ -2005,52 +2005,136 @@
 
       </section>
 
-<section id="wh-stock" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
+
+      <section id="wh-stock" class="tab-panel space-y-4">
+        <div class="bg-white dark:bg-white/3 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
+          
+          <!-- Header & Title -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
             <div>
-              <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="hourglass" class="w-5 h-5 text-amber-500"></i>
-                Quản Lý Hạn Dùng Gia Vị &amp; Xuất Kho Chuẩn FEFO
+                Danh Sách Tồn Kho &amp; Quản Lý Hạn Dùng FEFO
               </h2>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Sắp xếp tự động theo hạn dùng tăng dần. Lô cận Date được ưu tiên cảnh báo.</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn HACCP.
+              </p>
             </div>
-            <div class="flex items-center gap-2">
-              <input type="text" id="fefoSearchInput" oninput="filterFefoLive()" placeholder="🔍 Tìm SKU, Tên, Lô..." class="text-xs border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 bg-gray-50 dark:bg-gray-900/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">
-              <button onclick="exportFefoToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all" title="Xuất dữ liệu tồn kho ra Excel chuẩn Aptos">
+            
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="exportFefoToExcel()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-theme-xs active:scale-95 transition-all" title="Xuất toàn bộ hoặc các dòng đã chọn ra Excel chuẩn Aptos">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
               </button>
-              <button onclick="openReceiptModal()" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+              <button onclick="openReceiptModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#465fff] hover:bg-[#3641f5] text-white rounded-xl text-xs font-semibold shadow-theme-xs active:scale-95 transition-all">
                 <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
               </button>
             </div>
           </div>
 
-          <div class="hidden lg:block overflow-x-auto mt-4 rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+          <!-- Filters Bar (TailAdmin Data Table Style) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 text-xs">
+            <!-- Search Input -->
+            <div class="lg:col-span-5 relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input 
+                type="text" 
+                id="fefoSearchInput" 
+                oninput="filterFefoLive()" 
+                placeholder="Tìm SKU, tên gia vị, mã lô..." 
+                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#465fff] transition-all"
+              />
+            </div>
+
+            <!-- Filter: Danh mục hàng -->
+            <div class="lg:col-span-3">
+              <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#465fff] transition-all">
+                <option value="">Tất cả nhóm hàng</option>
+                <option value="Gia vị">Gia vị</option>
+                <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
+                <option value="CCDC">CCDC</option>
+              </select>
+            </div>
+
+            <!-- Filter: Trạng thái hạn dùng -->
+            <div class="lg:col-span-3">
+              <select id="fefoStatusFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#465fff] transition-all">
+                <option value="">Tất cả trạng thái</option>
+                <option value="safe">An toàn</option>
+                <option value="yellow">Cận Date (≤ 15 ngày)</option>
+                <option value="red">Nguy cơ FEFO (≤ 7 ngày)</option>
+              </select>
+            </div>
+
+            <!-- Reset Filter Button -->
+            <div class="lg:col-span-1 flex items-center justify-end">
+              <button onclick="resetFefoFilters()" class="w-full p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-all" title="Đặt lại bộ lọc">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bulk Selection Indicator -->
+          <div id="stockBulkActionBar" class="hidden p-2.5 rounded-xl bg-[#ecf3ff] dark:bg-[#465fff]/15 border border-[#c2d6ff] dark:border-[#465fff]/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-[#465fff] dark:text-[#7592ff] font-medium">
+              <span id="selectedStockCount" class="font-bold">0</span> mặt hàng đã được chọn
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportSelectedStockExcel()" class="px-3 py-1 bg-[#465fff] hover:bg-[#3641f5] text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Xuất các dòng đã chọn
+              </button>
+              <button onclick="clearStockSelection()" class="px-2 py-1 text-gray-500 hover:text-gray-700 dark:text-gray-400">
+                Bỏ chọn
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Container (TailAdmin Data Table Style) -->
+          <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead class="bg-gray-50/75 dark:bg-white/2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-100 dark:border-gray-800">
                 <tr>
-                  <th class="p-3">Ưu Tiên FEFO</th>
-                  <th class="p-3">Mã SKU</th>
-                  <th class="p-3">Tên Gia Vị</th>
-                  <th class="p-3">Mã Lô</th>
-                  <th class="p-3">Hạn Dùng (EXP)</th>
-                  <th class="p-3 text-right">Số Lượng Tồn</th>
-                  <th class="p-3 text-right">Số Ngày Còn</th>
-                  <th class="p-3 text-center">Trạng Thái</th>
-                  <th class="p-3 text-right">Thao Tác</th>
+                  <th class="p-3.5 text-center w-10">
+                    <input type="checkbox" id="selectAllStockCheckbox" onchange="toggleSelectAllStock(this.checked)" class="rounded border-gray-300 text-[#465fff] focus:ring-[#465fff] cursor-pointer">
+                  </th>
+                  <th class="p-3.5 w-16 text-center cursor-pointer hover:text-gray-700" onclick="sortStockBy('fefo_priority')">Ưu Tiên</th>
+                  <th class="p-3.5 cursor-pointer hover:text-gray-700" onclick="sortStockBy('sku')">Mã SKU</th>
+                  <th class="p-3.5 cursor-pointer hover:text-gray-700" onclick="sortStockBy('item_name')">Tên Mặt Hàng</th>
+                  <th class="p-3.5">Mã Lô</th>
+                  <th class="p-3.5 cursor-pointer hover:text-gray-700" onclick="sortStockBy('exp_date')">Hạn Dùng (EXP)</th>
+                  <th class="p-3.5 text-right cursor-pointer hover:text-gray-700" onclick="sortStockBy('qty')">Số Lượng Tồn</th>
+                  <th class="p-3.5 text-right cursor-pointer hover:text-gray-700" onclick="sortStockBy('days_remaining')">Ngày Còn</th>
+                  <th class="p-3.5 text-center">Trạng Thái</th>
+                  <th class="p-3.5 text-right">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody id="fefoTableBody" class="divide-y divide-slate-100">
-                <tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải dữ liệu lô kho...</td></tr>
+              <tbody id="fefoTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tr><td colspan="10" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang nạp dữ liệu tồn kho...</td></tr>
               </tbody>
             </table>
           </div>
-        <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
-        <div id="fefoMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+
+          <!-- Pagination Bar (TailAdmin Style) -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 gap-3 text-xs text-gray-500 dark:text-gray-400">
+            <div id="stockPaginationInfo">
+              Hiển thị <span class="font-bold text-gray-800 dark:text-white">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white">10</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white">0</span> mặt hàng
+            </div>
+            <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+              <button id="stockPrevBtn" onclick="changeStockPage(-1)" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                Trước
+              </button>
+              <span id="stockCurrentPageBadge" class="px-3 py-1.5 rounded-lg bg-[#ecf3ff] text-[#465fff] dark:bg-[#465fff]/20 dark:text-[#7592ff] font-bold">1</span>
+              <button id="stockNextBtn" onclick="changeStockPage(1)" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                Sau
+              </button>
+            </div>
+          </div>
+
+          <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
+          <div id="fefoMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
 
         </div>
       </section>
+
 <section id="wh-reorder" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
@@ -3901,6 +3985,56 @@
     </div>
   </div>
 
+
+  <!-- Modal Chỉnh Sửa Định Mức Mặt Hàng (Edit Item Modal - TailAdmin Style) -->
+  <div id="modalEditItem" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#101828] rounded-2xl max-w-lg w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800">
+      <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 mb-4">
+        <h3 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-4 h-4 text-[#465fff]"></i>
+          Chỉnh Sửa Định Mức &amp; Thông Số Kho
+        </h3>
+        <button onclick="closeModal('modalEditItem')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <input type="hidden" id="editItemSku">
+        <div>
+          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt Hàng</label>
+          <input type="text" id="editItemName" readonly class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-2.5 text-gray-500 font-medium">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Định Mức An Toàn (Min)</label>
+            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 font-mono focus:ring-2 focus:ring-[#465fff] outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Đơn Vị Tính</label>
+            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465fff] outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị Trí Kệ / Lưu Trữ</label>
+          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465fff] outline-none">
+        </div>
+        <div>
+          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi Chú Quản Lý</label>
+          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 rounded-xl p-2.5 focus:ring-2 focus:ring-[#465fff] outline-none">
+        </div>
+        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
+          <button onclick="closeModal('modalEditItem')" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
+            Hủy
+          </button>
+          <button onclick="saveItemSpecs()" class="px-4 py-2 bg-[#465fff] hover:bg-[#3641f5] text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-theme-xs transition-all">
+            <i data-lucide="check" class="w-4 h-4"></i> Lưu Thay Đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- WMS Fast Receipt Modal -->
   <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
@@ -4270,7 +4404,7 @@
         const json = await res.json();
         if (json.success) {
           App.fefoItems = json.data;
-          renderFefoRows(App.fefoItems);
+          filterFefoLive();
         }
       } catch (e) {
         console.error(e);
@@ -4279,33 +4413,42 @@
 
     function renderFefoRows(items) {
       const tbody = document.getElementById('fefoTableBody');
+      if (!tbody) return;
       if (!items || !items.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Không có tồn kho gia vị nào.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-gray-400 dark:text-gray-500">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</td></tr>';
         return;
       }
       tbody.innerHTML = items.map(r => {
-        let badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        if (r.danger_level === 'red') badgeClass = 'bg-rose-100 text-rose-800 border-rose-200 animate-pulse';
-        else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+        let badgeClass = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40';
+        if (r.danger_level === 'red') badgeClass = 'bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 animate-pulse';
+        else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40';
+
+        const isChecked = typeof selectedStockSkus !== 'undefined' && selectedStockSkus.has(r.sku);
 
         return `
-          <tr class="hover:bg-gray-50 dark:bg-gray-900/50 transition-colors">
-            <td class="p-3"><span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center font-mono font-bold text-[11px]">${r.fefo_priority}</span></td>
-            <td class="p-3 font-mono font-bold text-gray-700 dark:text-gray-200">
+          <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2 transition-colors">
+            <td class="p-3.5 text-center">
+              <input type="checkbox" class="stock-row-checkbox rounded border-gray-300 text-[#465fff] focus:ring-[#465fff] cursor-pointer" data-sku="${r.sku}" onchange="toggleStockItemSelect('${r.sku}', this.checked)" ${isChecked ? 'checked' : ''}>
+            </td>
+            <td class="p-3.5 text-center"><span class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center font-mono font-bold text-[11px] mx-auto">${r.fefo_priority}</span></td>
+            <td class="p-3.5 font-mono font-bold text-gray-900 dark:text-white">
               <a href="javascript:void(0)" onclick="openItemDetailModal('${r.sku}')" class="text-[#465fff] dark:text-[#7592ff] hover:underline" title="Xem chi tiết & lịch sử mặt hàng">
                 ${r.sku}
               </a>
             </td>
-            <td class="p-3 font-bold text-gray-900 dark:text-white">${r.item_name}</td>
-            <td class="p-3 font-mono text-gray-600 dark:text-gray-300">${r.batch_code}</td>
-            <td class="p-3 font-mono text-gray-700 dark:text-gray-200">${r.exp_date}</td>
-            <td class="p-3 text-right font-mono font-bold text-gray-900 dark:text-white">${fmtNum(r.qty)} ${r.unit}</td>
-            <td class="p-3 text-right font-mono font-bold ${r.danger_level === 'red' ? 'text-rose-600' : (r.danger_level === 'yellow' ? 'text-amber-600' : 'text-emerald-600')}">${r.days_remaining} ngày</td>
-            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.status_text}</span></td>
-            <td class="p-3 text-right">
+            <td class="p-3.5 font-medium text-gray-800 dark:text-gray-100">${r.item_name}</td>
+            <td class="p-3.5 font-mono text-gray-600 dark:text-gray-300">${r.batch_code}</td>
+            <td class="p-3.5 font-mono text-gray-700 dark:text-gray-200">${r.exp_date ? r.exp_date.slice(0, 10) : ''}</td>
+            <td class="p-3.5 text-right font-mono font-bold text-gray-900 dark:text-white">${fmtNum(r.qty)} ${r.unit || ''}</td>
+            <td class="p-3.5 text-right font-mono font-bold ${r.danger_level === 'red' ? 'text-rose-600 dark:text-rose-400' : (r.danger_level === 'yellow' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')}">${r.days_remaining} ngày</td>
+            <td class="p-3.5 text-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${badgeClass}">${r.status_text}</span></td>
+            <td class="p-3.5 text-right">
               <div class="inline-flex items-center gap-1.5 justify-end">
                 <button onclick="openItemDetailModal('${r.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-[#465fff] hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Xem chi tiết kỹ thuật">
                   <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+                <button onclick="openEditItemModal('${r.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Chỉnh sửa định mức an toàn">
+                  <i data-lucide="edit-3" class="w-4 h-4"></i>
                 </button>
                 <button onclick="openIssueModal('${r.sku}', '${r.item_name}', '${r.batch_code}', ${r.qty})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[11px] shadow-xs flex items-center gap-1 transition-all">
                   <i data-lucide="package-minus" class="w-3.5 h-3.5"></i> Xuất Bếp
@@ -4315,18 +4458,9 @@
           </tr>
         `;
       }).join('');
+      lucide.createIcons();
     }
-
-    function filterFefoLive() {
-      const q = document.getElementById('fefoSearchInput').value.toLowerCase();
-      const filtered = App.fefoItems.filter(r => 
-        r.sku.toLowerCase().includes(q) || 
-        r.item_name.toLowerCase().includes(q) || 
-        r.batch_code.toLowerCase().includes(q)
-      );
-      renderFefoRows(filtered);
-    }
-
+    
     // ========================================================================
     // WMS: ROP, LEAD TIME & PO SAP
     // ========================================================================
@@ -11623,6 +11757,161 @@ window.addEventListener('DOMContentLoaded', () => {
     initGoogleGIS();
   }, 300);
 });
+
+
+// ========================================================================
+// TAILADMIN STOCK TABLE CONTROLLER (PAGINATION, SORT, BULK SELECT, EDIT)
+// ========================================================================
+let stockCurrentPage = 1;
+const stockPageSize = 10;
+let stockSortColumn = 'fefo_priority';
+let stockSortOrder = 'asc';
+const selectedStockSkus = new Set();
+
+function filterFefoLive() {
+  const q = (document.getElementById('fefoSearchInput')?.value || '').toLowerCase().trim();
+  const category = document.getElementById('fefoCategoryFilter')?.value || '';
+  const status = document.getElementById('fefoStatusFilter')?.value || '';
+
+  let filtered = (App.fefoItems || []).filter(r => {
+    const matchSearch = !q || (
+      (r.sku && r.sku.toLowerCase().includes(q)) ||
+      (r.item_name && r.item_name.toLowerCase().includes(q)) ||
+      (r.batch_code && r.batch_code.toLowerCase().includes(q))
+    );
+    const matchCategory = !category || r.category === category;
+    const matchStatus = !status || r.danger_level === status;
+    return matchSearch && matchCategory && matchStatus;
+  });
+
+  // Sorting
+  filtered.sort((a, b) => {
+    let valA = a[stockSortColumn] ?? '';
+    let valB = b[stockSortColumn] ?? '';
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return stockSortOrder === 'asc' ? valA - valB : valB - valA;
+    }
+    return stockSortOrder === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+  });
+
+  // Pagination Slice
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / stockPageSize) || 1;
+  if (stockCurrentPage > totalPages) stockCurrentPage = totalPages;
+  if (stockCurrentPage < 1) stockCurrentPage = 1;
+
+  const startIdx = (stockCurrentPage - 1) * stockPageSize;
+  const pagedItems = filtered.slice(startIdx, startIdx + stockPageSize);
+
+  // Update pagination indicators
+  if (document.getElementById('stockPageEnd')) document.getElementById('stockPageEnd').textContent = Math.min(startIdx + stockPageSize, total);
+  if (document.getElementById('stockTotalCount')) document.getElementById('stockTotalCount').textContent = total;
+  if (document.getElementById('stockCurrentPageBadge')) document.getElementById('stockCurrentPageBadge').textContent = `${stockCurrentPage}/${totalPages}`;
+  if (document.getElementById('stockPrevBtn')) document.getElementById('stockPrevBtn').disabled = stockCurrentPage <= 1;
+  if (document.getElementById('stockNextBtn')) document.getElementById('stockNextBtn').disabled = stockCurrentPage >= totalPages;
+
+  renderFefoRows(pagedItems);
+}
+
+function changeStockPage(delta) {
+  stockCurrentPage += delta;
+  filterFefoLive();
+}
+
+function sortStockBy(col) {
+  if (stockSortColumn === col) {
+    stockSortOrder = stockSortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    stockSortColumn = col;
+    stockSortOrder = 'asc';
+  }
+  filterFefoLive();
+}
+
+function resetFefoFilters() {
+  if (document.getElementById('fefoSearchInput')) document.getElementById('fefoSearchInput').value = '';
+  if (document.getElementById('fefoCategoryFilter')) document.getElementById('fefoCategoryFilter').value = '';
+  if (document.getElementById('fefoStatusFilter')) document.getElementById('fefoStatusFilter').value = '';
+  stockCurrentPage = 1;
+  filterFefoLive();
+}
+
+function toggleSelectAllStock(isChecked) {
+  const checkboxes = document.querySelectorAll('.stock-row-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = isChecked;
+    const sku = cb.dataset.sku;
+    if (isChecked) selectedStockSkus.add(sku);
+    else selectedStockSkus.delete(sku);
+  });
+  updateStockBulkBar();
+}
+
+function toggleStockItemSelect(sku, isChecked) {
+  if (isChecked) selectedStockSkus.add(sku);
+  else selectedStockSkus.delete(sku);
+  updateStockBulkBar();
+}
+
+function updateStockBulkBar() {
+  const bar = document.getElementById('stockBulkActionBar');
+  const countEl = document.getElementById('selectedStockCount');
+  if (!bar) return;
+  if (selectedStockSkus.size > 0) {
+    bar.classList.remove('hidden');
+    if (countEl) countEl.textContent = selectedStockSkus.size;
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+function clearStockSelection() {
+  selectedStockSkus.clear();
+  const selectAll = document.getElementById('selectAllStockCheckbox');
+  if (selectAll) selectAll.checked = false;
+  document.querySelectorAll('.stock-row-checkbox').forEach(cb => { cb.checked = false; });
+  updateStockBulkBar();
+}
+
+function exportSelectedStockExcel() {
+  if (selectedStockSkus.size === 0) {
+    showToast('Vui lòng chọn ít nhất 1 mặt hàng để xuất Excel!');
+    return;
+  }
+  const selectedItems = (App.fefoItems || []).filter(i => selectedStockSkus.has(i.sku));
+  const headers = ['Ưu Tiên FEFO', 'Mã SKU', 'Tên Gia Vị', 'Mã Lô', 'Hạn Dùng (EXP)', 'Số Lượng Tồn', 'Đơn Vị', 'Số Ngày Còn', 'Trạng Thái'];
+  const rows = selectedItems.map(r => [
+    r.fefo_priority, r.sku, r.item_name, r.batch_code, r.exp_date, r.qty, r.unit, r.days_remaining, r.status_text
+  ]);
+  exportStyledExcel('Ton_Kho_Duoc_Chon.xlsx', 'DuocChon', headers, rows, [5, 7], [0, 1, 3, 4]);
+}
+
+function openEditItemModal(sku) {
+  const item = (App.fefoItems || []).find(i => i.sku === sku);
+  if (!item) return;
+
+  document.getElementById('editItemSku').value = item.sku;
+  document.getElementById('editItemName').value = `${item.sku} - ${item.item_name}`;
+  document.getElementById('editItemSafetyStock').value = item.safety_stock || 5.0;
+  document.getElementById('editItemUnit').value = item.unit || 'Can 5L';
+  document.getElementById('modalEditItem').classList.remove('hidden');
+}
+
+function saveItemSpecs() {
+  const sku = document.getElementById('editItemSku').value;
+  const safetyStock = parseFloat(document.getElementById('editItemSafetyStock').value) || 5.0;
+  const unit = document.getElementById('editItemUnit').value;
+
+  const item = (App.fefoItems || []).find(i => i.sku === sku);
+  if (item) {
+    item.safety_stock = safetyStock;
+    item.unit = unit;
+  }
+
+  closeModal('modalEditItem');
+  showToast(`Đã cập nhật định mức an toàn cho ${sku}!`);
+  filterFefoLive();
+}
 
 </script>
 </body>
