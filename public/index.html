@@ -690,29 +690,29 @@
   <!-- Main Container -->
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
-    <!-- Top Header Bar (100% TailAdmin Specification) -->
-    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-3 sm:px-4 md:px-6 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs min-h-[64px]">
+    <!-- Top Header Bar (100% TailAdmin Specification, Mobile-Optimized) -->
+    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2.5 sm:px-4 md:px-6 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs min-h-[56px] sm:min-h-[64px]">
       
       <!-- Left: Mobile Toggle & Brand / Active Tab -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <!-- Sidebar Toggle Button (Mobile / Desktop) -->
-        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="inline-flex size-10 lg:size-11 shrink-0 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 text-gray-600 dark:text-gray-300 shadow-theme-xs active:scale-95 transition-all">
-          <i data-lucide="menu" class="w-5 h-5"></i>
+        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="inline-flex size-9 sm:size-10 lg:size-11 shrink-0 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 text-gray-600 dark:text-gray-300 shadow-theme-xs active:scale-95 transition-all">
+          <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
 
         <!-- Brand Logo on Mobile only (Sidebar is already visible on Desktop) -->
-        <div class="flex items-center gap-2 lg:hidden shrink-0">
-          <div class="w-9 h-9 rounded-xl bg-[#465fff] flex items-center justify-center text-white font-black text-sm shadow-sm shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#465fff] flex items-center justify-center text-white font-black text-xs sm:text-sm shadow-sm shrink-0">
             A
           </div>
-          <div class="flex flex-col leading-tight">
+          <div class="hidden sm:flex flex-col leading-tight">
             <span class="font-extrabold text-gray-900 dark:text-white text-sm tracking-tight">ORBIT</span>
             <span class="text-[10px] text-gray-400 font-medium">Siba Food</span>
           </div>
         </div>
 
         <!-- Active Page Badge -->
-        <span id="mobileHeaderTitle" class="hidden sm:inline-flex items-center text-xs font-semibold text-[#465fff] dark:text-[#7592ff] bg-[#ecf3ff] dark:bg-[#465fff]/20 px-3 py-1.5 rounded-[8px] border border-[#c2d6ff] dark:border-[#465fff]/30 shrink-0 whitespace-nowrap">🏆 Toàn Chuỗi</span>
+        <span id="mobileHeaderTitle" class="hidden md:inline-flex items-center text-xs font-semibold text-[#465fff] dark:text-[#7592ff] bg-[#ecf3ff] dark:bg-[#465fff]/20 px-2.5 py-1 rounded-[8px] border border-[#c2d6ff] dark:border-[#465fff]/30 shrink-0 whitespace-nowrap">🏆 Toàn Chuỗi</span>
       </div>
 
       <!-- Center: TailAdmin Global Quick Search (Clean, Solid Background, Zero Collision) -->
@@ -732,14 +732,14 @@
       </div>
 
       <!-- Right: Controls, Filters & User Profile (Properly Gapped, Never Overlapping) -->
-      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+      <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 shrink-0">
         
         <!-- Global Branch Selector -->
-        <div class="h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2.5 sm:px-3 flex items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
+        <div class="h-9 sm:h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2 sm:px-3 flex items-center gap-1 sm:gap-1.5 shadow-theme-xs shrink-0">
           <button type="button" onclick="openSiteSelectorModal()" title="Bấm để đổi điểm bán / bếp phụ trách" class="text-[#465fff] hover:scale-110 active:scale-95 transition-all">
-            <i data-lucide="map-pin" class="w-4 h-4"></i>
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </button>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value); localStorage.setItem('orbit_user_site', this.value);" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[125px] sm:max-w-[160px] xl:max-w-[190px] truncate border-none">
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value); localStorage.setItem('orbit_user_site', this.value);" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[80px] xs:max-w-[110px] sm:max-w-[150px] xl:max-w-[190px] truncate border-none">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
             <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
@@ -759,27 +759,27 @@
         </div>
 
         <!-- Global Month Picker -->
-        <div class="hidden md:flex h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2.5 sm:px-3 items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
+        <div class="hidden md:flex h-9 sm:h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2 sm:px-3 items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
           <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0 pointer-events-none"></i>
           <span id="currentDateDisplay" class="hidden 2xl:inline text-xs font-medium text-gray-500 dark:text-gray-400"></span>
           <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-gray-800 dark:text-gray-200 outline-none text-xs border-none cursor-pointer">
         </div>
 
         <!-- Admin Pending Requests Button (Visible for Admin) -->
-        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="hidden h-10 lg:h-11 px-2.5 rounded-[10px] border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-theme-xs active:scale-95 transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
-          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="hidden h-9 sm:h-10 lg:h-11 px-2 sm:px-2.5 rounded-[10px] border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-theme-xs active:scale-95 transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400"></i>
           <span class="hidden xl:inline">Duyệt Quyền</span>
           <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[9.5px] font-black bg-rose-600 text-white">0</span>
         </button>
 
         <!-- TailAdmin Theme Toggler Button -->
-        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-10 lg:size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:scale-95 transition-all shrink-0">
-          <i id="themeIcon" data-lucide="moon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-9 sm:size-10 lg:size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:scale-95 transition-all shrink-0">
+          <i id="themeIcon" data-lucide="moon" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
 
         <!-- TailAdmin User Profile Button -->
-        <button onclick="handleUserProfileClick()" class="h-10 lg:h-11 flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
-          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+        <button onclick="handleUserProfileClick()" class="h-9 sm:h-10 lg:h-11 flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
           <div class="hidden xl:flex flex-col text-left leading-tight">
             <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
             <span id="headerUserRoleBadge" class="text-[9px] font-bold text-[#465fff] uppercase">ADMIN</span>
@@ -2814,11 +2814,11 @@
         <!-- Category 1: P&L & Chuỗi Căn Tin -->
         <div>
           <div class="flex items-center justify-between mb-2 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-[#ed263a]">1. P&amp;L &amp; Chuỗi Căng Tin</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950 dark:text-rose-300">Orbit Model</span>
+            <span class="font-bold text-[11px] uppercase tracking-wider text-[#465fff]">1. P&amp;L &amp; Chuỗi Căng Tin</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#ecf3ff] text-[#465fff] dark:bg-[#465fff]/20 dark:text-[#7592ff]">Orbit Model</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button onclick="switchFromHub('fnb-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button onclick="switchFromHub('fnb-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
                 <i data-lucide="boxes" class="w-5 h-5"></i>
               </div>
@@ -2827,7 +2827,7 @@
                 <div class="text-[10px] text-gray-500 truncate">Ma trận 14 điểm</div>
               </div>
             </button>
-            <button onclick="switchFromHub('fnb-counts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button onclick="switchFromHub('fnb-counts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
                 <i data-lucide="clipboard-check" class="w-5 h-5"></i>
               </div>
@@ -2836,7 +2836,7 @@
                 <div class="text-[10px] text-gray-500 truncate">Nhóm A & Thừa/thiếu</div>
               </div>
             </button>
-            <button onclick="switchFromHub('fnb-receipts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button onclick="switchFromHub('fnb-receipts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
                 <i data-lucide="package-plus" class="w-5 h-5"></i>
               </div>
@@ -2845,7 +2845,7 @@
                 <div class="text-[10px] text-gray-500 truncate">Phiếu nhập kho điểm</div>
               </div>
             </button>
-            <button onclick="switchFromHub('fnb-waste')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button onclick="switchFromHub('fnb-waste')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
                 <i data-lucide="trash-2" class="w-5 h-5"></i>
               </div>
@@ -2855,8 +2855,8 @@
               </div>
             </button>
             
-            <button onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
-              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-[#ed263a] flex items-center justify-center shrink-0">
+            <button data-role="admin-only" onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center shrink-0">
                 <i data-lucide="trophy" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -2864,7 +2864,7 @@
                 <div class="text-[10px] text-gray-500 truncate">14 Điểm bán</div>
               </div>
             </button>
-            <button onclick="switchFromHub('fnb-pl')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button data-role="admin-only" onclick="switchFromHub('fnb-pl')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
               </div>
@@ -2873,7 +2873,7 @@
                 <div class="text-[10px] text-gray-500 truncate">Prime Cost, EBITDA</div>
               </div>
             </button>
-            <button onclick="switchFromHub('fnb-pos')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#ed263a]">
+            <button data-role="admin-only" onclick="switchFromHub('fnb-pos')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:scale-95 transition-all hover:border-[#465fff]">
               <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="zap" class="w-5 h-5"></i>
               </div>
@@ -10252,6 +10252,15 @@ function applyUserSessionToUI() {
       financeCategory.classList.add('hidden');
     }
   }
+
+  // Ẩn / Hiện tất cả phần tử admin-only (bao gồm Mobile Menu Hub)
+  document.querySelectorAll('[data-role="admin-only"]').forEach(el => {
+    if (isAdmin) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
 
   // Đồng bộ nút điều hướng mobile cho tab đầu tiên
   const mobFnbChainBtn = document.getElementById('mobTab-fnb-chain');
