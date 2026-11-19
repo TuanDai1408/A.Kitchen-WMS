@@ -448,7 +448,7 @@
 
     <!-- Main Content Body (pb-24 on mobile/tablet to clear the bottom navigation bar) -->
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50/50 dark:bg-black">
-    <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6 lg:p-8 2xl:p-10 space-y-6 md:space-y-8 pb-24 md:pb-12">
+    <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6 lg:p-8 2xl:p-10 space-y-6 md:space-y-8 pb-28 xl:pb-12">
 
 
       <!-- ====================================================================
@@ -2729,65 +2729,89 @@
 
         </div>
       </section>
+      <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
+      <section id="tab-404" class="tab-panel py-16 px-4 text-center">
+        <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
+          <div class="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums font-black text-2xl shadow-inner">
+            404
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Không Tìm Thấy Trang Yêu Cầu</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+              Phân hệ hoặc đường dẫn bạn truy cập hiện không tồn tại hoặc đã được chuyển sang vị trí mới trong hệ thống WMS.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button onclick="switchTab('wh-dashboard')" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-theme-xs hover:bg-brand-600 active:translate-y-px transition-all">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              Quay Về Tổng Quan Kho
+            </button>
+          </div>
+        </div>
+      </section>
+
+      </div>
+    </main>
+  </div>
 
   <!-- ========================================================================
        NATIVE MOBILE & TABLET BOTTOM NAVIGATION BAR
        ======================================================================== -->
-  <nav class="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white/95 dark:bg-white/3/95 backdrop-blur-xl border-t border-gray-200/90 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),6px)] pt-1 px-2 select-none">
-    <div class="flex items-center justify-around max-w-lg mx-auto">
+  <nav id="mobileBottomNav" class="fixed bottom-0 inset-x-0 z-40 xl:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),8px)] pt-1.5 px-3 select-none">
+    <div class="flex items-center justify-around max-w-2xl mx-auto w-full">
       
       <!-- Tab 1: P&L Chuỗi -->
-      <button onclick="switchTab('fnb-chain')" id="mobTab-fnb-chain" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-brand-500 font-bold">
-        <div class="mob-ic-wrap p-1.5 rounded-xl">
+      <button onclick="switchTab('fnb-chain')" id="mobTab-fnb-chain" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-brand-500 font-bold cursor-pointer">
+        <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="trophy" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px]  mt-0.5">Chuỗi F&amp;B</span>
+        <span class="text-[10px] mt-0.5 leading-tight">Chuỗi F&amp;B</span>
       </button>
 
       <!-- Tab 2: Kho FEFO -->
-      <button onclick="switchTab('wh-stock')" id="mobTab-wh-stock" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium">
-        <div class="mob-ic-wrap p-1.5 rounded-xl">
+      <button onclick="switchTab('wh-stock')" id="mobTab-wh-stock" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
+        <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="package" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px]  mt-0.5">Kho FEFO</span>
+        <span class="text-[10px] mt-0.5 leading-tight">Kho FEFO</span>
       </button>
 
       <!-- Tab 3: Center Elevated FAB - Nhập Chứng Từ -->
-      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:translate-y-px transition-transform px-2 group">
-        <div class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-rose-900/35 flex items-center justify-center border-4 border-white dark:border-black transition-all group-hover:scale-105">
+      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:translate-y-px transition-transform px-2 group cursor-pointer">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center border-4 border-white dark:border-gray-900 transition-all group-hover:scale-105">
           <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
-        <span class="text-[9.5px] font-extrabold text-brand-500 dark:text-brand-400 mt-0.5">Nhập Từ</span>
+        <span class="text-[9.5px] font-extrabold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
       </button>
 
       <!-- Tab 4: Suất Ăn Ca Bếp -->
-      <button onclick="switchTab('portal-baocao')" id="mobTab-portal-baocao" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium">
-        <div class="mob-ic-wrap p-1.5 rounded-xl">
+      <button onclick="switchTab('portal-baocao')" id="mobTab-portal-baocao" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
+        <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="clipboard-list" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px]  mt-0.5">Suất Ăn</span>
+        <span class="text-[10px] mt-0.5 leading-tight">Suất Ăn</span>
       </button>
 
       <!-- Tab 5: Menu 9 Chấm / Launcher Hub -->
-      <button onclick="openMobileMenuHub()" id="mobTab-hub" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium">
-        <div class="mob-ic-wrap p-1.5 rounded-xl">
+      <button onclick="openMobileMenuHub()" id="mobTab-hub" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
+        <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="layout-grid" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px]  mt-0.5">Tất Cả</span>
+        <span class="text-[10px] mt-0.5 leading-tight">Tất Cả</span>
       </button>
 
     </div>
   </nav>
 
-  <!-- ========================================================================
+<!-- ========================================================================
        NATIVE MOBILE & TABLET FEATURE LAUNCHER (BOTTOM SHEET / APP HUB)
        ======================================================================== -->
   <div id="mobileMenuHub" class="fixed inset-0 z-99999 hidden flex-col justify-end select-none">
     <!-- Backdrop Blur -->
-    <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-gray-900/60 backdrop-blur-sm z-10 opacity-0 transition-opacity duration-300"></div>
+    <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-gray-900/60 backdrop-blur-sm z-10 transition-opacity duration-300"></div>
     
     <!-- Sheet Container -->
-    <div class="sheet-body relative z-20 w-full max-h-[85vh] bg-white dark:bg-gray-900 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col translate-y-full transition-transform duration-300">
+    <div class="sheet-body relative z-20 w-full max-h-[85vh] bg-white dark:bg-gray-900 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col transition-transform duration-300">
       
       <!-- Top Drag Handle & Header -->
       <div class="px-5 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
@@ -3054,34 +3078,6 @@
     </div>
   </div>
 
-
-
-
-        </div>
-    
-      <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
-      <section id="tab-404" class="tab-panel py-16 px-4 text-center">
-        <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
-          <div class="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums font-black text-2xl shadow-inner">
-            404
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Không Tìm Thấy Trang Yêu Cầu</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-              Phân hệ hoặc đường dẫn bạn truy cập hiện không tồn tại hoặc đã được chuyển sang vị trí mới trong hệ thống WMS.
-            </p>
-          </div>
-          <div class="pt-2">
-            <button onclick="switchTab('wh-dashboard')" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-theme-xs hover:bg-brand-600 active:translate-y-px transition-all">
-              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-              Quay Về Tổng Quan Kho
-            </button>
-          </div>
-        </div>
-      </section>
-
-</main>
-  </div>
 
   <!-- ========================================================================
        MODALS DIALOGS
@@ -6178,14 +6174,17 @@ function openMobileMenuHub() {
   if (!hub) return;
   hub.classList.remove('hidden');
   hub.classList.add('flex');
-  setTimeout(() => {
-    hub.classList.add('active');
-  }, 20);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      hub.classList.add('active');
+    });
+  });
   document.body.classList.add('overflow-hidden');
   const input = document.getElementById('mobileHubSearchInput');
   if (input) {
     input.value = '';
     filterMobileHubFeatures('');
+    setTimeout(() => { try { input.focus(); } catch(e){} }, 250);
   }
   if (window.lucide) lucide.createIcons();
 }
@@ -6200,6 +6199,15 @@ function closeMobileMenuHub() {
     hub.classList.add('hidden');
   }, 320);
 }
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const hub = document.getElementById('mobileMenuHub');
+    if (hub && !hub.classList.contains('hidden')) {
+      closeMobileMenuHub();
+    }
+  }
+});
 
 function filterMobileHubFeatures(val) {
   const q = String(val || '').toLowerCase().trim();
@@ -6227,14 +6235,14 @@ function updateMobileNavState(tabId) {
   // Update bottom navigation bar
   const activeMobGroup = TAB_META[tabId]?.mobTab || 'hub';
   document.querySelectorAll('.mob-nav-btn').forEach(btn => {
-    btn.classList.remove('active', 'text-brand-500', 'font-bold');
+    btn.classList.remove('active', 'text-brand-500', 'dark:text-brand-400', 'font-bold');
     btn.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium');
   });
 
   const activeBtn = document.getElementById(`mobTab-${activeMobGroup}`);
   if (activeBtn) {
     activeBtn.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
-    activeBtn.classList.add('active', 'text-brand-500', 'font-bold');
+    activeBtn.classList.add('active', 'text-brand-500', 'dark:text-brand-400', 'font-bold');
   }
 }
 
