@@ -772,7 +772,7 @@
         </div>
 
         <!-- Filter Pills Bar -->
-        <div class="bg-white dark:bg-[#161313] p-3 rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-3 rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div class="flex items-center gap-2">
             <span class="font-bold text-gray-700 dark:text-gray-300">Vùng vận hành:</span>
             <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
@@ -790,7 +790,7 @@
         </div>
 
         <!-- Rankings Table -->
-        <div class="bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs overflow-hidden">
+        <div class="bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs overflow-hidden">
           <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i data-lucide="list-ordered" class="w-4 h-4 text-[#ed263a]"></i>
@@ -835,7 +835,7 @@
       <section id="fnb-pl" class="tab-panel space-y-5">
         
         <!-- P&L Header Controls -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-[#d01a2f] dark:bg-rose-950/60 dark:text-rose-300">P&amp;L REPORT</span>
@@ -860,37 +860,37 @@
         <!-- 6 KPI Strip -->
         <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
           
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Thuần</div>
             <div class="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white font-mono mt-0.5 truncate" id="plNetRev">470,450,000đ</div>
             <div class="text-[10px] text-emerald-600 font-semibold truncate" id="plAchievement">102.3% Mục tiêu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Food Cost %</div>
             <div class="text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono mt-0.5 truncate" id="plFoodCostPct">42.8%</div>
             <div class="text-[10px] text-gray-400 font-mono truncate" id="plFoodCostVal">201,352,600đ</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Labor Cost (COL) %</div>
             <div class="text-sm sm:text-base font-extrabold text-purple-600 dark:text-purple-400 font-mono mt-0.5 truncate" id="plLaborCostPct">18.5%</div>
             <div class="text-[10px] text-gray-400 font-mono truncate" id="plLaborCostVal">87,033,250đ</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Prime Cost %</div>
             <div class="text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono mt-0.5 truncate" id="plPrimeCostPct">61.3%</div>
             <div class="text-[10px] text-emerald-600 font-semibold truncate">&le; 62.0% Mục tiêu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Lợi Nhuận EBITDA</div>
             <div class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate" id="plProfitVal">120,435,000đ</div>
             <div class="text-[10px] text-emerald-600 font-mono font-bold truncate" id="plProfitMargin">25.6% Doanh thu</div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
             <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Hòa Vốn</div>
             <div class="text-sm sm:text-base font-extrabold text-gray-700 dark:text-gray-300 font-mono mt-0.5 truncate" id="plBreakEven">212,500,000đ</div>
             <div class="text-[10px] text-gray-400 truncate">An toàn: 45.2%</div>
@@ -902,7 +902,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
           <!-- Column Left: P&L Breakdown Table (7 Cols) -->
-          <div class="lg:col-span-7 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs overflow-hidden">
+          <div class="lg:col-span-7 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs overflow-hidden">
             <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <i data-lucide="file-text" class="w-4 h-4 text-[#ed263a]"></i>
@@ -1048,7 +1048,7 @@
           <div class="lg:col-span-5 space-y-4">
             
             <!-- Weekly Trends -->
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                   <i data-lucide="trending-up" class="w-4 h-4 text-[#ed263a]"></i>
@@ -1075,7 +1075,7 @@
             </div>
 
             <!-- Core Operational Metrics -->
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
               <div class="flex items-center gap-2 mb-3">
                 <i data-lucide="activity" class="w-4 h-4 text-blue-500"></i>
                 <h3 class="font-extrabold text-xs text-gray-900 dark:text-white">Chỉ Số Vận Hành Điểm Bán</h3>
@@ -1101,7 +1101,7 @@
             </div>
 
             <!-- Top Dishes & Action Plans -->
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
               <div>
                 <div class="flex items-center gap-2 mb-2">
                   <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
@@ -1137,7 +1137,7 @@
       <section id="fnb-pos" class="tab-panel space-y-5">
         
         <!-- Header Banner -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">POS METRICS</span>
@@ -1155,17 +1155,17 @@
 
         <!-- 3 POS Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
             <div class="text-xs text-gray-500 font-bold mb-1 truncate">Doanh Thu POS Hôm Nay</div>
             <div class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono truncate" id="posDailyRevenue">16,850,000đ</div>
             <div class="text-[11px] text-emerald-600 font-semibold mt-1 truncate">+12.4% so với trung bình tuần</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
             <div class="text-xs text-gray-500 font-bold mb-1 truncate">Tổng Số Hóa Đơn POS</div>
             <div class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white font-mono truncate" id="posDailyBills">482 bill</div>
             <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Cao điểm trưa: 295 bill (61.2%)</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
             <div class="text-xs text-gray-500 font-bold mb-1 truncate">Giá Trị Trung Bình / Bill</div>
             <div class="text-xl sm:text-2xl font-extrabold text-[#465fff] font-mono truncate" id="posDailyAOV">34,950đ</div>
             <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Chuẩn suất ăn trưa công sở</div>
@@ -1175,7 +1175,7 @@
         <!-- Peak Hours Distribution & Payment Breakdown -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <h3 class="font-extrabold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <i data-lucide="clock" class="w-4 h-4 text-[#ed263a]"></i>
               <span>Phân Bổ Doanh Thu Theo Khung Giờ</span>
@@ -1185,7 +1185,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <h3 class="font-extrabold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <i data-lucide="credit-card" class="w-4 h-4 text-emerald-500"></i>
               <span>Cơ Cấu Phương Thức Thanh Toán</span>
@@ -1232,7 +1232,7 @@
       <section id="fnb-sites" class="tab-panel space-y-5">
         
         <!-- Header Banner -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">MASTER DATA</span>
@@ -1246,7 +1246,7 @@
         </div>
 
         <!-- Sites Master Table -->
-        <div class="bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs overflow-hidden">
+        <div class="bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs overflow-hidden">
           <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
@@ -1301,7 +1301,7 @@
         <!-- KPI Summary Cards (4 Cards) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           <!-- Card 1: Tổng Mặt Hàng -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Mặt Hàng F&amp;B</p>
@@ -1316,7 +1316,7 @@
           </div>
 
           <!-- Card 2: Tổng Giá Trị Tồn Chuỗi -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Giá Trị Tồn Chuỗi</p>
@@ -1331,7 +1331,7 @@
           </div>
 
           <!-- Card 3: Cảnh Báo Âm Tồn -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Cảnh Báo Âm Tồn</p>
@@ -1346,7 +1346,7 @@
           </div>
 
           <!-- Card 4: Chưa Có Tồn Đầu -->
-          <div class="bg-white dark:bg-[#161313] p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs relative overflow-hidden min-w-0">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0 flex-1">
                 <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Chưa Có Tồn Đầu</p>
@@ -1362,7 +1362,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2.5">
               <!-- Filter Vùng -->
@@ -1404,7 +1404,7 @@
         </div>
 
         <!-- Desktop Matrix Table (Sticky Item column & dynamic Sites columns) -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161313] shadow-xs">
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
           <table class="w-full border-collapse text-left text-xs" id="fnbStockDesktopTable">
             <thead class="bg-gray-50 dark:bg-[#1e1a1a] text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30" id="fnbStockTableHead">
               <!-- Dynamically populated headers -->
@@ -1451,7 +1451,7 @@
         </div>
 
         <!-- Controls & Filter Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2.5">
               <div class="flex items-center gap-1.5">
@@ -1488,26 +1488,26 @@
 
         <!-- Count Metrics Bar -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
             <span class="text-[10.5px] uppercase font-bold text-gray-400">Mặt Hàng Kiểm</span>
             <div id="fnbCountMetricTotal" class="text-xl font-extrabold font-mono text-gray-900 dark:text-white mt-0.5">--</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
             <span class="text-[10.5px] uppercase font-bold text-emerald-500">Khớp Sổ Sách</span>
             <div id="fnbCountMetricMatched" class="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">--</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
             <span class="text-[10.5px] uppercase font-bold text-rose-500">Lệch Thừa / Thiếu</span>
             <div id="fnbCountMetricDiff" class="text-xl font-extrabold font-mono text-rose-600 dark:text-rose-400 mt-0.5">--</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
             <span class="text-[10.5px] uppercase font-bold text-blue-500">Tổng Tiền Lệch</span>
             <div id="fnbCountMetricDiffVal" class="text-xl font-extrabold font-mono text-blue-600 dark:text-blue-400 mt-0.5">--</div>
           </div>
         </div>
 
         <!-- Desktop Counting Table -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161313] shadow-xs">
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
           <table class="w-full border-collapse text-left text-xs">
             <thead class="bg-gray-50 dark:bg-[#1e1a1a] text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
               <tr>
@@ -1531,7 +1531,7 @@
         </div>
 
         <!-- Recent Audit History -->
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3 mt-6">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3 mt-6">
           <div class="flex items-center justify-between">
             <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> Lịch Sử Các Đợt Kiểm Kê Gần Đây
@@ -1586,7 +1586,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col sm:flex-row items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 flex-wrap">
             <div class="flex items-center gap-1.5">
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
@@ -1604,7 +1604,7 @@
         </div>
 
         <!-- Receipts Table (Desktop) -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161313] shadow-xs">
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
           <table class="w-full border-collapse text-left text-xs">
             <thead class="bg-gray-50 dark:bg-[#1e1a1a] text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
               <tr>
@@ -1658,7 +1658,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col sm:flex-row items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 flex-wrap">
             <div class="flex items-center gap-1.5">
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
@@ -1676,7 +1676,7 @@
         </div>
 
         <!-- Waste Table (Desktop) -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161313] shadow-xs">
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
           <table class="w-full border-collapse text-left text-xs">
             <thead class="bg-gray-50 dark:bg-[#1e1a1a] text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
               <tr>
@@ -2006,7 +2006,7 @@
       </section>
 
 <section id="wh-stock" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
             <div>
               <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
@@ -2052,7 +2052,7 @@
         </div>
       </section>
 <section id="wh-reorder" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
             <div>
               <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
@@ -2091,7 +2091,7 @@
         </div>
       </section>
 <section id="wh-leadtime" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
             <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="truck" class="w-5 h-5 text-emerald-600"></i>
@@ -2124,7 +2124,7 @@
         </div>
       </section>
 <section id="wh-posap" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
             <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="file-diff" class="w-5 h-5 text-purple-600"></i>
@@ -2158,7 +2158,7 @@
       </section>
 <section id="portal-voucher" class="tab-panel space-y-4">
         <!-- Top filter bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="ctVung" onchange="onSelectVung('ct')" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
@@ -2174,7 +2174,7 @@
 
         <div class="space-y-4">
           <!-- CARD 1: IMPORT HÀNG LOẠT BẰNG EXCEL -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-3">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
@@ -2202,7 +2202,7 @@
           </div>
 
           <!-- CARD 2: NHẬP THỦ CÔNG 1 CHỨNG TỪ -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="receipt" class="w-4 h-4 text-sky-600"></i>
@@ -2264,7 +2264,7 @@
         </div>
       </section>
 <section id="portal-search" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="scVung" onchange="onSelectVung('sc')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
@@ -2290,7 +2290,7 @@
           </button>
         </div>
 
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
             <table class="w-full text-xs text-left">
               <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
@@ -2318,7 +2318,7 @@
       </section>
 <section id="portal-order" class="tab-panel space-y-5">
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="orderVung" onchange="onSelectVung('order')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
@@ -2338,22 +2338,22 @@
 
         <!-- 4 Quota KPIs -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase">Ngân Sách Tháng</div>
             <div class="text-xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="kpiNganSach">0đ</div>
             <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5" id="kpiSubSite">—</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="text-[11px] font-bold text-amber-600 uppercase">Đã Đặt Lũy Kế</div>
             <div class="text-xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="kpiDaDat">0đ</div>
             <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Các đơn trước trong tháng</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="text-[11px] font-bold text-emerald-600 uppercase">Còn Lại (Sau Đơn Này)</div>
             <div class="text-xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="kpiConLai">0đ</div>
             <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5" id="kpiDangNhapSub">Đang nhập: 0đ</div>
           </div>
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="text-[11px] font-bold text-rose-600 uppercase">Tỷ Lệ Ngân Sách</div>
             <div class="text-xl font-extrabold text-gray-900 dark:text-white font-mono mt-1" id="kpiTyLe">0%</div>
             <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Lũy kế + đang nhập</div>
@@ -2361,7 +2361,7 @@
         </div>
 
         <!-- Quota Progress Bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex justify-between items-center text-xs mb-2">
             <span class="font-bold text-gray-700 dark:text-gray-200">Tiến độ sử dụng ngân sách:</span>
             <span class="font-mono text-gray-500 dark:text-gray-400"><b id="budUsed" class="text-brand-700 font-bold">0đ</b> / <span id="budTotal">0đ</span></span>
@@ -2373,7 +2373,7 @@
         </div>
 
         <!-- Material Table Card -->
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 gap-3">
             <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
@@ -2417,7 +2417,7 @@
         </div>
       </section>
 <section id="portal-history" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="hsVung" onchange="onSelectVung('hs')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
@@ -2438,7 +2438,7 @@
           </button>
         </div>
 
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
             <table class="w-full text-xs text-left">
               <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
@@ -2466,7 +2466,7 @@
       </section>
 <section id="portal-baocao" class="tab-panel space-y-4">
         <!-- Top filter bar -->
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="bcVung" onchange="onSelectVung('bc')" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
@@ -2490,7 +2490,7 @@
 
         <form id="bcForm" onsubmit="return false;" class="space-y-4">
           <!-- NHÓM 1: THÔNG TIN CHUNG -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
@@ -2519,7 +2519,7 @@
           </div>
 
           <!-- NHÓM 2: SỐ LIỆU SUẤT ĂN -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="utensils" class="w-4 h-4 text-orange-600"></i>
@@ -2564,7 +2564,7 @@
           </div>
 
           <!-- NHÓM 3: GIAO HÀNG · NGUYÊN VẬT LIỆU · THIẾT BỊ -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="truck" class="w-4 h-4 text-blue-600"></i>
@@ -2597,7 +2597,7 @@
           </div>
 
           <!-- NHÓM 4: DƯ / THẤT THOÁT -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="trash-2" class="w-4 h-4 text-amber-600"></i>
@@ -2617,7 +2617,7 @@
           </div>
 
           <!-- NHÓM 5: NHÂN SỰ -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
@@ -2645,7 +2645,7 @@
           </div>
 
           <!-- NHÓM 6: PHẢN HỒI KHÁCH HÀNG -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="message-square" class="w-4 h-4 text-violet-600"></i>
@@ -2691,7 +2691,7 @@
           </div>
 
           <!-- NHÓM 7: CHI PHÍ PHÁT SINH NGOÀI KẾ HOẠCH -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="banknote" class="w-4 h-4 text-emerald-600"></i>
@@ -2714,7 +2714,7 @@
           </div>
 
           <!-- NHÓM 8: HÌNH ẢNH & ĐỀ XUẤT -->
-          <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
               <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="camera" class="w-4 h-4 text-rose-600"></i>
@@ -2750,7 +2750,7 @@
         </form>
       </section>
 <section id="portal-kiemke" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <div class="w-44">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">VÙNG MIỀN</label>
             <select id="kkVung" onchange="onSelectVung('kk')" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
@@ -2770,7 +2770,7 @@
           </button>
         </div>
 
-        <div class="bg-white dark:bg-[#161313] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs">
+        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
             <table class="w-full text-xs text-left">
               <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
@@ -2798,7 +2798,7 @@
   <!-- ========================================================================
        NATIVE MOBILE & TABLET BOTTOM NAVIGATION BAR
        ======================================================================== -->
-  <nav class="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white/95 dark:bg-[#161313]/95 backdrop-blur-xl border-t border-gray-200/90 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),6px)] pt-1 px-2 select-none">
+  <nav class="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white/95 dark:bg-white/3/95 backdrop-blur-xl border-t border-gray-200/90 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),6px)] pt-1 px-2 select-none">
     <div class="flex items-center justify-around max-w-lg mx-auto">
       
       <!-- Tab 1: P&L Chuỗi -->
@@ -2852,7 +2852,7 @@
     <div onclick="closeMobileMenuHub()" class="sheet-backdrop absolute inset-0 bg-black/60 backdrop-blur-xs opacity-0"></div>
     
     <!-- Sheet Container -->
-    <div class="sheet-body relative z-10 w-full max-h-[90vh] bg-white dark:bg-[#161313] rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col translate-y-full">
+    <div class="sheet-body relative z-10 w-full max-h-[90vh] bg-white dark:bg-white/3 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col translate-y-full">
       
       <!-- Top Drag Handle & Header -->
       <div class="px-5 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
@@ -3218,7 +3218,7 @@
   
   <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
   <div id="createReceiptModal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div class="bg-white dark:bg-white/3 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -3302,7 +3302,7 @@
 
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
   <div id="createWasteModal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div class="bg-white dark:bg-white/3 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -3386,7 +3386,7 @@
 
   <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
   <div id="invDetailModal" class="fixed inset-0 z-[130] hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div class="bg-white dark:bg-white/3 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
           <h3 id="invDetailModalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
@@ -3411,7 +3411,7 @@
        ORBIT SIBA FOOD: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
        ===================================================================== -->
   <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-sm sm:max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-white/3 w-full max-w-sm sm:max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Modal Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3490,7 +3490,7 @@
        POPUP THÔNG TIN USER & CHUYỂN ĐỔI TÀI KHOẢN (USER PROFILE MODAL)
        ===================================================================== -->
   <div id="userProfileModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-white/3 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3586,7 +3586,7 @@
        POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
        ===================================================================== -->
   <div id="siteSelectorModal" class="fixed inset-0 z-[155] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-white/3 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -3634,7 +3634,7 @@
        POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (DÀNH CHO USER GỬI ADMIN)
        ===================================================================== -->
   <div id="requestAccessModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeRequestAccessModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-white/3 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -3711,7 +3711,7 @@
        POPUP 3: ADMIN PHÊ DUYỆT CẤP QUYỀN (DÀNH CHO ADMIN)
        ===================================================================== -->
   <div id="adminApprovalModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-white/3 w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -3763,7 +3763,7 @@
 
 <!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
   <div id="roleSwitcherModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
-    <div class="bg-white dark:bg-[#161313] w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
+    <div class="bg-white dark:bg-white/3 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
         <div>
           <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
@@ -5549,7 +5549,7 @@ function initTailadminCharts() {
         bar: {
           horizontal: false,
           columnWidth: '42%',
-          borderRadius: 6,
+          borderRadius: 8,
           borderRadiusApplication: 'around'
         }
       },
@@ -6817,7 +6817,7 @@ window.searchVouchers = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không tìm thấy chứng từ nào</td></tr>';
-      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
+      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
       return;
     }
 
@@ -6849,7 +6849,7 @@ window.searchVouchers = async function() {
     // Mobile Cards
     if (mobContainer) {
       mobContainer.innerHTML = items.map(r => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span>
@@ -6972,7 +6972,7 @@ window.renderFefoRows = function(items) {
 
   if (!items || !items.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có tồn kho gia vị nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
     return;
   }
 
@@ -7007,7 +7007,7 @@ window.renderFefoRows = function(items) {
       else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center font-mono font-bold text-xs">P${r.fefo_priority}</span>
@@ -7061,7 +7061,7 @@ window.loadReorderROP = async function() {
 
       if (mob) {
         mob.innerHTML = App.ropItems.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -7111,7 +7111,7 @@ window.loadLeadTime = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
@@ -7161,7 +7161,7 @@ window.loadPoSap = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -7201,7 +7201,7 @@ window.loadHistory = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào trong kỳ.</td></tr>';
-      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
+      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
       return;
     }
 
@@ -7229,7 +7229,7 @@ window.loadHistory = async function() {
     // Mobile Cards
     if (mob) {
       mob.innerHTML = json.data.map(o => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
@@ -7302,7 +7302,7 @@ window.loadAudit = async function() {
           const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
           const tonCuoi = tonTruoc - suDung;
           return `
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
@@ -7346,7 +7346,7 @@ window.renderFnbChainTable = function(items) {
 
   if (!items || items.length === 0) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-gray-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
-    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
+    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
     return;
   }
 
@@ -7411,7 +7411,7 @@ window.renderFnbChainTable = function(items) {
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
@@ -7458,7 +7458,7 @@ window.renderFnbSites = function(sites) {
 
   if (!sites || !sites.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
     return;
   }
 
@@ -7481,7 +7481,7 @@ window.renderFnbSites = function(sites) {
 
   if (mob) {
     mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
@@ -7594,7 +7594,7 @@ window.searchVouchers = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không tìm thấy chứng từ nào</td></tr>';
-      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
+      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
       return;
     }
 
@@ -7626,7 +7626,7 @@ window.searchVouchers = async function() {
     // Mobile Cards
     if (mobContainer) {
       mobContainer.innerHTML = items.map(r => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span>
@@ -7749,7 +7749,7 @@ window.renderFefoRows = function(items) {
 
   if (!items || !items.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có tồn kho gia vị nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
     return;
   }
 
@@ -7784,7 +7784,7 @@ window.renderFefoRows = function(items) {
       else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center font-mono font-bold text-xs">P${r.fefo_priority}</span>
@@ -7838,7 +7838,7 @@ window.loadReorderROP = async function() {
 
       if (mob) {
         mob.innerHTML = App.ropItems.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -7888,7 +7888,7 @@ window.loadLeadTime = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
@@ -7938,7 +7938,7 @@ window.loadPoSap = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -7978,7 +7978,7 @@ window.loadHistory = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào trong kỳ.</td></tr>';
-      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
+      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
       return;
     }
 
@@ -8006,7 +8006,7 @@ window.loadHistory = async function() {
     // Mobile Cards
     if (mob) {
       mob.innerHTML = json.data.map(o => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
@@ -8079,7 +8079,7 @@ window.loadAudit = async function() {
           const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
           const tonCuoi = tonTruoc - suDung;
           return `
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
@@ -8123,7 +8123,7 @@ window.renderFnbChainTable = function(items) {
 
   if (!items || items.length === 0) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-gray-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
-    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
+    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
     return;
   }
 
@@ -8188,7 +8188,7 @@ window.renderFnbChainTable = function(items) {
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
@@ -8235,7 +8235,7 @@ window.renderFnbSites = function(sites) {
 
   if (!sites || !sites.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
     return;
   }
 
@@ -8258,7 +8258,7 @@ window.renderFnbSites = function(sites) {
 
   if (mob) {
     mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
@@ -8371,7 +8371,7 @@ window.searchVouchers = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không tìm thấy chứng từ nào</td></tr>';
-      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
+      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
       return;
     }
 
@@ -8403,7 +8403,7 @@ window.searchVouchers = async function() {
     // Mobile Cards
     if (mobContainer) {
       mobContainer.innerHTML = items.map(r => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span>
@@ -8526,7 +8526,7 @@ window.renderFefoRows = function(items) {
 
   if (!items || !items.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có tồn kho gia vị nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
     return;
   }
 
@@ -8561,7 +8561,7 @@ window.renderFefoRows = function(items) {
       else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center font-mono font-bold text-xs">P${r.fefo_priority}</span>
@@ -8615,7 +8615,7 @@ window.loadReorderROP = async function() {
 
       if (mob) {
         mob.innerHTML = App.ropItems.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -8665,7 +8665,7 @@ window.loadLeadTime = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
@@ -8715,7 +8715,7 @@ window.loadPoSap = async function() {
 
       if (mob) {
         mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
@@ -8755,7 +8755,7 @@ window.loadHistory = async function() {
 
     if (!json.success || !json.data || !json.data.length) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào trong kỳ.</td></tr>';
-      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
+      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
       return;
     }
 
@@ -8783,7 +8783,7 @@ window.loadHistory = async function() {
     // Mobile Cards
     if (mob) {
       mob.innerHTML = json.data.map(o => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
@@ -8856,7 +8856,7 @@ window.loadAudit = async function() {
           const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
           const tonCuoi = tonTruoc - suDung;
           return `
-            <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
@@ -8900,7 +8900,7 @@ window.renderFnbChainTable = function(items) {
 
   if (!items || items.length === 0) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-gray-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
-    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
+    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
     return;
   }
 
@@ -8965,7 +8965,7 @@ window.renderFnbChainTable = function(items) {
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
 
       return `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
@@ -9012,7 +9012,7 @@ window.renderFnbSites = function(sites) {
 
   if (!sites || !sites.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
     return;
   }
 
@@ -9035,7 +9035,7 @@ window.renderFnbSites = function(sites) {
 
   if (mob) {
     mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
@@ -9175,7 +9175,7 @@ window.renderFnbStock = function() {
         let rowHtml = `
           <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
             <td class="py-3 px-3 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
-            <td class="py-3 px-4 sticky left-0 z-10 bg-white dark:bg-[#161313] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
+            <td class="py-3 px-4 sticky left-0 z-10 bg-white dark:bg-white/3 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
               <div class="flex items-center gap-2">
                 <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${groupLabel}</span>
                 <span class="font-bold text-gray-900 dark:text-white truncate max-w-[180px]">${r.name}</span>
@@ -9235,7 +9235,7 @@ window.renderFnbStock = function() {
   const mob = document.getElementById('fnbStockMobileCards');
   if (mob) {
     if (filteredRows.length === 0) {
-      mob.innerHTML = `<div class="text-center py-10 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</div>`;
+      mob.innerHTML = `<div class="text-center py-10 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</div>`;
     } else {
       mob.innerHTML = filteredRows.map((r, idx) => {
         const groupLabel = groupMap[r.group] || r.group;
@@ -9261,7 +9261,7 @@ window.renderFnbStock = function() {
         });
         
         return `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <!-- Item Header -->
             <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-gray-800/80">
               <div>
@@ -9635,7 +9635,7 @@ window.renderFnbCountsTable = function() {
   // Mobile Card View
   if (mob) {
     if (filtered.length === 0) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp.</div>`;
+      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp.</div>`;
     } else {
       mob.innerHTML = filtered.map((item, idx) => {
         const book = item.book_qty || 0;
@@ -9644,7 +9644,7 @@ window.renderFnbCountsTable = function() {
         const diffVal = diff * (item.unit_price || 0);
 
         return `
-          <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${item.item_group}</span>
@@ -9933,10 +9933,10 @@ window.renderFnbReceiptsTable = function(receipts) {
   // Mobile Cards
   if (mob) {
     if (!receipts.length) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có phiếu nhập hàng nào.</div>`;
+      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có phiếu nhập hàng nào.</div>`;
     } else {
       mob.innerHTML = receipts.map(r => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-start justify-between">
             <div>
               <span class="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">${r.receipt_code}</span>
@@ -10165,10 +10165,10 @@ window.renderFnbWasteTable = function(wastes) {
   // Mobile Cards
   if (mob) {
     if (!wastes.length) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-[#161313] rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có biên bản hủy hàng nào.</div>`;
+      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có biên bản hủy hàng nào.</div>`;
     } else {
       mob.innerHTML = wastes.map(w => `
-        <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs space-y-2.5">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-start justify-between">
             <div>
               <span class="text-xs font-mono font-bold text-rose-600 dark:text-rose-400">${w.waste_code}</span>
