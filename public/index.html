@@ -28,9 +28,11 @@
           },
           width: {
             '72.5': '18.125rem', // 290px (TailAdmin Exact Width)
+            '107.5': '26.875rem', // 430px (TailAdmin Search Bar Width)
           },
           spacing: {
             '72.5': '18.125rem',
+            '107.5': '26.875rem',
           },
           colors: {
             // TailAdmin 100% Official Brand Colors (Vivid Electric Blue / Indigo)
@@ -689,56 +691,56 @@
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
     <!-- Top Header Bar (100% TailAdmin Specification) -->
-    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5 md:px-6 2xl:px-8 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs">
+    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-3 sm:px-4 md:px-6 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs min-h-[64px]">
       
       <!-- Left: Mobile Toggle & Brand / Active Tab -->
-      <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <!-- Sidebar Toggle Button (Mobile / Desktop) -->
-        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="inline-flex size-10 lg:size-11 shrink-0 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-700 bg-transparent text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-400 active:scale-95 transition-all">
+        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="inline-flex size-10 lg:size-11 shrink-0 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 text-gray-600 dark:text-gray-300 shadow-theme-xs active:scale-95 transition-all">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
 
-        <a href="#" class="flex items-center gap-2.5">
+        <!-- Brand Logo on Mobile only (Sidebar is already visible on Desktop) -->
+        <div class="flex items-center gap-2 lg:hidden shrink-0">
           <div class="w-9 h-9 rounded-xl bg-[#465fff] flex items-center justify-center text-white font-black text-sm shadow-sm shrink-0">
             A
           </div>
-          <div class="hidden sm:block">
-            <span class="font-extrabold text-gray-900 dark:text-white text-base tracking-tight">ORBIT</span>
-            <span class="text-xs text-gray-400 ml-1 font-normal">Siba Food</span>
+          <div class="flex flex-col leading-tight">
+            <span class="font-extrabold text-gray-900 dark:text-white text-sm tracking-tight">ORBIT</span>
+            <span class="text-[10px] text-gray-400 font-medium">Siba Food</span>
           </div>
-        </a>
+        </div>
 
-        <span id="mobileHeaderTitle" class="text-xs font-semibold text-[#465fff] dark:text-[#7592ff] bg-[#ecf3ff] dark:bg-[#465fff]/20 px-2.5 py-1 rounded-lg border border-[#c2d6ff] dark:border-[#465fff]/30 truncate">🏆 Toàn Chuỗi</span>
+        <!-- Active Page Badge -->
+        <span id="mobileHeaderTitle" class="hidden sm:inline-flex items-center text-xs font-semibold text-[#465fff] dark:text-[#7592ff] bg-[#ecf3ff] dark:bg-[#465fff]/20 px-3 py-1.5 rounded-[8px] border border-[#c2d6ff] dark:border-[#465fff]/30 shrink-0 whitespace-nowrap">🏆 Toàn Chuỗi</span>
       </div>
 
-      <!-- Center: TailAdmin Global Quick Search (Desktop) -->
-      <div class="hidden xl:block">
-        <div class="xl:w-107.5">
-          <div class="relative flex h-11 w-full min-w-0 items-center rounded-[10px] border border-gray-200 bg-transparent dark:border-gray-800 dark:bg-white/3 shadow-theme-xs transition-colors focus-within:border-[#465fff] focus-within:ring-3 focus-within:ring-[#465fff]/20">
-            <div class="flex items-center justify-center ps-3.5 text-gray-500 dark:text-gray-400">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </div>
-            <input
-              id="globalHeaderSearch"
-              oninput="filterGlobalQuickSearch(this.value)"
-              type="text"
-              placeholder="Search or type command..."
-              class="h-full flex-1 border-0 bg-transparent px-3 text-sm text-gray-800 dark:text-white/90 placeholder-gray-400 dark:placeholder-white/30 outline-none"
-            />
-            <div class="pe-3 select-none">
-              <kbd class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">⌘ K</kbd>
-            </div>
+      <!-- Center: TailAdmin Global Quick Search (Clean, Solid Background, Zero Collision) -->
+      <div class="hidden lg:flex flex-1 max-w-[240px] xl:max-w-[340px] 2xl:max-w-[420px] mx-2 xl:mx-4 shrink min-w-0">
+        <div class="relative flex h-10 lg:h-11 w-full items-center rounded-[10px] border border-gray-200 bg-gray-50/90 dark:border-gray-800 dark:bg-gray-800/80 shadow-theme-xs transition-colors focus-within:border-[#465fff] focus-within:bg-white dark:focus-within:bg-gray-900 focus-within:ring-2 focus-within:ring-[#465fff]/20">
+          <div class="flex items-center justify-center ps-3 text-gray-400 shrink-0 pointer-events-none">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </div>
+          <input
+            id="globalHeaderSearch"
+            oninput="filterGlobalQuickSearch(this.value)"
+            type="text"
+            placeholder="Search or type command..."
+            class="h-full w-full min-w-0 border-0 bg-transparent px-2.5 text-xs sm:text-sm text-gray-800 dark:text-white/90 placeholder-gray-400 dark:placeholder-gray-500 outline-none"
+          />
+          <div class="pe-2.5 select-none shrink-0">
+            <kbd class="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shadow-2xs">⌘ K</kbd>
           </div>
         </div>
       </div>
 
-      <!-- Right: Controls & User Profile -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <!-- Right: Controls, Filters & User Profile (Properly Gapped, Never Overlapping) -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         
         <!-- Global Branch Selector -->
-        <div class="h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-transparent px-3 flex items-center gap-2 shadow-theme-xs">
-          <i data-lucide="map-pin" class="w-4 h-4 text-[#465fff] shrink-0"></i>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[120px] sm:max-w-[170px] truncate border-none">
+        <div class="h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2.5 sm:px-3 flex items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
+          <i data-lucide="map-pin" class="w-4 h-4 text-[#465fff] shrink-0 pointer-events-none"></i>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-medium text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[125px] sm:max-w-[160px] xl:max-w-[190px] truncate border-none">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
             <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
@@ -758,25 +760,25 @@
         </div>
 
         <!-- Global Month Picker -->
-        <div class="hidden sm:flex h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-transparent px-3 items-center gap-2 shadow-theme-xs">
-          <i data-lucide="calendar" class="w-4 h-4 text-gray-400"></i>
+        <div class="hidden md:flex h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2.5 sm:px-3 items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
+          <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0 pointer-events-none"></i>
           <span id="currentDateDisplay" class="hidden 2xl:inline text-xs font-medium text-gray-500 dark:text-gray-400"></span>
-          <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-gray-800 dark:text-gray-200 outline-none text-xs border-none">
+          <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-gray-800 dark:text-gray-200 outline-none text-xs border-none cursor-pointer">
         </div>
 
         <!-- TailAdmin Theme Toggler Button -->
-        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-transparent flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white shadow-theme-xs active:scale-95 transition-all">
-          <i id="themeIcon" data-lucide="moon" class="w-5 h-5"></i>
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-10 lg:size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:scale-95 transition-all shrink-0">
+          <i id="themeIcon" data-lucide="moon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
 
         <!-- TailAdmin User Profile Button -->
-        <button onclick="openGoogleAuthModal()" class="flex items-center gap-3 p-1.5 rounded-[10px] border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 active:scale-98 transition-all" title="Tài khoản & Phân quyền">
-          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-8 h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700">
-          <div class="hidden lg:flex flex-col text-left leading-tight">
-            <span id="headerUserName" class="text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[110px]">Tuấn Đại</span>
-            <span id="headerUserRoleBadge" class="text-[10px] font-bold text-[#465fff] uppercase">ADMIN</span>
+        <button onclick="openGoogleAuthModal()" class="h-10 lg:h-11 flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Tài khoản & Phân quyền">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+          <div class="hidden xl:flex flex-col text-left leading-tight">
+            <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
+            <span id="headerUserRoleBadge" class="text-[9px] font-bold text-[#465fff] uppercase">ADMIN</span>
           </div>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 hidden lg:block"></i>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 hidden xl:block shrink-0"></i>
         </button>
 
       </div>
@@ -903,7 +905,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div class="relative">
-              <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               <input type="text" id="searchChainSiteInput" oninput="onSearchChainSite(this.value)" placeholder="Tìm mã SAP hoặc tên điểm bán..." class="pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white text-xs outline-none focus:border-[#ed263a] w-56">
             </div>
           </div>
@@ -1517,7 +1519,7 @@
 
             <!-- Search Input -->
             <div class="relative w-full lg:w-72">
-              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               <input type="text" id="fnbStockSearchInput" oninput="onFnbStockSearch(this.value)" placeholder="Tìm mã hàng, tên hàng..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-emerald-500">
             </div>
           </div>
@@ -1600,7 +1602,7 @@
             </div>
 
             <div class="relative w-full lg:w-64">
-              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm món / mã kiểm..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500">
             </div>
           </div>
@@ -1758,23 +1760,22 @@
         
         <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('fnb-stock')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="boxes" class="w-4 h-4 text-emerald-500"></i><span>Ma Trận Tồn Kho</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-[#1f1a1a] text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
 
-        <!-- Header Banner -->
-        <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-rose-950 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
-          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white tracking-wide uppercase">Orbit Siba Food</span>
-                <span class="text-xs text-gray-300">Kiểm Soát Hao Hụt &amp; Chất Lượng</span>
-              </div>
-              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Biên Bản Hủy Hàng &amp; Hao Hụt</h1>
-              <p class="text-xs text-gray-300 mt-1">Ghi nhận hàng hỏng, quá hạn, dập nát, cháy rách hoặc nấu dư cuối ngày. Tự động giảm số lượng tồn kho và ghi nhận chi phí hao hụt.</p>
-            </div>
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <button onclick="openCreateWasteModal()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-rose-900/30">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                <span>+ Ghi Biên Bản Hủy Hàng</span>
-              </button>
-            </div>
+        <!-- TailAdmin Breadcrumb Header -->
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90 tracking-tight">
+              Biên Bản Hủy Hàng &amp; Hao Hụt
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ghi nhận hàng hỏng, quá hạn, dập nát, cháy rách hoặc nấu dư cuối ngày. Tự động giảm số lượng tồn kho và ghi nhận chi phí hao hụt.</p>
+          </div>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button onclick="openCreateWasteModal()" class="inline-flex items-center gap-2 rounded-[10px] bg-[#465fff] hover:bg-[#3641f5] px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>+ Ghi Biên Bản Hủy Hàng</span>
+            </button>
+            <button onclick="loadFnbWaste()" class="inline-flex size-10 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 shadow-theme-xs transition-all" title="Làm mới">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
 
@@ -2796,7 +2797,7 @@
 
         <!-- Quick Live Search Input -->
         <div class="mt-3 relative">
-          <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
           <input type="text" id="mobileHubSearchInput" oninput="filterMobileHubFeatures(this.value)" placeholder="Tìm chức năng (P&amp;L, kho, FEFO, đặt hàng, báo cáo...)" class="w-full pl-10 pr-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white outline-none focus:border-[#ed263a]">
         </div>
       </div>
