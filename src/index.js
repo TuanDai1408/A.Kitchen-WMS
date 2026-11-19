@@ -44,6 +44,163 @@ function normalizeMonth(thang) {
   return s;
 }
 
+
+const FEATURE_NAME_TO_CODE = {
+  'fnb-chain': 'fnb-chain',
+  'Toàn Chuỗi & P&L 14 Điểm Bán': 'fnb-chain',
+  'fnb-pl': 'fnb-pl',
+  'Báo Cáo Lợi Nhuận P&L Chi Tiết': 'fnb-pl',
+  'fnb-pos': 'fnb-pos',
+  'Doanh Thu POS Thời Gian Thực': 'fnb-pos',
+  'fnb-stock': 'fnb-stock',
+  'Tồn Kho Điểm Bán': 'fnb-stock',
+  'Tồn Kho & Điểm Bán': 'fnb-stock',
+  'fnb-counts': 'fnb-counts',
+  'Kiểm Kê Điểm Bán': 'fnb-counts',
+  'Kiểm kê': 'fnb-counts',
+  'fnb-receipts': 'fnb-receipts',
+  'Quản Lý Nhập Hàng Điểm Bán': 'fnb-receipts',
+  'fnb-waste': 'fnb-waste',
+  'Biên Bản Hủy Hàng & Hao Hụt': 'fnb-waste',
+  'wh-dashboard': 'wh-dashboard',
+  'Kho Tổng WMS': 'wh-dashboard',
+  'wh-stock': 'wh-stock',
+  'Tồn Kho & FEFO Kho Tổng': 'wh-stock',
+  'wh-reorder': 'wh-reorder',
+  'Cảnh Báo Điểm Đặt Hàng (ROP)': 'wh-reorder',
+  'wh-leadtime': 'wh-leadtime',
+  'Lead Time Nhà Cung Cấp': 'wh-leadtime',
+  'wh-posap': 'wh-posap',
+  'Đơn Hàng SAP PO': 'wh-posap',
+  'portal-voucher': 'portal-voucher',
+  'Chứng Từ Thu Chi & Hóa Đơn': 'portal-voucher',
+  'portal-search': 'portal-search',
+  'Tra Cứu Báo Cáo Chuyên Sâu': 'portal-search',
+  'portal-order': 'portal-order',
+  'Đặt Hàng Kho Tổng': 'portal-order',
+  'Đặt Hàng Nội Bộ': 'portal-order',
+  'portal-history': 'portal-history',
+  'Lịch Sử Nhập Xuất Kho Tổng': 'portal-history',
+  'portal-baocao': 'portal-baocao',
+  'Báo Cáo Suất Ăn Hằng Ngày': 'portal-baocao',
+  'Báo Cáo Suất Ăn & Vận Hành': 'portal-baocao',
+  'portal-kiemke': 'portal-kiemke',
+  'Kiểm Kê Kho Tổng': 'portal-kiemke',
+  'fnb-sites': 'fnb-sites',
+  'Danh Mục 14 Điểm Bán & Mã SAP': 'fnb-sites'
+};
+
+async function ensureRolePermissions(env) {
+  try {
+    const essentialKhoPerms = [
+      ['KHO_TRUONG', 'portal-kiemke', 1, 1, 1, 1],
+      ['KHO_TRUONG', 'fnb-counts', 1, 1, 1, 1],
+      ['KHO_TRUONG', 'portal-baocao', 1, 1, 1, 0],
+      ['KHO_TRUONG', 'fnb-receipts', 1, 1, 1, 1]
+    ];
+    for (const [r, f, v, c, e, d] of essentialKhoPerms) {
+      const exists = await env.DB.prepare(`SELECT id FROM role_permissions WHERE role_code = ? AND feature_code = ? LIMIT 1`).bind(r, f).first();
+      if (!exists) {
+        await env.DB.prepare(`INSERT INTO role_permissions (role_code, feature_code, can_view, can_create, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)`).bind(r, f, v, c, e, d).run();
+      }
+    }
+  } catch (err) {
+    console.error('ensureRolePermissions notice:', err);
+  }
+}
+
+async function buildUserPermissions(env, user) {
+  await ensureRolePermissions(env);
+
+  const permissions = {};
+
+  if (user.role_code === 'ADMIN') {
+    const allFeatures = [
+      'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
+      'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
+      'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
+      'fnb-sites'
+    ];
+    allFeatures.forEach(f => {
+      permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
+    });
+    return permissions;
+  }
+
+  const { results: permRows } = await env.DB.prepare(`
+    SELECT feature_code, can_view, can_create, can_edit, can_delete
+    FROM role_permissions
+    WHERE role_code = ?
+  `).bind(user.role_code).all();
+
+  (permRows || []).forEach(p => {
+    permissions[p.feature_code] = {
+      canView: p.can_view === 1,
+      canCreate: p.can_create === 1,
+      canEdit: p.can_edit === 1,
+      canDelete: p.can_delete === 1
+    };
+  });
+
+  if (user.email) {
+    const { results: approvedRequests } = await env.DB.prepare(`
+      SELECT requested_role, requested_feature
+      FROM access_requests
+      WHERE user_email = ? AND status = 'APPROVED'
+    `).bind(user.email).all();
+
+    for (const req of (approvedRequests || [])) {
+      if (req.requested_role && req.requested_role !== user.role_code) {
+        const { results: rolePerms } = await env.DB.prepare(`
+          SELECT feature_code, can_view, can_create, can_edit, can_delete
+          FROM role_permissions
+          WHERE role_code = ?
+        `).bind(req.requested_role).all();
+
+        (rolePerms || []).forEach(p => {
+          if (!permissions[p.feature_code]) {
+            permissions[p.feature_code] = {
+              canView: p.can_view === 1,
+              canCreate: p.can_create === 1,
+              canEdit: p.can_edit === 1,
+              canDelete: p.can_delete === 1
+            };
+          } else {
+            permissions[p.feature_code].canView = permissions[p.feature_code].canView || (p.can_view === 1);
+            permissions[p.feature_code].canCreate = permissions[p.feature_code].canCreate || (p.can_create === 1);
+            permissions[p.feature_code].canEdit = permissions[p.feature_code].canEdit || (p.can_edit === 1);
+            permissions[p.feature_code].canDelete = permissions[p.feature_code].canDelete || (p.can_delete === 1);
+          }
+        });
+      }
+
+      if (req.requested_feature) {
+        const featureCode = FEATURE_NAME_TO_CODE[req.requested_feature] || req.requested_feature;
+        if (featureCode) {
+          permissions[featureCode] = {
+            canView: true,
+            canCreate: true,
+            canEdit: true,
+            canDelete: permissions[featureCode]?.canDelete || false
+          };
+        }
+      }
+    }
+  }
+
+  if (user.role_code === 'KHO_TRUONG') {
+    ['portal-kiemke', 'fnb-counts', 'portal-baocao', 'wh-stock', 'wh-dashboard', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-order', 'portal-history', 'fnb-stock', 'fnb-sites', 'fnb-receipts'].forEach(f => {
+      if (!permissions[f]) {
+        permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+      } else {
+        permissions[f].canView = true;
+      }
+    });
+  }
+
+  return permissions;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -902,21 +1059,7 @@ export default {
             badge_color: 'stone'
           };
 
-          const { results: permRows } = await env.DB.prepare(`
-            SELECT feature_code, can_view, can_create, can_edit, can_delete
-            FROM role_permissions
-            WHERE role_code = ?
-          `).bind(user.role_code).all();
-
-          const permissions = {};
-          permRows.forEach(p => {
-            permissions[p.feature_code] = {
-              canView: p.can_view === 1,
-              canCreate: p.can_create === 1,
-              canEdit: p.can_edit === 1,
-              canDelete: p.can_delete === 1
-            };
-          });
+          const permissions = await buildUserPermissions(env, user);
 
           function getCleanInitials(name) {
             if (!name) return 'U';
@@ -972,21 +1115,7 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
         }
 
-        const { results: permRows } = await env.DB.prepare(`
-          SELECT feature_code, can_view, can_create, can_edit, can_delete
-          FROM role_permissions
-          WHERE role_code = ?
-        `).bind(role).all();
-
-        const permissions = {};
-        permRows.forEach(p => {
-          permissions[p.feature_code] = {
-            canView: p.can_view === 1,
-            canCreate: p.can_create === 1,
-            canEdit: p.can_edit === 1,
-            canDelete: p.can_delete === 1
-          };
-        });
+        const permissions = await buildUserPermissions(env, { role_code: role, email: '' });
 
         return new Response(JSON.stringify({
           success: true,
@@ -1040,11 +1169,31 @@ export default {
         `).bind(newStatus, reviewedBy || 'Admin', requestId).run();
 
         if (action === 'APPROVE') {
-          await env.DB.prepare(`
-            UPDATE app_users
-            SET role_code = ?
-            WHERE email = ?
-          `).bind(req.requested_role, req.user_email).run();
+          const currentUser = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(req.user_email).first();
+          if (currentUser) {
+            const roleHierarchy = {
+              'ADMIN': 100,
+              'KHO_TRUONG': 50,
+              'BEP_TRUONG': 40,
+              'KE_TOAN': 40,
+              'NHAN_VIEN': 10
+            };
+            const currentWeight = roleHierarchy[currentUser.role_code] || 10;
+            const requestedWeight = roleHierarchy[req.requested_role] || 10;
+
+            let newRole = currentUser.role_code;
+            if (currentUser.role_code === 'NHAN_VIEN' || requestedWeight > currentWeight) {
+              newRole = req.requested_role;
+            } else if (req.requested_role === 'KHO_TRUONG') {
+              newRole = 'KHO_TRUONG';
+            }
+
+            await env.DB.prepare(`
+              UPDATE app_users
+              SET role_code = ?
+              WHERE email = ?
+            `).bind(newRole, req.user_email).run();
+          }
         }
 
         return new Response(JSON.stringify({

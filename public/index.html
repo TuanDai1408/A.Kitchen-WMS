@@ -10559,6 +10559,8 @@ const FEATURE_TITLES = {
   'fnb-chain': { name: 'Toàn Chuỗi & P&L 14 Điểm Bán', role: 'ADMIN', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm' },
   'fnb-pl': { name: 'Báo Cáo Lợi Nhuận P&L Chi Tiết', role: 'KE_TOAN', desc: 'Báo cáo lãi lỗ, kiểm soát định mức chi phí vận hành' },
   'fnb-pos': { name: 'Doanh Thu POS Thời Gian Thực', role: 'KE_TOAN', desc: 'Tra cứu hóa đơn POS, dòng tiền và phân tích giờ cao điểm' },
+  'fnb-stock': { name: 'Tồn Kho Điểm Bán', role: 'NHAN_VIEN', desc: 'Xem tồn kho thực tế tại các điểm bán' },
+  'fnb-counts': { name: 'Kiểm Kê Điểm Bán', role: 'BEP_TRUONG', desc: 'Kiểm kê định kỳ ca sáng/tối và đối soát nguyên vật liệu' },
   'fnb-receipts': { name: 'Quản Lý Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Tạo phiếu nhập từ NCC ngoài, tăng tồn kho' },
   'fnb-waste': { name: 'Biên Bản Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, giảm tồn kho và chi phí hao hụt' },
   'fnb-sites': { name: 'Danh Mục 14 Điểm Bán & Mã SAP', role: 'KHO_TRUONG', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống' },
@@ -10569,8 +10571,10 @@ const FEATURE_TITLES = {
   'wh-posap': { name: 'Đơn Hàng SAP PO', role: 'KHO_TRUONG', desc: 'Đồng bộ đơn mua nguyên vật liệu từ SAP ERP' },
   'portal-voucher': { name: 'Chứng Từ Thu Chi & Hóa Đơn', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
   'portal-search': { name: 'Tra Cứu Báo Cáo Chuyên Sâu', role: 'KE_TOAN', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều' },
-  'portal-kiemke': { name: 'Kiểm Kê Kho Tổng', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' },
+  'portal-order': { name: 'Đặt Hàng Kho Tổng', role: 'NHAN_VIEN', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán' },
   'portal-history': { name: 'Lịch Sử Nhập Xuất Kho Tổng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
+  'portal-baocao': { name: 'Báo Cáo Suất Ăn & Vận Hành', role: 'NHAN_VIEN', desc: 'Báo cáo suất ăn và chi phí phát sinh' },
+  'portal-kiemke': { name: 'Kiểm Kê Kho Tổng', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' }
 };
 
 // ============================================================================
@@ -10909,6 +10913,24 @@ function initRbacAuth() {
   if (gCurrentUser.role === 'ADMIN') {
     checkPendingAccessRequests();
   }
+
+  // Đồng bộ quyền mới nhất từ server ở background (nếu Admin vừa phê duyệt thêm quyền)
+  if (gCurrentUser && gCurrentUser.email) {
+    fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: gCurrentUser.email })
+    }).then(r => r.json()).then(res => {
+      if (res.success && res.data && res.data.permissions) {
+        gCurrentUser.permissions = res.data.permissions;
+        gCurrentUser.role = res.data.role;
+        gCurrentUser.roleName = res.data.roleName;
+        try { localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser)); } catch(e){}
+        saveAccountToList(gCurrentUser);
+        applyUserSessionToUI();
+      }
+    }).catch(() => {});
+  }
 }
 
 function updateUIForUnauthenticated() {
@@ -11074,24 +11096,24 @@ function canAccessTab(tabId) {
 
   if (gCurrentUser.role === 'ADMIN') return true;
 
-  if (gCurrentUser.role === 'NHAN_VIEN') {
-    const basicTabs = ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'];
-    return basicTabs.includes(tabId);
+  // 1. Kiểm tra quyền chi tiết (Permissions động từ Backend bao gồm cả quyền Role và Quyền Cộng Dồn)
+  if (gCurrentUser.permissions && gCurrentUser.permissions[tabId] && gCurrentUser.permissions[tabId].canView) {
+    return true;
   }
 
-  if (gCurrentUser.permissions) {
-    const perm = gCurrentUser.permissions[tabId];
-    return !!(perm && perm.canView);
+  // 2. Quyền mặc định theo Role
+  if (gCurrentUser.role === 'KHO_TRUONG') {
+    // Quản lý kho có toàn quyền Kho Tổng + Kiểm kê kho tổng + Kiểm kê điểm bán + Báo cáo + Nhập hàng
+    return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].includes(tabId);
   }
-
   if (gCurrentUser.role === 'BEP_TRUONG') {
     return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].includes(tabId);
   }
-  if (gCurrentUser.role === 'KHO_TRUONG') {
-    return ['fnb-stock', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order'].includes(tabId);
-  }
   if (gCurrentUser.role === 'KE_TOAN') {
     return ['fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
+  }
+  if (gCurrentUser.role === 'NHAN_VIEN') {
+    return ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'].includes(tabId);
   }
 
   return false;
