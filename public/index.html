@@ -659,7 +659,7 @@
     <div class="pt-3 pb-4 mt-auto border-t border-gray-200 dark:border-gray-800">
       <div class="rounded-2xl bg-gray-50 dark:bg-white/3 p-3 border border-gray-200/80 dark:border-gray-800/80 flex items-center justify-between gap-2.5">
         <!-- User Info (Click to open Auth Modal) -->
-        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-90 transition-opacity" onclick="openGoogleAuthModal()" role="button" title="Tài khoản & Phân quyền">
+        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-90 transition-opacity" onclick="handleUserProfileClick()" role="button" title="Thông tin tài khoản & Chuyển đổi">
           <div class="relative shrink-0">
             <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=Admin&background=ed263a&color=fff" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
             <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black"></span>
@@ -778,7 +778,7 @@
         </button>
 
         <!-- TailAdmin User Profile Button -->
-        <button onclick="openGoogleAuthModal()" class="h-10 lg:h-11 flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Tài khoản & Phân quyền">
+        <button onclick="handleUserProfileClick()" class="h-10 lg:h-11 flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:scale-98 transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
           <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
           <div class="hidden xl:flex flex-col text-left leading-tight">
             <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
@@ -3358,52 +3358,160 @@
         </button>
       </div>
 
-      <!-- Modal Body (CHỈ HIỂN THỊ DUY NHẤT 1 CHỨC NĂNG: ĐĂNG NHẬP BẰNG GOOGLE) -->
-      <div class="p-6 sm:p-8 space-y-6 text-center">
+      <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
+      <div class="p-6 sm:p-7 space-y-5 text-center">
         
-        <div class="space-y-2">
-          <div class="w-16 h-16 mx-auto rounded-3xl bg-blue-50 dark:bg-blue-950/40 text-[#465fff] flex items-center justify-center shadow-inner">
-            <svg class="w-8 h-8" viewBox="0 0 24 24">
+        <div class="space-y-1.5">
+          <div class="w-14 h-14 mx-auto rounded-3xl bg-blue-50 dark:bg-blue-950/40 text-[#465fff] flex items-center justify-center shadow-inner">
+            <svg class="w-7 h-7" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
           </div>
-          <h4 class="font-extrabold text-lg text-gray-900 dark:text-white">Đăng Nhập Bằng Google</h4>
+          <h4 class="font-extrabold text-base text-gray-900 dark:text-white">Đăng Nhập Bằng Google</h4>
           <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-            Vui lòng đăng nhập bằng tài khoản Gmail của bạn để xác thực danh tính và phân quyền truy cập hệ thống.
+            Chọn tài khoản Google đã lưu trên máy hoặc đăng nhập tài khoản Gmail mới để tiếp tục
           </p>
         </div>
 
+        <!-- Danh sách tài khoản đã lưu trên máy (nếu có) -->
+        <div id="loginSavedAccountsContainer" class="hidden text-left space-y-2">
+          <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Tài khoản đã đăng nhập:</span>
+            <span class="text-[10px] text-gray-400 font-normal">Nhấn để chuyển đổi</span>
+          </div>
+          <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[220px] overflow-y-auto custom-scrollbar">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
         <!-- Official Google GIS Button Container -->
-        <div class="space-y-3 pt-2">
+        <div class="space-y-2 pt-1">
+          <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider" id="googleBtnLabel">Đăng nhập tài khoản Google khác</div>
           <div id="googleSignInBtn" class="flex justify-center min-h-[46px]"></div>
           
           <!-- Fallback direct Google button if GIS button is delayed or customized -->
           <div id="googleSignInFallback" class="hidden">
-            <button onclick="promptGoogleOneTap()" class="w-full py-3 px-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/80 text-gray-800 dark:text-white font-bold text-xs flex items-center justify-center gap-3 shadow-theme-xs hover:border-[#465fff] active:scale-98 transition-all">
-              <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <button onclick="promptGoogleOneTap()" class="w-full py-2.5 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-bold text-xs flex items-center justify-center gap-3 shadow-theme-xs hover:border-[#465fff] active:scale-98 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
-              <span>Đăng nhập bằng Google</span>
+              <span>Mở hộp thoại đăng nhập Google</span>
             </button>
           </div>
         </div>
 
         <!-- Privacy & Security note -->
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-400 dark:text-gray-500">
-          Hệ thống bảo mật OAuth 2.0 • Bản quyền Orbit Siba Food
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 text-[10.5px] text-gray-400">
+          Xác thực bảo mật OAuth 2.0 • Orbit Siba Food
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- =====================================================================
+    <!-- =====================================================================
+       POPUP THÔNG TIN USER & CHUYỂN ĐỔI TÀI KHOẢN (USER PROFILE MODAL)
+       ===================================================================== -->
+  <div id="userProfileModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
+    <div class="bg-white dark:bg-[#161313] w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#465fff] text-white flex items-center justify-center shadow-md">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Thông Tin Tài Khoản</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Orbit Siba Food • Phân Quyền & Vai Trò</p>
+          </div>
+        </div>
+        <button onclick="closeUserProfileModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+        
+        <!-- Main User Card -->
+        <div class="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center gap-3.5">
+          <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=Admin&background=465fff&color=fff" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#465fff]/30 shrink-0">
+          <div class="min-w-0 flex-1">
+            <h4 id="profModalName" class="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
+            <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">admin@sibafood.vn</div>
+            <div class="mt-1 flex items-center gap-2 flex-wrap">
+              <span id="profModalRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+              <span id="profModalSiteBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-50 text-[#465fff] dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-3 h-3"></i>
+                <span id="profModalSiteName">K001 - Hùng Vương</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permissions Overview Box -->
+        <div class="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 text-blue-900 dark:text-blue-200 space-y-1">
+          <div class="font-bold flex items-center gap-1.5 text-xs">
+            <i data-lucide="shield" class="w-4 h-4 text-[#465fff]"></i>
+            <span>Phạm vi quyền hạn của bạn:</span>
+          </div>
+          <p id="profModalPermSummary" class="text-[11px] text-blue-800/80 dark:text-blue-300/80">
+            Toàn quyền quản trị hệ thống, xem và điều hành tất cả 19 phân hệ F&B và Kho tổng.
+          </p>
+        </div>
+
+        <!-- Saved Accounts & Switcher Section -->
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-wider text-[11px]">Chuyển Đổi Tài Khoản Google:</span>
+            <button onclick="closeUserProfileModal(); openGoogleAuthModal(false);" class="text-[#465fff] hover:underline font-bold text-[11px] flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm tài khoản
+            </button>
+          </div>
+          <div id="profSavedAccountsList" class="space-y-1.5 max-h-[160px] overflow-y-auto custom-scrollbar">
+            <!-- Dynamically populated list of other saved accounts -->
+          </div>
+        </div>
+
+        <!-- Quick Site Switcher Link -->
+        <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="store" class="w-4 h-4 text-[#465fff]"></i>
+            <div>
+              <div class="font-bold text-gray-800 dark:text-gray-200 text-xs">Điểm Bán / Bếp Phụ Trách</div>
+              <div id="profCurrentSiteText" class="text-[11px] text-gray-400">Đang chọn: K001</div>
+            </div>
+          </div>
+          <button onclick="closeUserProfileModal(); openSiteSelectorModal();" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs flex items-center gap-1 transition-all">
+            Đổi Site
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <button id="profReqAccessBtn" onclick="closeUserProfileModal(); openRequestAccessModal('fnb-chain');" class="flex-1 py-2.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#465fff] text-gray-700 dark:text-gray-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="key" class="w-3.5 h-3.5 text-[#465fff]"></i>
+            <span>Xin Cấp Thêm Quyền</span>
+          </button>
+          <button onclick="closeUserProfileModal(); dangXuatAdmin();" class="py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Đăng Xuất</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+<!-- =====================================================================
        POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
        ===================================================================== -->
   <div id="siteSelectorModal" class="fixed inset-0 z-[155] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
@@ -9676,7 +9784,6 @@ window.closeInvDetailModal = function() {
 // ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
 // ============================================================================
 
-// Khởi tạo: Mặc định là null, BẮT BUỘC đăng nhập Gmail kể cả Admin
 let gCurrentUser = null;
 window.isForceAuthModal = false;
 
@@ -9717,7 +9824,283 @@ const FEATURE_TITLES = {
   'portal-history': { name: 'Lịch Sử Nhập Xuất Kho Tổng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
 };
 
-// 1. Khởi tạo phiên làm việc từ LocalStorage (BẮT BUỘC ĐĂNG NHẬP)
+// ============================================================================
+// QUẢN LÝ LƯU TRỮ VÀ CHUYỂN ĐỔI NHIỀU TÀI KHOẢN GOOGLE TRÊN MÁY CÁ NHÂN
+// ============================================================================
+
+window.getSavedAccounts = function() {
+  try {
+    const raw = localStorage.getItem('orbit_saved_accounts');
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr;
+    }
+  } catch (e) {
+    console.error('getSavedAccounts error:', e);
+  }
+  return [];
+};
+
+window.saveAccountToList = function(user) {
+  if (!user || !user.email) return;
+  let accounts = getSavedAccounts();
+  const idx = accounts.findIndex(a => a.email.toLowerCase() === user.email.toLowerCase());
+  const entry = {
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName || user.email.split('@')[0],
+    avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email)}&background=465fff&color=fff`,
+    role: user.role || 'NHAN_VIEN',
+    roleName: user.roleName || 'Nhân Viên Vận Hành',
+    badgeColor: user.badgeColor || 'gray',
+    permissions: user.permissions || null,
+    assignedSite: user.assignedSite || localStorage.getItem('orbit_user_site') || 'K001',
+    lastLogin: Date.now()
+  };
+
+  if (idx !== -1) {
+    accounts[idx] = { ...accounts[idx], ...entry };
+  } else {
+    accounts.push(entry);
+  }
+  localStorage.setItem('orbit_saved_accounts', JSON.stringify(accounts));
+};
+
+window.removeSavedAccount = function(email, event) {
+  if (event) event.stopPropagation();
+  let accounts = getSavedAccounts();
+  accounts = accounts.filter(a => a.email.toLowerCase() !== email.toLowerCase());
+  localStorage.setItem('orbit_saved_accounts', JSON.stringify(accounts));
+  
+  if (gCurrentUser && gCurrentUser.email.toLowerCase() === email.toLowerCase()) {
+    dangXuatAdmin();
+  } else {
+    renderSavedAccountsInLoginModal();
+    renderSavedAccountsInProfileModal();
+    if (typeof showToast === 'function') showToast(`Đã xóa tài khoản ${email} khỏi máy này`);
+  }
+};
+
+window.switchToSavedAccount = async function(email) {
+  const accounts = getSavedAccounts();
+  const acc = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
+  if (!acc) return;
+
+  try {
+    if (typeof showLoading === 'function') showLoading(`Đang chuyển sang ${acc.fullName}...`);
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: acc.email })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi đăng nhập');
+
+    gCurrentUser = json.data;
+    localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    saveAccountToList(gCurrentUser);
+
+    window.isForceAuthModal = false;
+    closeGoogleAuthModal();
+    closeUserProfileModal();
+    applyUserSessionToUI();
+
+    if (acc.assignedSite) {
+      localStorage.setItem('orbit_user_site', acc.assignedSite);
+      const branchSel = document.getElementById('globalBranchSelect');
+      if (branchSel) branchSel.value = acc.assignedSite;
+      if (typeof onGlobalBranchChange === 'function') onGlobalBranchChange(acc.assignedSite);
+    }
+
+    if (typeof showToast === 'function') {
+      showToast(`Đã chuyển sang tài khoản: ${gCurrentUser.fullName} (${gCurrentUser.roleName})`);
+    }
+
+    if (gCurrentUser.role === 'ADMIN') {
+      checkPendingAccessRequests();
+    }
+  } catch (err) {
+    console.error('switchToSavedAccount error:', err);
+    gCurrentUser = acc;
+    localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    window.isForceAuthModal = false;
+    closeGoogleAuthModal();
+    closeUserProfileModal();
+    applyUserSessionToUI();
+    if (typeof showToast === 'function') showToast(`Đã chuyển sang tài khoản: ${gCurrentUser.fullName}`);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+// Hiển thị danh sách tài khoản đã lưu trong Login Modal
+window.renderSavedAccountsInLoginModal = function() {
+  const container = document.getElementById('loginSavedAccountsContainer');
+  const listEl = document.getElementById('loginSavedAccountsList');
+  const labelEl = document.getElementById('googleBtnLabel');
+  if (!container || !listEl) return;
+
+  const accounts = getSavedAccounts();
+  if (accounts.length === 0) {
+    container.classList.add('hidden');
+    if (labelEl) labelEl.textContent = 'Đăng nhập bằng tài khoản Google';
+    return;
+  }
+
+  container.classList.remove('hidden');
+  if (labelEl) labelEl.textContent = 'Hoặc đăng nhập tài khoản Google khác:';
+
+  listEl.innerHTML = accounts.map(acc => {
+    const isCurrent = gCurrentUser && gCurrentUser.email.toLowerCase() === acc.email.toLowerCase();
+    const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
+      acc.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
+      acc.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+      acc.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+
+    return `
+      <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+        isCurrent
+          ? 'border-[#465fff] bg-[#ecf3ff] dark:bg-[#465fff]/15 ring-2 ring-[#465fff]/40'
+          : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
+      }">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <img src="${acc.avatarUrl}" alt="${acc.fullName}" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-gray-200 dark:ring-gray-700">
+          <div class="min-w-0 text-left">
+            <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+              <span>${acc.fullName}</span>
+              ${isCurrent ? '<span class="text-[9px] px-1 py-0.2 rounded font-black bg-[#465fff] text-white">ĐANG DÙNG</span>' : ''}
+            </div>
+            <div class="text-[10px] text-gray-400 font-mono truncate">${acc.email}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${roleBadgeColor}">${acc.role}</span>
+          <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="p-1 rounded text-gray-400 hover:text-rose-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+};
+
+// Hiển thị danh sách tài khoản đã lưu trong Profile Modal
+window.renderSavedAccountsInProfileModal = function() {
+  const listEl = document.getElementById('profSavedAccountsList');
+  if (!listEl) return;
+
+  const accounts = getSavedAccounts();
+  const otherAccounts = accounts.filter(a => !gCurrentUser || a.email.toLowerCase() !== gCurrentUser.email.toLowerCase());
+
+  if (otherAccounts.length === 0) {
+    listEl.innerHTML = `<div class="p-3 text-center text-gray-400 text-[11px] italic bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">Chưa có tài khoản phụ nào khác được lưu trên máy này. Bấm "+ Thêm tài khoản" để đăng nhập thêm.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = otherAccounts.map(acc => `
+    <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-[#465fff] bg-white dark:bg-gray-800/40 flex items-center justify-between gap-2.5 cursor-pointer transition-all">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <img src="${acc.avatarUrl}" alt="${acc.fullName}" class="w-7 h-7 rounded-full object-cover shrink-0">
+        <div class="min-w-0">
+          <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${acc.fullName}</div>
+          <div class="text-[10px] text-gray-400 font-mono truncate">${acc.email}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span class="text-[8.5px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">${acc.role}</span>
+        <span class="text-xs text-[#465fff] font-bold">Chuyển ↗</span>
+      </div>
+    </div>
+  `).join('');
+
+  if (window.lucide) lucide.createIcons();
+};
+
+// Click vào User Profile (Header hoặc Sidebar)
+window.handleUserProfileClick = function() {
+  if (gCurrentUser && gCurrentUser.email) {
+    openUserProfileModal();
+  } else {
+    openGoogleAuthModal(true);
+  }
+};
+
+window.openUserProfileModal = function() {
+  if (!gCurrentUser) {
+    openGoogleAuthModal(true);
+    return;
+  }
+
+  const modal = document.getElementById('userProfileModal');
+  if (!modal) return;
+
+  const nameEl = document.getElementById('profModalName');
+  const emailEl = document.getElementById('profModalEmail');
+  const avEl = document.getElementById('profModalAvatar');
+  const roleEl = document.getElementById('profModalRoleBadge');
+  const siteEl = document.getElementById('profModalSiteName');
+  const siteTextEl = document.getElementById('profCurrentSiteText');
+  const permSummaryEl = document.getElementById('profModalPermSummary');
+  const reqBtn = document.getElementById('profReqAccessBtn');
+
+  if (nameEl) nameEl.textContent = gCurrentUser.fullName || 'Người dùng';
+  if (emailEl) emailEl.textContent = gCurrentUser.email;
+  if (avEl) avEl.src = gCurrentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(gCurrentUser.fullName || gCurrentUser.email)}&background=465fff&color=fff`;
+
+  if (roleEl) {
+    roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
+    roleEl.className = `text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase ${
+      gCurrentUser.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
+      gCurrentUser.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
+      gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
+      gCurrentUser.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
+      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+    }`;
+  }
+
+  const curSite = localStorage.getItem('orbit_user_site') || 'K001';
+  const siteObj = SITES_LIST.find(s => s.code === curSite);
+  const siteName = siteObj ? siteObj.name : curSite;
+  if (siteEl) siteEl.textContent = siteName;
+  if (siteTextEl) siteTextEl.textContent = `Đang phụ trách: ${siteName}`;
+
+  if (permSummaryEl) {
+    if (gCurrentUser.role === 'ADMIN') {
+      permSummaryEl.textContent = 'Toàn quyền quản trị hệ thống, phê duyệt cấp quyền và truy cập tất cả 19 phân hệ F&B và Kho tổng.';
+      if (reqBtn) reqBtn.classList.add('hidden');
+    } else if (gCurrentUser.role === 'BEP_TRUONG') {
+      permSummaryEl.textContent = 'Quản lý điểm bán: Xem tồn kho ma trận, kiểm kê hằng ngày, tạo phiếu nhập hàng NCC, lập biên bản hủy hàng & báo cáo suất ăn.';
+      if (reqBtn) reqBtn.classList.remove('hidden');
+    } else if (gCurrentUser.role === 'KHO_TRUONG') {
+      permSummaryEl.textContent = 'Quản lý kho WMS: Theo dõi hạn dùng FEFO kho gia vị tổng, cảnh báo đặt hàng ROP, lead time NCC và PO SAP.';
+      if (reqBtn) reqBtn.classList.remove('hidden');
+    } else if (gCurrentUser.role === 'KE_TOAN') {
+      permSummaryEl.textContent = 'Kế toán kiểm soát: Báo cáo P&L chuỗi 14 điểm, doanh thu bán hàng POS, chứng từ & hóa đơn thuế.';
+      if (reqBtn) reqBtn.classList.remove('hidden');
+    } else {
+      permSummaryEl.textContent = 'Quyền nhân viên cơ bản: Kiểm kê hằng ngày, xem tồn kho cơ bản, báo cáo suất ăn và đặt hàng vật tư. (Có thể xin cấp thêm quyền nâng cao).';
+      if (reqBtn) reqBtn.classList.remove('hidden');
+    }
+  }
+
+  renderSavedAccountsInProfileModal();
+
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeUserProfileModal = function() {
+  document.getElementById('userProfileModal')?.classList.add('hidden');
+};
+
+
+// ============================================================================
+// KHỞI TẠO PHIÊN LÀM VIỆC & PHÂN QUYỀN
+// ============================================================================
+
 function initRbacAuth() {
   let saved = null;
   try {
@@ -9730,27 +10113,23 @@ function initRbacAuth() {
   renderSitesOptions();
 
   if (!saved || !saved.email) {
-    // CHƯA ĐĂNG NHẬP: Bắt buộc mở modal đăng nhập Google
     gCurrentUser = null;
     updateUIForUnauthenticated();
-    openGoogleAuthModal(true); // force mode
+    openGoogleAuthModal(true);
     return;
   }
 
-  // ĐÃ ĐĂNG NHẬP
   gCurrentUser = saved;
+  saveAccountToList(gCurrentUser);
   applyUserSessionToUI();
 
-  // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
   checkAndPromptUserSite();
 
-  // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền từ nhân viên
   if (gCurrentUser.role === 'ADMIN') {
     checkPendingAccessRequests();
   }
 }
 
-// 2. Giao diện khi chưa đăng nhập
 function updateUIForUnauthenticated() {
   const nameEl = document.getElementById('sidebarUserName');
   const roleEl = document.getElementById('sidebarUserRoleBadge');
@@ -9770,7 +10149,6 @@ function updateUIForUnauthenticated() {
     hdrRole.className = 'text-[9px] font-extrabold text-gray-400 uppercase';
   }
 
-  // Khóa tất cả các tab
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     btn.classList.add('opacity-40');
     const lock = btn.querySelector('.lock-icon');
@@ -9780,20 +10158,17 @@ function updateUIForUnauthenticated() {
   if (window.lucide) lucide.createIcons();
 }
 
-// 3. Cập nhật giao diện theo User Session & Phân Quyền
 function applyUserSessionToUI() {
   if (!gCurrentUser) {
     updateUIForUnauthenticated();
     return;
   }
 
-  // Sync Sidebar Profile
   const nameEl = document.getElementById('sidebarUserName');
   const roleEl = document.getElementById('sidebarUserRoleBadge');
   const emailEl = document.getElementById('sidebarUserEmail');
   const avImg = document.getElementById('userAvatarImg');
 
-  // Sync Header Profile
   const hdrName = document.getElementById('headerUserName');
   const hdrRole = document.getElementById('headerUserRoleBadge');
   const hdrAv = document.getElementById('headerUserAvatar');
@@ -9823,7 +10198,6 @@ function applyUserSessionToUI() {
     hdrRole.className = `text-[9px] font-extrabold uppercase truncate ${curStyle.text}`;
   }
 
-  // Quản lý nút Duyệt Quyền dành cho Admin trên Header
   const adminBtn = document.getElementById('adminPendingReqBtn');
   if (adminBtn) {
     if (gCurrentUser.role === 'ADMIN') {
@@ -9833,8 +10207,6 @@ function applyUserSessionToUI() {
     }
   }
 
-  // Phân quyền chi tiết trên Sidebar:
-  // User có quyền cơ bản (canAccessTab = true) sẽ mở, chức năng sâu hơn (canAccessTab = false) sẽ có lock-icon
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     const tabId = btn.getAttribute('data-tab');
     if (!tabId) return;
@@ -9854,24 +10226,20 @@ function applyUserSessionToUI() {
   if (window.lucide) lucide.createIcons();
 }
 
-// 4. Kiểm tra quyền truy cập tab
 function canAccessTab(tabId) {
   if (!gCurrentUser) return false;
   if (gCurrentUser.role === 'ADMIN') return true;
 
-  // Nếu user là NHAN_VIEN (User thông thường): chỉ có 4 chức năng cơ bản
   if (gCurrentUser.role === 'NHAN_VIEN') {
     const basicTabs = ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'];
     return basicTabs.includes(tabId);
   }
 
-  // Nếu có bảng quyền chi tiết permissions
   if (gCurrentUser.permissions) {
     const perm = gCurrentUser.permissions[tabId];
     return !!(perm && perm.canView);
   }
 
-  // Phân quyền theo vai trò mặc định
   if (gCurrentUser.role === 'BEP_TRUONG') {
     return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].includes(tabId);
   }
@@ -9885,7 +10253,6 @@ function canAccessTab(tabId) {
   return false;
 }
 
-// 5. Hook switchTab để mở popup xin quyền nếu chưa được cấp
 const _origSwitchTab = window.switchTab;
 window.switchTab = function(tabId, btn) {
   if (!gCurrentUser) {
@@ -9893,7 +10260,6 @@ window.switchTab = function(tabId, btn) {
     return;
   }
   if (!canAccessTab(tabId)) {
-    // Chức năng sâu chưa được cấp quyền -> Mở popup xin quyền cho Admin duyệt
     openRequestAccessModal(tabId);
     return;
   }
@@ -9903,7 +10269,7 @@ window.switchTab = function(tabId, btn) {
 };
 
 // ============================================================================
-// LOGIC POPUP 1: CHỌN SITE PHỤ TRÁCH & LƯU LOCALSTORAGE CÁ NHÂN
+// LOGIC POPUP CHỌN SITE PHỤ TRÁCH & LƯU LOCALSTORAGE CÁ NHÂN
 // ============================================================================
 
 window.renderSitesOptions = function() {
@@ -10009,7 +10375,6 @@ window.checkAndPromptUserSite = function(forceOpen = false) {
   if (!savedSite || forceOpen) {
     openSiteSelectorModal();
   } else {
-    // Đã lưu -> tự động áp dụng vào Header dropdown và dữ liệu
     const branchSel = document.getElementById('globalBranchSelect');
     if (branchSel && branchSel.value !== savedSite) {
       branchSel.value = savedSite;
@@ -10031,7 +10396,10 @@ window.openSiteSelectorModal = function() {
 window.saveSiteSelection = function() {
   const site = window.tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
   localStorage.setItem('orbit_user_site', site);
-  if (gCurrentUser) gCurrentUser.assignedSite = site;
+  if (gCurrentUser) {
+    gCurrentUser.assignedSite = site;
+    saveAccountToList(gCurrentUser);
+  }
 
   const branchSel = document.getElementById('globalBranchSelect');
   if (branchSel) {
@@ -10048,9 +10416,8 @@ window.saveSiteSelection = function() {
   }
 };
 
-
 // ============================================================================
-// LOGIC POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (USER -> ADMIN)
+// LOGIC POPUP XIN QUYỀN TRUY CẬP (USER -> ADMIN)
 // ============================================================================
 
 window.openRequestAccessModal = function(tabId) {
@@ -10118,9 +10485,8 @@ window.submitRequestAccess = async function() {
   }
 };
 
-
 // ============================================================================
-// LOGIC POPUP 3: ADMIN PHÊ DUYỆT YÊU CẦU CẤP QUYỀN (ADMIN)
+// LOGIC POPUP ADMIN PHÊ DUYỆT CẤP QUYỀN (ADMIN)
 // ============================================================================
 
 window.cachedAccessRequests = [];
@@ -10260,7 +10626,6 @@ window.handleApproveRequest = async function(requestId, action) {
   }
 };
 
-
 // ============================================================================
 // GOOGLE GIS & AUTH MODAL ENGINE
 // ============================================================================
@@ -10290,7 +10655,7 @@ function initGoogleGIS() {
         text: 'signin_with',
         shape: 'pill',
         logo_alignment: 'left',
-        width: 280
+        width: 300
       });
     }
 
@@ -10316,6 +10681,8 @@ async function handleGoogleLoginResponse(response) {
 
     gCurrentUser = json.data;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    saveAccountToList(gCurrentUser);
+
     window.isForceAuthModal = false;
     closeGoogleAuthModal();
     applyUserSessionToUI();
@@ -10324,10 +10691,8 @@ async function handleGoogleLoginResponse(response) {
       showToast(`Đăng nhập Google thành công! Xin chào ${gCurrentUser.fullName} (${gCurrentUser.roleName})`);
     }
 
-    // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
     checkAndPromptUserSite();
 
-    // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền
     if (gCurrentUser.role === 'ADMIN') {
       checkPendingAccessRequests();
     }
@@ -10358,6 +10723,7 @@ window.openGoogleAuthModal = function(isForce = false) {
     else closeBtn.classList.remove('hidden');
   }
 
+  renderSavedAccountsInLoginModal();
   initGoogleGIS();
   if (window.lucide) lucide.createIcons();
 };
@@ -10376,69 +10742,12 @@ window.loginWithGoogle = function() {
   promptGoogleOneTap();
 };
 
-window.copyCurrentOrigin = function() {
-  const domain = window.location.origin || 'https://akitchen-kho-app.trantuandai2508.workers.dev';
-  navigator.clipboard.writeText(domain).then(() => {
-    const btn = document.getElementById('copyOriginBtnText');
-    if (btn) {
-      btn.textContent = 'Đã chép!';
-      setTimeout(() => { btn.textContent = 'Sao chép'; }, 2000);
-    }
-    if (typeof showToast === 'function') showToast('Đã sao chép: ' + domain);
-  }).catch(() => {
-    if (typeof showToast === 'function') showToast('Domain: ' + domain);
-  });
-};
-
-window.quickLoginRole = async function(email) {
-  try {
-    if (typeof showLoading === 'function') showLoading('Xác thực tài khoản Google...');
-    const res = await fetch('/api/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Lỗi đăng nhập');
-
-    gCurrentUser = json.data;
-    localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
-    window.isForceAuthModal = false;
-    closeGoogleAuthModal();
-    applyUserSessionToUI();
-
-    if (typeof showToast === 'function') showToast(`Xin chào ${gCurrentUser.fullName}! (${gCurrentUser.roleName})`);
-
-    // Kiểm tra site phụ trách đã lưu trên máy cá nhân chưa
-    checkAndPromptUserSite();
-
-    // Nếu là Admin -> Kiểm tra yêu cầu cấp quyền
-    if (gCurrentUser.role === 'ADMIN') {
-      checkPendingAccessRequests();
-    }
-  } catch (err) {
-    console.error('quickLoginRole error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
-  } finally {
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-window.submitManualLogin = async function() {
-  const email = document.getElementById('authEmailInput')?.value;
-  if (!email) {
-    if (typeof showToast === 'function') showToast('Vui lòng nhập email');
-    return;
-  }
-  quickLoginRole(email);
-};
-
 // Đăng xuất
 window.dangXuatAdmin = function() {
   localStorage.removeItem('orbit_user');
   gCurrentUser = null;
   updateUIForUnauthenticated();
-  openGoogleAuthModal(true); // bắt buộc đăng nhập lại
+  openGoogleAuthModal(true);
   if (typeof showToast === 'function') showToast('Đã đăng xuất tài khoản! Vui lòng đăng nhập để tiếp tục.');
 };
 
@@ -10475,6 +10784,7 @@ window.switchRoleAction = async function(roleCode) {
     gCurrentUser.permissions = json.data.permissions;
 
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    saveAccountToList(gCurrentUser);
     applyUserSessionToUI();
     closeRoleSwitcherModal();
     if (typeof showToast === 'function') showToast(`Đã chuyển sang vai trò: ${json.data.roleName}`);
