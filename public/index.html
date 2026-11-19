@@ -27,6 +27,20 @@
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
+            // NextAdmin Core Brand & Accent Colors
+            primary: {
+              50: '#eff3ff',
+              100: '#dae2ff',
+              200: '#becdff',
+              300: '#91aeff',
+              400: '#5e84fc',
+              500: '#3758f9',
+              600: '#2237ee',
+              700: '#1a25db',
+              800: '#1c20b1',
+              900: '#1c228c',
+              950: '#161755'
+            },
             siba: {
               50: '#fff4f3',
               100: '#ffe4e4',
@@ -39,19 +53,34 @@
               800: '#8c041b',
               900: '#52020f'
             },
-            brand: {
-              50: '#fff4f3',
-              100: '#ffe4e4',
-              500: '#ed263a',
-              600: '#d01a2f',
-              700: '#ab0521',
-              800: '#8c041b',
-              900: '#52020f'
+            // NextAdmin Dark Theme Surface Tokens
+            dark: {
+              bg: '#0b0f19',        // Deep Dark Slate body background
+              surface: '#111827',   // Slate-900 Card / Header / Sidebar surface
+              card: '#161f30',      // Elevated Card background
+              border: '#1f2937',    // Border
+              borderSoft: '#2d3748',
+              muted: '#6b7280',
+              text: '#f9fafb'
+            },
+            // NextAdmin Light Theme Surface Tokens
+            light: {
+              bg: '#f9fafb',        // Cool Gray body background
+              surface: '#ffffff',   // Pure White surface
+              border: '#e5e7eb',    // Clean 1px border
+              borderSoft: '#f3f4f6',
+              muted: '#9ca3af',
+              text: '#111827'
             }
+          },
+          boxShadow: {
+            'card': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+            'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+            'nextadmin': '0 4px 20px -2px rgba(0, 0, 0, 0.06)'
           }
         }
       }
-    }
+    };
   </script>
 
   <style>
@@ -63,51 +92,176 @@
       --font-sans: 'Be Vietnam Pro', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
       -webkit-tap-highlight-color: transparent;
+
+      /* NextAdmin Light Mode Variables */
+      --app-bg: #f9fafb;
+      --surface-bg: #ffffff;
+      --surface-subtle: #f3f4f6;
+      --border-main: #e5e7eb;
+      --border-subtle: #f1f5f9;
+      --text-main: #111827;
+      --text-sub: #4b5563;
+      --text-muted: #9ca3af;
+      --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
     }
+
+    .dark {
+      /* NextAdmin Dark Mode Variables (Deep Slate / Navy) */
+      --app-bg: #0b0f19;
+      --surface-bg: #111827;
+      --surface-subtle: #161f30;
+      --border-main: #1f2937;
+      --border-subtle: #242f42;
+      --text-main: #f9fafb;
+      --text-sub: #9ca3af;
+      --text-muted: #6b7280;
+      --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+    }
+
     body {
       font-family: 'Be Vietnam Pro', sans-serif;
-      background-color: #f6f5f3;
-      color: #1a1616;
+      background-color: var(--app-bg);
+      color: var(--text-main);
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
-    .dark body {
-      background-color: #0f0d0d;
-      color: #f5f2f2;
-    }
+
+    /* Quy chuẩn hiển thị số theo user rules */
     .font-mono, .num, code, .pos-mono, .font-receipt {
       font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
-      font-feature-settings: 'tnum' 1; /* Cố định độ rộng chữ số */
+      font-feature-settings: 'tnum' 1; /* Cố định độ rộng chữ số (Tabular numbers) */
     }
+
+    /* Tab Switch Animations (Smooth NextAdmin fade & slight slide) */
     .tab-panel {
       display: none;
-      animation: fadeIn 0.18s ease-in-out;
+      animation: nextAdminFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tab-panel.active {
       display: block;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+    @keyframes nextAdminFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Custom Modern Slim Scrollbars */
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
       height: 5px;
     }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 4px;
+      background: #d1d5db;
+      border-radius: 9999px;
     }
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #3F3F46;
+      background: #374151;
     }
-    /* Siba Theme Card Transitions */
-    .siba-card {
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .siba-card:hover {
-      box-shadow: 0 10px 25px -5px rgba(237, 38, 58, 0.08), 0 8px 10px -6px rgba(237, 38, 58, 0.04);
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
     }
 
-    /* Mobile Sheet Transitions */
+    /* NextAdmin Card Architecture */
+    .siba-card, .nextadmin-card {
+      background-color: var(--surface-bg);
+      border: 1px solid var(--border-main);
+      border-radius: 0.875rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .siba-card:hover, .nextadmin-card:hover {
+      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.08);
+      border-color: #d1d5db;
+    }
+    .dark .siba-card:hover, .dark .nextadmin-card:hover {
+      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.45);
+      border-color: #374151;
+    }
+
+    /* NextAdmin Table Architecture */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    thead th {
+      background-color: var(--surface-subtle);
+      color: var(--text-sub);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-main);
+    }
+    tbody tr {
+      background-color: var(--surface-bg);
+      transition: background-color 0.15s ease;
+    }
+    tbody tr:hover {
+      background-color: var(--surface-subtle);
+    }
+    tbody td {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    /* Form Inputs & Controls */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+      background-color: var(--surface-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-main);
+      transition: all 0.15s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #ed263a !important;
+      box-shadow: 0 0 0 3px rgba(237, 38, 58, 0.12);
+    }
+    .dark input:not([type="checkbox"]):not([type="radio"]),
+    .dark select,
+    .dark textarea {
+      background-color: #111827;
+      color: #f9fafb;
+      border-color: #1f2937;
+    }
+
+    /* NextAdmin Dark Mode Complete Overrides (Eliminates rogue white backgrounds) */
+    .dark .bg-white {
+      background-color: #111827 !important;
+      color: #f9fafb !important;
+    }
+    .dark .bg-stone-50, .dark .bg-stone-50\/50, .dark .bg-stone-50\/60, .dark .bg-stone-50\/70,
+    .dark .bg-gray-50 {
+      background-color: #161f30 !important;
+    }
+    .dark .bg-stone-100, .dark .bg-gray-100 {
+      background-color: #1e293b !important;
+    }
+    .dark .bg-stone-200, .dark .bg-gray-200 {
+      background-color: #334155 !important;
+    }
+    .dark .border-stone-100, .dark .border-stone-200, .dark .border-stone-300,
+    .dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 {
+      border-color: #1f2937 !important;
+    }
+    .dark .text-stone-900, .dark .text-stone-800, .dark .text-gray-900, .dark .text-gray-800 {
+      color: #f9fafb !important;
+    }
+    .dark .text-stone-700, .dark .text-stone-600, .dark .text-gray-700, .dark .text-gray-600 {
+      color: #cbd5e1 !important;
+    }
+    .dark .text-stone-500, .dark .text-stone-400, .dark .text-gray-500, .dark .text-gray-400 {
+      color: #94a3b8 !important;
+    }
+
+    /* Mobile Sheet & Bottom Navigation */
     #mobileMenuHub.active {
       display: flex !important;
     }
@@ -123,8 +277,6 @@
     .sheet-backdrop {
       transition: opacity 0.22s ease-out;
     }
-    
-    /* Native Mobile Bottom Navigation */
     .mob-nav-btn.active {
       color: #ed263a !important;
     }
@@ -136,235 +288,7 @@
     .mob-nav-btn .mob-ic-wrap {
       transition: all 0.2s ease-in-out;
     }
-  
-    /* =======================================================================
-       ORBIT SIBA COMPREHENSIVE DARK THEME RULES (No white tables/cards)
-       ======================================================================= */
-    .dark, .dark body {
-      background-color: #0f0d0d !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-white {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-stone-50, .dark .bg-stone-50 dark:bg-stone-900/50 {
-      background-color: #1a1717 !important;
-    }
-    .dark .bg-stone-100, .dark .bg-stone-100 dark:bg-stone-800/80 {
-      background-color: #242020 !important;
-    }
-    .dark .bg-stone-200, .dark .bg-stone-200 dark:bg-stone-700 {
-      background-color: #2e2929 !important;
-    }
-    .dark .border-stone-100, .dark .border-stone-100 dark:border-stone-800,
-    .dark .border-stone-200, .dark .border-stone-200 dark:border-stone-800,
-    .dark .border-stone-300, .dark .border-stone-300 dark:border-stone-700 {
-      border-color: #2b2626 !important;
-    }
-    .dark .text-stone-900, .dark .text-stone-900 dark:text-white,
-    .dark .text-stone-800, .dark .text-stone-800 dark:text-stone-100 {
-      color: #fafaf9 !important;
-    }
-    .dark .text-stone-700, .dark .text-stone-700 dark:text-stone-200,
-    .dark .text-stone-600, .dark .text-stone-600 dark:text-stone-300 {
-      color: #d6d3d1 !important;
-    }
-    .dark .text-stone-500, .dark .text-stone-500 dark:text-stone-400,
-    .dark .text-stone-400, .dark .text-stone-400 dark:text-stone-500 {
-      color: #a8a29e !important;
-    }
-    .dark table {
-      color: #e7e5e4 !important;
-    }
-    .dark thead, .dark thead tr, .dark thead th {
-      background-color: #1e1a1a !important;
-      color: #e7e5e4 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr {
-      background-color: #161313 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody td {
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr:hover,
-    .dark tr.hover\:bg-stone-50 dark:bg-stone-900/50:hover,
-    .dark tr.hover\:bg-stone-50:hover,
-    .dark tr.hover\:bg-stone-50\/70:hover {
-      background-color: #242020 !important;
-    }
-    .dark input:not([type="checkbox"]):not([type="radio"]),
-    .dark select,
-    .dark textarea {
-      background-color: #1a1717 !important;
-      color: #f5f2f2 !important;
-      border-color: #383232 !important;
-    }
-    .dark input:focus, .dark select:focus, .dark textarea:focus {
-      border-color: #ed263a !important;
-    }
-    .dark #generalModal > div,
-    .dark #authModal > div,
-    .dark #loadingModal > div {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-      border-color: #2b2626 !important;
-    }
-
-    /* =======================================================================
-       ORBIT SIBA COMPREHENSIVE DARK THEME RULES (No white tables/cards)
-       ======================================================================= */
-    .dark, .dark body {
-      background-color: #0f0d0d !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-white {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-stone-50, .dark .bg-stone-50 dark:bg-stone-900/50 {
-      background-color: #1a1717 !important;
-    }
-    .dark .bg-stone-100, .dark .bg-stone-100 dark:bg-stone-800/80 {
-      background-color: #242020 !important;
-    }
-    .dark .bg-stone-200, .dark .bg-stone-200 dark:bg-stone-700 {
-      background-color: #2e2929 !important;
-    }
-    .dark .border-stone-100, .dark .border-stone-100 dark:border-stone-800,
-    .dark .border-stone-200, .dark .border-stone-200 dark:border-stone-800,
-    .dark .border-stone-300, .dark .border-stone-300 dark:border-stone-700 {
-      border-color: #2b2626 !important;
-    }
-    .dark .text-stone-900, .dark .text-stone-900 dark:text-white,
-    .dark .text-stone-800, .dark .text-stone-800 dark:text-stone-100 {
-      color: #fafaf9 !important;
-    }
-    .dark .text-stone-700, .dark .text-stone-700 dark:text-stone-200,
-    .dark .text-stone-600, .dark .text-stone-600 dark:text-stone-300 {
-      color: #d6d3d1 !important;
-    }
-    .dark .text-stone-500, .dark .text-stone-500 dark:text-stone-400,
-    .dark .text-stone-400, .dark .text-stone-400 dark:text-stone-500 {
-      color: #a8a29e !important;
-    }
-    .dark table {
-      color: #e7e5e4 !important;
-    }
-    .dark thead, .dark thead tr, .dark thead th {
-      background-color: #1e1a1a !important;
-      color: #e7e5e4 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr {
-      background-color: #161313 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody td {
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr:hover,
-    .dark tr.hover\:bg-stone-50 dark:bg-stone-900/50:hover,
-    .dark tr.hover\:bg-stone-50:hover,
-    .dark tr.hover\:bg-stone-50\/70:hover {
-      background-color: #242020 !important;
-    }
-    .dark input:not([type="checkbox"]):not([type="radio"]),
-    .dark select,
-    .dark textarea {
-      background-color: #1a1717 !important;
-      color: #f5f2f2 !important;
-      border-color: #383232 !important;
-    }
-    .dark input:focus, .dark select:focus, .dark textarea:focus {
-      border-color: #ed263a !important;
-    }
-    .dark #generalModal > div,
-    .dark #authModal > div,
-    .dark #loadingModal > div {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-      border-color: #2b2626 !important;
-    }
-
-    /* =======================================================================
-       ORBIT SIBA COMPREHENSIVE DARK THEME RULES (No white tables/cards)
-       ======================================================================= */
-    .dark, .dark body {
-      background-color: #0f0d0d !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-white {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-    }
-    .dark .bg-stone-50, .dark .bg-stone-50 dark:bg-stone-900/50 {
-      background-color: #1a1717 !important;
-    }
-    .dark .bg-stone-100, .dark .bg-stone-100 dark:bg-stone-800/80 {
-      background-color: #242020 !important;
-    }
-    .dark .bg-stone-200, .dark .bg-stone-200 dark:bg-stone-700 {
-      background-color: #2e2929 !important;
-    }
-    .dark .border-stone-100, .dark .border-stone-100 dark:border-stone-800,
-    .dark .border-stone-200, .dark .border-stone-200 dark:border-stone-800,
-    .dark .border-stone-300, .dark .border-stone-300 dark:border-stone-700 {
-      border-color: #2b2626 !important;
-    }
-    .dark .text-stone-900, .dark .text-stone-900 dark:text-white,
-    .dark .text-stone-800, .dark .text-stone-800 dark:text-stone-100 {
-      color: #fafaf9 !important;
-    }
-    .dark .text-stone-700, .dark .text-stone-700 dark:text-stone-200,
-    .dark .text-stone-600, .dark .text-stone-600 dark:text-stone-300 {
-      color: #d6d3d1 !important;
-    }
-    .dark .text-stone-500, .dark .text-stone-500 dark:text-stone-400,
-    .dark .text-stone-400, .dark .text-stone-400 dark:text-stone-500 {
-      color: #a8a29e !important;
-    }
-    .dark table {
-      color: #e7e5e4 !important;
-    }
-    .dark thead, .dark thead tr, .dark thead th {
-      background-color: #1e1a1a !important;
-      color: #e7e5e4 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr {
-      background-color: #161313 !important;
-      border-color: #2b2626 !important;
-    }
-    .dark tbody td {
-      border-color: #2b2626 !important;
-    }
-    .dark tbody tr:hover,
-    .dark tr.hover\:bg-stone-50 dark:bg-stone-900/50:hover,
-    .dark tr.hover\:bg-stone-50:hover,
-    .dark tr.hover\:bg-stone-50\/70:hover {
-      background-color: #242020 !important;
-    }
-    .dark input:not([type="checkbox"]):not([type="radio"]),
-    .dark select,
-    .dark textarea {
-      background-color: #1a1717 !important;
-      color: #f5f2f2 !important;
-      border-color: #383232 !important;
-    }
-    .dark input:focus, .dark select:focus, .dark textarea:focus {
-      border-color: #ed263a !important;
-    }
-    .dark #generalModal > div,
-    .dark #authModal > div,
-    .dark #loadingModal > div {
-      background-color: #161313 !important;
-      color: #f5f2f2 !important;
-      border-color: #2b2626 !important;
-    }
-</style>
+  </style>
   <!-- Google Identity Services (Real Google Sign-In) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -378,10 +302,10 @@
     <!-- =====================================================================
        ORBIT SIBA FOOD: MODERN MINIMALIST ERP SIDEBAR (PC & TABLET)
        ===================================================================== -->
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#141111] text-stone-800 dark:text-stone-200 flex flex-col transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static border-r border-stone-200/80 dark:border-stone-800/80 shadow-2xl lg:shadow-none select-none">
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#0D1117] text-gray-800 dark:text-gray-200 flex flex-col transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static border-r border-stone-200/80 dark:border-stone-800/80 shadow-2xl lg:shadow-none select-none">
     
     <!-- Sidebar Brand Header -->
-    <div class="p-4 border-b border-stone-100 dark:border-stone-800/80 flex items-center justify-between bg-stone-50/60 dark:bg-stone-900/40">
+    <div class="p-4 border-b border-gray-200/80 dark:border-gray-800/80 flex items-center justify-between bg-gray-50/70 dark:bg-[#111827]/70">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ed263a] to-[#d01a2f] flex items-center justify-center text-white shadow-md shadow-rose-900/20 shrink-0">
           <i data-lucide="chef-hat" class="w-5 h-5"></i>
@@ -628,31 +552,42 @@
   <!-- Main Container -->
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
     
-    <!-- Top Header Bar (Native Mobile & Tablet App Bar) -->
-    <header class="sticky top-0 z-20 bg-white/95 dark:bg-[#161313]/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-xs">
+    <!-- Top Header Bar (NextAdmin SaaS Architecture) -->
+    <header class="sticky top-0 z-30 h-16 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800/80 px-3 sm:px-6 flex items-center justify-between gap-3 shadow-xs">
       
       <!-- Left: Mobile Brand & Active Tab Indicator -->
-      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+      <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
         <!-- Drawer Toggle Button (Tablet & Mobile) -->
-        <button onclick="openMobileMenuHub()" class="lg:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:scale-95 transition-transform shrink-0" title="Khởi chạy chức năng">
+        <button onclick="openMobileMenuHub()" class="lg:hidden p-2 rounded-xl text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 active:scale-95 transition-all shrink-0" title="Khởi chạy chức năng">
           <i data-lucide="layout-grid" class="w-4 h-4 text-[#ed263a]"></i>
         </button>
         
-        <!-- Brand Title / Mobile Indicator -->
+        <!-- Brand Title & Active Module Pill -->
         <div class="flex items-center gap-2 min-w-0">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#ed263a] animate-pulse shrink-0"></span>
-          <span class="font-extrabold text-stone-900 dark:text-white text-sm sm:text-base tracking-tight shrink-0">ORBIT</span>
-          <span id="mobileHeaderTitle" class="text-[11px] sm:text-xs font-bold text-[#ed263a] dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl border border-rose-200 dark:border-rose-900/60 truncate">🏆 Toàn Chuỗi</span>
+          <div class="hidden sm:flex items-center gap-1.5 shrink-0">
+            <span class="w-2 h-2 rounded-full bg-[#ed263a] animate-pulse"></span>
+            <span class="font-extrabold text-gray-900 dark:text-white text-sm tracking-tight">ORBIT</span>
+          </div>
+          <span id="mobileHeaderTitle" class="text-xs font-bold text-[#ed263a] dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/20 px-2.5 py-1 rounded-xl border border-rose-300/40 dark:border-rose-900/60 truncate">🏆 Toàn Chuỗi</span>
         </div>
       </div>
 
-      <!-- Right: Mobile Quick Controls -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Center: NextAdmin Global Quick Search (Desktop) -->
+      <div class="hidden md:flex items-center max-w-xs xl:max-w-md w-full mx-2">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="globalHeaderSearch" oninput="filterGlobalQuickSearch(this.value)" placeholder="Tìm chức năng, nguyên liệu, phiếu..." class="w-full pl-9 pr-14 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-700/80 bg-gray-50/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none focus:border-[#ed263a] focus:bg-white dark:focus:bg-[#111827] transition-all">
+          <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-gray-200/70 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 select-none">Ctrl K</kbd>
+        </div>
+      </div>
+
+      <!-- Right: NextAdmin Controls & User Profile Chip -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
         
         <!-- Global Branch Chip Selector -->
-        <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800/90 rounded-xl px-2 sm:px-2.5 py-1.5 border border-stone-200 dark:border-stone-700 text-xs shadow-2xs">
+        <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-xl px-2.5 py-1.5 border border-gray-200 dark:border-gray-700 text-xs">
           <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ed263a] shrink-0"></i>
-          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-bold text-stone-800 dark:text-stone-200 outline-none cursor-pointer text-[11px] sm:text-xs max-w-[100px] sm:max-w-[170px] truncate">
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-bold text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[110px] sm:max-w-[160px] truncate">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
             <option value="K002">K002 - MN Trường MN Hoa Hồng Đỏ</option>
@@ -671,15 +606,25 @@
           </select>
         </div>
 
-        <!-- Global Month Selector (Hidden on extra small phones, visible on sm+) -->
-        <div class="hidden sm:flex items-center gap-1 bg-stone-100 dark:bg-stone-800/90 rounded-xl px-2 py-1.5 border border-stone-200 dark:border-stone-700 text-xs">
-          <i data-lucide="calendar" class="w-3.5 h-3.5 text-stone-500"></i>
-          <span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-stone-500 dark:text-stone-400 mr-2"></span><span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-stone-500 dark:text-stone-400 mr-2"></span><input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-stone-800 dark:text-stone-200 outline-none text-xs">
+        <!-- Global Month Selector -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-xl px-2.5 py-1.5 border border-gray-200 dark:border-gray-700 text-xs">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
+          <span id="currentDateDisplay" class="hidden xl:inline text-[11px] font-medium text-gray-500 dark:text-gray-400 mr-1"></span>
+          <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent font-mono font-medium text-gray-800 dark:text-gray-200 outline-none text-xs">
         </div>
 
-        <!-- Theme Toggle Button -->
-        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="p-1.5 sm:p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 active:scale-95 transition-all">
+        <!-- NextAdmin Theme Toggle Pill -->
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 active:scale-95 transition-all">
           <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- NextAdmin Header User Profile Button -->
+        <button onclick="openGoogleAuthModal()" class="flex items-center gap-2 p-1 pl-1.5 sm:pr-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/80 dark:hover:bg-gray-800 active:scale-98 transition-all" title="Tài khoản & Phân quyền">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=Admin&background=ed263a&color=fff" alt="Avatar" class="w-7 h-7 rounded-lg object-cover ring-1 ring-black/5 dark:ring-white/10">
+          <div class="hidden xl:flex flex-col text-left leading-tight">
+            <span id="headerUserName" class="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[110px]">Tuấn Đại</span>
+            <span id="headerUserRoleBadge" class="text-[9px] font-extrabold text-[#ed263a] uppercase">ADMIN</span>
+          </div>
         </button>
 
       </div>
@@ -9501,14 +9446,22 @@ function initRbacAuth() {
 
 // 2. Cập nhật giao diện theo User Session & Phân Quyền
 function applyUserSessionToUI() {
+  // Sync Sidebar Profile
   const nameEl = document.getElementById('sidebarUserName');
   const roleEl = document.getElementById('sidebarUserRoleBadge');
   const emailEl = document.getElementById('sidebarUserEmail');
   const avImg = document.getElementById('userAvatarImg');
 
+  // Sync NextAdmin Header Profile
+  const hdrName = document.getElementById('headerUserName');
+  const hdrRole = document.getElementById('headerUserRoleBadge');
+  const hdrAv = document.getElementById('headerUserAvatar');
+
   if (nameEl) nameEl.textContent = gCurrentUser.fullName || 'Người dùng';
+  if (hdrName) hdrName.textContent = gCurrentUser.fullName || 'Người dùng';
   if (emailEl) emailEl.textContent = gCurrentUser.email || '';
   if (avImg && gCurrentUser.avatarUrl) avImg.src = gCurrentUser.avatarUrl;
+  if (hdrAv && gCurrentUser.avatarUrl) hdrAv.src = gCurrentUser.avatarUrl;
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.role || 'ADMIN';
@@ -9518,6 +9471,17 @@ function applyUserSessionToUI() {
       gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
       gCurrentUser.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
       'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300'
+    }`;
+  }
+
+  if (hdrRole) {
+    hdrRole.textContent = gCurrentUser.role || 'ADMIN';
+    hdrRole.className = `text-[9px] font-extrabold uppercase truncate ${
+      gCurrentUser.role === 'ADMIN' ? 'text-rose-600 dark:text-rose-400' :
+      gCurrentUser.role === 'BEP_TRUONG' ? 'text-blue-600 dark:text-blue-400' :
+      gCurrentUser.role === 'KHO_TRUONG' ? 'text-amber-600 dark:text-amber-400' :
+      gCurrentUser.role === 'KE_TOAN' ? 'text-emerald-600 dark:text-emerald-400' :
+      'text-gray-500'
     }`;
   }
 
@@ -9750,6 +9714,28 @@ window.dangXuatAdmin = function() {
 };
 
 // 8. Quick Filter Sidebar Menu on PC
+// Global Quick Search (NextAdmin Search Bar)
+window.filterGlobalQuickSearch = function(query) {
+  const q = (query || '').toLowerCase().trim();
+  const sidebarSearch = document.getElementById('sidebarMenuSearch');
+  if (sidebarSearch && sidebarSearch.value !== query) {
+    sidebarSearch.value = query;
+  }
+  filterSidebarMenu(query);
+};
+
+// Keyboard Shortcut: Ctrl + K (or Cmd + K) to focus Global Search
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const searchInput = document.getElementById('globalHeaderSearch') || document.getElementById('sidebarMenuSearch');
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.select();
+    }
+  }
+});
+
 window.filterSidebarMenu = function(query) {
   const q = (query || '').toLowerCase().trim();
   document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
