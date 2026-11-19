@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
   
-  <!-- Google Fonts: Be Vietnam Pro & JetBrains Mono (Theo quy chuẩn User) -->
+  <!-- Google Fonts: Outfit (100% TailAdmin) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,67 +22,67 @@
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Outfit"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
           width: {
             '72.5': '18.125rem', // 290px (TailAdmin Exact Width)
           },
           spacing: {
             '72.5': '18.125rem',
           },
-          fontFamily: {
-            sans: ['"Be Vietnam Pro"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
           colors: {
-            // NextAdmin Core Brand & Accent Colors
+            // TailAdmin 100% Official Brand Colors (Vivid Electric Blue / Indigo)
+            brand: {
+              50: 'rgba(236, 243, 255, 1)',
+              100: 'rgba(221, 233, 255, 1)',
+              200: 'rgba(194, 214, 255, 1)',
+              300: 'rgba(156, 185, 255, 1)',
+              400: 'rgba(117, 146, 255, 1)',
+              500: 'rgba(70, 95, 255, 1)',   // #465FFF Primary
+              600: 'rgba(54, 65, 245, 1)',
+              700: 'rgba(42, 49, 216, 1)',
+              800: 'rgba(37, 45, 174, 1)',
+              900: 'rgba(38, 46, 137, 1)',
+              950: 'rgba(22, 25, 80, 1)'
+            },
             primary: {
-              50: '#eff3ff',
-              100: '#dae2ff',
-              200: '#becdff',
-              300: '#91aeff',
-              400: '#5e84fc',
-              500: '#3758f9',
-              600: '#2237ee',
-              700: '#1a25db',
-              800: '#1c20b1',
-              900: '#1c228c',
-              950: '#161755'
+              50: '#ecf3ff',
+              100: '#dde9ff',
+              200: '#c2d6ff',
+              300: '#9cb9ff',
+              400: '#7592ff',
+              500: '#465fff',
+              600: '#3641f5',
+              700: '#2a31d8',
+              800: '#252dae',
+              900: '#262e89'
             },
-            siba: {
-              50: '#fff4f3',
-              100: '#ffe4e4',
-              200: '#ffcccc',
-              300: '#ff9999',
-              400: '#ff6666',
-              500: '#ed263a', // Siba Red Primary
-              600: '#d01a2f',
-              700: '#ab0521',
-              800: '#8c041b',
-              900: '#52020f'
-            },
-            // NextAdmin Dark Theme Surface Tokens
             dark: {
-              bg: '#0b0f19',        // Deep Dark Slate body background
-              surface: '#111827',   // Slate-900 Card / Header / Sidebar surface
-              card: '#161f30',      // Elevated Card background
-              border: '#1f2937',    // Border
+              bg: '#000000',        // TailAdmin Dark Body / Sidebar Background
+              surface: '#101828',   // TailAdmin Dark Card / Surface
+              card: '#111827',
+              border: '#1f2937',
               borderSoft: '#2d3748',
               muted: '#6b7280',
-              text: '#f9fafb'
+              text: '#ffffff'
             },
-            // NextAdmin Light Theme Surface Tokens
             light: {
-              bg: '#f9fafb',        // Cool Gray body background
-              surface: '#ffffff',   // Pure White surface
-              border: '#e5e7eb',    // Clean 1px border
+              bg: '#f9fafb',        // TailAdmin Light Background
+              surface: '#ffffff',
+              border: '#e5e7eb',
               borderSoft: '#f3f4f6',
               muted: '#9ca3af',
-              text: '#111827'
+              text: '#101828'
             }
           },
           boxShadow: {
-            'card': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-            'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
-            'nextadmin': '0 4px 20px -2px rgba(0, 0, 0, 0.06)'
+            'card': '0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
+            'theme-xs': '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
+            'theme-sm': '0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
+            'theme-md': '0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)',
+            'theme-lg': '0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)'
           }
         }
       }
@@ -91,68 +91,69 @@
 
   <style>
     @theme {
-      --font-sans: 'Be Vietnam Pro', sans-serif;
+      --font-sans: 'Outfit', sans-serif;
     }
     :root {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      --font-sans: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Outfit', sans-serif;
+      --font-sans: 'Outfit', sans-serif;
       --font-mono: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace;
       -webkit-tap-highlight-color: transparent;
 
-      /* NextAdmin Light Mode Variables */
+      /* TailAdmin 100% Light Mode Tokens */
       --app-bg: #f9fafb;
       --surface-bg: #ffffff;
       --surface-subtle: #f3f4f6;
       --border-main: #e5e7eb;
       --border-subtle: #f1f5f9;
-      --text-main: #111827;
-      --text-sub: #4b5563;
-      --text-muted: #9ca3af;
-      --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      --text-main: #101828;
+      --text-sub: #475467;
+      --text-muted: #98a2b3;
+      --color-brand-500: #465fff;
+      --card-shadow: 0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06);
     }
 
     .dark {
-      /* NextAdmin Dark Mode Variables (Deep Slate / Navy) */
-      --app-bg: #0b0f19;
-      --surface-bg: #111827;
+      /* TailAdmin 100% Dark Mode Tokens (Pitch Black & Dark Slate) */
+      --app-bg: #000000;
+      --surface-bg: #101828;
       --surface-subtle: #161f30;
       --border-main: #1f2937;
       --border-subtle: #242f42;
-      --text-main: #f9fafb;
-      --text-sub: #9ca3af;
-      --text-muted: #6b7280;
-      --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+      --text-main: #ffffff;
+      --text-sub: #98a2b3;
+      --text-muted: #667085;
+      --color-brand-500: #465fff;
+      --card-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.4);
     }
 
     body {
-      font-family: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Outfit', sans-serif;
       background-color: var(--app-bg);
       color: var(--text-main);
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Quy chuẩn hiển thị số theo user rules */
+    /* Quy chuẩn hiển thị số cố định bề ngang (Tabular figures) */
     .font-mono, .num, code, .pos-mono, .font-receipt {
       font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
-      font-feature-settings: 'tnum' 1; /* Cố định độ rộng chữ số (Tabular numbers) */
+      font-feature-settings: 'tnum' 1;
     }
 
-    /* Tab Switch Animations (Smooth NextAdmin fade & slight slide) */
+    /* Tab Switch Animations */
     .tab-panel {
       display: none;
-      animation: nextAdminFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: tailAdminFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tab-panel.active {
       display: block;
     }
-    @keyframes nextAdminFadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+    @keyframes tailAdminFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    
     /* TailAdmin Exact Menu & Sidebar Specifications */
-    .w-72\.5, .w-72\.5 {
+    .w-72\.5 {
       width: 18.125rem !important; /* 290px */
     }
     .menu-item {
@@ -167,33 +168,33 @@
       transition: all 0.15s ease-in-out;
     }
     .menu-item.active, .menu-item-active {
-      background-color: #fff1f2 !important; /* bg-rose-50 */
-      color: #ed263a !important; /* text-brand-500 */
+      background-color: rgba(236, 243, 255, 1) !important; /* bg-brand-50 */
+      color: #465fff !important; /* text-brand-500 */
       font-weight: 600 !important;
     }
     .dark .menu-item.active, .dark .menu-item-active {
-      background-color: rgba(237, 38, 58, 0.12) !important;
-      color: #ff6b7a !important;
+      background-color: rgba(70, 95, 255, 0.12) !important; /* dark:bg-brand-500/[0.12] */
+      color: #7592ff !important; /* dark:text-brand-400 */
     }
     .menu-item.active .menu-icon {
-      color: #ed263a !important;
+      color: #465fff !important;
     }
     .dark .menu-item.active .menu-icon {
-      color: #ff6b7a !important;
+      color: #7592ff !important;
     }
     .menu-item:not(.active):hover {
       background-color: #f3f4f6; /* hover:bg-gray-100 */
-      color: #111827;
+      color: #101828;
     }
     .dark .menu-item:not(.active):hover {
       background-color: rgba(255, 255, 255, 0.05); /* dark:hover:bg-white/5 */
       color: #ffffff;
     }
     .menu-item:not(.active):hover .menu-icon {
-      color: #1f2937;
+      color: #101828;
     }
     .dark .menu-item:not(.active):hover .menu-icon {
-      color: #f3f4f6;
+      color: #ffffff;
     }
 
     /* Custom Modern Slim Scrollbars */
@@ -211,28 +212,23 @@
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #374151;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #9ca3af;
-    }
 
-    /* NextAdmin Card Architecture */
-    .siba-card, .nextadmin-card {
+    /* TailAdmin Card Architecture */
+    .siba-card, .nextadmin-card, .tailadmin-card {
       background-color: var(--surface-bg);
       border: 1px solid var(--border-main);
-      border-radius: 0.875rem;
+      border-radius: 0.75rem; /* rounded-xl */
       box-shadow: var(--card-shadow);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .siba-card:hover, .nextadmin-card:hover {
-      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.08);
-      border-color: #d1d5db;
+    .siba-card:hover, .tailadmin-card:hover {
+      box-shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06);
     }
-    .dark .siba-card:hover, .dark .nextadmin-card:hover {
-      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.45);
-      border-color: #374151;
+    .dark .siba-card:hover, .dark .tailadmin-card:hover {
+      box-shadow: 0px 6px 12px -2px rgba(0, 0, 0, 0.5);
     }
 
-    /* NextAdmin Table Architecture */
+    /* TailAdmin Table Architecture */
     table {
       width: 100%;
       border-collapse: separate;
@@ -257,12 +253,12 @@
     }
     tbody td {
       padding: 0.75rem 1rem;
-      font-size: 0.75rem;
+      font-size: 0.8125rem;
       border-bottom: 1px solid var(--border-subtle);
       color: var(--text-main);
     }
 
-    /* Form Inputs & Controls */
+    /* Form Inputs */
     input:not([type="checkbox"]):not([type="radio"]),
     select,
     textarea {
@@ -273,44 +269,39 @@
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #ed263a !important;
-      box-shadow: 0 0 0 3px rgba(237, 38, 58, 0.12);
+      border-color: #465fff !important; /* TailAdmin Brand 500 Focus */
+      box-shadow: 0px 0px 0px 4px rgba(70, 95, 255, 0.12) !important;
     }
     .dark input:not([type="checkbox"]):not([type="radio"]),
     .dark select,
     .dark textarea {
-      background-color: #111827;
-      color: #f9fafb;
+      background-color: #101828;
+      color: #ffffff;
       border-color: #1f2937;
     }
 
-    /* NextAdmin Dark Mode Complete Overrides (Eliminates rogue white backgrounds) */
+    /* Dark Mode Deep Blacks (TailAdmin Standards) */
     .dark .bg-white {
-      background-color: #111827 !important;
-      color: #f9fafb !important;
+      background-color: #101828 !important;
+      color: #ffffff !important;
     }
-    .dark .bg-stone-50, .dark .bg-stone-50\/50, .dark .bg-stone-50\/60, .dark .bg-stone-50\/70,
-    .dark .bg-gray-50 {
+    .dark .bg-gray-50, .dark .bg-stone-50 {
+      background-color: #0d1117 !important;
+    }
+    .dark .bg-gray-100, .dark .bg-stone-100 {
       background-color: #161f30 !important;
     }
-    .dark .bg-stone-100, .dark .bg-gray-100 {
-      background-color: #1e293b !important;
-    }
-    .dark .bg-stone-200, .dark .bg-gray-200 {
-      background-color: #334155 !important;
-    }
-    .dark .border-stone-100, .dark .border-stone-200, .dark .border-stone-300,
-    .dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 {
+    .dark .border-gray-200, .dark .border-stone-200 {
       border-color: #1f2937 !important;
     }
-    .dark .text-stone-900, .dark .text-stone-800, .dark .text-gray-900, .dark .text-gray-800 {
-      color: #f9fafb !important;
+    .dark .text-gray-900, .dark .text-stone-900 {
+      color: #ffffff !important;
     }
-    .dark .text-stone-700, .dark .text-stone-600, .dark .text-gray-700, .dark .text-gray-600 {
-      color: #cbd5e1 !important;
+    .dark .text-gray-700, .dark .text-stone-700 {
+      color: #d0d5dd !important;
     }
-    .dark .text-stone-500, .dark .text-stone-400, .dark .text-gray-500, .dark .text-gray-400 {
-      color: #94a3b8 !important;
+    .dark .text-gray-500, .dark .text-stone-500 {
+      color: #98a2b3 !important;
     }
 
     /* Mobile Sheet & Bottom Navigation */
@@ -330,11 +321,11 @@
       transition: opacity 0.22s ease-out;
     }
     .mob-nav-btn.active {
-      color: #ed263a !important;
+      color: #465fff !important;
     }
     .mob-nav-btn.active .mob-ic-wrap {
-      background-color: rgba(237, 38, 58, 0.12);
-      color: #ed263a;
+      background-color: rgba(70, 95, 255, 0.12);
+      color: #465fff;
       transform: translateY(-2px);
     }
     .mob-nav-btn .mob-ic-wrap {
@@ -362,13 +353,13 @@
     <!-- SIDEBAR HEADER (TailAdmin exact layout) -->
     <div class="sidebar-header flex items-center justify-between gap-2 pt-5 pb-5">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-[#ed263a] flex items-center justify-center text-white shadow-sm shrink-0">
+        <div class="w-10 h-10 rounded-xl bg-[#465fff] flex items-center justify-center text-white shadow-sm shrink-0">
           <i data-lucide="chef-hat" class="w-5 h-5"></i>
         </div>
         <div class="min-w-0">
           <div class="font-extrabold text-gray-900 dark:text-white text-base tracking-tight flex items-center gap-1.5">
             <span>A.Kitchen</span>
-            <span class="text-[9.5px] px-1.5 py-0.5 rounded font-black bg-[#ed263a] text-white tracking-wide">ORBIT</span>
+            <span class="text-[9.5px] px-1.5 py-0.5 rounded font-black bg-[#465fff] text-white tracking-wide">ORBIT</span>
           </div>
           <div class="text-xs text-gray-400 dark:text-gray-500 font-medium truncate">Siba Food • Chuỗi F&amp;B</div>
         </div>
@@ -397,9 +388,9 @@
           </div>
           <ul class="mb-3 flex flex-col gap-1">
             <li>
-              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left active menu-item-active bg-rose-50 text-[#ed263a] font-semibold dark:bg-[#ed263a]/[0.12] dark:text-rose-400">
+              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left active menu-item-active bg-[#ecf3ff] text-[#465fff] font-semibold dark:bg-[#465fff]/[0.12] dark:text-[#7592ff]">
                 <div class="flex items-center gap-3 min-w-0">
-                  <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-[#ed263a] dark:text-rose-400"></i>
+                  <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-[#465fff] dark:text-[#7592ff]"></i>
                   <span class="truncate">Toàn Chuỗi & Xếp Hạng</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
@@ -656,10 +647,10 @@
         <!-- Brand Title & Active Module Pill -->
         <div class="flex items-center gap-2 min-w-0">
           <div class="hidden sm:flex items-center gap-1.5 shrink-0">
-            <span class="w-2 h-2 rounded-full bg-[#ed263a] animate-pulse"></span>
+            <span class="w-2 h-2 rounded-full bg-[#465fff] animate-pulse"></span>
             <span class="font-extrabold text-gray-900 dark:text-white text-sm tracking-tight">ORBIT</span>
           </div>
-          <span id="mobileHeaderTitle" class="text-xs font-bold text-[#ed263a] dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/20 px-2.5 py-1 rounded-xl border border-rose-300/40 dark:border-rose-900/60 truncate">🏆 Toàn Chuỗi</span>
+          <span id="mobileHeaderTitle" class="text-xs font-bold text-[#465fff] dark:text-[#7592ff] bg-[#ecf3ff] dark:bg-[#465fff]/20 px-2.5 py-1 rounded-xl border border-[#c2d6ff] dark:border-[#465fff]/30 truncate">🏆 Toàn Chuỗi</span>
         </div>
       </div>
 
@@ -677,7 +668,7 @@
         
         <!-- Global Branch Chip Selector -->
         <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-xl px-2.5 py-1.5 border border-gray-200 dark:border-gray-700 text-xs">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ed263a] shrink-0"></i>
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#465fff] shrink-0"></i>
           <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value)" class="bg-transparent font-bold text-gray-800 dark:text-gray-200 outline-none cursor-pointer text-xs max-w-[110px] sm:max-w-[160px] truncate">
             <option value="ALL">Tất Cả Điểm Bán (Chuỗi)</option>
             <option value="K001">K001 - MN Bếp Ăn ĐH Hùng Vương</option>
@@ -2680,7 +2671,7 @@
         <div class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-[#ed263a] via-[#e0192e] to-[#ab0521] text-white shadow-lg shadow-rose-900/35 flex items-center justify-center border-4 border-white dark:border-[#161313] transition-all group-hover:scale-105">
           <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
-        <span class="text-[9.5px] font-extrabold text-[#ed263a] dark:text-rose-400 mt-0.5">Nhập Từ</span>
+        <span class="text-[9.5px] font-extrabold text-[#465fff] dark:text-[#7592ff] mt-0.5">Nhập Từ</span>
       </button>
 
       <!-- Tab 4: Suất Ăn Ca Bếp -->
@@ -2881,7 +2872,7 @@
                 <i data-lucide="receipt" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-extrabold text-[#ed263a] dark:text-rose-400 truncate">Nhập Chứng Từ</div>
+                <div class="font-extrabold text-[#465fff] dark:text-[#7592ff] truncate">Nhập Chứng Từ</div>
                 <div class="text-[10px] text-stone-500 truncate">Full Screen</div>
               </div>
             </button>
@@ -3631,11 +3622,11 @@
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('active', 'menu-item-active', 'bg-rose-50', 'text-[#ed263a]', 'font-semibold', 'dark:bg-[#ed263a]/[0.12]', 'dark:text-rose-400');
+        b.classList.remove('active', 'menu-item-active', 'bg-[#ecf3ff]', 'text-[#465fff]', 'font-semibold', 'dark:bg-[#465fff]/[0.12]', 'dark:text-[#7592ff]');
         b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
         const ic = b.querySelector('.menu-icon');
         if (ic) {
-          ic.classList.remove('text-[#ed263a]', 'dark:text-rose-400');
+          ic.classList.remove('text-[#465fff]', 'dark:text-[#7592ff]');
           ic.classList.add('text-gray-500', 'dark:text-gray-400');
         }
       });
@@ -3643,11 +3634,11 @@
       const target = document.getElementById(tabId);
       if (target) target.classList.add('active');
       if (btn) {
-        btn.classList.add('active', 'menu-item-active', 'bg-rose-50', 'text-[#ed263a]', 'font-semibold', 'dark:bg-[#ed263a]/[0.12]', 'dark:text-rose-400');
+        btn.classList.add('active', 'menu-item-active', 'bg-[#ecf3ff]', 'text-[#465fff]', 'font-semibold', 'dark:bg-[#465fff]/[0.12]', 'dark:text-[#7592ff]');
         btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
         const ic = btn.querySelector('.menu-icon');
         if (ic) {
-          ic.classList.add('text-[#ed263a]', 'dark:text-rose-400');
+          ic.classList.add('text-[#465fff]', 'dark:text-[#7592ff]');
           ic.classList.remove('text-gray-500', 'dark:text-gray-400');
         }
       }
@@ -5861,7 +5852,7 @@ window.searchVouchers = async function() {
     if (tbody) {
       tbody.innerHTML = items.map(r => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.maCT}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.maCT}</td>
           <td class="p-3 text-stone-900 dark:text-stone-100 font-medium">${r.site}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-mono text-[11px] border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span></td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
@@ -5885,7 +5876,7 @@ window.searchVouchers = async function() {
       mobContainer.innerHTML = items.map(r => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${r.maCT}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white leading-snug">${r.site}</div>
@@ -5972,7 +5963,7 @@ window.viewVoucherDetail = async function(maCT) {
       const html = `
         <div class="space-y-3 text-xs">
           <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-stone-50 dark:bg-stone-900/60 rounded-2xl border border-stone-200 dark:border-stone-800">
-            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#ed263a] dark:text-rose-400">${v.voucher_code}</b></div>
+            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#465fff] dark:text-[#7592ff]">${v.voucher_code}</b></div>
             <div><span class="text-stone-400">Loại hóa đơn:</span><br><b class="text-stone-800 dark:text-stone-200">${v.invoice_type}</b></div>
             <div><span class="text-stone-400">Điểm bán:</span><br><b class="text-stone-800 dark:text-stone-200">${v.site_name}</b></div>
             <div><span class="text-stone-400">Nhà cung cấp:</span><br><b class="text-stone-800 dark:text-stone-200">${v.supplier_name || '—'}</b></div>
@@ -6056,7 +6047,7 @@ window.renderFefoRows = function(items) {
             <div>Vị trí kệ: <b class="font-mono text-stone-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tồn khả dụng:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.qty} ${r.uom}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.qty} ${r.uom}</span>
             </div>
           </div>
         </div>
@@ -6085,7 +6076,7 @@ window.loadReorderROP = async function() {
             <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.safety_stock}</td>
             <td class="p-3 text-right font-mono font-bold text-amber-600">${r.rop}</td>
             <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${r.current_stock}</td>
-            <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.suggested_order}</td>
+            <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.suggested_order}</td>
             <td class="p-3 text-center">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
             </td>
@@ -6107,7 +6098,7 @@ window.loadReorderROP = async function() {
               <div>Tồn hiện tại: <b class="font-mono text-stone-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="font-mono text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="font-mono text-stone-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.suggested_order} ${r.uom}</b></div>
+              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.suggested_order} ${r.uom}</b></div>
             </div>
           </div>
         `).join('');
@@ -6243,13 +6234,13 @@ window.loadHistory = async function() {
     if (tbody) {
       tbody.innerHTML = json.data.map(o => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${o.maDon}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${o.maDon}</td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
           <td class="p-3 font-bold text-stone-900 dark:text-white">${o.site}</td>
           <td class="p-3 text-stone-700 dark:text-stone-300">${o.nguoiDat}</td>
           <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${o.soDong}</td>
           <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-          <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</td>
+          <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</td>
           <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span></td>
           <td class="p-3 text-right">
             <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
@@ -6265,7 +6256,7 @@ window.loadHistory = async function() {
       mob.innerHTML = json.data.map(o => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${o.maDon}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white">${o.site}</div>
@@ -6276,7 +6267,7 @@ window.loadHistory = async function() {
             <div>Tổng số lượng: <b class="font-mono text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</span>
             </div>
           </div>
           <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
@@ -6323,7 +6314,7 @@ window.loadAudit = async function() {
                 <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white rounded font-mono text-right text-xs"
                   oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
               </td>
-              <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+              <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
             </tr>
           `;
         }).join('');
@@ -6357,7 +6348,7 @@ window.loadAudit = async function() {
                 </div>
                 <div class="text-center">
                   <div class="text-[10px] text-stone-400">Tồn cuối kỳ</div>
-                  <div class="font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                  <div class="font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
                 </div>
               </div>
             </div>
@@ -6448,7 +6439,7 @@ window.renderFnbChainTable = function(items) {
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#ed263a] dark:text-rose-400' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
               <div>
                 <div class="font-extrabold text-xs sm:text-sm text-stone-900 dark:text-white leading-tight">${s.name}</div>
                 <div class="text-[10px] font-mono text-stone-400">Mã: ${s.code} • ${s.region}</div>
@@ -6499,7 +6490,7 @@ window.renderFnbSites = function(sites) {
   if (tbody) {
     tbody.innerHTML = sites.map(s => `
       <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-        <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${s.code}</td>
+        <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${s.code}</td>
         <td class="p-3 font-bold text-stone-900 dark:text-white">${s.name}</td>
         <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
         <td class="p-3 text-stone-600 dark:text-stone-300">${s.address || '—'}</td>
@@ -6518,7 +6509,7 @@ window.renderFnbSites = function(sites) {
       <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${s.code}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
           </div>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-stone-100 text-stone-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
@@ -6638,7 +6629,7 @@ window.searchVouchers = async function() {
     if (tbody) {
       tbody.innerHTML = items.map(r => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.maCT}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.maCT}</td>
           <td class="p-3 text-stone-900 dark:text-stone-100 font-medium">${r.site}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-mono text-[11px] border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span></td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
@@ -6662,7 +6653,7 @@ window.searchVouchers = async function() {
       mobContainer.innerHTML = items.map(r => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${r.maCT}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white leading-snug">${r.site}</div>
@@ -6749,7 +6740,7 @@ window.viewVoucherDetail = async function(maCT) {
       const html = `
         <div class="space-y-3 text-xs">
           <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-stone-50 dark:bg-stone-900/60 rounded-2xl border border-stone-200 dark:border-stone-800">
-            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#ed263a] dark:text-rose-400">${v.voucher_code}</b></div>
+            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#465fff] dark:text-[#7592ff]">${v.voucher_code}</b></div>
             <div><span class="text-stone-400">Loại hóa đơn:</span><br><b class="text-stone-800 dark:text-stone-200">${v.invoice_type}</b></div>
             <div><span class="text-stone-400">Điểm bán:</span><br><b class="text-stone-800 dark:text-stone-200">${v.site_name}</b></div>
             <div><span class="text-stone-400">Nhà cung cấp:</span><br><b class="text-stone-800 dark:text-stone-200">${v.supplier_name || '—'}</b></div>
@@ -6833,7 +6824,7 @@ window.renderFefoRows = function(items) {
             <div>Vị trí kệ: <b class="font-mono text-stone-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tồn khả dụng:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.qty} ${r.uom}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.qty} ${r.uom}</span>
             </div>
           </div>
         </div>
@@ -6862,7 +6853,7 @@ window.loadReorderROP = async function() {
             <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.safety_stock}</td>
             <td class="p-3 text-right font-mono font-bold text-amber-600">${r.rop}</td>
             <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${r.current_stock}</td>
-            <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.suggested_order}</td>
+            <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.suggested_order}</td>
             <td class="p-3 text-center">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
             </td>
@@ -6884,7 +6875,7 @@ window.loadReorderROP = async function() {
               <div>Tồn hiện tại: <b class="font-mono text-stone-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="font-mono text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="font-mono text-stone-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.suggested_order} ${r.uom}</b></div>
+              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.suggested_order} ${r.uom}</b></div>
             </div>
           </div>
         `).join('');
@@ -7020,13 +7011,13 @@ window.loadHistory = async function() {
     if (tbody) {
       tbody.innerHTML = json.data.map(o => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${o.maDon}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${o.maDon}</td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
           <td class="p-3 font-bold text-stone-900 dark:text-white">${o.site}</td>
           <td class="p-3 text-stone-700 dark:text-stone-300">${o.nguoiDat}</td>
           <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${o.soDong}</td>
           <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-          <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</td>
+          <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</td>
           <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span></td>
           <td class="p-3 text-right">
             <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
@@ -7042,7 +7033,7 @@ window.loadHistory = async function() {
       mob.innerHTML = json.data.map(o => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${o.maDon}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white">${o.site}</div>
@@ -7053,7 +7044,7 @@ window.loadHistory = async function() {
             <div>Tổng số lượng: <b class="font-mono text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</span>
             </div>
           </div>
           <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
@@ -7100,7 +7091,7 @@ window.loadAudit = async function() {
                 <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white rounded font-mono text-right text-xs"
                   oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
               </td>
-              <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+              <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
             </tr>
           `;
         }).join('');
@@ -7134,7 +7125,7 @@ window.loadAudit = async function() {
                 </div>
                 <div class="text-center">
                   <div class="text-[10px] text-stone-400">Tồn cuối kỳ</div>
-                  <div class="font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                  <div class="font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
                 </div>
               </div>
             </div>
@@ -7225,7 +7216,7 @@ window.renderFnbChainTable = function(items) {
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#ed263a] dark:text-rose-400' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
               <div>
                 <div class="font-extrabold text-xs sm:text-sm text-stone-900 dark:text-white leading-tight">${s.name}</div>
                 <div class="text-[10px] font-mono text-stone-400">Mã: ${s.code} • ${s.region}</div>
@@ -7276,7 +7267,7 @@ window.renderFnbSites = function(sites) {
   if (tbody) {
     tbody.innerHTML = sites.map(s => `
       <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-        <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${s.code}</td>
+        <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${s.code}</td>
         <td class="p-3 font-bold text-stone-900 dark:text-white">${s.name}</td>
         <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
         <td class="p-3 text-stone-600 dark:text-stone-300">${s.address || '—'}</td>
@@ -7295,7 +7286,7 @@ window.renderFnbSites = function(sites) {
       <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${s.code}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
           </div>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-stone-100 text-stone-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
@@ -7415,7 +7406,7 @@ window.searchVouchers = async function() {
     if (tbody) {
       tbody.innerHTML = items.map(r => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.maCT}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.maCT}</td>
           <td class="p-3 text-stone-900 dark:text-stone-100 font-medium">${r.site}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-mono text-[11px] border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span></td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
@@ -7439,7 +7430,7 @@ window.searchVouchers = async function() {
       mobContainer.innerHTML = items.map(r => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${r.maCT}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${r.maCT}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${r.loaiHoaDon}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white leading-snug">${r.site}</div>
@@ -7526,7 +7517,7 @@ window.viewVoucherDetail = async function(maCT) {
       const html = `
         <div class="space-y-3 text-xs">
           <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-stone-50 dark:bg-stone-900/60 rounded-2xl border border-stone-200 dark:border-stone-800">
-            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#ed263a] dark:text-rose-400">${v.voucher_code}</b></div>
+            <div><span class="text-stone-400">Mã chứng từ:</span><br><b class="font-mono text-sm text-[#465fff] dark:text-[#7592ff]">${v.voucher_code}</b></div>
             <div><span class="text-stone-400">Loại hóa đơn:</span><br><b class="text-stone-800 dark:text-stone-200">${v.invoice_type}</b></div>
             <div><span class="text-stone-400">Điểm bán:</span><br><b class="text-stone-800 dark:text-stone-200">${v.site_name}</b></div>
             <div><span class="text-stone-400">Nhà cung cấp:</span><br><b class="text-stone-800 dark:text-stone-200">${v.supplier_name || '—'}</b></div>
@@ -7610,7 +7601,7 @@ window.renderFefoRows = function(items) {
             <div>Vị trí kệ: <b class="font-mono text-stone-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tồn khả dụng:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.qty} ${r.uom}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.qty} ${r.uom}</span>
             </div>
           </div>
         </div>
@@ -7639,7 +7630,7 @@ window.loadReorderROP = async function() {
             <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${r.safety_stock}</td>
             <td class="p-3 text-right font-mono font-bold text-amber-600">${r.rop}</td>
             <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${r.current_stock}</td>
-            <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${r.suggested_order}</td>
+            <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${r.suggested_order}</td>
             <td class="p-3 text-center">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
             </td>
@@ -7661,7 +7652,7 @@ window.loadReorderROP = async function() {
               <div>Tồn hiện tại: <b class="font-mono text-stone-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="font-mono text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="font-mono text-stone-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${r.suggested_order} ${r.uom}</b></div>
+              <div>Đề xuất đặt: <b class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${r.suggested_order} ${r.uom}</b></div>
             </div>
           </div>
         `).join('');
@@ -7797,13 +7788,13 @@ window.loadHistory = async function() {
     if (tbody) {
       tbody.innerHTML = json.data.map(o => `
         <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-          <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${o.maDon}</td>
+          <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${o.maDon}</td>
           <td class="p-3 font-mono text-stone-600 dark:text-stone-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
           <td class="p-3 font-bold text-stone-900 dark:text-white">${o.site}</td>
           <td class="p-3 text-stone-700 dark:text-stone-300">${o.nguoiDat}</td>
           <td class="p-3 text-right font-mono text-stone-600 dark:text-stone-300">${o.soDong}</td>
           <td class="p-3 text-right font-mono font-bold text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-          <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</td>
+          <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</td>
           <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span></td>
           <td class="p-3 text-right">
             <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] text-stone-700 dark:text-stone-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
@@ -7819,7 +7810,7 @@ window.loadHistory = async function() {
       mob.innerHTML = json.data.map(o => `
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${o.maDon}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${o.maDon}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">${o.trangThai || 'Mới tạo'}</span>
           </div>
           <div class="font-bold text-xs text-stone-900 dark:text-white">${o.site}</div>
@@ -7830,7 +7821,7 @@ window.loadHistory = async function() {
             <div>Tổng số lượng: <b class="font-mono text-stone-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-stone-200/60 dark:border-stone-800">
               <span class="text-stone-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="font-mono font-extrabold text-sm text-[#ed263a] dark:text-rose-400">${fmtVND(o.tongTien)}</span>
+              <span class="font-mono font-extrabold text-sm text-[#465fff] dark:text-[#7592ff]">${fmtVND(o.tongTien)}</span>
             </div>
           </div>
           <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-stone-100 hover:bg-[#ed263a] hover:text-white dark:bg-stone-800 dark:hover:bg-[#ed263a] rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 flex items-center justify-center gap-1.5 transition-all">
@@ -7877,7 +7868,7 @@ window.loadAudit = async function() {
                 <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white rounded font-mono text-right text-xs"
                   oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
               </td>
-              <td class="p-3 text-right font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+              <td class="p-3 text-right font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
             </tr>
           `;
         }).join('');
@@ -7911,7 +7902,7 @@ window.loadAudit = async function() {
                 </div>
                 <div class="text-center">
                   <div class="text-[10px] text-stone-400">Tồn cuối kỳ</div>
-                  <div class="font-mono font-bold text-[#ed263a] dark:text-rose-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                  <div class="font-mono font-bold text-[#465fff] dark:text-[#7592ff]" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
                 </div>
               </div>
             </div>
@@ -8002,7 +7993,7 @@ window.renderFnbChainTable = function(items) {
         <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#ed263a] dark:text-rose-400' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-[#465fff] dark:text-[#7592ff]' : 'text-stone-600 dark:text-stone-400'}">${rankLabel}</span>
               <div>
                 <div class="font-extrabold text-xs sm:text-sm text-stone-900 dark:text-white leading-tight">${s.name}</div>
                 <div class="text-[10px] font-mono text-stone-400">Mã: ${s.code} • ${s.region}</div>
@@ -8053,7 +8044,7 @@ window.renderFnbSites = function(sites) {
   if (tbody) {
     tbody.innerHTML = sites.map(s => `
       <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors">
-        <td class="p-3 font-mono font-bold text-[#ed263a] dark:text-rose-400">${s.code}</td>
+        <td class="p-3 font-mono font-bold text-[#465fff] dark:text-[#7592ff]">${s.code}</td>
         <td class="p-3 font-bold text-stone-900 dark:text-white">${s.name}</td>
         <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
         <td class="p-3 text-stone-600 dark:text-stone-300">${s.address || '—'}</td>
@@ -8072,7 +8063,7 @@ window.renderFnbSites = function(sites) {
       <div class="bg-white dark:bg-[#161313] p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="font-mono font-bold text-xs text-[#ed263a] dark:text-rose-400">${s.code}</span>
+            <span class="font-mono font-bold text-xs text-[#465fff] dark:text-[#7592ff]">${s.code}</span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
           </div>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-stone-100 text-stone-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
