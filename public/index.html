@@ -1029,7 +1029,10 @@
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">MASTER DATA</span>
-              <h1 class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white">Danh Mục 14 Điểm Bán / Bếp Ăn Vận Hành</h1>
+              <h1 class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>Danh Mục 14 Điểm Bán / Bếp Ăn Vận Hành</span>
+                <span id="fnbSitesCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-300">14 điểm bán</span>
+              </h1>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400">Danh mục chính thức liên kết mã SAP, khu vực địa lý và hạn mức ngân sách vật tư tháng.</p>
           </div>
@@ -3664,7 +3667,18 @@
             <span>Tài khoản đã đăng nhập:</span>
             <span class="text-[10px] text-gray-400 font-normal">Nhấn để chuyển đổi</span>
           </div>
-          <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[220px] overflow-y-auto custom-scrollbar">
+          <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[180px] overflow-y-auto custom-scrollbar">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Phần chọn vai trò khi đăng nhập (Các vai trò chưa được duyệt sẽ tối mờ & không chọn được) -->
+        <div id="loginRoleSelectionContainer" class="hidden text-left space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn vai trò khi đăng nhập:</span>
+            <span class="text-[10px] text-gray-400">Cần Ban Quản Trị duyệt</span>
+          </div>
+          <div id="loginRoleSelectionList" class="space-y-1.5 max-h-[150px] overflow-y-auto custom-scrollbar text-xs">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -3997,27 +4011,8 @@
         <button onclick="closeRoleSwitcherModal()" class="p-1.5 rounded-full text-gray-400 bg-gray-100 dark:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
 
-      <div class="space-y-1.5 text-xs">
-        <button onclick="switchRoleAction('ADMIN')" class="w-full p-2.5 rounded-xl text-left border border-gray-200 dark:border-gray-800 hover:border-rose-500 flex items-center justify-between">
-          <div><div class="font-bold text-rose-600">Ban Quản Trị (ADMIN)</div><div class="text-[10px] text-gray-400">Toàn quyền 19/19 chức năng</div></div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-        </button>
-        <button onclick="switchRoleAction('BEP_TRUONG')" class="w-full p-2.5 rounded-xl text-left border border-gray-200 dark:border-gray-800 hover:border-blue-500 flex items-center justify-between">
-          <div><div class="font-bold text-blue-600">Bếp Trưởng / Quản Lý Điểm</div><div class="text-[10px] text-gray-400">Kho bếp, Kiểm kê, Nhập hủy, Suất ăn</div></div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-        </button>
-        <button onclick="switchRoleAction('KHO_TRUONG')" class="w-full p-2.5 rounded-xl text-left border border-gray-200 dark:border-gray-800 hover:border-amber-500 flex items-center justify-between">
-          <div><div class="font-bold text-amber-600">Quản Lý Kho WMS</div><div class="text-[10px] text-gray-400">Kho FEFO, ROP, PO SAP, Tồn chuỗi</div></div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-        </button>
-        <button onclick="switchRoleAction('KE_TOAN')" class="w-full p-2.5 rounded-xl text-left border border-gray-200 dark:border-gray-800 hover:border-emerald-500 flex items-center justify-between">
-          <div><div class="font-bold text-emerald-600">Kế Toán Kiểm Soát</div><div class="text-[10px] text-gray-400">P&amp;L, POS, Chứng từ hóa đơn</div></div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-        </button>
-        <button onclick="switchRoleAction('NHAN_VIEN')" class="w-full p-2.5 rounded-xl text-left border border-gray-200 dark:border-gray-800 hover:border-gray-500 flex items-center justify-between">
-          <div><div class="font-bold text-gray-600 dark:text-gray-300">Nhân Viên Vận Hành</div><div class="text-[10px] text-gray-400">Chỉ nhập kiểm kê &amp; suất ăn</div></div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-        </button>
+      <div id="roleSwitcherList" class="space-y-2 text-xs">
+        <!-- Rendered dynamically: chỉ vai trò được Admin duyệt mới chọn được, vai trò chưa duyệt sẽ tối mờ -->
       </div>
     </div>
   </div>
@@ -6980,39 +6975,94 @@ async function loadFnbSites() {
     showLoading();
     const resp = await fetch('/api/branches');
     const res = await resp.json();
-    if (res.success && res.data) {
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       renderFnbSites(res.data);
+    } else {
+      // Graceful fallback to master list of 14 points of sale
+      const list = getAppSitesList().filter(s => s.code !== 'ALL');
+      renderFnbSites(list);
     }
   } catch (err) {
     console.error('Error loadFnbSites:', err);
+    const list = getAppSitesList().filter(s => s.code !== 'ALL');
+    renderFnbSites(list);
   } finally {
     hideLoading();
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
   }
 }
 
 function renderFnbSites(sites) {
   const tbody = document.getElementById('fnbSitesMasterTableBody');
-  if (!tbody || !sites) return;
+  const mob = document.getElementById('fnbSitesMobileCards');
+  if (!sites) return;
 
-  tbody.innerHTML = sites.map(s => `
-    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-      <td class="py-3 px-4 tabular-nums font-bold text-brand-500">${s.code}</td>
-      <td class="py-3 px-4 font-bold text-gray-900 dark:text-white">${s.name}</td>
-      <td class="py-3 px-3 text-center">
-        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'}">${s.region || 'Miền Nam'}</span>
-      </td>
-      <td class="py-3 px-4 text-gray-500">${s.address || 'Hệ thống căn tin Tân Long Group'}</td>
-      <td class="py-3 px-3">
-        <div class="font-semibold text-gray-800 dark:text-gray-200">Quản Lý Cơ Sở</div>
-        <div class="text-[10.5px] tabular-nums text-gray-400">0903.xxx.xxx</div>
-      </td>
-      <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">10,000,000đ</td>
-      <td class="py-3 px-3 text-center">
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">HOẠT ĐỘNG</span>
-      </td>
-    </tr>
-  `).join('');
+  const countBadge = document.getElementById('fnbSitesCountBadge');
+  if (countBadge) {
+    countBadge.textContent = `${sites.length} điểm bán`;
+  }
+
+  if (tbody) {
+    tbody.innerHTML = sites.map(s => {
+      let regionBadge = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300';
+      if (s.region === 'Miền Bắc') {
+        regionBadge = 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300';
+      } else if (s.region === 'Miền Trung') {
+        regionBadge = 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300';
+      }
+
+      return `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="py-3 px-4 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
+        <td class="py-3 px-4 font-bold text-gray-900 dark:text-white">${s.name}</td>
+        <td class="py-3 px-3 text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+        </td>
+        <td class="py-3 px-4 text-gray-500 dark:text-gray-400">${s.address || 'Hệ thống căn tin Tân Long Group'}</td>
+        <td class="py-3 px-3">
+          <div class="font-semibold text-gray-800 dark:text-gray-200">${s.site_type || 'Quản Lý Cơ Sở'}</div>
+          <div class="text-[10.5px] tabular-nums text-gray-400">${s.phone || '0903.xxx.xxx'}</div>
+        </td>
+        <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</td>
+        <td class="py-3 px-3 text-center">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+        </td>
+      </tr>
+    `;
+    }).join('');
+  }
+
+  if (mob) {
+    mob.innerHTML = sites.map(s => {
+      let regionBadge = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300';
+      if (s.region === 'Miền Bắc') {
+        regionBadge = 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300';
+      } else if (s.region === 'Miền Trung') {
+        regionBadge = 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300';
+      }
+
+      return `
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+        </div>
+        <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
+        <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
+          <span>${s.address || 'Hệ thống căn tin Tân Long Group'}</span>
+        </div>
+        <div class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800 text-xs">
+          <span class="text-gray-500">Hạn mức ngân sách:</span>
+          <span class="font-bold text-gray-900 dark:text-white tabular-nums">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</span>
+        </div>
+      </div>
+    `;
+    }).join('');
+  }
 }
 
 // ============================================================================
@@ -8637,58 +8687,96 @@ window.renderFnbChainTable = function(items) {
   if (window.lucide) lucide.createIcons();
 };
 
-// 11. Upgraded renderFnbSites (Desktop Table + Mobile Cards)
 window.renderFnbSites = function(sites) {
   const tbody = document.getElementById('fnbSitesMasterTableBody');
   const mob = document.getElementById('fnbSitesMobileCards');
+  if (!sites) return;
 
-  if (!sites || !sites.length) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
-    return;
+  const countBadge = document.getElementById('fnbSitesCountBadge');
+  if (countBadge) {
+    countBadge.textContent = `${sites.length} điểm bán`;
   }
 
   if (tbody) {
-    tbody.innerHTML = sites.map(s => `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
-        <td class="p-3 font-bold text-gray-900 dark:text-white">${s.name}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
-        <td class="p-3 text-gray-600 dark:text-gray-300">${s.address || '—'}</td>
-        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Đang hoạt động' : 'Tạm ngưng'}</span></td>
-        <td class="p-3 text-right">
-          <button onclick="viewSiteDetail('${s.code}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-            Chi tiết
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    if (!sites.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
+    } else {
+      tbody.innerHTML = sites.map(s => {
+        let regionBadge = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300';
+        if (s.region === 'Miền Bắc') {
+          regionBadge = 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300';
+        } else if (s.region === 'Miền Trung') {
+          regionBadge = 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300';
+        }
+
+        return `
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-3 px-4 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
+          <td class="py-3 px-4 font-bold text-gray-900 dark:text-white">${s.name}</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+          </td>
+          <td class="py-3 px-4 text-gray-500 dark:text-gray-400">${s.address || 'Hệ thống căn tin Tân Long Group'}</td>
+          <td class="py-3 px-3">
+            <div class="font-semibold text-gray-800 dark:text-gray-200">${s.site_type || 'Quản Lý Cơ Sở'}</div>
+            <div class="text-[10.5px] tabular-nums text-gray-400">${s.phone || '0903.000.xxx'}</div>
+          </td>
+          <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+          </td>
+        </tr>
+      `;
+      }).join('');
+    }
   }
 
   if (mob) {
-    mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
+    if (!sites.length) {
+      mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
+    } else {
+      mob.innerHTML = sites.map(s => {
+        let regionBadge = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300';
+        if (s.region === 'Miền Bắc') {
+          regionBadge = 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300';
+        } else if (s.region === 'Miền Trung') {
+          regionBadge = 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300';
+        }
+
+        return `
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
           </div>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
+          <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
+          <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
+            <span>${s.address || 'Hệ thống căn tin Tân Long Group'}</span>
+          </div>
+          <div class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800 text-xs">
+            <span class="text-gray-500">Hạn mức ngân sách:</span>
+            <span class="font-bold text-gray-900 dark:text-white tabular-nums">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</span>
+          </div>
+          <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i> Xem Báo Cáo P&amp;L Điểm Này
+          </button>
         </div>
-        <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
-        <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
-          <span>${s.address || 'Chưa cập nhật địa chỉ'}</span>
-        </div>
-        <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-          <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i> Xem Báo Cáo P&amp;L Điểm Này
-        </button>
-      </div>
-    `).join('');
+      `;
+      }).join('');
+    }
   }
 
   if (window.lucide) lucide.createIcons();
 };
+
+function renderFnbSites(sites) {
+  return window.renderFnbSites(sites);
+}
+
 
 // 12. Fix async issues on older functions
 window.addEventListener('DOMContentLoaded', () => {
@@ -9414,838 +9502,6 @@ window.renderFnbChainTable = function(items) {
   if (window.lucide) lucide.createIcons();
 };
 
-// 11. Upgraded renderFnbSites (Desktop Table + Mobile Cards)
-window.renderFnbSites = function(sites) {
-  const tbody = document.getElementById('fnbSitesMasterTableBody');
-  const mob = document.getElementById('fnbSitesMobileCards');
-
-  if (!sites || !sites.length) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
-    return;
-  }
-
-  if (tbody) {
-    tbody.innerHTML = sites.map(s => `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
-        <td class="p-3 font-bold text-gray-900 dark:text-white">${s.name}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
-        <td class="p-3 text-gray-600 dark:text-gray-300">${s.address || '—'}</td>
-        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Đang hoạt động' : 'Tạm ngưng'}</span></td>
-        <td class="p-3 text-right">
-          <button onclick="viewSiteDetail('${s.code}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-            Chi tiết
-          </button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  if (mob) {
-    mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
-          </div>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
-        </div>
-        <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
-        <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
-          <span>${s.address || 'Chưa cập nhật địa chỉ'}</span>
-        </div>
-        <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-          <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i> Xem Báo Cáo P&amp;L Điểm Này
-        </button>
-      </div>
-    `).join('');
-  }
-
-  if (window.lucide) lucide.createIcons();
-};
-
-// 12. Fix async issues on older functions
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (typeof loadFnbChain === 'function') loadFnbChain();
-    if (typeof updateMobileNavState === 'function') updateMobileNavState('fnb-chain');
-    if (window.lucide) lucide.createIcons();
-  }, 250);
-});
-
-
-
-
-// ============================================================================
-// ORBIT SIBA FOOD: MASTER UPGRADES (MOBILE CARDS, DARK MODE, REAL DB, LIGHTBOX)
-// ============================================================================
-
-// 1. Image / File Lightbox Engine
-function openImageLightbox(fileLink, fileName, fileType) {
-  const lb = document.getElementById('imageLightbox');
-  if (!lb) {
-    window.open(fileLink, '_blank');
-    return;
-  }
-  const img = document.getElementById('lightboxImg');
-  const iframe = document.getElementById('lightboxIframe');
-  const titleEl = document.getElementById('lightboxFileName');
-  if (titleEl) titleEl.textContent = fileName || 'Xem tệp đính kèm';
-
-  const driveMatch = fileLink && fileLink.match(/\/d\/([^/\?]+)/);
-  const driveId = driveMatch ? driveMatch[1] : null;
-
-  const isImg = (fileType && fileType.startsWith('image/')) ||
-                /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileName || '') ||
-                /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileLink || '');
-
-  if (driveId) {
-    if (isImg) {
-      img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
-      img.classList.remove('hidden');
-      iframe.classList.add('hidden');
-      iframe.src = '';
-    } else {
-      iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
-      iframe.classList.remove('hidden');
-      img.classList.add('hidden');
-      img.src = '';
-    }
-  } else {
-    if (isImg) {
-      img.src = fileLink;
-      img.classList.remove('hidden');
-      iframe.classList.add('hidden');
-      iframe.src = '';
-    } else {
-      window.open(fileLink, '_blank');
-      return;
-    }
-  }
-  lb.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  if (window.lucide) lucide.createIcons();
-}
-
-function closeImageLightbox() {
-  const lb = document.getElementById('imageLightbox');
-  if (lb) lb.classList.add('hidden');
-  const img = document.getElementById('lightboxImg');
-  const iframe = document.getElementById('lightboxIframe');
-  if (img) img.src = '';
-  if (iframe) iframe.src = '';
-  document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeImageLightbox();
-});
-
-// 2. Upgraded searchVouchers (Desktop Table + Mobile Cards + Lightbox)
-window.searchVouchers = async function() {
-  const site = document.getElementById('scSite') ? document.getElementById('scSite').value : '';
-  const loai = document.getElementById('scLoai') ? document.getElementById('scLoai').value : '';
-  showLoading('Tra cứu chứng từ...');
-  try {
-    const res = await fetch(`/api/vouchers?site=${encodeURIComponent(site)}&loaiHoaDon=${encodeURIComponent(loai)}`);
-    const json = await res.json();
-    const tbody = document.getElementById('scBody');
-    const mobContainer = document.getElementById('scMobileCards');
-
-    if (!json.success || !json.data || !json.data.length) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không tìm thấy chứng từ nào</td></tr>';
-      if (mobContainer) mobContainer.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy chứng từ nào</div>';
-      return;
-    }
-
-    const items = json.data;
-
-    // Desktop Table
-    if (tbody) {
-      tbody.innerHTML = items.map(r => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${r.maCT}</td>
-          <td class="p-3 text-gray-900 dark:text-gray-100 font-medium">${r.site}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 tabular-nums text-[11px] border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span></td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</td>
-          <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.nhaCungCap || '—'}</td>
-          <td class="p-3 text-gray-600 dark:text-gray-300">${r.nguoiNhap}</td>
-          <td class="p-3 text-center">
-            ${r.soFile ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">📎 ${r.soFile} file</span>` : '<span class="text-gray-400 text-xs">—</span>'}
-          </td>
-          <td class="p-3 text-right">
-            <button onclick="viewVoucherDetail('${r.maCT}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-              Xem
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // Mobile Cards
-    if (mobContainer) {
-      mobContainer.innerHTML = items.map(r => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${r.maCT}</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span>
-          </div>
-          <div class="font-bold text-xs text-gray-900 dark:text-white leading-snug">${r.site}</div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-gray-600 dark:text-gray-400">
-            <div>Ngày nhận: <b class="tabular-nums text-gray-900 dark:text-white">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</b></div>
-            <div>NCC: <b class="text-gray-900 dark:text-white truncate block">${r.nhaCungCap || '—'}</b></div>
-            <div>Người nhập: <b class="text-gray-900 dark:text-white">${r.nguoiNhap}</b></div>
-            <div>Đính kèm: <b class="${r.soFile ? 'text-rose-600 dark:text-rose-400' : 'text-gray-400'}">${r.soFile ? `📎 ${r.soFile} file` : 'Không có'}</b></div>
-          </div>
-          <button onclick="viewVoucherDetail('${r.maCT}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-            <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết &amp; Ảnh Đính Kèm
-          </button>
-        </div>
-      `).join('');
-    }
-  } catch (err) {
-    console.error('searchVouchers error:', err);
-    showToast('Lỗi tra cứu chứng từ: ' + err.message, 'error');
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 3. Upgraded viewVoucherDetail (Image Gallery, Click to Zoom Lightbox)
-window.viewVoucherDetail = async function(maCT) {
-  showLoading('Tải chi tiết chứng từ...');
-  try {
-    const res = await fetch(`/api/voucher-detail?maCT=${encodeURIComponent(maCT)}`);
-    const json = await res.json();
-    if (json.success && json.data) {
-      const v = json.data;
-
-      let galleryHtml = '';
-      if (v.files && v.files.length) {
-        galleryHtml = `
-          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-            <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-1.5">
-              <span>🖼️ Tệp đính kèm &amp; Hình ảnh</span>
-              <span class="px-2 py-0.2 rounded-full text-[10px] tabular-nums bg-rose-100 text-brand-500 dark:bg-rose-950 dark:text-rose-300 font-bold">${v.files.length}</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              ${v.files.map((f, i) => {
-                const driveMatch = f.file_link && f.file_link.match(/\/d\/([^/\?]+)/);
-                const driveId = driveMatch ? driveMatch[1] : null;
-                const isImg = (f.file_type && f.file_type.startsWith('image/')) ||
-                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_name || '') ||
-                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_link || '');
-                const thumbUrl = (driveId && isImg) ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w600` : '';
-
-                return `
-                  <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 flex flex-col justify-between gap-2 shadow-2xs">
-                    ${thumbUrl ? `
-                      <div class="w-full h-36 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800 relative cursor-pointer group" onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')">
-                        <img src="${thumbUrl}" alt="${f.file_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity">
-                          🔍 Phóng to xem ảnh
-                        </div>
-                      </div>
-                    ` : ''}
-                    <div class="flex items-center justify-between gap-2 min-w-0">
-                      <div class="truncate text-xs font-medium text-gray-800 dark:text-gray-200" title="${f.file_name}">
-                        ${isImg ? '🖼️' : '📄'} ${f.file_name}
-                      </div>
-                      <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')" class="px-2.5 py-1 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-[11px] font-bold transition-all shadow-2xs">
-                          Xem
-                        </button>
-                        <a href="${f.file_link}" target="_blank" class="p-1 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 text-[11px]" title="Mở Drive tab mới">
-                          ↗
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      } else {
-        galleryHtml = `<div class="mt-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-center text-xs text-gray-400 italic">Không có tệp đính kèm hoặc hình ảnh nào</div>`;
-      }
-
-      const html = `
-        <div class="space-y-3 text-xs">
-          <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <div><span class="text-gray-400">Mã chứng từ:</span><br><b class="tabular-nums text-sm text-brand-500 dark:text-brand-400">${v.voucher_code}</b></div>
-            <div><span class="text-gray-400">Loại hóa đơn:</span><br><b class="text-gray-800 dark:text-gray-200">${v.invoice_type}</b></div>
-            <div><span class="text-gray-400">Điểm bán:</span><br><b class="text-gray-800 dark:text-gray-200">${v.site_name}</b></div>
-            <div><span class="text-gray-400">Nhà cung cấp:</span><br><b class="text-gray-800 dark:text-gray-200">${v.supplier_name || '—'}</b></div>
-            <div><span class="text-gray-400">Người giao:</span><br><b class="text-gray-800 dark:text-gray-200">${v.deliverer_name || '—'}</b></div>
-            <div><span class="text-gray-400">Người nhận:</span><br><b class="text-gray-800 dark:text-gray-200">${v.receiver_name || '—'}</b></div>
-            <div><span class="text-gray-400">Ngày xuất HĐ:</span><br><b class="tabular-nums text-gray-800 dark:text-gray-200">${v.invoice_date || '—'}</b></div>
-            <div><span class="text-gray-400">Ngày nhận hàng:</span><br><b class="tabular-nums text-gray-800 dark:text-gray-200">${v.receive_date || '—'}</b></div>
-          </div>
-          <div>
-            <span class="text-gray-400">Ghi chú nghiệp vụ:</span>
-            <div class="p-2.5 mt-1 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300">${v.note || 'Không có ghi chú thêm.'}</div>
-          </div>
-          ${galleryHtml}
-        </div>
-      `;
-      openGeneralModal(`Chi Tiết Chứng Từ: ${maCT}`, html);
-    }
-  } catch (err) {
-    console.error('viewVoucherDetail error:', err);
-    showToast('Lỗi tải chi tiết: ' + err.message, 'error');
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 4. Upgraded renderFefoRows (Desktop Table + Mobile Cards)
-window.renderFefoRows = function(items) {
-  const tbody = document.getElementById('fefoTableBody');
-  const mob = document.getElementById('fefoMobileCards');
-
-  if (!items || !items.length) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có tồn kho gia vị nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có tồn kho gia vị nào.</div>';
-    return;
-  }
-
-  // Desktop Table
-  if (tbody) {
-    tbody.innerHTML = items.map(r => {
-      let badgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800';
-      if (r.danger_level === 'red') badgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800 animate-pulse';
-      else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
-
-      return `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3"><span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center tabular-nums font-bold text-[11px]">${r.fefo_priority}</span></td>
-          <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.sku}</td>
-          <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.item_name}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.batch_no}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.exp_date}</td>
-          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span></td>
-          <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${r.qty}</td>
-          <td class="p-3 tabular-nums text-gray-500">${r.uom}</td>
-          <td class="p-3 tabular-nums text-gray-500">${r.location_bin || 'KHO-GIAVI'}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  // Mobile Cards
-  if (mob) {
-    mob.innerHTML = items.map(r => {
-      let badgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800';
-      if (r.danger_level === 'red') badgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800 animate-pulse';
-      else if (r.danger_level === 'yellow') badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800';
-
-      return `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center tabular-nums font-bold text-xs">P${r.fefo_priority}</span>
-              <span class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</span>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span>
-          </div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-            <div>SKU: <b class="tabular-nums text-gray-900 dark:text-white">${r.sku}</b></div>
-            <div>Số lô: <b class="tabular-nums text-gray-900 dark:text-white">${r.batch_no}</b></div>
-            <div>Hạn dùng: <b class="tabular-nums text-gray-900 dark:text-white">${r.exp_date}</b></div>
-            <div>Vị trí kệ: <b class="tabular-nums text-gray-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
-            <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
-              <span class="text-gray-500 font-medium">Tồn khả dụng:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.qty} ${r.uom}</span>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-};
-
-// 5. Upgraded loadReorderROP (Desktop Table + Mobile Cards)
-window.loadReorderROP = async function() {
-  try {
-    const res = await fetch(`/api/reorder?branch=${App.currentBranch}`);
-    const json = await res.json();
-    if (json.success) {
-      App.ropItems = json.data;
-      const tbody = document.getElementById('ropTableBody');
-      const mob = document.getElementById('ropMobileCards');
-
-      if (tbody) {
-        tbody.innerHTML = App.ropItems.map(r => `
-          <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-            <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.sku}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.item_name}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.daily_usage}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.lead_time_days}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.safety_stock}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-amber-600">${r.rop}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${r.current_stock}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${r.suggested_order}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      if (mob) {
-        mob.innerHTML = App.ropItems.map(r => `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku}</div>
-              </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Tồn hiện tại: <b class="tabular-nums text-gray-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
-              <div>Điểm ROP: <b class="tabular-nums text-amber-600">${r.rop} ${r.uom}</b></div>
-              <div>Lead time: <b class="tabular-nums text-gray-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-// 6. Upgraded loadLeadTime (Desktop Table + Mobile Cards)
-window.loadLeadTime = async function() {
-  try {
-    const res = await fetch('/api/leadtime');
-    const json = await res.json();
-    if (json.success) {
-      const tbody = document.getElementById('leadTimeTableBody');
-      const mob = document.getElementById('leadTimeMobileCards');
-
-      if (tbody) {
-        tbody.innerHTML = json.data.map(r => `
-          <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-            <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.po_number}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.supplier_name}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.order_date}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.actual_delivery_date || '—'}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.committed_lead_time_days} ngày</td>
-            <td class="p-3 text-right tabular-nums font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      if (mob) {
-        mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number}</div>
-              </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${r.order_date}</b></div>
-              <div>Giao thực tế: <b class="tabular-nums text-gray-900 dark:text-white">${r.actual_delivery_date || '—'}</b></div>
-              <div>Cam kết: <b class="tabular-nums text-gray-900 dark:text-white">${r.committed_lead_time_days} ngày</b></div>
-              <div>Thực tế: <b class="tabular-nums font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</b></div>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-// 7. Upgraded loadPoSap (Desktop Table + Mobile Cards)
-window.loadPoSap = async function() {
-  try {
-    const res = await fetch('/api/po-sap');
-    const json = await res.json();
-    if (json.success) {
-      const tbody = document.getElementById('poSapTableBody');
-      const mob = document.getElementById('poSapMobileCards');
-
-      if (tbody) {
-        tbody.innerHTML = json.data.map(r => `
-          <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-            <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.sku}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.item_name}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.supplier_name}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${fmtVND(r.contract_price)}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${fmtVND(r.actual_price)}</td>
-            <td class="p-3 text-right tabular-nums font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      if (mob) {
-        mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku} • NCC: ${r.supplier_name}</div>
-              </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </div>
-            <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Giá HĐ: <br><b class="tabular-nums text-gray-900 dark:text-white">${fmtVND(r.contract_price)}</b></div>
-              <div>Giá thực: <br><b class="tabular-nums text-gray-900 dark:text-white">${fmtVND(r.actual_price)}</b></div>
-              <div>Chênh lệch: <br><b class="tabular-nums font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</b></div>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-// 8. Upgraded loadHistory (Desktop Table + Mobile Cards)
-window.loadHistory = async function() {
-  const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
-  const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
-  let thang = '';
-  if (monthInput) {
-    const p = monthInput.split('-');
-    thang = `${p[1]}/${p[0]}`;
-  }
-  try {
-    showLoading('Tải lịch sử đơn hàng...');
-    const res = await fetch(`/api/orders?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
-    const json = await res.json();
-    const tbody = document.getElementById('hsBody');
-    const mob = document.getElementById('hsMobileCards');
-
-    if (!json.success || !json.data || !json.data.length) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào trong kỳ.</td></tr>';
-      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
-      return;
-    }
-
-    // Desktop Table
-    if (tbody) {
-      tbody.innerHTML = json.data.map(o => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${o.maDon}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
-          <td class="p-3 font-bold text-gray-900 dark:text-white">${o.site}</td>
-          <td class="p-3 text-gray-700 dark:text-gray-300">${o.nguoiDat}</td>
-          <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${o.soDong}</td>
-          <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-          <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
-          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span></td>
-          <td class="p-3 text-right">
-            <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-              Chi tiết
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // Mobile Cards
-    if (mob) {
-      mob.innerHTML = json.data.map(o => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${o.maDon}</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
-          </div>
-          <div class="font-bold text-xs text-gray-900 dark:text-white">${o.site}</div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-            <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</b></div>
-            <div>Người đặt: <b class="text-gray-900 dark:text-white">${o.nguoiDat}</b></div>
-            <div>Số loại mặt hàng: <b class="tabular-nums text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
-            <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
-            <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
-              <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
-            </div>
-          </div>
-          <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-            <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết Đơn
-          </button>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 9. Upgraded loadAudit (Desktop Table + Mobile Cards)
-window.loadAudit = async function() {
-  const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
-  showLoading('Tải bảng kiểm kê...');
-  try {
-    const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);
-    const json = await res.json();
-    const tbody = document.getElementById('kkBody');
-    const mob = document.getElementById('kkMobileCards');
-
-    if (json.success && json.data.length) {
-      App.auditItems = json.data;
-
-      // Desktop Table
-      if (tbody) {
-        tbody.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${it.item_code}</td>
-              <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${it.item_name}</td>
-              <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">${it.unit}</td>
-              <td class="p-3 text-right tabular-nums text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</td>
-              <td class="p-3 text-right">
-                <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded tabular-nums text-right text-xs"
-                  oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
-              </td>
-              <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Mobile Cards
-      if (mob) {
-        mob.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
-                  <div class="text-[10.5px] tabular-nums text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit}</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] tabular-nums font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50">
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn đầu kỳ</div>
-                  <div class="tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Sử dụng kỳ</div>
-                  <input type="number" min="0" value="${suDung}"
-                         class="w-full text-center p-1 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                         oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0));">
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn cuối kỳ</div>
-                  <div class="tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 10. Upgraded renderFnbChainTable (Desktop Table + Mobile Cards)
-window.renderFnbChainTable = function(items) {
-  const tbody = document.getElementById('fnbChainTableBody');
-  const mob = document.getElementById('fnbChainMobileCards');
-
-  if (!items || items.length === 0) {
-    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-gray-400">Không tìm thấy điểm bán nào phù hợp.</td></tr>`;
-    if (mob) mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy điểm bán nào phù hợp.</div>`;
-    return;
-  }
-
-  // Desktop Table
-  if (tbody) {
-    tbody.innerHTML = items.map((s, idx) => {
-      let statusBadge = '';
-      if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
-      } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
-      } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
-      }
-
-      let rankBadge = '';
-      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
-      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
-      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
-      else rankBadge = `<span class="tabular-nums text-gray-500 font-bold">${s.rank}</span>`;
-
-      return `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="py-3 px-3 text-center">${rankBadge}</td>
-          <td class="py-3 px-4">
-            <div class="font-bold text-gray-900 dark:text-white">${s.name}</div>
-            <div class="text-[10.5px] tabular-nums text-gray-400">SAP: ${s.code}</div>
-          </td>
-          <td class="py-3 px-3 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
-          </td>
-          <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtVND(s.netRevenue)}</td>
-          <td class="py-3 px-3 text-right tabular-nums text-gray-500">${fmtVND(s.targetRevenue)}</td>
-          <td class="py-3 px-3 text-center">
-            <div class="tabular-nums font-bold text-gray-900 dark:text-white">${s.achievementPct}%</div>
-            <div class="w-16 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 mx-auto mt-1 overflow-hidden">
-              <div class="${parseFloat(s.achievementPct) >= 100 ? 'bg-emerald-500' : 'bg-blue-500'} h-1.5 rounded-full" style="width: ${Math.min(100, parseFloat(s.achievementPct))}%"></div>
-            </div>
-          </td>
-          <td class="py-3 px-3 text-center tabular-nums ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${s.foodCostPct}%</td>
-          <td class="py-3 px-3 text-center tabular-nums text-purple-600 font-bold">${s.laborCostPct}%</td>
-          <td class="py-3 px-3 text-right tabular-nums font-bold ${s.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${fmtVND(s.ebitda)}</td>
-          <td class="py-3 px-3 text-center tabular-nums font-bold text-gray-700 dark:text-gray-300">${s.margin}%</td>
-          <td class="py-3 px-3 text-center">${statusBadge}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  // Mobile Cards (No horizontal scroll)
-  if (mob) {
-    mob.innerHTML = items.map((s, idx) => {
-      let statusBadge = '';
-      if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
-      } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
-      } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
-      }
-
-      let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
-
-      return `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
-              <div>
-                <div class="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
-                <div class="text-[10px] tabular-nums text-gray-400">Mã: ${s.code} • ${s.region}</div>
-              </div>
-            </div>
-            ${statusBadge}
-          </div>
-          <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-xs text-gray-600 dark:text-gray-400">
-            <div>
-              <span class="text-[10.5px] text-gray-400">Doanh thu thuần:</span><br>
-              <b class="tabular-nums text-sm text-gray-900 dark:text-white">${fmtVND(s.netRevenue)}</b>
-            </div>
-            <div>
-              <span class="text-[10.5px] text-gray-400">Đạt mục tiêu:</span><br>
-              <b class="tabular-nums text-sm text-emerald-600">${s.achievementPct}%</b>
-            </div>
-            <div>
-              <span class="text-[10.5px] text-gray-400">Food Cost %:</span><br>
-              <b class="tabular-nums ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600' : 'text-rose-600'} font-bold">${s.foodCostPct}%</b>
-            </div>
-            <div>
-              <span class="text-[10.5px] text-gray-400">EBITDA:</span><br>
-              <b class="tabular-nums text-emerald-600 font-bold">${fmtVND(s.ebitda)} (${s.margin}%)</b>
-            </div>
-          </div>
-          <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết Báo Cáo P&amp;L
-          </button>
-        </div>
-      `;
-    }).join('');
-  }
-
-  if (window.lucide) lucide.createIcons();
-};
-
-// 11. Upgraded renderFnbSites (Desktop Table + Mobile Cards)
-window.renderFnbSites = function(sites) {
-  const tbody = document.getElementById('fnbSitesMasterTableBody');
-  const mob = document.getElementById('fnbSitesMobileCards');
-
-  if (!sites || !sites.length) {
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Không có điểm bán nào.</td></tr>';
-    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có điểm bán nào.</div>';
-    return;
-  }
-
-  if (tbody) {
-    tbody.innerHTML = sites.map(s => `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
-        <td class="p-3 font-bold text-gray-900 dark:text-white">${s.name}</td>
-        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span></td>
-        <td class="p-3 text-gray-600 dark:text-gray-300">${s.address || '—'}</td>
-        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Đang hoạt động' : 'Tạm ngưng'}</span></td>
-        <td class="p-3 text-right">
-          <button onclick="viewSiteDetail('${s.code}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-            Chi tiết
-          </button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  if (mob) {
-    mob.innerHTML = sites.map(s => `
-      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region || '—'}</span>
-          </div>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">${s.is_active ? 'Hoạt động' : 'Tạm ngưng'}</span>
-        </div>
-        <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
-        <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
-          <span>${s.address || 'Chưa cập nhật địa chỉ'}</span>
-        </div>
-        <button onclick="viewSiteDetail('${s.code}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-          <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i> Xem Báo Cáo P&amp;L Điểm Này
-        </button>
-      </div>
-    `).join('');
-  }
-
-  if (window.lucide) lucide.createIcons();
-};
-
-
-// ============================================================================
 // 13. F&B CHAIN STOCK MATRIX ENGINE (Siba Food Standard - /fnb/stock)
 // ============================================================================
 let gFnbStockData = null;
@@ -11928,6 +11184,9 @@ window.renderSavedAccountsInLoginModal = function() {
   container.classList.remove('hidden');
   if (labelEl) labelEl.textContent = 'Hoặc đăng nhập tài khoản Google khác:';
 
+  if (accounts[0]) {
+    renderLoginRoleSelection(gCurrentUser || accounts[0]);
+  }
   listEl.innerHTML = accounts.map(acc => {
     const isCurrent = gCurrentUser && gCurrentUser.email.toLowerCase() === acc.email.toLowerCase();
     const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
@@ -13002,8 +12261,92 @@ window.dangXuatAdmin = function() {
   if (typeof showToast === 'function') showToast('Đã đăng xuất tài khoản! Vui lòng đăng nhập để tiếp tục.');
 };
 
-// Role Switcher Modal Actions (Kiểm thử nhanh vai trò)
+// Role Switcher Modal Actions (Chuyển vai trò & Bảo vệ phê duyệt)
+const APP_SYSTEM_ROLES = [
+  { code: 'ADMIN', name: 'Ban Quản Trị (ADMIN)', desc: 'Toàn quyền quản trị 20/20 chức năng hệ thống', color: 'rose', icon: 'shield-alert' },
+  { code: 'BEP_TRUONG', name: 'Bếp Trưởng / Quản Lý Điểm', desc: 'Kho bếp, Kiểm kê, Nhập hủy hàng, Suất ăn', color: 'blue', icon: 'chef-hat' },
+  { code: 'KHO_TRUONG', name: 'Quản Lý Kho WMS', desc: 'Kho FEFO, Định mức ROP, PO SAP, Tồn kho chuỗi', color: 'amber', icon: 'warehouse' },
+  { code: 'KE_TOAN', name: 'Kế Toán Kiểm Soát', desc: 'Báo cáo P&L, Doanh thu POS, Chứng từ thu chi', color: 'emerald', icon: 'calculator' },
+  { code: 'NHAN_VIEN', name: 'Nhân Viên Vận Hành', desc: 'Nhập kiểm kê hằng ngày & Báo cáo suất ăn', color: 'gray', icon: 'user' }
+];
+
+window.renderRoleSwitcherModal = function() {
+  const container = document.getElementById('roleSwitcherList');
+  if (!container) return;
+
+  const currentUser = window.gCurrentUser || {};
+  const currentRole = currentUser.role || 'NHAN_VIEN';
+  const isOwner = currentUser.email === 'trantuandai2508@gmail.com' || currentRole === 'ADMIN';
+  const approvedRoles = currentUser.approvedRoles || [currentRole];
+
+  container.innerHTML = APP_SYSTEM_ROLES.map(r => {
+    const isCurrent = currentRole === r.code;
+    const isPermitted = isOwner || approvedRoles.includes(r.code);
+
+    if (isPermitted) {
+      return `
+        <div onclick="switchRoleAction('${r.code}')" class="p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+          isCurrent
+            ? 'border-brand-500 bg-brand-50/70 dark:bg-brand-500/15 ring-2 ring-[#465FFF]/30 shadow-xs'
+            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-brand-500 hover:shadow-xs'
+        }">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+              r.color === 'rose' ? 'bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400' :
+              r.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400' :
+              r.color === 'amber' ? 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400' :
+              r.color === 'emerald' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' :
+              'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+            }">
+              <i data-lucide="${r.icon}" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0 text-left">
+              <div class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5 truncate">
+                <span>${r.name}</span>
+                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-black bg-brand-500 text-white shrink-0">ĐANG CHỌN</span>' : ''}
+              </div>
+              <div class="text-[10px] text-gray-400 truncate mt-0.5">${r.desc}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[9px] px-2 py-0.5 rounded font-extrabold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+              <i data-lucide="check" class="w-3 h-3"></i> Đã duyệt
+            </span>
+          </div>
+        </div>
+      `;
+    } else {
+      // VAI TRÒ CHƯA CÓ QUYỀN: TỐI MỜ, KHÔNG ĐƯỢC CHỌN, CÓ NÚT XIN DUYỆT
+      return `
+        <div class="p-3 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/25 flex items-center justify-between gap-3 opacity-40 select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-gray-200/60 dark:bg-gray-800 text-gray-400 flex items-center justify-center shrink-0">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0 text-left">
+              <div class="font-bold text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 truncate">
+                <span>${r.name}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 shrink-0">CẦN ADMIN DUYỆT</span>
+              </div>
+              <div class="text-[10px] text-gray-400 truncate mt-0.5">Bạn chưa có quyền sử dụng vai trò này</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold text-[10.5px] border border-brand-200 dark:border-brand-800 active:translate-y-px transition-all flex items-center gap-1">
+              <i data-lucide="send" class="w-3 h-3"></i>
+              <span>Xin duyệt</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+};
+
 window.openRoleSwitcherModal = function() {
+  renderRoleSwitcherModal();
   document.getElementById('roleSwitcherModal')?.classList.remove('hidden');
   if (window.lucide) lucide.createIcons();
 };
@@ -13012,16 +12355,52 @@ window.closeRoleSwitcherModal = function() {
   document.getElementById('roleSwitcherModal')?.classList.add('hidden');
 };
 
+window.openRequestAccessForRole = function(roleCode, event) {
+  if (event) event.stopPropagation();
+  closeRoleSwitcherModal();
+  closeGoogleAuthModal();
+
+  const roleNames = {
+    ADMIN: 'Ban Quản Trị Hệ Thống',
+    BEP_TRUONG: 'Bếp Trưởng / Quản Lý Điểm',
+    KHO_TRUONG: 'Quản Lý Kho WMS',
+    KE_TOAN: 'Kế Toán Kiểm Soát',
+    NHAN_VIEN: 'Nhân Viên Vận Hành'
+  };
+  const rName = roleNames[roleCode] || roleCode;
+  window.pendingRequestFeature = '';
+  window.pendingRequestFeatureName = `Vai trò ${rName}`;
+
+  const featEl = document.getElementById('reqFeatureName');
+  const descEl = document.getElementById('reqFeatureDesc');
+  const roleSel = document.getElementById('reqRoleSelect');
+  const userEl = document.getElementById('reqUserName');
+  const emailEl = document.getElementById('reqUserEmail');
+  const reasonEl = document.getElementById('reqReasonInput');
+
+  if (featEl) featEl.textContent = `Xin phê duyệt: ${rName}`;
+  if (descEl) descEl.textContent = `Bạn đang gửi yêu cầu tới Ban Quản Trị để được phê duyệt vai trò ${rName}. Sau khi được duyệt, bạn sẽ được cấp quyền truy cập các chức năng của vai trò này.`;
+  if (roleSel) roleSel.value = roleCode;
+  if (userEl) userEl.textContent = (gCurrentUser && gCurrentUser.fullName) || 'Người dùng';
+  if (emailEl) emailEl.textContent = (gCurrentUser && gCurrentUser.email) || '';
+  if (reasonEl) reasonEl.value = '';
+
+  document.getElementById('requestAccessModal')?.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
 window.switchRoleAction = async function(roleCode) {
   try {
-    if (typeof showLoading === 'function') showLoading();
+    if (typeof showLoading === 'function') showLoading('Đang chuyển vai trò...');
     const res = await fetch('/api/auth/switch-role', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role: roleCode, email: (gCurrentUser && gCurrentUser.email) || '' })
     });
     const json = await res.json();
-    if (!json.success) throw new Error('Không chuyển được vai trò');
+    if (!json.success) {
+      throw new Error(json.error || 'Bạn không có quyền chọn vai trò này khi chưa được Admin duyệt.');
+    }
 
     if (!gCurrentUser) {
       gCurrentUser = {
@@ -13038,12 +12417,63 @@ window.switchRoleAction = async function(roleCode) {
     saveAccountToList(gCurrentUser);
     applyUserSessionToUI();
     closeRoleSwitcherModal();
-    if (typeof showToast === 'function') showToast(`Đã chuyển sang vai trò: ${json.data.roleName}`);
+    if (typeof showToast === 'function') showToast(`Đã chuyển sang vai trò: ${json.data.roleName}`, 'success');
   } catch (e) {
-    if (typeof showToast === 'function') showToast('Lỗi: ' + e.message);
+    if (typeof showToast === 'function') showToast(e.message, 'warning');
   } finally {
     if (typeof hideLoading === 'function') hideLoading();
   }
+};
+
+// Hiển thị danh sách vai trò khi đăng nhập (Các vai trò không có quyền sẽ tối mờ & không chọn được)
+window.renderLoginRoleSelection = function(targetUser) {
+  const container = document.getElementById('loginRoleSelectionContainer');
+  const listEl = document.getElementById('loginRoleSelectionList');
+  if (!container || !listEl) return;
+
+  if (!targetUser || !targetUser.email) {
+    container.classList.add('hidden');
+    return;
+  }
+
+  container.classList.remove('hidden');
+  const currentRole = targetUser.role || 'NHAN_VIEN';
+  const isOwner = targetUser.email === 'trantuandai2508@gmail.com' || currentRole === 'ADMIN';
+  const approvedRoles = targetUser.approvedRoles || [currentRole];
+
+  listEl.innerHTML = APP_SYSTEM_ROLES.map(r => {
+    const isCurrent = currentRole === r.code;
+    const isPermitted = isOwner || approvedRoles.includes(r.code);
+
+    if (isPermitted) {
+      return `
+        <div onclick="switchRoleAction('${r.code}')" class="p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+          isCurrent
+            ? 'border-brand-500 bg-brand-50/80 dark:bg-brand-500/20 ring-1 ring-brand-500/40'
+            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300'
+        }">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2 h-2 rounded-full ${isCurrent ? 'bg-emerald-500 ring-2 ring-emerald-200 dark:ring-emerald-900' : 'bg-gray-300 dark:bg-gray-600'} shrink-0"></span>
+            <span class="font-bold text-gray-800 dark:text-gray-200 truncate">${r.name}</span>
+          </div>
+          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">ĐÃ DUYỆT</span>
+        </div>
+      `;
+    } else {
+      // TỐI MỜ, KHÔNG ĐƯỢC CHỌN, CÓ NÚT XIN DUYỆT
+      return `
+        <div class="p-2 rounded-xl border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20 flex items-center justify-between gap-2 opacity-40 select-none">
+          <div class="flex items-center gap-2 min-w-0">
+            <i data-lucide="lock" class="w-3 h-3 text-gray-400 shrink-0"></i>
+            <span class="font-bold text-gray-400 dark:text-gray-500 truncate">${r.name}</span>
+          </div>
+          <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto text-[9.5px] px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold hover:underline shrink-0">Xin duyệt</button>
+        </div>
+      `;
+    }
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
 };
 
 // Global Quick Search
