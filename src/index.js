@@ -416,7 +416,9 @@ export default {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Content-Type': 'application/json; charset=utf-8'
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      'Pragma': 'no-cache'
     };
 
     if (request.method === 'OPTIONS') {
@@ -2347,7 +2349,20 @@ export default {
 
       // Fallback: Static Assets
       if (env.ASSETS) {
-        return env.ASSETS.fetch(request);
+        const response = await env.ASSETS.fetch(request);
+        // Ngăn chặn cache tĩnh HTML để đảm bảo client luôn thấy bản cập nhật mới nhất ngay lập tức
+        if (pathname === '/' || pathname === '/index.html' || response.headers.get('content-type')?.includes('text/html')) {
+          const newHeaders = new Headers(response.headers);
+          newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+          newHeaders.set('Pragma', 'no-cache');
+          newHeaders.set('Expires', '0');
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders
+          });
+        }
+        return response;
       }
 
       return new Response(JSON.stringify({ error: 'Endpoint Not Found' }), { status: 404, headers: corsHeaders });
