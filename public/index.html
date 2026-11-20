@@ -108,7 +108,7 @@
         <div class="sidebar-category hidden" data-cat="fnb-finance">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hiệu Quả & Doanh Thu</h3>
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">P&L</span>
+            
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
@@ -144,7 +144,7 @@
         <div class="sidebar-category" data-cat="fnb-inventory">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vận Hành Kho Bếp</h3>
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">Bếp</span>
+            
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
@@ -189,7 +189,7 @@
         <div class="sidebar-category" data-cat="wh-wms">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Kho Vận & WMS</h3>
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">WMS</span>
+            
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
@@ -306,7 +306,7 @@
         <div class="sidebar-category" data-cat="sys-admin">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hệ Thống & Danh Mục</h3>
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">System</span>
+            
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
@@ -338,7 +338,7 @@
         <!-- User Info (Click to open Auth Modal) -->
         <div class="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-90 transition-opacity" onclick="handleUserProfileClick()" role="button" title="Thông tin tài khoản & Chuyển đổi">
           <div class="relative shrink-0">
-            <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
+            <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=TD&background=19723c&color=fff&bold=true" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
             <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black"></span>
           </div>
           <div class="min-w-0">
@@ -388,7 +388,7 @@
         </div>
 
         <!-- Active Page Badge -->
-        <span id="mobileHeaderTitle" class="hidden md:inline-flex items-center text-xs font-semibold text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/20 px-2.5 py-1 rounded-[8px] border border-brand-200 dark:border-brand-500/30 shrink-0 whitespace-nowrap">🏆 Toàn Chuỗi</span>
+        <span id="mobileHeaderTitle" class="hidden md:inline-flex items-center text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/40 px-2.5 py-1 rounded-md border border-brand-200/80 dark:border-brand-800/80 shrink-0 whitespace-nowrap">Toàn Chuỗi</span>
       </div>
 
       <!-- Center: TailAdmin Global Quick Search (100% TailAdmin Specification with ⌘K Badge) -->
@@ -403,16 +403,14 @@
             id="globalHeaderSearch"
             oninput="filterGlobalQuickSearch(this.value)"
             type="text"
-            placeholder="Search or type command..."
-            class="h-full flex-1 rounded-none border-0 bg-transparent px-2 text-sm text-gray-800 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white/90 dark:placeholder:text-white/30"
+            placeholder="Tìm theo mã SKU, tên hàng hóa, số phiếu (F2)..."
+            class="h-full flex-1 rounded-none border-0 bg-transparent px-2 text-xs sm:text-sm text-gray-800 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white/90 dark:placeholder:text-white/30"
           />
-          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3.5 text-sm font-medium text-gray-500 select-none dark:text-gray-400">
-            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="group/badge inline-flex h-5.5 w-fit shrink-0 cursor-pointer items-center justify-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-1.75 py-[4.5px] text-xs font-medium tracking-[-0.2px] whitespace-nowrap text-gray-500 shadow-none transition-colors select-none [text-shadow:0_4px_4px_var(--color-gray-300)] dark:border-gray-800 dark:bg-white/3 dark:text-gray-400 dark:[text-shadow:0_4px_4px_rgba(255,255,255,0.10)]">
-              <span>⌘</span>
-              <span>K</span>
+          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3 text-xs font-medium text-gray-400 select-none">
+            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
+              F2
             </span>
           </div>
-        </div>
       </div>
 
       <!-- Right: Controls, Filters & User Profile (Properly Gapped, Never Overlapping) -->
@@ -424,7 +422,7 @@
             <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
           </div>
           <div class="flex items-center gap-1.5 min-w-0">
-            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">Miền Nam</span>
+            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-[10px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
             <span id="taskbarSiteName" class="font-bold text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
           </div>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
@@ -471,105 +469,73 @@
       <!-- ====================================================================
            PHÂN HỆ F&B 1: TOÀN CHUỖI & XẾP HẠNG 14 ĐIỂM BÁN (ORBIT SIBA FOOD)
            ==================================================================== -->
-      <section id="fnb-chain" class="tab-panel active space-y-5">
+      <section id="fnb-chain" class="tab-panel active space-y-4">
         
-        <!-- TailAdmin Breadcrumb Header -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <!-- Header -->
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90 ">
-              Biên Bản Hủy Hàng &amp; Hao Hụt Bếp
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+              Hiệu Quả &amp; Xếp Hạng Toàn Chuỗi
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ghi nhận hàng hỏng, quá hạn, cháy rách hoặc nấu dư để ghi nhận chi phí hao hụt.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Theo dõi doanh thu, tỷ suất EBITDA, Food Cost &amp; Labor Cost trên toàn hệ thống 14 điểm bán.</p>
           </div>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <button onclick="openCreateWasteModal()" class="inline-flex items-center gap-2 rounded-[10px] bg-brand-500 hover:bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              <span>+ Ghi Biên Bản Hủy Hàng</span>
-            </button>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs text-gray-600 dark:text-gray-300 font-medium shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-600"></i>
+              Kỳ báo cáo: <strong class="text-gray-900 dark:text-white font-semibold">Tháng 11/2026</strong>
+            </span>
           </div>
         </div>
 
-        <!-- 4 Top KPI Cards (TailAdmin Metric Items Layout) -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-5 2xl:gap-6">
-          
+        <!-- Inline Metric Toolbar: Chain Performance -->
+        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 xl:grid-cols-4 mb-4">
           <!-- Metric 1: Tổng Doanh Thu Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-blue-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400">
-                <i data-lucide="dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
-              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-600 dark:bg-green-500/15 dark:text-green-500">
-                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-                <span>105.8%</span>
-              </span>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Doanh Thu Chuỗi</span>
+              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainTotalRevenue" title="6,347,000,000đ">6.347.000.000 ₫</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">14 Điểm bán toàn chuỗi</span>
             </div>
-            <div class="mt-4 min-w-0">
-              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Doanh Thu Chuỗi</span>
-              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalRevenue" title="6,347,000,000đ">6,347,000,000đ</h4>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
-              Đạt 105.8% kế hoạch tháng (14 Điểm bán)
-            </div>
+            <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shrink-0">
+              105,8% KH
+            </span>
           </div>
 
           <!-- Metric 2: Lợi Nhuận EBITDA Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-                <i data-lucide="wallet" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
-              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" id="chainAvgMargin">
-                24.4%
-              </span>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Lợi Nhuận EBITDA</span>
+              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainTotalProfit" title="1,548,000,000đ">1.548.000.000 ₫</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Biên EBITDA trung bình</span>
             </div>
-            <div class="mt-4 min-w-0">
-              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Lợi Nhuận EBITDA Chuỗi</span>
-              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-900 dark:text-white/90 truncate" id="chainTotalProfit" title="1,548,000,000đ">1,548,000,000đ</h4>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
-              Biên EBITDA trung bình toàn chuỗi
-            </div>
+            <span class="inline-flex items-center gap-1 rounded-md bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-300 border border-brand-200/60 dark:border-brand-800/60 shrink-0" id="chainAvgMargin">
+              24,4%
+            </span>
           </div>
 
           <!-- Metric 3: Food Cost TB Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
-                <i data-lucide="utensils" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
-              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
-                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>Chuẩn</span>
-              </span>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Food Cost TB Chuỗi</span>
+              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainAvgFoodCost">42,4%</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Mục tiêu định mức ≤ 43%</span>
             </div>
-            <div class="mt-4 min-w-0">
-              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Food Cost TB Chuỗi</span>
-              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgFoodCost">42.4%</h4>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
-              Trong định mức mục tiêu (&le; 43.0%)
-            </div>
+            <span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-300 shrink-0">
+              Đạt chuẩn
+            </span>
           </div>
 
           <!-- Metric 4: Labor Cost (COL) Chuỗi -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:shadow-theme-md min-w-0 overflow-hidden">
-            <div class="flex items-center justify-between">
-              <div class="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
-                <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
-              <span class="inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 rounded-lg bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
-                <span>Tối ưu</span>
-              </span>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Labor Cost (COL)</span>
+              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainAvgLaborCost">18,2%</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Định mức nhân công ≤ 19%</span>
             </div>
-            <div class="mt-4 min-w-0">
-              <span class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 block truncate">Labor Cost (COL) Chuỗi</span>
-              <h4 class="mt-1 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90 truncate" id="chainAvgLaborCost">18.2%</h4>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 truncate">
-              Định mức nhân công chuẩn chuỗi (&le; 19.0%)
-            </div>
+            <span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-300 shrink-0">
+              Tối ưu
+            </span>
           </div>
-
         </div>
 
         <!-- Filter Pills Bar -->
@@ -1384,66 +1350,60 @@
           </div>
         </div>
 
-        <!-- KPI Summary Cards (4 Cards) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-          <!-- Card 1: Tổng Mặt Hàng -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Mặt Hàng F&amp;B</p>
-                <h3 id="fnbStockKpiTotalItems" class="text-xl sm:text-title-sm font-bold tabular-nums text-gray-900 dark:text-white mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">5 nhóm hàng danh mục</p>
-              </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center shrink-0">
-                <i data-lucide="boxes" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+        <!-- Inline Metric Toolbar: F&B Stock -->
+        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 lg:grid-cols-4 mb-4">
+          <!-- Item 1: Tổng Mặt Hàng F&B -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Mặt Hàng F&amp;B</span>
+              <h3 id="fnbStockKpiTotalItems" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">--</h3>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">5 nhóm danh mục</span>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+            <div class="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+              <i data-lucide="boxes" class="w-4 h-4"></i>
+            </div>
           </div>
 
-          <!-- Card 2: Tổng Giá Trị Tồn Chuỗi -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Giá Trị Tồn Chuỗi</p>
-                <h3 id="fnbStockKpiTotalValue" class="text-xl sm:text-title-sm font-bold tabular-nums text-gray-900 dark:text-white mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">14 điểm bán toàn hệ thống</p>
-              </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center shrink-0">
-                <i data-lucide="circle-dollar-sign" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+          <!-- Item 2: Tổng Giá Trị Tồn Chuỗi -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Giá Trị Tồn Chuỗi</span>
+              <h3 id="fnbStockKpiTotalValue" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">--</h3>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">14 Điểm bán toàn hệ thống</span>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+            <div class="w-8 h-8 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+              <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
+            </div>
           </div>
 
-          <!-- Card 3: Cảnh Báo Âm Tồn -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Cảnh Báo Âm Tồn</p>
-                <h3 id="fnbStockKpiNegative" class="text-xl sm:text-title-sm font-bold tabular-nums text-rose-600 dark:text-rose-400 mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Vượt định mức hoặc chưa ghi nhận nhập</p>
-              </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 flex items-center justify-center shrink-0">
-                <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+          <!-- Item 3: Cảnh Báo Âm Tồn -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-rose-700 dark:text-rose-400 block truncate flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                Cảnh Báo Âm Tồn
+              </span>
+              <h3 id="fnbStockKpiNegative" class="text-base sm:text-lg font-bold tabular-nums text-rose-600 dark:text-rose-400 mt-0.5 font-mono truncate">--</h3>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Cần kiểm kê đối soát</span>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+            <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60 shrink-0">
+              Kiểm đếm
+            </span>
           </div>
 
-          <!-- Card 4: Chưa Có Tồn Đầu -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Chưa Có Tồn Đầu</p>
-                <h3 id="fnbStockKpiNoOpening" class="text-xl sm:text-title-sm font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Cần cập nhật số dư ban đầu</p>
-              </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center shrink-0">
-                <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-              </div>
+          <!-- Item 4: Chưa Có Tồn Đầu -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Chưa Có Tồn Đầu
+              </span>
+              <h3 id="fnbStockKpiNoOpening" class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono truncate">--</h3>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Chưa có số dư ban đầu</span>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 shrink-0">
+              Cập nhật
+            </span>
           </div>
         </div>
 
@@ -1830,104 +1790,73 @@
           </div>
         </div>
 
-        <!-- 5 KPI Metric Cards (TailAdmin 100% Faithful: 12x12 rounded-xl icon + label + big number + badge % increase/decrease) -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 xl:grid-cols-5">
-          
+        <!-- Inline Metric Toolbar: Warehouse Overview -->
+        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mb-4">
           <!-- Metric 1: Tổng SKU -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-brand-300 dark:hover:border-brand-500/30">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
-              <i data-lucide="boxes" class="w-6 h-6"></i>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng SKU Quản Lý</span>
+              <h4 id="dashMetricSkus" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">0 Mã</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Toàn bộ danh mục kho</span>
             </div>
-            <div class="mt-4 flex items-end justify-between">
-              <div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng SKU Quản Lý</span>
-                <h4 id="dashMetricSkus" class="mt-1.5 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90">
-                  0 Mã
-                </h4>
-              </div>
-              <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
-                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-                +5.4%
-              </span>
+            <div class="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+              <i data-lucide="boxes" class="w-4 h-4"></i>
             </div>
           </div>
 
           <!-- Metric 2: Tổng Giá Trị Tồn Kho -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-brand-300 dark:hover:border-brand-500/30">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 shrink-0">
-              <i data-lucide="circle-dollar-sign" class="w-6 h-6"></i>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Giá Trị Tồn Kho (SAP)</span>
+              <h4 id="dashMetricValue" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">0 ₫</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Theo giá bình quân</span>
             </div>
-            <div class="mt-4 flex items-end justify-between">
-              <div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Giá Trị Tồn Kho (SAP)</span>
-                <h4 id="dashMetricValue" class="mt-1.5 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90">
-                  0 ₫
-                </h4>
-              </div>
-              <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
-                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-                +12.8%
-              </span>
+            <div class="w-8 h-8 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+              <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
             </div>
           </div>
 
-          <!-- Metric 3: Cảnh Báo Đặt ROP / Dưới mức tối thiểu -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-amber-300 dark:hover:border-amber-500/30">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 shrink-0">
-              <i data-lucide="alert-circle" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-4 flex items-end justify-between">
-              <div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Dưới Mức Tối Thiểu</span>
-                <h4 id="dashMetricRop" class="mt-1.5 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90">
-                  0 Mã
-                </h4>
-              </div>
-              <span class="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-500/15 dark:text-amber-500">
-                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
-                Cảnh báo
+          <!-- Metric 3: Cảnh Báo ROP / Dưới mức tối thiểu -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Dưới Mức Tối Thiểu
               </span>
+              <h4 id="dashMetricRop" class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono truncate">0 Mã</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Chạm ngưỡng an toàn</span>
             </div>
+            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 shrink-0">
+              Cần đặt
+            </span>
           </div>
 
           <!-- Metric 4: Sắp Hết Hạn / Cận Date -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-rose-300 dark:hover:border-rose-500/30">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 shrink-0">
-              <i data-lucide="hourglass" class="w-6 h-6"></i>
-            </div>
-            <div class="mt-4 flex items-end justify-between">
-              <div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Cận Date (≤ 7 Ngày)</span>
-                <h4 id="dashMetricExp" class="mt-1.5 text-title-sm font-bold tabular-nums  text-rose-600 dark:text-rose-400">
-                  0 Lô
-                </h4>
-              </div>
-              <span class="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-600 dark:bg-rose-500/15 dark:text-rose-500">
-                <i data-lucide="trending-down" class="w-3.5 h-3.5"></i>
-                FEFO Gấp
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-rose-700 dark:text-rose-400 block truncate flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                Cận Date (≤ 7 Ngày)
               </span>
+              <h4 id="dashMetricExp" class="text-base sm:text-lg font-bold tabular-nums text-rose-600 dark:text-rose-400 mt-0.5 font-mono truncate">0 Lô</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Ưu tiên xuất FEFO</span>
             </div>
+            <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60 shrink-0">
+              Xuất gấp
+            </span>
           </div>
 
           <!-- Metric 5: Hàng Tồn Chậm / Chết -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 transition-all hover:border-purple-300 dark:hover:border-purple-500/30">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 shrink-0">
-              <i data-lucide="package-search" class="w-6 h-6"></i>
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tồn Chậm Luân Chuyển</span>
+              <h4 id="dashMetricSlow" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">2 Mã</h4>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Lưu kho &gt; 20 ngày</span>
             </div>
-            <div class="mt-4 flex items-end justify-between">
-              <div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tồn Chậm Luân Chuyển</span>
-                <h4 id="dashMetricSlow" class="mt-1.5 text-title-sm font-bold tabular-nums  text-gray-800 dark:text-white/90">
-                  2 Mã
-                </h4>
-              </div>
-              <span class="inline-flex items-center gap-1 rounded-lg bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600 dark:bg-purple-500/15 dark:text-purple-400">
-                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                &gt; 20 ngày
-              </span>
-            </div>
+            <span class="text-[10px] font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded shrink-0">
+              Chậm
+            </span>
           </div>
-
         </div>
 
         <!-- Row 1 Charts: Inbound/Outbound Monthly Bar Chart (8 cols) + Safety Stock Radial Gauge (4 cols) -->
@@ -2347,24 +2276,24 @@
 
         <div class="space-y-4">
           <!-- CARD 1: IMPORT HÀNG LOẠT BẰNG EXCEL -->
-          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-xs">
             <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-3">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-brand-600"></i>
                 Import Chứng Từ Hàng Loạt Bằng File Excel
               </h3>
-              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">Chuẩn hóa dữ liệu</span>
+              <span class="text-[11px] px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300 font-medium border border-brand-200/60 dark:border-brand-800/60">Mẫu chuẩn</span>
             </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
               Tải file mẫu (đã có sẵn 1 dòng dữ liệu ví dụ), điền thông tin chứng từ rồi tải lên. Cột bắt buộc: <b>Site</b>, <b>Loại hóa đơn</b>. Định dạng ngày: <code class="bg-gray-100 dark:bg-gray-800/80 px-1 py-0.5 rounded text-gray-700 dark:text-gray-200 tabular-nums">yyyy-mm-dd</code>.<br>
-              Cột <b>"Link ảnh (Drive)"</b>: người dùng tự upload ảnh lên Google Drive, bật quyền chia sẻ <i>"Anyone with link" (Người có liên kết)</i> rồi dán link vào (nhiều link phân tách nhau bằng dấu phẩy). Khi tra cứu, ảnh sẽ xem được trực tiếp.
+              Cột <b>"Link ảnh (Drive)"</b>: dán liên kết Google Drive chia sẻ quyền xem để hệ thống tự động trích xuất xem ảnh trực tiếp.
             </p>
             <div class="flex flex-wrap items-center gap-3">
-              <button onclick="taiTemplateChungTu()" class="px-4 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 font-bold rounded-xl text-xs flex items-center gap-2 border border-gray-300 dark:border-gray-700 shadow-xs transition-all">
+              <button onclick="taiTemplateChungTu()" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold rounded-lg text-xs flex items-center gap-2 border border-gray-300 dark:border-gray-700 shadow-xs transition-all">
                 <i data-lucide="download" class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300"></i>
                 Tải Template Excel Mẫu
               </button>
-              <label class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm cursor-pointer transition-all">
+              <label class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                 <span>Chọn File &amp; Import Excel</span>
                 <input type="file" id="ctImportFile" accept=".xlsx, .xls" class="hidden" onchange="importExcelChungTu(this)">
@@ -2375,61 +2304,61 @@
           </div>
 
           <!-- CARD 2: NHẬP THỦ CÔNG 1 CHỨNG TỪ -->
-          <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                <i data-lucide="receipt" class="w-4 h-4 text-sky-600"></i>
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="receipt" class="w-4 h-4 text-brand-600"></i>
                 Nhập Thủ Công 1 Chứng Từ Giao Nhận Hàng
               </h3>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Lưu trữ hóa đơn GTGT, biên bản giao nhận, phiếu xuất kho và đính kèm tệp chứng thực vào hệ thống.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Loại hóa đơn / Chứng từ <span class="text-rose-500">*</span></label>
-                <select id="ctLoai" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></select>
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Loại hóa đơn / Chứng từ <span class="text-rose-500">*</span></label>
+                <select id="ctLoai" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs"></select>
               </div>
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Nhà cung cấp / Đối tác</label>
-                <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Thực Phẩm ABC" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Nhà cung cấp / Đối tác</label>
+                <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Thực Phẩm ABC" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs">
               </div>
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày xuất hóa đơn <span class="text-rose-500">*</span></label>
-                <input type="date" id="ctNgayXuat" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Ngày xuất hóa đơn <span class="text-rose-500">*</span></label>
+                <input type="date" id="ctNgayXuat" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-mono">
               </div>
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày nhận hàng thực tế <span class="text-rose-500">*</span></label>
-                <input type="date" id="ctNgayNhan" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Ngày nhận hàng thực tế <span class="text-rose-500">*</span></label>
+                <input type="date" id="ctNgayNhan" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-mono">
               </div>
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Tên người giao hàng</label>
-                <input type="text" id="ctNguoiGiao" placeholder="Tên tài xế / người giao hàng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Tên người giao hàng</label>
+                <input type="text" id="ctNguoiGiao" placeholder="Tên tài xế / người giao hàng..." class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs">
               </div>
               <div>
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Tên người nhận hàng</label>
-                <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Tên người nhận hàng</label>
+                <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng..." class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs">
               </div>
               <div class="md:col-span-2 lg:col-span-3">
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi chú bổ sung</label>
-                <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú thêm về quy cách, bao bì, số lượng thực nhận..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Ghi chú bổ sung</label>
+                <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú thêm về quy cách, bao bì, số lượng thực nhận..." class="w-full py-2 px-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs"></textarea>
               </div>
               <div class="md:col-span-2 lg:col-span-3">
-                <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">File đính kèm (nhiều file — ảnh, PDF, Excel, Word · tối đa 20MB/tệp)</label>
-                <label class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-brand-500 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:bg-gray-800/80 transition-all text-center">
-                  <i data-lucide="upload-cloud" class="w-8 h-8 text-brand-600 mb-2"></i>
-                  <span class="text-gray-700 dark:text-gray-200 font-bold">Kéo thả hoặc <b class="text-brand-600 underline">bấm để chọn nhiều file</b></span>
-                  <span class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">Hỗ trợ JPG, PNG, PDF, XLSX, DOCX (Tối đa 20MB/file)</span>
+                <label class="font-semibold text-gray-700 dark:text-gray-300 block mb-1">File đính kèm (nhiều file — ảnh, PDF, Excel, Word · tối đa 20MB/tệp)</label>
+                <label class="border border-dashed border-gray-300 dark:border-gray-700 hover:border-brand-500 p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-gray-50/50 dark:bg-gray-900/30 hover:bg-gray-100/50 dark:hover:bg-gray-800/40 transition-all text-center">
+                  <i data-lucide="upload-cloud" class="w-6 h-6 text-brand-600 mb-1.5"></i>
+                  <span class="text-xs text-gray-700 dark:text-gray-200 font-semibold">Kéo thả hoặc <b class="text-brand-600 underline">bấm để chọn file chứng từ</b></span>
+                  <span class="text-[10.5px] text-gray-400 dark:text-gray-500 mt-0.5">Hỗ trợ JPG, PNG, PDF, XLSX, DOCX (Tối đa 20MB/file)</span>
                   <input type="file" id="ctFile" multiple class="hidden" onchange="onChonFile(this)">
                 </label>
-                <div id="ctFileList" class="space-y-1.5 mt-3"></div>
+                <div id="ctFileList" class="space-y-1.5 mt-2.5"></div>
               </div>
             </div>
 
-            <div class="flex justify-end gap-2.5 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
-              <button type="button" onclick="resetChungTuForm()" class="px-5 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-gray-900/50 transition-all">
+            <div class="flex justify-end gap-2.5 mt-5 pt-3.5 border-t border-gray-100 dark:border-gray-800">
+              <button type="button" onclick="resetChungTuForm()" class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-all">
                 Hủy / Làm mới
               </button>
-              <button type="button" id="btnLuuCT" onclick="luuChungTuForm()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
+              <button type="button" id="btnLuuCT" onclick="luuChungTuForm()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 shadow-xs transition-all">
                 <i data-lucide="save" class="w-4 h-4"></i> Lưu chứng từ
               </button>
             </div>
@@ -2515,40 +2444,42 @@
           </button>
         </div>
 
-        <!-- 4 Quota KPIs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase">Ngân Sách Tháng</div>
-            <div class="text-xl font-extrabold text-gray-900 dark:text-white tabular-nums mt-1" id="kpiNganSach">0đ</div>
-            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5" id="kpiSubSite">—</div>
+        <!-- Budget & Quota Toolbar: Consolidated High-Density Strip -->
+        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs p-4 mb-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800">
+            <!-- 1: Ngân Sách Tháng -->
+            <div class="min-w-0 pr-2">
+              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Ngân Sách Tháng</span>
+              <div class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono" id="kpiNganSach">0 ₫</div>
+              <span class="text-[10px] text-gray-400 block truncate" id="kpiSubSite">—</span>
+            </div>
+            <!-- 2: Đã Đặt Lũy Kế -->
+            <div class="min-w-0 sm:pl-3 pr-2 pt-2 sm:pt-0">
+              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate">Đã Đặt Lũy Kế</span>
+              <div class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono" id="kpiDaDat">0 ₫</div>
+              <span class="text-[10px] text-gray-400 block truncate">Các đơn trước trong tháng</span>
+            </div>
+            <!-- 3: Còn Lại -->
+            <div class="min-w-0 sm:pl-3 pr-2 pt-2 sm:pt-0">
+              <span class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 block truncate">Còn Lại (Khả Dụng)</span>
+              <div class="text-base sm:text-lg font-bold tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono" id="kpiConLai">0 ₫</div>
+              <span class="text-[10px] text-gray-400 block truncate" id="kpiDangNhapSub">Đang nhập: 0 ₫</span>
+            </div>
+            <!-- 4: Tỷ Lệ Sử Dụng & Progress -->
+            <div class="min-w-0 sm:pl-3 pt-2 sm:pt-0">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 truncate">Tỷ Lệ Ngân Sách</span>
+                <span class="text-sm font-bold tabular-nums text-gray-900 dark:text-white font-mono" id="kpiTyLe">0%</span>
+              </div>
+              <div class="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1.5">
+                <div id="budFill" class="h-full bg-brand-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-gray-400 mt-1">
+                <span>Dùng: <b id="budUsed" class="text-gray-700 dark:text-gray-200 font-semibold font-mono">0 ₫</b> / <span id="budTotal" class="font-mono">0 ₫</span></span>
+                <span id="budNote" class="text-gray-400 truncate max-w-[120px]">Chưa nhập mặt hàng</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <div class="text-[11px] font-bold text-amber-600 uppercase">Đã Đặt Lũy Kế</div>
-            <div class="text-xl font-extrabold text-gray-900 dark:text-white tabular-nums mt-1" id="kpiDaDat">0đ</div>
-            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Các đơn trước trong tháng</div>
-          </div>
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <div class="text-[11px] font-bold text-emerald-600 uppercase">Còn Lại (Sau Đơn Này)</div>
-            <div class="text-xl font-extrabold text-gray-900 dark:text-white tabular-nums mt-1" id="kpiConLai">0đ</div>
-            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5" id="kpiDangNhapSub">Đang nhập: 0đ</div>
-          </div>
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <div class="text-[11px] font-bold text-rose-600 uppercase">Tỷ Lệ Ngân Sách</div>
-            <div class="text-xl font-extrabold text-gray-900 dark:text-white tabular-nums mt-1" id="kpiTyLe">0%</div>
-            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Lũy kế + đang nhập</div>
-          </div>
-        </div>
-
-        <!-- Quota Progress Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="flex justify-between items-center text-xs mb-2">
-            <span class="font-bold text-gray-700 dark:text-gray-200">Tiến độ sử dụng ngân sách:</span>
-            <span class="tabular-nums text-gray-500 dark:text-gray-400"><b id="budUsed" class="text-brand-700 font-bold">0đ</b> / <span id="budTotal">0đ</span></span>
-          </div>
-          <div class="w-full h-3 bg-gray-100 dark:bg-gray-800/80 rounded-full overflow-hidden">
-            <div id="budFill" class="h-full bg-brand-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
-          <div id="budNote" class="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5">Chưa nhập số lượng mặt hàng.</div>
         </div>
 
         <!-- Material Table Card -->
@@ -2564,7 +2495,7 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2 text-xs">
-            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="🔍 Tìm mã hoặc tên vật tư..." class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg min-w-[200px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="Tìm mã hoặc tên vật tư..." class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg min-w-[200px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
             <select id="fLoai" onchange="filterItems()" class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"><option value="">Tất cả loại NVL</option></select>
             <label class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 cursor-pointer ml-auto">
               <input type="checkbox" id="fChiNhap" onchange="filterItems()" class="rounded text-brand-600"> Chỉ hiện dòng đang nhập
@@ -3139,7 +3070,7 @@
             </div>
             <div>
               <div class="font-extrabold text-gray-900 dark:text-white text-base leading-tight">Trung Tâm Ứng Dụng</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400">Orbit Siba Food • 15 Chức năng vận hành</div>
+              <div class="text-[11px] text-gray-500 dark:text-gray-400">A.Kitchen WMS • Chức năng vận hành</div>
             </div>
           </div>
           <button onclick="closeMobileMenuHub()" class="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full bg-gray-100 dark:bg-gray-800 active:translate-y-px transition-transform">
@@ -3161,7 +3092,7 @@
         <div>
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-bold text-[11px] uppercase tracking-wider text-brand-500">1. P&amp;L &amp; Chuỗi Căng Tin</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-400">Orbit Model</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">A.Kitchen</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('fnb-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
@@ -3614,7 +3545,7 @@
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
           <h3 id="invDetailModalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
-          <p id="invDetailModalSub" class="text-[10.5px] text-gray-400">Orbit Siba Food Database</p>
+          <p id="invDetailModalSub" class="text-[10.5px] text-gray-400">A.Kitchen WMS Database</p>
         </div>
         <button onclick="closeInvDetailModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -3724,7 +3655,7 @@
           </div>
           <div>
             <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Thông Tin Tài Khoản</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Orbit Siba Food • Phân Quyền & Vai Trò</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">A.Kitchen WMS • Phân Quyền & Vai Trò</p>
           </div>
         </div>
         <button onclick="closeUserProfileModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
@@ -6518,26 +6449,26 @@ function toggleTheme() {
 // ============================================================================
 
 const TAB_META = {
-  'fnb-chain': { title: '🏆 Toàn Chuỗi', mobTab: 'fnb-chain' },
-  'fnb-pl': { title: '📊 Báo Cáo P&L', mobTab: 'fnb-chain' },
-  'fnb-pos': { title: '⚡ Doanh Thu POS', mobTab: 'fnb-chain' },
-  'fnb-stock': { title: '📦 Tồn Kho Chuỗi F&B', mobTab: 'fnb-chain' },
-  'fnb-counts': { title: '📋 Kiểm Kê Hằng Ngày', mobTab: 'fnb-chain' },
-  'fnb-receipts': { title: '📥 Nhập Hàng Điểm Bán', mobTab: 'fnb-chain' },
-  'fnb-waste': { title: '🗑️ Hủy Hàng & Hao Hụt', mobTab: 'fnb-chain' },
-  'fnb-sites': { title: '🏢 14 Điểm Bán SAP', mobTab: 'hub' },
-      'user-matrix': { title: '🛡️ Phân Quyền User Matrix', mobTab: 'hub' },
-  'wh-dashboard': { title: '📈 Tổng Quan Kho', mobTab: 'wh-stock' },
-  'wh-stock': { title: '📦 Hạn Dùng & FEFO', mobTab: 'wh-stock' },
-  'wh-reorder': { title: '⚠️ Cảnh Báo ROP', mobTab: 'wh-stock' },
-  'wh-leadtime': { title: '⏱️ Lead Time NCC', mobTab: 'wh-stock' },
-  'wh-posap': { title: '📑 Đơn PO SAP', mobTab: 'wh-stock' },
-  'portal-voucher': { title: '🧾 Nhập Chứng Từ', mobTab: 'portal-voucher' },
-  'portal-search': { title: '🔍 Tra Cứu Chứng Từ', mobTab: 'portal-voucher' },
-  'portal-order': { title: '🛒 Đặt Hàng CCDC', mobTab: 'hub' },
-  'portal-history': { title: '📜 Lịch Sử Đơn', mobTab: 'hub' },
-  'portal-baocao': { title: '📋 Báo Cáo Suất Ăn', mobTab: 'portal-baocao' },
-  'portal-kiemke': { title: '⚖️ Kiểm Kê Tồn Kho', mobTab: 'hub' }
+  'fnb-chain': { title: 'Toàn Chuỗi & Xếp Hạng', mobTab: 'fnb-chain' },
+  'fnb-pl': { title: 'Báo Cáo P&L Điểm Bán', mobTab: 'fnb-chain' },
+  'fnb-pos': { title: 'Doanh Thu POS & Bán Lẻ', mobTab: 'fnb-chain' },
+  'fnb-stock': { title: 'Tồn Kho Chuỗi F&B', mobTab: 'fnb-chain' },
+  'fnb-counts': { title: 'Kiểm Kê Hằng Ngày', mobTab: 'fnb-chain' },
+  'fnb-receipts': { title: 'Nhập Hàng Điểm Bán', mobTab: 'fnb-chain' },
+  'fnb-waste': { title: 'Hủy Hàng & Hao Hụt', mobTab: 'fnb-chain' },
+  'fnb-sites': { title: 'Danh Mục 14 Điểm Bán', mobTab: 'hub' },
+  'user-matrix': { title: 'Phân Quyền User Matrix', mobTab: 'hub' },
+  'wh-dashboard': { title: 'Tổng Quan Kho Vận', mobTab: 'wh-stock' },
+  'wh-stock': { title: 'Hạn Dùng & FEFO', mobTab: 'wh-stock' },
+  'wh-reorder': { title: 'Cảnh Báo Tồn ROP', mobTab: 'wh-stock' },
+  'wh-leadtime': { title: 'Lead Time Nhà Cung Cấp', mobTab: 'wh-stock' },
+  'wh-posap': { title: 'Đơn Hàng PO SAP', mobTab: 'wh-stock' },
+  'portal-voucher': { title: 'Tạo & Duyệt Chứng Từ', mobTab: 'portal-voucher' },
+  'portal-search': { title: 'Tra Cứu Chứng Từ', mobTab: 'portal-voucher' },
+  'portal-order': { title: 'Đặt Hàng Vật Tư Bếp', mobTab: 'hub' },
+  'portal-history': { title: 'Lịch Sử Đặt Hàng', mobTab: 'hub' },
+  'portal-baocao': { title: 'Báo Cáo Suất Ăn Ca', mobTab: 'portal-baocao' },
+  'portal-kiemke': { title: 'Kiểm Kê Tồn Kho Kỳ', mobTab: 'hub' }
 };
 
 function openMobileMenuHub() {
