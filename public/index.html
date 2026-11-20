@@ -3,12 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Orbit Siba Food • A.Kitchen ERP &amp; WMS</title>
+  <title>A.Kitchen WMS - Quản lý kho</title>
   
-  <!-- Google Fonts: Outfit (Variable) & Be Vietnam Pro (Vietnamese Fallback) -->
+  <!-- Favicon & PWA Metadata -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/assets/brand/favicon-16.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+  <meta name="theme-color" content="#19723C">
+  <meta name="apple-mobile-web-app-title" content="A.Kitchen WMS">
+  <meta name="application-name" content="A.Kitchen WMS">
+  <link rel="manifest" href="/manifest.webmanifest">
+  
+  <!-- Google Fonts: Be Vietnam Pro (Brand Sans) & JetBrains Mono (Numbers/Tabular Figures) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
   <link rel="stylesheet" href="/assets/app.css">
@@ -41,9 +51,16 @@
 </head>
 <body class="h-screen overflow-hidden flex antialiased bg-gray-50/50 dark:bg-black transition-colors duration-200">
 
-  <!-- Preloader (TailAdmin Exact Specification) -->
+  <!-- Preloader (TailAdmin Exact Specification with A.Kitchen Brand Mark) -->
   <div id="preloader" class="fixed top-0 left-0 z-999999 flex h-screen w-screen items-center justify-center bg-white dark:bg-black transition-opacity duration-300 pointer-events-none opacity-0 invisible">
-    <div class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-brand-500 border-t-transparent"></div>
+    <div class="relative flex flex-col items-center gap-3">
+      <div class="relative flex items-center justify-center">
+        <div class="h-16 w-16 animate-spin rounded-full border-2 border-solid border-brand-600/20 border-t-brand-600"></div>
+        <img src="/assets/brand/logo-mark.png" alt="A.Kitchen" width="28" height="24" class="absolute w-7 h-auto object-contain block dark:hidden">
+        <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="28" height="24" class="absolute w-7 h-auto object-contain hidden dark:block">
+      </div>
+      <span class="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wide">A.Kitchen WMS</span>
+    </div>
   </div>
 
   <!-- Screen Reader Skip Link -->
@@ -65,20 +82,12 @@
        ===================================================================== -->
   <aside id="sidebar" class="sidebar fixed top-0 left-0 z-9999 flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-all duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
     
-    <!-- SIDEBAR HEADER (TailAdmin exact layout) -->
+    <!-- SIDEBAR HEADER (A.Kitchen Brand Exact Specification) -->
     <div class="sidebar-header flex items-center justify-between gap-2 pt-5 pb-5">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-sm shrink-0">
-          <i data-lucide="chef-hat" class="w-5 h-5"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="font-extrabold text-gray-900 dark:text-white text-base  flex items-center gap-1.5">
-            <span>A.Kitchen</span>
-            <span class="text-[9.5px] px-1.5 py-0.5 rounded font-black bg-brand-500 text-white tracking-wide">ORBIT</span>
-          </div>
-          <div class="text-xs text-gray-400 dark:text-gray-500 font-medium truncate">Siba Food • Chuỗi F&amp;B</div>
-        </div>
-      </div>
+      <a href="#" onclick="switchTab('fnb-chain'); return false;" class="flex items-center gap-2 min-w-0" title="A.Kitchen WMS">
+        <img src="/assets/brand/logo-horizontal.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain block dark:hidden">
+        <img src="/assets/brand/logo-horizontal-dark.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain hidden dark:block">
+      </a>
       <button onclick="toggleSidebar()" class="xl:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
@@ -368,14 +377,13 @@
           <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
 
-        <!-- Brand Logo on Mobile only (Sidebar is already visible on Desktop) -->
-        <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
-          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-500 flex items-center justify-center text-white font-black text-xs sm:text-sm shadow-sm shrink-0">
-            A
-          </div>
+        <!-- Brand Logo on Mobile only (A.Kitchen Logo Mark) -->
+        <div class="flex items-center gap-2 lg:hidden shrink-0">
+          <img src="/assets/brand/logo-mark.png" alt="A.Kitchen" width="39" height="34" decoding="async" class="h-8 sm:h-9 w-auto object-contain block dark:hidden">
+          <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="39" height="34" decoding="async" class="h-8 sm:h-9 w-auto object-contain hidden dark:block">
           <div class="hidden sm:flex flex-col leading-tight">
-            <span class="font-extrabold text-gray-900 dark:text-white text-sm ">ORBIT</span>
-            <span class="text-[10px] text-gray-400 font-medium">Siba Food</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-sm">A.Kitchen</span>
+            <span class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">WMS</span>
           </div>
         </div>
 
@@ -3038,8 +3046,10 @@
       <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
       <section id="tab-404" class="tab-panel py-16 px-4 text-center">
         <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
-          <div class="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums font-black text-2xl shadow-inner">
-            404
+          <div class="flex flex-col items-center justify-center gap-3">
+            <img src="/assets/brand/logo-stacked.png" alt="A.Kitchen" width="160" height="170" class="h-24 w-auto object-contain block dark:hidden">
+            <img src="/assets/brand/logo-stacked-dark.png" alt="A.Kitchen" width="160" height="170" class="h-24 w-auto object-contain hidden dark:block">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 tabular-nums font-mono">Lỗi 404 • Không Tìm Thấy Trang</span>
           </div>
           <div>
             <h3 class="text-lg font-bold text-gray-900 dark:text-white">Không Tìm Thấy Trang Yêu Cầu</h3>
@@ -3627,20 +3637,20 @@
   <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up">
       
-      <!-- Modal Header -->
-      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-brand-500 text-white flex items-center justify-center shadow-md">
-            <i data-lucide="shield-check" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Đăng Nhập Hệ Thống</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Orbit Siba Food • WMS & Chuỗi F&B</p>
-          </div>
-        </div>
-        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+      <!-- Modal Header with Centered Stacked Brand Logo -->
+      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 relative flex flex-col items-center text-center">
+        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800" title="Đóng">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
+        <div class="mb-3">
+          <img src="/assets/brand/logo-stacked.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain block dark:hidden">
+          <img src="/assets/brand/logo-stacked-dark.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain hidden dark:block">
+        </div>
+        <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Đăng Nhập Hệ Thống</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">A.Kitchen WMS • Chuỗi Bếp & Điểm Bán</p>
+      </div>
+      <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
+      
       </div>
 
       <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
@@ -5970,7 +5980,7 @@ function initTailadminCharts() {
   const elBar = document.getElementById('inboundOutboundChart');
   if (elBar && !chartInboundOutbound) {
     const optionsBar = {
-      colors: ['#465FFF', '#10B981'],
+      colors: ['#19723C', '#10B981'],
       chart: {
         fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
         type: 'bar',
@@ -6024,7 +6034,7 @@ function initTailadminCharts() {
   if (elGauge && !chartSafetyGauge) {
     const optionsGauge = {
       series: [92.4],
-      colors: ['#9CB9FF'],
+      colors: ['#599973'],
       chart: {
         fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
         type: 'radialBar',
@@ -6059,7 +6069,7 @@ function initTailadminCharts() {
           shade: 'light',
           type: 'horizontal',
           shadeIntensity: 0.5,
-          gradientToColors: ['#465FFF'],
+          gradientToColors: ['#19723C'],
           inverseColors: false,
           opacityFrom: 1,
           opacityTo: 1,
@@ -6080,7 +6090,7 @@ function initTailadminCharts() {
         { name: 'Tổng giá trị tồn (Triệu ₫)', data: [1050, 1120, 1080, 1190, 1220, 1180, 1258] },
         { name: 'Định mức tối thiểu (Triệu ₫)', data: [800, 800, 800, 800, 800, 800, 800] }
       ],
-      colors: ['#465FFF', '#F59E0B'],
+      colors: ['#19723C', '#F59E0B'],
       chart: {
         fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
         type: 'area',
@@ -6397,7 +6407,7 @@ async function openItemDetailModal(sku) {
       const isDark = isDarkModeActive();
       const options = {
         series: [{ name: 'Tồn kho thực tế', data: [15, 14, 16, 12, 11, 14, 13, 15, 14, 12, item.qty || 10] }],
-        colors: ['#465FFF'],
+        colors: ['#19723C'],
         chart: {
           fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
           type: 'area',
@@ -11154,7 +11164,7 @@ window.renderSavedAccountsInLoginModal = function() {
     return `
       <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
         isCurrent
-          ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#465FFF]/40'
+          ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#19723C]/40'
           : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
       }">
         <div class="flex items-center gap-2.5 min-w-0">
@@ -11736,7 +11746,7 @@ window.renderSitesOptions = function() {
         data-region="${site.region}"
         class="site-option-card p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
           isSelected 
-            ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#465FFF]' 
+            ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#19723C]' 
             : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
         }"
       >
@@ -11792,14 +11802,14 @@ window.selectSiteOption = function(siteCode) {
     const checkIcon = check?.querySelector('i');
 
     if (isThis) {
-      card.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-500/15', 'ring-2', 'ring-[#465FFF]');
+      card.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-500/15', 'ring-2', 'ring-[#19723C]');
       card.classList.remove('border-gray-200', 'dark:border-gray-800');
       if (check) {
         check.className = 'site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 border-brand-500 bg-brand-500 text-white';
         if (checkIcon) checkIcon.classList.remove('hidden');
       }
     } else {
-      card.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-500/15', 'ring-2', 'ring-[#465FFF]');
+      card.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-500/15', 'ring-2', 'ring-[#19723C]');
       card.classList.add('border-gray-200', 'dark:border-gray-800');
       if (check) {
         check.className = 'site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 border-gray-300 dark:border-gray-600';
@@ -12239,7 +12249,7 @@ window.renderRoleSwitcherModal = function() {
       return `
         <div onclick="switchRoleAction('${r.code}')" class="p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
           isCurrent
-            ? 'border-brand-500 bg-brand-50/70 dark:bg-brand-500/15 ring-2 ring-[#465FFF]/30 shadow-xs'
+            ? 'border-brand-500 bg-brand-50/70 dark:bg-brand-500/15 ring-2 ring-[#19723C]/30 shadow-xs'
             : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-brand-500 hover:shadow-xs'
         }">
           <div class="flex items-center gap-3 min-w-0">
@@ -12703,7 +12713,7 @@ function updateAuditKpisAndChart(items) {
           { name: 'Sổ sách', data: bookData },
           { name: 'Thực tế', data: actualData }
         ],
-        colors: ['#465FFF', '#10B981'],
+        colors: ['#19723C', '#10B981'],
         chart: {
           fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
           type: 'bar',
