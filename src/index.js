@@ -109,7 +109,9 @@ const FEATURE_NAME_TO_CODE = {
   'portal-kiemke': 'portal-kiemke',
   'Kiểm Kê Kho Tổng': 'portal-kiemke',
   'fnb-sites': 'fnb-sites',
-  'Danh Mục 14 Điểm Bán & Mã SAP': 'fnb-sites'
+  'Danh Mục 14 Điểm Bán & Mã SAP': 'fnb-sites',
+  'user-matrix': 'user-matrix',
+  'Quản Lý User & Phân Quyền': 'user-matrix'
 };
 
 async function ensureRolePermissions(env) {
@@ -131,6 +133,28 @@ async function ensureRolePermissions(env) {
   }
 }
 
+async function ensureUserPermissionsTable(env) {
+  try {
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS user_permissions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email TEXT NOT NULL,
+        feature_code TEXT NOT NULL,
+        can_view INTEGER DEFAULT 1,
+        can_create INTEGER DEFAULT 0,
+        can_edit INTEGER DEFAULT 0,
+        can_delete INTEGER DEFAULT 0,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_email, feature_code)
+      )
+    `).run();
+    await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)`).run().catch(() => {});
+  } catch (err) {
+    console.error('ensureUserPermissionsTable notice:', err);
+  }
+}
+
+
 async function buildUserPermissions(env, user) {
   await ensureRolePermissions(env);
 
@@ -141,7 +165,7 @@ async function buildUserPermissions(env, user) {
       'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
       'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
       'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
-      'fnb-sites'
+      'fnb-sites', 'user-matrix'
     ];
     allFeatures.forEach(f => {
       permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
@@ -220,8 +244,39 @@ async function buildUserPermissions(env, user) {
     });
   }
 
+
+  // ÁP DỤNG MA TRẬN PHÂN QUYỀN TÙY CHỈNH CHO TỪNG USER (Cấp quyền hoặc Cắt quyền)
+  if (user.email) {
+    try {
+      await ensureUserPermissionsTable(env);
+      const { results: customPerms } = await env.DB.prepare(`
+        SELECT feature_code, can_view, can_create, can_edit, can_delete
+        FROM user_permissions
+        WHERE user_email = ?
+      `).bind(user.email).all();
+
+      (customPerms || []).forEach(cp => {
+        if (cp.can_view === 0) {
+          // CẮT QUYỀN: Thu hồi quyền truy cập chức năng này đối với user
+          delete permissions[cp.feature_code];
+        } else {
+          // CẤP QUYỀN: Cấp quyền riêng biệt cho user
+          permissions[cp.feature_code] = {
+            canView: true,
+            canCreate: cp.can_create === 1,
+            canEdit: cp.can_edit === 1,
+            canDelete: cp.can_delete === 1
+          };
+        }
+      });
+    } catch (err) {
+      console.error('Error applying user_permissions:', err);
+    }
+  }
+
   return permissions;
 }
+
 
 export default {
   async fetch(request, env, ctx) {
@@ -1147,6 +1202,154 @@ export default {
           success: true,
           data: { roles, perms, users }
         }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // 2.11.X MA TRẬN PHÂN QUYỀN USER & CHỨC NĂNG (USER PERMISSIONS MATRIX)
+      // ======================================================================
+      
+      // 1. Lấy toàn bộ dữ liệu Ma Trận User x Chức Năng
+      if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
+        await ensureRolePermissions(env);
+        await ensureUserPermissionsTable(env);
+
+        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles ORDER BY id ASC`).all();
+        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
+        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`).all();
+        const { results: userPerms } = await env.DB.prepare(`SELECT * FROM user_permissions`).all();
+
+        const users = (rawUsers || []).map(u => {
+          const repaired = repairAtobMojibake(u.full_name);
+          if (repaired && repaired !== u.full_name) {
+            env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, u.id).run().catch(() => {});
+          }
+          return { ...u, full_name: repaired || u.full_name };
+        });
+
+        const features = [
+          // Nhóm 1: Doanh Thu & P&L
+          { code: 'fnb-chain', name: 'Toàn Chuỗi & Xếp Hạng', group: 'fnb-finance', groupName: 'Doanh Thu & P&L', icon: 'trophy', color: 'rose' },
+          { code: 'fnb-pl', name: 'Báo Cáo P&L Điểm Bán', group: 'fnb-finance', groupName: 'Doanh Thu & P&L', icon: 'pie-chart', color: 'rose' },
+          { code: 'fnb-pos', name: 'Doanh Thu POS & Bán Lẻ', group: 'fnb-finance', groupName: 'Doanh Thu & P&L', icon: 'zap', color: 'rose' },
+          
+          // Nhóm 2: Bếp & Tồn Kho Điểm Bán
+          { code: 'fnb-stock', name: 'Ma Trận Tồn Kho', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'boxes', color: 'emerald' },
+          { code: 'fnb-counts', name: 'Kiểm Kê Hằng Ngày', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'clipboard-check', color: 'emerald' },
+          { code: 'fnb-receipts', name: 'Nhập Hàng Điểm Bán', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'package-plus', color: 'emerald' },
+          { code: 'fnb-waste', name: 'Hủy Hàng & Hao Hụt', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'trash-2', color: 'emerald' },
+          
+          // Nhóm 3: Kho Tổng WMS
+          { code: 'wh-dashboard', name: 'Tổng Quan Kho WMS', group: 'wh-wms', groupName: 'Kho Tổng WMS', icon: 'layout-dashboard', color: 'amber' },
+          { code: 'wh-stock', name: 'Tồn Kho & FEFO Tổng', group: 'wh-wms', groupName: 'Kho Tổng WMS', icon: 'layers', color: 'amber' },
+          { code: 'wh-reorder', name: 'Điểm Đặt Hàng ROP', group: 'wh-wms', groupName: 'Kho Tổng WMS', icon: 'alert-triangle', color: 'amber' },
+          { code: 'wh-leadtime', name: 'Lead Time Nhà Cung Cấp', group: 'wh-wms', groupName: 'Kho Tổng WMS', icon: 'clock', color: 'amber' },
+          { code: 'wh-posap', name: 'Đơn Hàng SAP PO', group: 'wh-wms', groupName: 'Kho Tổng WMS', icon: 'shopping-cart', color: 'amber' },
+          
+          // Nhóm 4: Portal Nghiệp Vụ
+          { code: 'portal-voucher', name: 'Nhập Chứng Từ Thu Chi', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'file-text', color: 'blue' },
+          { code: 'portal-search', name: 'Tra Cứu Báo Cáo', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'search', color: 'blue' },
+          { code: 'portal-order', name: 'Đặt Hàng CCDC / Vật Tư', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'shopping-bag', color: 'blue' },
+          { code: 'portal-history', name: 'Lịch Sử Đặt Hàng', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'history', color: 'blue' },
+          { code: 'portal-baocao', name: 'Báo Cáo Suất Ăn Ca', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'utensils', color: 'blue' },
+          { code: 'portal-kiemke', name: 'Kiểm Kê Tồn Kho Kỳ', group: 'portal-ops', groupName: 'Portal Nghiệp Vụ', icon: 'check-square', color: 'blue' },
+          
+          // Nhóm 5: Hệ Thống
+          { code: 'fnb-sites', name: 'Danh Mục 14 Điểm Bán', group: 'sys-admin', groupName: 'Hệ Thống & Danh Mục', icon: 'building-2', color: 'purple' },
+          { code: 'user-matrix', name: 'Quản Lý User & Phân Quyền', group: 'sys-admin', groupName: 'Hệ Thống & Danh Mục', icon: 'users-cog', color: 'purple' }
+        ];
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            users,
+            roles: roles || [],
+            rolePermissions: perms || [],
+            userPermissions: userPerms || [],
+            features
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 2. Toggle Phân Quyền hoặc Cắt Quyền cho từng user đối với từng chức năng
+      if (pathname === '/api/auth/user-permissions/toggle' && request.method === 'POST') {
+        await ensureUserPermissionsTable(env);
+        const { userEmail, featureCode, action } = await request.json(); // action: 'GRANT', 'REVOKE', 'RESET'
+        if (!userEmail || !featureCode) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc featureCode' }), { status: 400, headers: corsHeaders });
+        }
+
+        if (action === 'RESET') {
+          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`).bind(userEmail, featureCode).run();
+          return new Response(JSON.stringify({ success: true, message: 'Đã khôi phục quyền mặc định theo vai trò' }), { headers: corsHeaders });
+        }
+
+        const canView = action === 'GRANT' ? 1 : 0;
+        const canCreate = action === 'GRANT' ? 1 : 0;
+        const canEdit = action === 'GRANT' ? 1 : 0;
+        const canDelete = action === 'GRANT' ? 1 : 0;
+
+        await env.DB.prepare(`
+          INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+          ON CONFLICT(user_email, feature_code) DO UPDATE SET
+            can_view = excluded.can_view,
+            can_create = excluded.can_create,
+            can_edit = excluded.can_edit,
+            can_delete = excluded.can_delete,
+            updated_at = datetime('now')
+        `).bind(userEmail, featureCode, canView, canCreate, canEdit, canDelete).run();
+
+        return new Response(JSON.stringify({
+          success: true,
+          message: action === 'GRANT' ? `Đã CẤP quyền ${featureCode} cho ${userEmail}` : `Đã CẮT quyền ${featureCode} của ${userEmail}`
+        }), { headers: corsHeaders });
+      }
+
+      // 3. Reset toàn bộ quyền của 1 user về mặc định theo Role
+      if (pathname === '/api/auth/user-permissions/reset-user' && request.method === 'POST') {
+        const { userEmail } = await request.json();
+        if (!userEmail) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail' }), { status: 400, headers: corsHeaders });
+        await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+        return new Response(JSON.stringify({ success: true, message: `Đã khôi phục toàn bộ quyền của ${userEmail} về vai trò gốc` }), { headers: corsHeaders });
+      }
+
+      // 4. Cập nhật Vai trò (Role) cho User
+      if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
+        const { userEmail, roleCode, resetPermissions } = await request.json();
+        if (!userEmail || !roleCode) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc roleCode' }), { status: 400, headers: corsHeaders });
+        await env.DB.prepare(`UPDATE app_users SET role_code = ? WHERE email = ?`).bind(roleCode, userEmail).run();
+        if (resetPermissions) {
+          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+        }
+        return new Response(JSON.stringify({ success: true, message: `Đã cập nhật vai trò ${roleCode} cho ${userEmail}` }), { headers: corsHeaders });
+      }
+
+      // 5. Khóa / Mở khóa tài khoản User
+      if (pathname === '/api/auth/users/toggle-status' && request.method === 'POST') {
+        const { userEmail, status } = await request.json(); // 'ACTIVE' or 'LOCKED'
+        if (!userEmail || !status) return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin' }), { status: 400, headers: corsHeaders });
+        await env.DB.prepare(`UPDATE app_users SET status = ? WHERE email = ?`).bind(status, userEmail).run();
+        return new Response(JSON.stringify({ success: true, message: `Đã ${status === 'ACTIVE' ? 'mở khóa' : 'khóa'} tài khoản ${userEmail}` }), { headers: corsHeaders });
+      }
+
+      // 6. Thêm tài khoản User mới
+      if (pathname === '/api/auth/users/create' && request.method === 'POST') {
+        const { email, fullName, roleCode } = await request.json();
+        if (!email) return new Response(JSON.stringify({ success: false, error: 'Email là bắt buộc' }), { status: 400, headers: corsHeaders });
+        const cleanEmail = email.trim().toLowerCase();
+        const existing = await env.DB.prepare(`SELECT id FROM app_users WHERE email = ? LIMIT 1`).bind(cleanEmail).first();
+        if (existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Tài khoản email này đã tồn tại trong hệ thống' }), { status: 400, headers: corsHeaders });
+        }
+        const safeName = (fullName || cleanEmail.split('@')[0]).trim();
+        const initialRole = roleCode || 'NHAN_VIEN';
+        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=465fff&color=fff&bold=true`;
+        await env.DB.prepare(`
+          INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
+          VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', datetime('now'))
+        `).bind(cleanEmail, safeName, avatarUrl, initialRole).run();
+
+        return new Response(JSON.stringify({ success: true, message: `Đã thêm người dùng ${cleanEmail} thành công` }), { headers: corsHeaders });
       }
 
       // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)

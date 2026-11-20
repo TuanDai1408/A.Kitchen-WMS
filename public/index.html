@@ -309,6 +309,15 @@
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
             </li>
+            <li>
+              <button onclick="switchTab('user-matrix', this)" data-tab="user-matrix" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="shield-check" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Phân Quyền User Matrix</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
           </ul>
         </div>
       </nav>
@@ -1055,6 +1064,288 @@
         </div>
 
       </section>
+
+      <!-- ====================================================================
+           PHÂN HỆ HỆ THỐNG & QUẢN TRỊ: MA TRẬN PHÂN QUYỀN USER (ORBIT SIBA FOOD)
+           ==================================================================== -->
+      <section id="user-matrix" class="tab-panel space-y-5">
+        
+        <!-- Header & Breadcrumb -->
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">RBAC MATRIX</span>
+              <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90">
+                Ma Trận Phân Quyền &amp; Quản Lý User
+              </h2>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Cấp quyền (Grant) hoặc Thu hồi quyền (Revoke) trực tiếp cho từng nhân sự đối với từng chức năng trên toàn chuỗi.</p>
+          </div>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button onclick="openAddUserModal()" class="inline-flex items-center gap-2 rounded-[10px] bg-brand-500 hover:bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>+ Thêm Tài Khoản</span>
+            </button>
+            <button onclick="exportUserMatrixExcel()" class="inline-flex items-center gap-2 rounded-[10px] bg-emerald-600 hover:bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all" title="Xuất file Excel chuẩn Aptos">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              <span>Xuất Excel Ma Trận</span>
+            </button>
+            <button onclick="loadUserMatrix()" class="inline-flex size-10 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 shadow-theme-xs transition-all" title="Tải lại dữ liệu">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+          <!-- Card 1: Tổng số user -->
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Tài Khoản User</p>
+                <h3 id="userMatrixKpiTotal" class="text-xl sm:text-title-sm font-bold tabular-nums text-gray-900 dark:text-white mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Đăng nhập bằng Google</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center shrink-0">
+                <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
+          </div>
+
+          <!-- Card 2: User đang hoạt động -->
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Đang Hoạt Động (Active)</p>
+                <h3 id="userMatrixKpiActive" class="text-xl sm:text-title-sm font-bold tabular-nums text-emerald-600 dark:text-emerald-400 mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Có quyền truy cập hợp lệ</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center shrink-0">
+                <i data-lucide="user-check" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+          </div>
+
+          <!-- Card 3: Phân quyền tùy chỉnh -->
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Quyền Tùy Chỉnh Riêng</p>
+                <h3 id="userMatrixKpiCustomOverrides" class="text-xl sm:text-title-sm font-bold tabular-nums text-brand-500 dark:text-brand-400 mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Quyền cấp thêm hoặc bị cắt</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-brand-500 flex items-center justify-center shrink-0">
+                <i data-lucide="sliders" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-brand-500"></div>
+          </div>
+
+          <!-- Card 4: Quản trị viên & Kho trưởng -->
+          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Quản Trị &amp; Kho Trưởng</p>
+                <h3 id="userMatrixKpiAdmins" class="text-xl sm:text-title-sm font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-1 truncate">--</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Admin, Kho Trưởng, Kế Toán</p>
+              </div>
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar with Legend -->
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Lọc Vai Trò -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Vai trò:</span>
+                <select id="userMatrixRoleFilter" onchange="filterUserMatrix()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-purple-500">
+                  <option value="ALL">Tất cả vai trò</option>
+                  <option value="ADMIN">Quản Trị Viên (ADMIN)</option>
+                  <option value="KHO_TRUONG">Quản Lý Kho (KHO_TRUONG)</option>
+                  <option value="BEP_TRUONG">Bếp Trưởng (BEP_TRUONG)</option>
+                  <option value="KE_TOAN">Kế Toán Chuỗi (KE_TOAN)</option>
+                  <option value="QUAN_LY_VUNG">Quản Lý Vùng (QUAN_LY_VUNG)</option>
+                  <option value="NHAN_VIEN">Nhân Viên Điểm Bán (NHAN_VIEN)</option>
+                </select>
+              </div>
+
+              <!-- Lọc Nhóm Tính Năng -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nhóm:</span>
+                <select id="userMatrixGroupFilter" onchange="filterUserMatrix()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-purple-500">
+                  <option value="ALL">Tất cả 5 nhóm (20 chức năng)</option>
+                  <option value="fnb-finance">1. Doanh Thu &amp; P&amp;L</option>
+                  <option value="fnb-inventory">2. Bếp &amp; Tồn Kho Điểm Bán</option>
+                  <option value="wh-wms">3. Kho Tổng WMS</option>
+                  <option value="portal-ops">4. Portal Nghiệp Vụ</option>
+                  <option value="sys-admin">5. Hệ Thống</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Ô tìm kiếm User -->
+            <div class="relative w-full lg:w-72">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="userMatrixSearchInput" oninput="filterUserMatrix()" placeholder="Tìm tên user, email..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-purple-500">
+            </div>
+          </div>
+
+          <!-- Chú thích Legend trực quan -->
+          <div class="pt-2 border-t border-gray-100 dark:border-gray-800/60 flex flex-wrap items-center gap-4 text-[11px] text-gray-500 dark:text-gray-400 select-none">
+            <span class="font-bold text-gray-700 dark:text-gray-300">Hướng dẫn thao tác:</span>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center size-4 rounded bg-emerald-500 text-white font-bold text-[9px]">✓</span>
+              <span><strong>Theo Role</strong>: Có quyền mặc định</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center size-4 rounded bg-brand-500 text-white font-bold text-[9px]">+</span>
+              <span class="text-brand-600 dark:text-brand-400 font-bold">Cấp Riêng</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center size-4 rounded bg-rose-500 text-white font-bold text-[9px]">✕</span>
+              <span class="text-rose-600 dark:text-rose-400 font-bold">Bị Thu Hồi (Cắt Quyền)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center size-4 rounded bg-gray-200 dark:bg-gray-700 text-gray-400 font-bold text-[9px]">-</span>
+              <span>Không có quyền</span>
+            </div>
+            <span class="italic text-[10.5px] text-gray-400 ml-auto">💡 Bấm vào ô toggle để Cấp / Cắt quyền tức thì</span>
+          </div>
+        </div>
+
+        <!-- Desktop Matrix Table (Sticky User info column & dynamic Features matrix) -->
+        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
+          <table class="w-full border-collapse text-left text-xs" id="userMatrixDesktopTable">
+            <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30" id="userMatrixTableHead">
+              <!-- Dynamically populated group & feature headers -->
+            </thead>
+            <tbody id="userMatrixTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
+              <!-- Dynamically populated user rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Native Mobile Card View (No horizontal scrolling on phones) -->
+        <div id="userMatrixMobileCards" class="block lg:hidden space-y-3 mt-4">
+          <!-- Dynamically populated mobile cards -->
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           MODAL: THÊM TÀI KHOẢN MỚI
+           ==================================================================== -->
+      <div id="addUserModal" class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-xs hidden p-4">
+        <div class="w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center shrink-0">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-base text-gray-900 dark:text-white">Thêm Tài Khoản Mới</h3>
+                <p class="text-[11px] text-gray-400">Tạo tài khoản và phân quyền khởi tạo</p>
+              </div>
+            </div>
+            <button onclick="closeAddUserModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 hover:text-gray-600 transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <form onsubmit="submitAddUser(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Email Google (*)</label>
+              <input type="email" id="addUserInputEmail" required placeholder="example@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Họ Và Tên</label>
+              <input type="text" id="addUserInputName" placeholder="Nguyễn Văn A" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Vai Trò Ban Đầu</label>
+              <select id="addUserInputRole" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500">
+                <option value="NHAN_VIEN">Nhân Viên Điểm Bán (NHAN_VIEN)</option>
+                <option value="KHO_TRUONG">Quản Lý Kho (KHO_TRUONG)</option>
+                <option value="BEP_TRUONG">Bếp Trưởng (BEP_TRUONG)</option>
+                <option value="KE_TOAN">Kế Toán Chuỗi (KE_TOAN)</option>
+                <option value="QUAN_LY_VUNG">Quản Lý Vùng (QUAN_LY_VUNG)</option>
+                <option value="ADMIN">Quản Trị Viên (ADMIN)</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button type="button" onclick="closeAddUserModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Hủy</button>
+              <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white shadow-theme-xs transition-colors">Tạo Tài Khoản</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           MODAL: CHỈNH SỬA VAI TRÒ & RESET QUYỀN USER
+           ==================================================================== -->
+      <div id="editUserModal" class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-xs hidden p-4">
+        <div class="w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-brand-500 flex items-center justify-center shrink-0">
+                <i data-lucide="shield" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-base text-gray-900 dark:text-white">Điều Chỉnh Tài Khoản</h3>
+                <p id="editUserEmailDisplay" class="text-[11px] text-gray-400">user@gmail.com</p>
+              </div>
+            </div>
+            <button onclick="closeEditUserModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 hover:text-gray-600 transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <form onsubmit="submitEditUserRole(event)" class="space-y-4">
+            <input type="hidden" id="editUserTargetEmail">
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Vai Trò Hệ Thống</label>
+              <select id="editUserRoleSelect" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500">
+                <option value="ADMIN">Quản Trị Viên (ADMIN)</option>
+                <option value="KHO_TRUONG">Quản Lý Kho (KHO_TRUONG)</option>
+                <option value="BEP_TRUONG">Bếp Trưởng (BEP_TRUONG)</option>
+                <option value="KE_TOAN">Kế Toán Chuỗi (KE_TOAN)</option>
+                <option value="QUAN_LY_VUNG">Quản Lý Vùng (QUAN_LY_VUNG)</option>
+                <option value="NHAN_VIEN">Nhân Viên Điểm Bán (NHAN_VIEN)</option>
+              </select>
+            </div>
+
+            <label class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 cursor-pointer select-none">
+              <input type="checkbox" id="editUserResetPermsToggle" class="rounded text-amber-600 focus:ring-0">
+              <span class="text-xs text-amber-800 dark:text-amber-300 font-medium leading-relaxed">
+                Khôi phục toàn bộ quyền của user này về mặc định theo vai trò mới (Xóa các phân quyền riêng).
+              </span>
+            </label>
+
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button type="button" onclick="resetUserAllPermsPrompt()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors">
+                Xóa Quyền Riêng
+              </button>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="closeEditUserModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Hủy</button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white shadow-theme-xs transition-colors">Lưu Thay Đổi</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
 
 
       <!-- =====================================================================
@@ -3061,6 +3352,15 @@
                 <div class="text-[10px] text-gray-500 truncate">Danh mục chuẩn</div>
               </div>
             </button>
+            <button onclick="switchFromHub('user-matrix')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-gray-900 dark:text-white truncate">Phân Quyền Matrix</div>
+                <div class="text-[10px] text-gray-500 truncate">Quản lý User &amp; Quyền</div>
+              </div>
+            </button>
             <button onclick="openAuthModal('login'); closeMobileMenuHub();" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
@@ -4097,6 +4397,7 @@
       if (tabId === 'fnb-receipts') loadFnbReceipts();
       if (tabId === 'fnb-waste') loadFnbWaste();
       if (tabId === 'fnb-sites') loadFnbSites();
+      if (tabId === 'user-matrix') loadUserMatrix();
       
       if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
       if (tabId === 'wh-stock') loadStockFEFO();
@@ -6202,6 +6503,7 @@ const TAB_META = {
   'fnb-receipts': { title: '📥 Nhập Hàng Điểm Bán', mobTab: 'fnb-chain' },
   'fnb-waste': { title: '🗑️ Hủy Hàng & Hao Hụt', mobTab: 'fnb-chain' },
   'fnb-sites': { title: '🏢 14 Điểm Bán SAP', mobTab: 'hub' },
+      'user-matrix': { title: '🛡️ Phân Quyền User Matrix', mobTab: 'hub' },
   'wh-dashboard': { title: '📈 Tổng Quan Kho', mobTab: 'wh-stock' },
   'wh-stock': { title: '📦 Hạn Dùng & FEFO', mobTab: 'wh-stock' },
   'wh-reorder': { title: '⚠️ Cảnh Báo ROP', mobTab: 'wh-stock' },
@@ -6680,6 +6982,690 @@ function renderFnbSites(sites) {
     </tr>
   `).join('');
 }
+
+// ============================================================================
+// PHÂN HỆ MA TRẬN PHÂN QUYỀN USER & CHỨC NĂNG (RBAC PERMISSIONS MATRIX)
+// ============================================================================
+
+window.gUserMatrixData = null;
+
+async function loadUserMatrix() {
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/users-matrix');
+    const res = await resp.json();
+    if (!res.success || !res.data) {
+      showToast(res.error || 'Không thể tải dữ liệu ma trận phân quyền', 'error');
+      return;
+    }
+    window.gUserMatrixData = res.data;
+    renderUserMatrixKPIs(res.data);
+    renderUserMatrixTable(res.data);
+    renderUserMatrixMobile(res.data);
+  } catch (err) {
+    console.error('Error loadUserMatrix:', err);
+    showToast('Lỗi kết nối khi tải ma trận phân quyền', 'error');
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function renderUserMatrixKPIs(data) {
+  const users = data.users || [];
+  const userPerms = data.userPermissions || [];
+
+  const totalUsers = users.length;
+  const activeUsers = users.filter(u => u.status === 'ACTIVE' || !u.status).length;
+  const customOverrides = userPerms.length;
+  const admins = users.filter(u => ['ADMIN', 'KHO_TRUONG', 'KE_TOAN'].includes(u.role_code)).length;
+
+  const elTotal = document.getElementById('userMatrixKpiTotal');
+  const elActive = document.getElementById('userMatrixKpiActive');
+  const elOverrides = document.getElementById('userMatrixKpiCustomOverrides');
+  const elAdmins = document.getElementById('userMatrixKpiAdmins');
+
+  if (elTotal) elTotal.textContent = totalUsers.toLocaleString('vi-VN');
+  if (elActive) elActive.textContent = activeUsers.toLocaleString('vi-VN');
+  if (elOverrides) elOverrides.textContent = customOverrides.toLocaleString('vi-VN');
+  if (elAdmins) elAdmins.textContent = admins.toLocaleString('vi-VN');
+}
+
+function filterUserMatrix() {
+  if (!window.gUserMatrixData) return;
+  renderUserMatrixTable(window.gUserMatrixData);
+  renderUserMatrixMobile(window.gUserMatrixData);
+}
+
+function resolveUserFeaturePermission(user, feature, rolePermissions, userPermissions) {
+  // 1. Kiểm tra quyền riêng biệt (Custom Override)
+  const custom = (userPermissions || []).find(up => up.user_email === user.email && up.feature_code === feature.code);
+  if (custom) {
+    if (custom.can_view === 1) {
+      return { isGranted: true, type: 'CUSTOM_GRANT', label: 'Cấp riêng', badgeClass: 'bg-brand-500 text-white' };
+    } else {
+      return { isGranted: false, type: 'CUSTOM_REVOKE', label: 'Bị khóa', badgeClass: 'bg-rose-500 text-white' };
+    }
+  }
+
+  // 2. Kiểm tra quyền ADMIN tối cao
+  if (user.role_code === 'ADMIN') {
+    return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+  }
+
+  // 3. Kiểm tra quyền mặc định của Kho Trưởng
+  if (user.role_code === 'KHO_TRUONG') {
+    const khoFeatures = ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'];
+    if (khoFeatures.includes(feature.code)) {
+      return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+    }
+  }
+
+  // 4. Kiểm tra theo role_permissions trong database
+  const rolePerm = (rolePermissions || []).find(rp => rp.role_code === user.role_code && rp.feature_code === feature.code);
+  if (rolePerm && rolePerm.can_view === 1) {
+    return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+  }
+
+  // 5. Mặc định không có quyền
+  return { isGranted: false, type: 'NONE', label: 'Không', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-400' };
+}
+
+function renderUserMatrixTable(data) {
+  const thead = document.getElementById('userMatrixTableHead');
+  const tbody = document.getElementById('userMatrixTableBody');
+  if (!thead || !tbody) return;
+
+  const users = data.users || [];
+  const allFeatures = data.features || [];
+  const rolePerms = data.rolePermissions || [];
+  const userPerms = data.userPermissions || [];
+
+  const searchKeyword = (document.getElementById('userMatrixSearchInput')?.value || '').trim().toLowerCase();
+  const selectedRole = document.getElementById('userMatrixRoleFilter')?.value || 'ALL';
+  const selectedGroup = document.getElementById('userMatrixGroupFilter')?.value || 'ALL';
+
+  // Lọc Features theo nhóm
+  const visibleFeatures = allFeatures.filter(f => selectedGroup === 'ALL' || f.group === selectedGroup);
+
+  // Lọc Users
+  const filteredUsers = users.filter(u => {
+    if (selectedRole !== 'ALL' && u.role_code !== selectedRole) return false;
+    if (searchKeyword) {
+      const matchName = (u.full_name || '').toLowerCase().includes(searchKeyword);
+      const matchEmail = (u.email || '').toLowerCase().includes(searchKeyword);
+      if (!matchName && !matchEmail) return false;
+    }
+    return true;
+  });
+
+  // 1. Render Table Head (2 hàng: Nhóm tính năng & Từng tính năng cụ thể)
+  // Gom nhóm visibleFeatures
+  const groups = [];
+  visibleFeatures.forEach(f => {
+    let g = groups.find(x => x.group === f.group);
+    if (!g) {
+      g = { group: f.group, groupName: f.groupName, color: f.color, features: [] };
+      groups.push(g);
+    }
+    g.features.push(f);
+  });
+
+  let headHtml = `
+    <tr class="bg-gray-50/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-800 select-none">
+      <th rowspan="2" class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px] sticky left-0 z-30 bg-gray-50 dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">STT</th>
+      <th rowspan="2" class="py-3 px-4 text-left font-bold uppercase tracking-wider text-[11px] sticky left-12 z-30 bg-gray-50 dark:bg-gray-900 min-w-[220px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Nhân Sự &amp; Email</th>
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] sticky left-[268px] z-30 bg-gray-50 dark:bg-gray-900 min-w-[130px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Vai Trò Hệ Thống</th>
+  `;
+
+  groups.forEach(g => {
+    const colColor = g.color === 'rose' ? 'bg-rose-50/60 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300'
+      : g.color === 'emerald' ? 'bg-emerald-50/60 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
+      : g.color === 'amber' ? 'bg-amber-50/60 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+      : g.color === 'blue' ? 'bg-blue-50/60 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300'
+      : 'bg-purple-50/60 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300';
+
+    headHtml += `
+      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-extrabold uppercase tracking-wider text-[11px] border-l border-gray-200 dark:border-gray-800 ${colColor}">
+        ${g.groupName} (${g.features.length})
+      </th>
+    `;
+  });
+
+  headHtml += `
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] min-w-[100px] border-l border-gray-200 dark:border-gray-800">Thao Tác</th>
+    </tr>
+    <tr class="bg-gray-50 dark:bg-white/3 border-b border-gray-200 dark:border-gray-800 text-[10.5px]">
+  `;
+
+  visibleFeatures.forEach(f => {
+    headHtml += `
+      <th class="py-2 px-2 text-center font-semibold text-gray-600 dark:text-gray-300 border-l border-gray-100 dark:border-gray-800 min-w-[110px]" title="${f.name} (${f.code})">
+        <div class="flex items-center justify-center gap-1">
+          <i data-lucide="${f.icon || 'shield'}" class="w-3.5 h-3.5 text-gray-400"></i>
+          <span class="truncate max-w-[95px]">${f.name}</span>
+        </div>
+      </th>
+    `;
+  });
+
+  headHtml += `</tr>`;
+  thead.innerHTML = headHtml;
+
+  // 2. Render Table Body (Từng dòng User)
+  if (filteredUsers.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${visibleFeatures.length + 4}" class="text-center py-12 text-gray-400">Không tìm thấy người dùng nào phù hợp với bộ lọc.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredUsers.map((u, idx) => {
+    const isLocked = u.status === 'LOCKED';
+    const initials = getCleanInitials(u.full_name || u.email);
+    const avatarUrl = (u.avatar_url && !u.avatar_url.includes('ui-avatars.com'))
+      ? u.avatar_url
+      : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
+
+    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
+      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
+      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
+      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
+      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
+      : '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
+
+    let rowHtml = `
+      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors ${isLocked ? 'opacity-60 bg-rose-50/20' : ''}">
+        <!-- STT -->
+        <td class="py-3 px-3 text-center tabular-nums text-gray-400 text-xs sticky left-0 z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">${idx + 1}</td>
+        
+        <!-- User Info -->
+        <td class="py-3 px-4 sticky left-12 z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
+          <div class="flex items-center gap-2.5">
+            <img src="${avatarUrl}" class="size-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
+            <div class="min-w-0">
+              <div class="font-bold text-gray-900 dark:text-white truncate max-w-[160px]">${u.full_name || 'Chưa đặt tên'}</div>
+              <div class="text-[11px] text-gray-400 truncate max-w-[160px]" title="${u.email}">${u.email}</div>
+            </div>
+          </div>
+        </td>
+
+        <!-- Vai Trò -->
+        <td class="py-3 px-3 text-center sticky left-[268px] z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
+          <button onclick="openEditUserModal('${u.email}')" class="hover:scale-105 transition-transform" title="Bấm để đổi vai trò của user này">
+            ${roleBadge}
+          </button>
+        </td>
+    `;
+
+    // Dynamic Feature Cells (Matrix Toggles)
+    visibleFeatures.forEach(f => {
+      const perm = resolveUserFeaturePermission(u, f, rolePerms, userPerms);
+      
+      let btnBg = '';
+      let icon = '';
+      let tooltipText = '';
+
+      if (perm.isGranted) {
+        if (perm.type === 'CUSTOM_GRANT') {
+          btnBg = 'bg-brand-500 hover:bg-brand-600 text-white shadow-xs';
+          icon = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
+          tooltipText = `Đang CẤP RIÊNG. Bấm để CẮT QUYỀN ${f.name}`;
+        } else {
+          btnBg = 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs';
+          icon = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
+          tooltipText = `Có quyền theo vai trò ${u.role_code}. Bấm để CẮT QUYỀN ${f.name}`;
+        }
+      } else {
+        if (perm.type === 'CUSTOM_REVOKE') {
+          btnBg = 'bg-rose-500 hover:bg-rose-600 text-white shadow-xs';
+          icon = '<i data-lucide="x" class="w-3.5 h-3.5"></i>';
+          tooltipText = `Đã BỊ CẮT QUYỀN. Bấm để CẤP LẠI ${f.name}`;
+        } else {
+          btnBg = 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-400';
+          icon = '<i data-lucide="minus" class="w-3.5 h-3.5"></i>';
+          tooltipText = `Không có quyền. Bấm để CẤP QUYỀN ${f.name}`;
+        }
+      }
+
+      rowHtml += `
+        <td class="py-2.5 px-2 text-center border-l border-gray-100 dark:border-gray-800/60">
+          <div class="inline-flex flex-col items-center gap-1">
+            <button
+              onclick="toggleUserPermission('${u.email}', '${f.code}', ${perm.isGranted}, '${perm.type}')"
+              class="size-7 rounded-lg ${btnBg} flex items-center justify-center transition-all active:scale-90"
+              title="${tooltipText}"
+            >
+              ${icon}
+            </button>
+            <span class="text-[9px] px-1 py-0.2 rounded font-bold ${perm.badgeClass}">${perm.label}</span>
+          </div>
+        </td>
+      `;
+    });
+
+    // Thao tác
+    rowHtml += `
+        <td class="py-3 px-3 text-center border-l border-gray-100 dark:border-gray-800">
+          <div class="flex items-center justify-center gap-1.5">
+            <button onclick="openEditUserModal('${u.email}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Chỉnh sửa vai trò & tài khoản">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="toggleUserStatusPrompt('${u.email}', '${isLocked ? 'ACTIVE' : 'LOCKED'}')" class="p-1.5 rounded-lg border ${isLocked ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-rose-200 text-rose-600 hover:bg-rose-50'} transition-colors" title="${isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}">
+              <i data-lucide="${isLocked ? 'unlock' : 'lock'}" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return rowHtml;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderUserMatrixMobile(data) {
+  const container = document.getElementById('userMatrixMobileCards');
+  if (!container) return;
+
+  const users = data.users || [];
+  const allFeatures = data.features || [];
+  const rolePerms = data.rolePermissions || [];
+  const userPerms = data.userPermissions || [];
+
+  const searchKeyword = (document.getElementById('userMatrixSearchInput')?.value || '').trim().toLowerCase();
+  const selectedRole = document.getElementById('userMatrixRoleFilter')?.value || 'ALL';
+
+  const filteredUsers = users.filter(u => {
+    if (selectedRole !== 'ALL' && u.role_code !== selectedRole) return false;
+    if (searchKeyword) {
+      const matchName = (u.full_name || '').toLowerCase().includes(searchKeyword);
+      const matchEmail = (u.email || '').toLowerCase().includes(searchKeyword);
+      if (!matchName && !matchEmail) return false;
+    }
+    return true;
+  });
+
+  if (filteredUsers.length === 0) {
+    container.innerHTML = '<div class="text-center py-8 text-gray-400 text-xs">Không tìm thấy tài khoản nào.</div>';
+    return;
+  }
+
+  container.innerHTML = filteredUsers.map(u => {
+    const isLocked = u.status === 'LOCKED';
+    const initials = getCleanInitials(u.full_name || u.email);
+    const avatarUrl = (u.avatar_url && !u.avatar_url.includes('ui-avatars.com'))
+      ? u.avatar_url
+      : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
+
+    let featuresGrid = allFeatures.map(f => {
+      const perm = resolveUserFeaturePermission(u, f, rolePerms, userPerms);
+      const isGranted = perm.isGranted;
+      const isRevoked = perm.type === 'CUSTOM_REVOKE';
+
+      return `
+        <div class="flex items-center justify-between p-2 rounded-xl border border-gray-100 dark:border-gray-800 ${isGranted ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : (isRevoked ? 'bg-rose-50/40 dark:bg-rose-950/20' : 'bg-gray-50/50 dark:bg-gray-800/30')}">
+          <div class="flex items-center gap-2 min-w-0">
+            <i data-lucide="${f.icon || 'shield'}" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
+            <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">${f.name}</span>
+          </div>
+          <button
+            onclick="toggleUserPermission('${u.email}', '${f.code}', ${perm.isGranted}, '${perm.type}')"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
+          >
+            <span>${isGranted ? 'BẬT' : 'TẮT'}</span>
+            <span class="text-[8px] opacity-80">(${perm.label})</span>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3.5">
+        <div class="flex items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800/80 pb-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <img src="${avatarUrl}" class="size-9 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
+            <div class="min-w-0">
+              <div class="font-extrabold text-xs text-gray-900 dark:text-white truncate">${u.full_name || 'Chưa đặt tên'}</div>
+              <div class="text-[11px] text-gray-400 truncate">${u.email}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[9.5px] px-2 py-0.5 rounded font-extrabold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
+            <button onclick="openEditUserModal('${u.email}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
+              <i data-lucide="more-vertical" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          ${featuresGrid}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function toggleUserPermission(userEmail, featureCode, currentlyGranted, currentType) {
+  try {
+    // Nếu đang được cấp -> chuyển sang CẮT QUYỀN ('REVOKE')
+    // Nếu đang bị tắt -> chuyển sang CẤP QUYỀN ('GRANT')
+    const action = currentlyGranted ? 'REVOKE' : 'GRANT';
+    
+    // Cập nhật Optimistic trên bộ nhớ
+    if (window.gUserMatrixData && window.gUserMatrixData.userPermissions) {
+      let existing = window.gUserMatrixData.userPermissions.find(p => p.user_email === userEmail && p.feature_code === featureCode);
+      if (existing) {
+        existing.can_view = action === 'GRANT' ? 1 : 0;
+      } else {
+        window.gUserMatrixData.userPermissions.push({
+          user_email: userEmail,
+          feature_code: featureCode,
+          can_view: action === 'GRANT' ? 1 : 0
+        });
+      }
+      renderUserMatrixTable(window.gUserMatrixData);
+      renderUserMatrixMobile(window.gUserMatrixData);
+    }
+
+    const resp = await fetch('/api/auth/user-permissions/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail, featureCode, action })
+    });
+    const res = await resp.json();
+    if (!res.success) {
+      showToast(res.error || 'Không thể lưu phân quyền', 'error');
+      loadUserMatrix(); // revert
+      return;
+    }
+
+    showToast(res.message || 'Đã cập nhật phân quyền thành công', 'success');
+
+    // Nếu sửa quyền của chính mình -> đồng bộ session
+    if (window.gCurrentUser && window.gCurrentUser.email === userEmail) {
+      if (!window.gCurrentUser.permissions) window.gCurrentUser.permissions = {};
+      if (action === 'GRANT') {
+        window.gCurrentUser.permissions[featureCode] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
+      } else {
+        delete window.gCurrentUser.permissions[featureCode];
+      }
+      try { localStorage.setItem('orbit_user_session', JSON.stringify(window.gCurrentUser)); } catch(e){}
+    }
+  } catch (err) {
+    console.error('Error toggleUserPermission:', err);
+    showToast('Lỗi mạng khi lưu phân quyền', 'error');
+    loadUserMatrix();
+  }
+}
+
+async function resetUserFeaturePermission(userEmail, featureCode) {
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/user-permissions/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail, featureCode, action: 'RESET' })
+    });
+    const res = await resp.json();
+    if (res.success) {
+      showToast('Đã khôi phục quyền mặc định theo vai trò', 'info');
+      await loadUserMatrix();
+    } else {
+      showToast(res.error || 'Không thể khôi phục quyền', 'error');
+    }
+  } catch(e) {
+    showToast('Lỗi mạng khi khôi phục quyền', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// ============================================================================
+// MODAL QUẢN LÝ USER
+// ============================================================================
+
+function openAddUserModal() {
+  const modal = document.getElementById('addUserModal');
+  if (modal) modal.classList.remove('hidden');
+  const emailInput = document.getElementById('addUserInputEmail');
+  if (emailInput) emailInput.focus();
+}
+
+function closeAddUserModal() {
+  const modal = document.getElementById('addUserModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function submitAddUser(e) {
+  if (e) e.preventDefault();
+  const email = (document.getElementById('addUserInputEmail')?.value || '').trim();
+  const fullName = (document.getElementById('addUserInputName')?.value || '').trim();
+  const roleCode = document.getElementById('addUserInputRole')?.value || 'NHAN_VIEN';
+
+  if (!email) {
+    showToast('Vui lòng nhập Email', 'warning');
+    return;
+  }
+
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/users/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, fullName, roleCode })
+    });
+    const res = await resp.json();
+    if (res.success) {
+      showToast(res.message || 'Thêm tài khoản thành công', 'success');
+      closeAddUserModal();
+      document.getElementById('addUserInputEmail').value = '';
+      document.getElementById('addUserInputName').value = '';
+      await loadUserMatrix();
+    } else {
+      showToast(res.error || 'Không thể thêm tài khoản', 'error');
+    }
+  } catch (err) {
+    showToast('Lỗi kết nối máy chủ', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function openEditUserModal(userEmail) {
+  if (!window.gUserMatrixData) return;
+  const user = window.gUserMatrixData.users.find(u => u.email === userEmail);
+  if (!user) return;
+
+  document.getElementById('editUserTargetEmail').value = user.email;
+  document.getElementById('editUserEmailDisplay').textContent = user.email + ' (' + (user.full_name || 'Chưa đặt tên') + ')';
+  document.getElementById('editUserRoleSelect').value = user.role_code || 'NHAN_VIEN';
+  document.getElementById('editUserResetPermsToggle').checked = false;
+
+  const modal = document.getElementById('editUserModal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeEditUserModal() {
+  const modal = document.getElementById('editUserModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function submitEditUserRole(e) {
+  if (e) e.preventDefault();
+  const userEmail = document.getElementById('editUserTargetEmail')?.value;
+  const roleCode = document.getElementById('editUserRoleSelect')?.value;
+  const resetPermissions = document.getElementById('editUserResetPermsToggle')?.checked || false;
+
+  if (!userEmail || !roleCode) return;
+
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/users/update-role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail, roleCode, resetPermissions })
+    });
+    const res = await resp.json();
+    if (res.success) {
+      showToast(res.message || 'Cập nhật vai trò thành công', 'success');
+      closeEditUserModal();
+      await loadUserMatrix();
+    } else {
+      showToast(res.error || 'Lỗi khi cập nhật vai trò', 'error');
+    }
+  } catch (err) {
+    showToast('Lỗi mạng', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function resetUserAllPermsPrompt() {
+  const userEmail = document.getElementById('editUserTargetEmail')?.value;
+  if (!userEmail) return;
+
+  if (!confirm(`Bạn có chắc chắn muốn xóa tất cả phân quyền riêng và khôi phục quyền mặc định theo vai trò cho ${userEmail}?`)) {
+    return;
+  }
+
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/user-permissions/reset-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail })
+    });
+    const res = await resp.json();
+    if (res.success) {
+      showToast(res.message || 'Đã khôi phục quyền mặc định thành công', 'success');
+      closeEditUserModal();
+      await loadUserMatrix();
+    } else {
+      showToast(res.error || 'Lỗi khi khôi phục quyền', 'error');
+    }
+  } catch (err) {
+    showToast('Lỗi mạng', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function toggleUserStatusPrompt(userEmail, newStatus) {
+  const actionText = newStatus === 'ACTIVE' ? 'mở khóa' : 'khóa';
+  if (!confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản ${userEmail}?`)) {
+    return;
+  }
+
+  try {
+    showLoading();
+    const resp = await fetch('/api/auth/users/toggle-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail, status: newStatus })
+    });
+    const res = await resp.json();
+    if (res.success) {
+      showToast(res.message || 'Đã cập nhật trạng thái tài khoản', 'success');
+      await loadUserMatrix();
+    } else {
+      showToast(res.error || 'Lỗi khi cập nhật trạng thái', 'error');
+    }
+  } catch (err) {
+    showToast('Lỗi mạng', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// ============================================================================
+// EXCEL EXPORT - QUY CHUẨN USER (FONT APTOS, NAVY #1F4E79, FREEZE, AUTOFILTER)
+// ============================================================================
+
+function exportUserMatrixExcel() {
+  if (!window.gUserMatrixData || !window.gUserMatrixData.users || window.gUserMatrixData.users.length === 0) {
+    showToast('Chưa có dữ liệu ma trận để xuất Excel', 'warning');
+    return;
+  }
+
+  try {
+    const wb = XLSX.utils.book_new();
+    const data = window.gUserMatrixData;
+    const users = data.users;
+    const features = data.features;
+    const rolePerms = data.rolePermissions;
+    const userPerms = data.userPermissions;
+
+    // Header chuẩn
+    const headers = [
+      'STT',
+      'Họ Và Tên',
+      'Email Google',
+      'Vai Trò Hệ Thống',
+      'Trạng Thái',
+      'Ngày Tạo'
+    ];
+
+    features.forEach(f => {
+      headers.push(f.name + ' (' + f.code + ')');
+    });
+
+    const rows = users.map((u, idx) => {
+      const row = [
+        idx + 1,
+        u.full_name || 'Chưa đặt tên',
+        u.email,
+        u.role_code,
+        u.status === 'LOCKED' ? 'BỊ KHÓA' : 'HOẠT ĐỘNG',
+        u.created_at || ''
+      ];
+
+      features.forEach(f => {
+        const perm = resolveUserFeaturePermission(u, f, rolePerms, userPerms);
+        let statusText = 'KHÔNG';
+        if (perm.isGranted) {
+          statusText = perm.type === 'CUSTOM_GRANT' ? 'CẤP RIÊNG (✓)' : 'THEO ROLE (✓)';
+        } else if (perm.type === 'CUSTOM_REVOKE') {
+          statusText = 'BỊ KHÓA (✕)';
+        }
+        row.push(statusText);
+      });
+
+      return row;
+    });
+
+    const wsData = [headers, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Freeze panes và AutoFilter
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: headers.length - 1 } }) };
+    ws['!freeze'] = { xSplit: 3, ySplit: 1, topLeftCell: 'D2', activePane: 'bottomRight', state: 'frozen' };
+
+    // Độ rộng cột
+    const colWidths = [
+      { wch: 6 },  // STT
+      { wch: 24 }, // Họ tên
+      { wch: 30 }, // Email
+      { wch: 18 }, // Vai trò
+      { wch: 14 }, // Trạng thái
+      { wch: 20 }  // Ngày tạo
+    ];
+    features.forEach(() => {
+      colWidths.push({ wch: 22 });
+    });
+    ws['!cols'] = colWidths;
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Ma Trận Phân Quyền');
+    const fileName = 'A.Kitchen_MaTran_PhanQuyen_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    XLSX.writeFile(wb, fileName);
+    showToast('Đã xuất file Excel Ma Trận thành công (Font Aptos)!', 'success');
+  } catch (err) {
+    console.error('Error exportUserMatrixExcel:', err);
+    showToast('Lỗi khi xuất file Excel', 'error');
+  }
+}
+
 
 // ============================================================================
 // EXCEL EXPORT - QUY CHUẨN USER (FONT APTOS, NAVY #1F4E79, FREEZE, AUTOFILTER)
@@ -11272,6 +12258,9 @@ function canAccessTab(tabId) {
     return gCurrentUser.role === 'ADMIN';
   }
 
+  if (tabId === 'user-matrix') {
+    return gCurrentUser && (gCurrentUser.role === 'ADMIN' || (gCurrentUser.permissions && gCurrentUser.permissions['user-matrix']?.canView));
+  }
   if (gCurrentUser.role === 'ADMIN') return true;
 
   // 1. Kiểm tra quyền chi tiết (Permissions động từ Backend bao gồm cả quyền Role và Quyền Cộng Dồn)
