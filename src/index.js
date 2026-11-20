@@ -1190,6 +1190,21 @@ export default {
         }
         const permissions = await buildUserPermissions(env, user);
         const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first();
+
+        let approvedRoles = [user.role_code];
+        if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
+          approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
+        } else {
+          const { results: appReqs } = await env.DB.prepare(`
+            SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
+          `).bind(user.email).all();
+          (appReqs || []).forEach(r => {
+            if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
+              approvedRoles.push(r.requested_role);
+            }
+          });
+        }
+
         return new Response(JSON.stringify({
           success: true,
           data: {
@@ -1200,11 +1215,13 @@ export default {
               avatarUrl: user.avatar_url,
               role: user.role_code,
               roleName: roleInfo?.role_name || user.role_code,
-              status: user.status
+              status: user.status,
+              approvedRoles
             },
             role: user.role_code,
             roleName: roleInfo?.role_name || user.role_code,
             badgeColor: roleInfo?.badge_color || 'bg-brand-500',
+            approvedRoles,
             permissions
           }
         }), { headers: corsHeaders });
@@ -1252,12 +1269,12 @@ export default {
           }
 
           if (!user) {
-            // Xác định vai trò mặc định
+            // Xác định vai trò mặc định:
+            // Chỉ tài khoản Owner mới mặc định ADMIN, các user mới khác mặc định là NHAN_VIEN chờ duyệt
             let defaultRole = 'NHAN_VIEN';
-            if (email.includes('admin') || email.includes('daitt') || email.includes('tuandai') || email.includes('trantuandai')) defaultRole = 'ADMIN';
-            else if (email.includes('bep') || email.includes('chef')) defaultRole = 'BEP_TRUONG';
-            else if (email.includes('kho') || email.includes('stock')) defaultRole = 'KHO_TRUONG';
-            else if (email.includes('ketoan') || email.includes('account')) defaultRole = 'KE_TOAN';
+            if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
+              defaultRole = 'ADMIN';
+            }
 
             const insertRes = await env.DB.prepare(`
               INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
@@ -1301,6 +1318,20 @@ export default {
             }
           }
 
+          let approvedRoles = [user.role_code];
+          if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
+            approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
+          } else {
+            const { results: appReqs } = await env.DB.prepare(`
+              SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
+            `).bind(user.email).all();
+            (appReqs || []).forEach(r => {
+              if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
+                approvedRoles.push(r.requested_role);
+              }
+            });
+          }
+
           return new Response(JSON.stringify({
             success: true,
             message: 'Đăng nhập bằng Google thành công!',
@@ -1313,6 +1344,7 @@ export default {
               roleName: roleInfo.role_name,
               badgeColor: roleInfo.badge_color,
               authProvider: user.auth_provider,
+              approvedRoles,
               permissions
             }
           }), { headers: corsHeaders });
@@ -1506,9 +1538,38 @@ export default {
       // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)
       if (pathname === '/api/auth/switch-role' && request.method === 'POST') {
         const { role, email } = await request.json();
+        if (!role) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu vai trò' }), { status: 400, headers: corsHeaders });
+        }
         const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(role).first();
         if (!roleInfo) {
           return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
+        }
+
+        let user = null;
+        if (email) {
+          user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+        }
+
+        // BẢO VỆ PHÂN QUYỀN: Chỉ Admin (Owner) hoặc user đã được Admin phê duyệt vai trò này mới được phép chuyển
+        const isOwner = email === 'trantuandai2508@gmail.com' || (user && user.role_code === 'ADMIN');
+        const isCurrentRole = user && user.role_code === role;
+
+        let isApprovedRole = false;
+        if (email) {
+          const approvedReq = await env.DB.prepare(`
+            SELECT id FROM access_requests 
+            WHERE user_email = ? AND requested_role = ? AND status = 'APPROVED' 
+            LIMIT 1
+          `).bind(email, role).first();
+          if (approvedReq) isApprovedRole = true;
+        }
+
+        if (!isOwner && !isCurrentRole && !isApprovedRole) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: `Bạn chưa được Ban Quản Trị phê duyệt vai trò ${roleInfo.role_name}. Vui lòng gửi yêu cầu để Admin duyệt.`
+          }), { status: 403, headers: corsHeaders });
         }
 
         const permissions = await buildUserPermissions(env, { role_code: role, email: email || '' });
