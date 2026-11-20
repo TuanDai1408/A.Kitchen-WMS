@@ -97,7 +97,7 @@
     <div class="mb-5">
       <div class="relative">
         <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-        <input type="text" id="sidebarMenuSearch" oninput="filterSidebarMenu(this.value)" placeholder="Tìm chức năng..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none focus:border-brand-500 transition-all">
+        <input type="text" id="sidebarMenuSearch" oninput="filterSidebarMenu(this.value)" placeholder="Tìm chức năng..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-gray-50 dark:bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100/5 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none focus:border-brand-500 transition-all">
       </div>
     </div>
 
@@ -2387,31 +2387,31 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Loại hóa đơn / Chứng từ <span class="text-rose-500">*</span></label>
-                <select id="ctLoai" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white"></select>
+                <select id="ctLoai" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></select>
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Nhà cung cấp / Đối tác</label>
-                <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Thực Phẩm ABC" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="ctNCC" placeholder="VD: Công ty TNHH Thực Phẩm ABC" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày xuất hóa đơn <span class="text-rose-500">*</span></label>
-                <input type="date" id="ctNgayXuat" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums">
+                <input type="date" id="ctNgayXuat" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày nhận hàng thực tế <span class="text-rose-500">*</span></label>
-                <input type="date" id="ctNgayNhan" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums">
+                <input type="date" id="ctNgayNhan" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Tên người giao hàng</label>
-                <input type="text" id="ctNguoiGiao" placeholder="Tên tài xế / người giao hàng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="ctNguoiGiao" placeholder="Tên tài xế / người giao hàng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Tên người nhận hàng</label>
-                <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="ctNguoiNhan" placeholder="Tên thủ kho / bếp trưởng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div class="md:col-span-2 lg:col-span-3">
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi chú bổ sung</label>
-                <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú thêm về quy cách, bao bì, số lượng thực nhận..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl"></textarea>
+                <textarea id="ctGhiChu" rows="2" placeholder="Ghi chú thêm về quy cách, bao bì, số lượng thực nhận..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
               </div>
               <div class="md:col-span-2 lg:col-span-3">
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">File đính kèm (nhiều file — ảnh, PDF, Excel, Word · tối đa 20MB/tệp)</label>
@@ -2451,15 +2451,15 @@
           </div>
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">LOẠI HÓA ĐƠN</label>
-            <select id="scLoai" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"></select>
+            <select id="scLoai" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></select>
           </div>
           <div class="flex-1 min-w-[130px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TỪ NGÀY</label>
-            <input type="date" id="scTu" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg">
+            <input type="date" id="scTu" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
           </div>
           <div class="flex-1 min-w-[130px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">ĐẾN NGÀY</label>
-            <input type="date" id="scDen" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg">
+            <input type="date" id="scDen" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
           </div>
           <button onclick="exportVouchersExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center gap-1.5 shadow-sm">
             <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Xuất Excel
@@ -2564,8 +2564,8 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2 text-xs">
-            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="🔍 Tìm mã hoặc tên vật tư..." class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg min-w-[200px]">
-            <select id="fLoai" onchange="filterItems()" class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white"><option value="">Tất cả loại NVL</option></select>
+            <input type="text" id="orderSearch" oninput="filterItems()" placeholder="🔍 Tìm mã hoặc tên vật tư..." class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg min-w-[200px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            <select id="fLoai" onchange="filterItems()" class="p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"><option value="">Tất cả loại NVL</option></select>
             <label class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 cursor-pointer ml-auto">
               <input type="checkbox" id="fChiNhap" onchange="filterItems()" class="rounded text-brand-600"> Chỉ hiện dòng đang nhập
             </label>
@@ -2613,7 +2613,7 @@
               <label class="font-bold text-gray-700 dark:text-gray-200">THÁNG ĐẶT</label>
               <button type="button" onclick="document.getElementById('hsMonth').value=''; loadHistory();" class="text-[11px] text-brand-600 hover:underline">Tất cả tháng</button>
             </div>
-            <input type="month" id="hsMonth" onchange="loadHistory()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg">
+            <input type="month" id="hsMonth" onchange="loadHistory()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
           </div>
           <button onclick="loadHistory()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
@@ -2685,11 +2685,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày báo cáo <span class="text-rose-500">*</span></label>
-                <input type="date" id="bcNgay" name="Ngày báo cáo" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums">
+                <input type="date" id="bcNgay" name="Ngày báo cáo" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Người báo cáo <span class="text-rose-500">*</span></label>
-                <select id="bcNguoiBaoCao" onchange="bcNguoiBaoCaoChange()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white">
+                <select id="bcNguoiBaoCao" onchange="bcNguoiBaoCaoChange()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                   <option value="">-- Chọn người báo cáo --</option>
                   <option value="Bếp trưởng">Bếp trưởng</option>
                   <option value="Quản lý Site">Quản lý Site</option>
@@ -2698,7 +2698,7 @@
                   <option value="Giám sát vận hành">Giám sát vận hành</option>
                   <option value="Khác">Khác (Tự nhập tên)...</option>
                 </select>
-                <input type="text" id="bcNguoiBaoCaoKhac" placeholder="Nhập họ và tên người báo cáo mới" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl mt-2 hidden">
+                <input type="text" id="bcNguoiBaoCaoKhac" placeholder="Nhập họ và tên người báo cáo mới" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl mt-2 hidden bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
             </div>
           </div>
@@ -2715,35 +2715,35 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất KH - Sáng <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcSang" name="Số suất ăn khách hàng - Sáng" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold">
+                <input type="number" min="0" value="0" id="bcSang" name="Số suất ăn khách hàng - Sáng" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất KH - Trưa <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcTrua" name="Số suất ăn khách hàng - Trưa" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold">
+                <input type="number" min="0" value="0" id="bcTrua" name="Số suất ăn khách hàng - Trưa" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất KH - Chiều <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcChieu" name="Số suất ăn khách hàng - Chiều" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold">
+                <input type="number" min="0" value="0" id="bcChieu" name="Số suất ăn khách hàng - Chiều" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất Nhân viên <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcNhanVien" name="Số suất ăn nhân viên" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold">
+                <input type="number" min="0" value="0" id="bcNhanVien" name="Số suất ăn nhân viên" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất ăn Hủy <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcHuy" name="Số suất ăn hủy" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right text-rose-600 font-bold">
+                <input type="number" min="0" value="0" id="bcHuy" name="Số suất ăn hủy" oninput="tinhTongSuat()" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right text-rose-600 font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-emerald-800 block mb-1">Tổng suất đã xuất (Tự tính)</label>
-                <input type="text" id="bcTong" value="0" disabled readonly class="w-full p-2.5 border border-emerald-300 rounded-xl tabular-nums tabular-nums text-right font-extrabold bg-emerald-50 text-emerald-800 text-sm">
+                <input type="text" id="bcTong" value="0" disabled readonly class="w-full p-2.5 border border-emerald-300 rounded-xl tabular-nums tabular-nums text-right font-extrabold bg-emerald-50 text-emerald-800 text-sm text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất Lưu mẫu <span class="text-rose-500">*</span></label>
-                <input type="number" min="0" value="0" id="bcLuuMau" name="Số suất ăn lưu mẫu" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold">
+                <input type="number" min="0" value="0" id="bcLuuMau" name="Số suất ăn lưu mẫu" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất Giáo viên (Cả ngày)</label>
-                <input type="number" min="0" value="0" id="bcGiaoVien" name="Số suất ăn giáo viên (Cả ngày)" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcGiaoVien" name="Số suất ăn giáo viên (Cả ngày)" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
             </div>
           </div>
@@ -2759,7 +2759,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Giờ giao suất ăn so với kế hoạch</label>
-                <select id="bcGioGiao" name="Giờ giao suất ăn so với kế hoạch" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white">
+                <select id="bcGioGiao" name="Giờ giao suất ăn so với kế hoạch" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                   <option value="">-- Chọn trạng thái --</option>
                   <option value="Đúng giờ">Đúng giờ</option>
                   <option value="Sớm hơn">Sớm hơn</option>
@@ -2768,15 +2768,15 @@
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Lý do nếu giao trễ</label>
-                <input type="text" id="bcLyDoTre" name="Lý do nếu giao trễ" placeholder="Ghi rõ lý do kẹt xe, chế biến chậm..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="bcLyDoTre" name="Lý do nếu giao trễ" placeholder="Ghi rõ lý do kẹt xe, chế biến chậm..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Tình trạng NVL (thiếu hụt/đổi trả nếu có)</label>
-                <textarea id="bcTinhTrangNVL" name="Tình trạng nguyên vật liệu (thiếu hụt/đổi trả nếu có)" rows="2" placeholder="Ghi nhận tình trạng rau củ, thịt cá, hạn dùng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl"></textarea>
+                <textarea id="bcTinhTrangNVL" name="Tình trạng nguyên vật liệu (thiếu hụt/đổi trả nếu có)" rows="2" placeholder="Ghi nhận tình trạng rau củ, thịt cá, hạn dùng..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Sự cố thiết bị / máy móc (nếu có)</label>
-                <textarea id="bcSuCoThietBi" name="Sự cố thiết bị/máy móc (nếu có)" rows="2" placeholder="Tủ đông, bếp gas, lò nướng, hút mùi..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl"></textarea>
+                <textarea id="bcSuCoThietBi" name="Sự cố thiết bị/máy móc (nếu có)" rows="2" placeholder="Tủ đông, bếp gas, lò nướng, hút mùi..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
               </div>
             </div>
           </div>
@@ -2792,11 +2792,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất ăn dư/thất thoát - Số lượng</label>
-                <input type="number" min="0" value="0" id="bcSuatDu" name="Suất ăn dư/thất thoát - số lượng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcSuatDu" name="Suất ăn dư/thất thoát - số lượng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Nguyên nhân dư/thất thoát</label>
-                <input type="text" id="bcNguyenNhanDu" name="Nguyên nhân dư/thất thoát" placeholder="Khách báo hủy đột xuất, thời tiết..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="bcNguyenNhanDu" name="Nguyên nhân dư/thất thoát" placeholder="Khách báo hủy đột xuất, thời tiết..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
             </div>
           </div>
@@ -2812,19 +2812,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số nhân viên có mặt</label>
-                <input type="number" min="0" value="0" id="bcStaffCoMat" name="Số nhân viên có mặt" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcStaffCoMat" name="Số nhân viên có mặt" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số nhân viên vắng</label>
-                <input type="number" min="0" value="0" id="bcStaffVang" name="Số nhân viên vắng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcStaffVang" name="Số nhân viên vắng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số nhân viên tăng ca</label>
-                <input type="number" min="0" value="0" id="bcStaffTangCa" name="Số nhân viên tăng ca" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcStaffTangCa" name="Số nhân viên tăng ca" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div class="sm:col-span-3">
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Sự cố nhân sự (nếu có)</label>
-                <input type="text" id="bcSuCoNhanSu" name="Sự cố nhân sự (nếu có)" placeholder="Nghỉ ốm đột xuất, thiếu người ca tối..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="bcSuCoNhanSu" name="Sự cố nhân sự (nếu có)" placeholder="Nghỉ ốm đột xuất, thiếu người ca tối..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
             </div>
           </div>
@@ -2840,15 +2840,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng khiếu nại</label>
-                <input type="number" min="0" value="0" id="bcKhieuNai" name="Số lượng khiếu nại từ khách hàng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcKhieuNai" name="Số lượng khiếu nại từ khách hàng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng khen ngợi</label>
-                <input type="number" min="0" value="0" id="bcKhenNgoi" name="Số lượng khen ngợi từ khách hàng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right">
+                <input type="number" min="0" value="0" id="bcKhenNgoi" name="Số lượng khen ngợi từ khách hàng" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl tabular-nums tabular-nums text-right bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Phân loại khiếu nại</label>
-                <select id="bcPhanLoaiKhieuNai" name="Phân loại khiếu nại (nếu có)" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white">
+                <select id="bcPhanLoaiKhieuNai" name="Phân loại khiếu nại (nếu có)" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                   <option value="">-- Không có khiếu nại --</option>
                   <option value="Chất lượng món ăn">Chất lượng món ăn</option>
                   <option value="Vệ sinh an toàn thực phẩm">Vệ sinh an toàn thực phẩm</option>
@@ -2860,7 +2860,7 @@
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mức độ nghiêm trọng</label>
-                <select id="bcMucDo" name="Mức độ nghiêm trọng của phản ánh" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white">
+                <select id="bcMucDo" name="Mức độ nghiêm trọng của phản ánh" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                   <option value="">-- Chọn mức độ --</option>
                   <option value="Thấp">Thấp</option>
                   <option value="Trung bình">Trung bình</option>
@@ -2870,7 +2870,7 @@
               </div>
               <div class="md:col-span-2 lg:col-span-4">
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Chi tiết ý kiến phản hồi từ khách hàng</label>
-                <textarea id="bcChiTietPhanHoi" name="Chi tiết ý kiến khách hàng" rows="2" placeholder="Ghi nhận cụ thể nội dung phản hồi, món ăn liên quan, thời gian..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl"></textarea>
+                <textarea id="bcChiTietPhanHoi" name="Chi tiết ý kiến khách hàng" rows="2" placeholder="Ghi nhận cụ thể nội dung phản hồi, món ăn liên quan, thời gian..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
               </div>
             </div>
           </div>
@@ -2886,14 +2886,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Có phát sinh chi phí ngoài kế hoạch?</label>
-                <select id="bcPhatSinhChiPhi" name="Có phát sinh chi phí ngoài kế hoạch không?" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white">
+                <select id="bcPhatSinhChiPhi" name="Có phát sinh chi phí ngoài kế hoạch không?" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                   <option value="Không">Không</option>
                   <option value="Có">Có</option>
                 </select>
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số tiền và lý do (nếu có phát sinh)</label>
-                <input type="text" id="bcChiPhiLyDo" name="Số tiền và lý do (nếu có phát sinh)" placeholder="VD: 500.000đ - mua thêm bình gas khẩn cấp" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl">
+                <input type="text" id="bcChiPhiLyDo" name="Số tiền và lý do (nếu có phát sinh)" placeholder="VD: 500.000đ - mua thêm bình gas khẩn cấp" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
               </div>
             </div>
           </div>
@@ -2919,7 +2919,7 @@
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Đề xuất / kiến nghị từ site (nếu có)</label>
-                <textarea id="bcDeXuat" name="Đề xuất / kiến nghị từ site (nếu có)" rows="3" placeholder="Kiến nghị nâng cấp công cụ dụng cụ, hỗ trợ nhân sự, đổi nhà cung cấp..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl"></textarea>
+                <textarea id="bcDeXuat" name="Đề xuất / kiến nghị từ site (nếu có)" rows="3" placeholder="Kiến nghị nâng cấp công cụ dụng cụ, hỗ trợ nhân sự, đổi nhà cung cấp..." class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></textarea>
               </div>
             </div>
           </div>
@@ -2949,7 +2949,7 @@
           </div>
           <div class="flex-1 min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
-            <input type="month" id="kkMonth" onchange="loadAudit()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg">
+            <input type="month" id="kkMonth" onchange="loadAudit()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
           </div>
           <button onclick="loadAudit()" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-lg border border-gray-300 dark:border-gray-700">Tải dữ liệu</button>
           <button onclick="saveAudit()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm">Lưu kiểm kê</button>
@@ -4138,7 +4138,7 @@
         <input type="hidden" id="editItemSku">
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt Hàng</label>
-          <input type="text" id="editItemName" readonly class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-2.5 text-gray-500 font-medium">
+          <input type="text" id="editItemName" readonly class="w-full bg-gray-50 dark:bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100/5 border border-gray-200 dark:border-gray-700 rounded-xl p-2.5 text-gray-500 font-medium">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -5028,7 +5028,7 @@
           </div>
           <div>
             <label class="font-bold block mb-1">Ghi chú / Giải trình:</label>
-            <textarea id="orderNote" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg" placeholder="Ghi chú đơn hàng..."></textarea>
+            <textarea id="orderNote" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" placeholder="Ghi chú đơn hàng..."></textarea>
           </div>
           <div class="flex justify-end gap-2 pt-2">
             <button onclick="closeGeneralModal()" class="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-bold">Xem lại</button>

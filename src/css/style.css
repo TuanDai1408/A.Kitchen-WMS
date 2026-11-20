@@ -270,6 +270,59 @@
   scrollbar-color: #344054 transparent;
 }
 
+/* ==========================================================================
+   GLOBAL FORM INPUT & SELECT STYLING (TailAdmin Standard Light & Dark)
+   ========================================================================== */
+input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not(.bg-transparent),
+select:not(.bg-transparent),
+textarea:not(.bg-transparent) {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not(.bg-transparent),
+.dark select:not(.bg-transparent),
+.dark textarea:not(.bg-transparent) {
+  background-color: #111827 !important; /* dark card / input surface */
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not(.bg-transparent):focus,
+.dark select:not(.bg-transparent):focus,
+.dark textarea:not(.bg-transparent):focus {
+  background-color: #1f2937 !important;
+  border-color: var(--color-brand-500, #358353) !important;
+  color: #ffffff !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+.dark select option {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+.dark input:disabled,
+.dark select:disabled,
+.dark textarea:disabled {
+  background-color: #1f2937 !important;
+  color: #6b7280 !important;
+  border-color: #374151 !important;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="month"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.9) hue-rotate(180deg);
+  cursor: pointer;
+}
+
 @media (min-width: 1280px) {
   .sidebar:not(.sidebar-static):hover {
     width: 290px;
