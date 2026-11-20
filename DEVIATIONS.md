@@ -45,3 +45,16 @@ Chỉ có **3 trường hợp duy nhất** được phép có sự sai biệt so
 ## 4. Cam Kết Tuân Thủ
 
 Ngoài 3 ngoại lệ trên, **MỌI THÀNH PHẦN KHÁC** (layout wrapper, padding, margin, border color `gray-200` / `gray-800`, card background `bg-white` / `dark:bg-white/3`, dark body `dark:bg-black`, shadow `theme-xs` $\rightarrow$ `theme-xl`, focus ring `rgba(70,95,255,0.12)`, cỡ chữ title-sm/title-lg/heading-six) **BẮT BUỘC KHỚP 100% VỚI TAILADMIN FREE**. Mọi sai lệch ngoài danh sách này đều bị coi là lỗi và phải được khắc phục triệt để.
+
+
+---
+
+## 4. Ngoại Lệ 4: Nhận Diện Thương Hiệu A.Kitchen & Tên Gọi Thống Nhất
+
+| Hạng mục | Trạng thái cũ | Bản A.Kitchen WMS chuẩn hóa | Lý do & Quy chuẩn |
+| :--- | :--- | :--- | :--- |
+| **Bảng màu Thương hiệu Chính** | Xanh dương TailAdmin `#465FFF` | **Xanh Lá `#19723C`** (thang 50–950) | Đo trực tiếp từ Logo chính thức của A.Kitchen. Áp dụng cho nút chính, menu active, link, focus-ring. |
+| **Màu Điểm Nhấn (Accent)** | Xanh dương / Vàng cam tùy ý | **Cam `#FF600F`** (thang 50–950) | Đo trực tiếp từ Logo chính thức của A.Kitchen. Chỉ dùng làm điểm nhấn chỉ báo, icon nhỏ, chuỗi biểu đồ thứ hai. |
+| **Tài sản Logo** | Icon chef-hat trong khối xanh vuông | **Bộ nhận diện A.Kitchen chính thức** | `logo-horizontal` (Sidebar), `logo-mark` (Header mobile & Preloader), `logo-stacked` (Login modal & Trang 404), đầy đủ bản sáng và bản tối (`-dark`). |
+| **Tên Gọi Hiển Thị** | "ORBIT", "Orbit Siba Food" | **"A.Kitchen WMS"** (Tiêu đề tab: "A.Kitchen WMS - Quản lý kho") | Xóa bỏ hoàn toàn "ORBIT" khỏi mọi chuỗi ký tự hiển thị tới người dùng; bảo lưu "Siba Food" ở chân trang hệ thống. Toàn bộ biến, id, khóa `orbit_*` trong localStorage được giữ nguyên vẹn 100%. |
+| **Quy chuẩn Font Chữ** | Outfit + Fallback | **Be Vietnam Pro & JetBrains Mono** | Tuân thủ tuyệt đối quy chuẩn User Rules: `Be Vietnam Pro` cho toàn bộ giao diện; `JetBrains Mono` với `font-feature-settings: 'tnum' 1;` cho số liệu bảng biểu. |

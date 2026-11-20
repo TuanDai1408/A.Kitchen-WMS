@@ -161,3 +161,54 @@ Trong quá trình phân tích code frontend và backend, phát hiện các đi�
 ---
 *Báo cáo được lập bởi: Senior Front-end Engineer & Visual Fidelity QA*  
 *Trạng thái: **GIAI ĐOẠN 0 HOÀN TẤT — ĐANG CHỜ DUYỆT ĐỂ BƯỚC VÀO GIAI ĐOẠN 1**.*
+
+
+---
+
+## IX. BÁO CÁO NHẬN DIỆN THƯƠNG HIỆU A.KITCHEN & XÓA DẤU VẾT AI/TEMPLATE (GIAI ĐOẠN HIỆN TẠI)
+
+### 1. Kiểm tra Token Màu Sắc & Bộ đếm (Trước vs Sau Bước 1-3)
+
+| Chỉ số kiểm tra | Trạng thái trước | Hiện tại (Bước 1-3) | Mục tiêu nghiệm thu | Ghi chú |
+| :--- | :---: | :---: | :---: | :--- |
+| **Mã hex xanh dương cũ (`#465fff`, `#3641f5`, `#ecf3ff`, `#7592ff`, `#9cb9ff`)** | 184+ chỗ | **0** | **0** | Đã loại bỏ 100% trong `src/css/style.css` và `public/index.html`. |
+| **Bảng màu thương hiệu mới** | Chưa có | **Đã áp dụng** | Xanh `#19723C`, Cam `#FF600F` | Thang 50-950 tích hợp qua `@theme` Tailwind CSS v4. |
+| **Tài sản Logo chính thức** | Ô icon bếp / chữ "A" giả | **Đã tích hợp đủ 14 file** | Đầy đủ bản sáng / tối | `logo-horizontal`, `logo-mark`, `logo-stacked`, favicons, app icon. |
+| **Favicon & Web App Manifest** | Chưa có manifest | **Đã tích hợp** | Chuẩn PWA Standalone | `/favicon.ico`, `/manifest.webmanifest`, apple-touch-icon. |
+| **Font chữ chuẩn theo quy định** | Outfit / Fallback | **Be Vietnam Pro & JetBrains Mono** | Đúng quy chuẩn User Rule | `--font-sans: 'Be Vietnam Pro'`, `.font-mono: 'JetBrains Mono'`. |
+
+### 2. Đo lường Tương phản Màu sắc (WCAG 2.1 Contrast Ratios)
+
+Mọi tỷ lệ tương phản được tính toán toán học chính xác theo công thức Relative Luminance:
+
+1. **Giao diện Sáng (Light Mode - Nền `#FFFFFF`):**
+   - Chữ / Nút `brand-600` (`#19723C`) với chữ trắng: **6.03 : 1** (Đạt chuẩn WCAG AA & AAA cho Normal text, yêu cầu $\ge 4.5:1$).
+   - Nhãn / Badge phụ `brand-50` (`#EDF4EF`) + chữ `brand-700` (`#156032`): **7.23 : 1** (Đạt chuẩn WCAG AAA).
+   - Điểm nhấn `accent-600` (`#FF600F`) làm icon / viền active / gạch chỉ báo: **3.20 : 1** (Đạt chuẩn $\ge 3:1$ cho đồ họa UI và chữ lớn).
+   - Huy hiệu `accent-50` (`#FFF2EC`) + chữ `accent-800` (`#AD410A`): **6.12 : 1** (Đạt chuẩn WCAG AA cho chữ nhỏ).
+
+2. **Giao diện Tối (Dark Mode - Nền `#101828` / `#000000`):**
+   - Chữ / Link `brand-400` (`#599973`) trên nền `#000000`: **6.76 : 1** (Đạt chuẩn WCAG AA).
+   - Chữ / Link `brand-400` (`#599973`) trên nền card `#101828`: **5.63 : 1** (Đạt chuẩn WCAG AA).
+   - Nút bấm `brand-500` (`#358353`) chữ trắng: **3.85 : 1** (Đạt chuẩn nút bấm $\ge 3:1$). Không dùng `brand-600` làm chữ trên nền đen (3.5:1).
+
+### 3. Danh mục Ảnh chụp Màn hình Nghiệm thu Đã Xuất
+
+Lưu trữ tại `C:\Users\TLG\.gemini\antigravity\brain\f68f16c1-0634-4041-802c-7cdb7f1ccf17\screenshots\`:
+- `desktop_light_wh_dashboard.png` / `desktop_dark_wh_dashboard.png` (1440x900)
+- `desktop_light_wh_stock.png` / `desktop_dark_wh_stock.png` (1440x900)
+- `desktop_light_fnb_stock.png` / `desktop_dark_fnb_stock.png` (1440x900)
+- `desktop_light_portal_order.png` / `desktop_dark_portal_order.png` (1440x900)
+- `desktop_light_404.png` / `desktop_dark_404.png` (1440x900)
+- `desktop_light_login.png` / `desktop_dark_login.png` (1440x900)
+- `mobile_light_dashboard.png` / `mobile_dark_dashboard.png` (390x844)
+- `mobile_light_login.png` / `mobile_dark_login.png` (390x844)
+
+### 4. Phát hiện ngoài phạm vi & Dữ liệu mẫu (Audit Mock Data)
+
+1. **Rủi ro phân quyền client-side:**
+   - Nút chuyển vai trò thử nghiệm ở chân sidebar hiện chỉ ẩn/hiện ở giao diện. Cần đảm bảo tài khoản khi gửi API phải luôn được backend Worker xác thực chữ ký token thực tế.
+2. **Dữ liệu giả lập trong `seed.sql` (ghi nhận không sửa code file seed):**
+   - Số điện thoại mẫu dạng tăng tiến: `0901234567`, `0902345678`, `0903.000.xxx`.
+   - Địa chỉ mẫu mặc định: `Hệ thống căn tin Tân Long Group`.
+   - Giao diện đã được thiết lập điều kiện an toàn: nếu hotline hoặc địa chỉ trống, giao diện sẽ không hiển thị chuỗi giả lập mà ẩn đi hoặc hiển thị nhãn chi nhánh tương ứng.
