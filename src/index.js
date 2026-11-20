@@ -185,8 +185,10 @@ async function autoCleanDemoData(env) {
 
     await env.DB.prepare(`
       DELETE FROM branches 
-      WHERE id IN ('b_k505', 'b_q1', 'b_q7', 'b_td') OR id LIKE 'b_%'
+      WHERE id IN ('b_q1', 'b_q7', 'b_td')
     `).run().catch(() => {});
+
+    await ensureBranchesSynced(env);
 
     await env.DB.prepare(`
       DELETE FROM items 
@@ -203,6 +205,27 @@ async function autoCleanDemoData(env) {
     `).run().catch(() => {});
   } catch (err) {
     console.error('autoCleanDemoData error:', err);
+  }
+}
+
+
+async function ensureBranchesSynced(env) {
+  try {
+    // 1. Đồng bộ các điểm bán từ master sites sang branches nếu còn thiếu
+    await env.DB.prepare(`
+      INSERT OR IGNORE INTO branches (id, code, name, address, phone, is_active)
+      SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, 1 as is_active
+      FROM sites
+      WHERE site_code NOT IN (SELECT code FROM branches)
+    `).run().catch(() => {});
+
+    // 2. Đảm bảo K505 luôn có mặt và active trong branches
+    await env.DB.prepare(`
+      INSERT OR REPLACE INTO branches (id, code, name, address, phone, is_active)
+      VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', 1)
+    `).run().catch(() => {});
+  } catch (err) {
+    console.error('ensureBranchesSynced notice:', err);
   }
 }
 
@@ -407,8 +430,22 @@ export default {
 
       // 1.1 GET /api/branches
       if (pathname === '/api/branches' && request.method === 'GET') {
+        await ensureBranchesSynced(env);
         const { results } = await env.DB.prepare(`
-          SELECT * FROM branches WHERE is_active = 1 ORDER BY code
+          SELECT 
+            COALESCE(b.id, LOWER(s.site_code)) as id,
+            s.site_code as code,
+            COALESCE(b.name, s.site_name, s.name) as name,
+            s.region,
+            COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+            COALESCE(b.phone, '0903.000.xxx') as phone,
+            COALESCE(s.budget, 10000000) as budget,
+            COALESCE(b.is_active, 1) as is_active,
+            s.site_type
+          FROM sites s
+          LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+          WHERE COALESCE(b.is_active, 1) = 1
+          ORDER BY s.site_code
         `).all();
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
@@ -1149,7 +1186,7 @@ export default {
         const id = 'RPT-' + Date.now();
         const siteCode = extractSiteCode(site || branchCode || 'k001').toLowerCase();
         const branchRow = await env.DB.prepare(`SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`).bind(siteCode, siteCode).first();
-        const validBranchId = branchRow ? branchRow.id : 'b_k505';
+        const validBranchId = branchRow ? branchRow.id : 'k505';
         const imgLinkStr = Array.isArray(images) ? images.map(im => im.name || im.url).join(' , ') : (images || '');
 
         await env.DB.prepare(`
