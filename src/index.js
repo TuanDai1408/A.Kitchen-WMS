@@ -228,39 +228,73 @@ async function ensureUserPermissionsTable(env) {
 }
 
 
+const ALL_SYSTEM_FEATURES = [
+  'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
+  'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
+  'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
+  'fnb-sites', 'user-matrix'
+];
+
 async function buildUserPermissions(env, user) {
   await ensureRolePermissions(env);
 
   const permissions = {};
 
+  // 1. Khởi tạo quyền mặc định theo vai trò (Role Defaults)
   if (user.role_code === 'ADMIN') {
-    const allFeatures = [
-      'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
-      'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
-      'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
-      'fnb-sites', 'user-matrix'
-    ];
-    allFeatures.forEach(f => {
+    ALL_SYSTEM_FEATURES.forEach(f => {
       permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
     });
-    return permissions;
+  } else {
+    // Với các vai trò khác, khởi tạo mặc định tất cả canView = false
+    ALL_SYSTEM_FEATURES.forEach(f => {
+      permissions[f] = { canView: false, canCreate: false, canEdit: false, canDelete: false };
+    });
+
+    const { results: permRows } = await env.DB.prepare(`
+      SELECT feature_code, can_view, can_create, can_edit, can_delete
+      FROM role_permissions
+      WHERE role_code = ?
+    `).bind(user.role_code).all();
+
+    (permRows || []).forEach(p => {
+      permissions[p.feature_code] = {
+        canView: p.can_view === 1,
+        canCreate: p.can_create === 1,
+        canEdit: p.can_edit === 1,
+        canDelete: p.can_delete === 1
+      };
+    });
+
+    // Quyền cơ bản nếu chưa có trong role_permissions
+    if (user.role_code === 'KHO_TRUONG') {
+      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].forEach(f => {
+        if (!permissions[f] || !permissions[f].canView) {
+          permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+        }
+      });
+    } else if (user.role_code === 'BEP_TRUONG') {
+      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].forEach(f => {
+        if (!permissions[f] || !permissions[f].canView) {
+          permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+        }
+      });
+    } else if (user.role_code === 'KE_TOAN') {
+      ['fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].forEach(f => {
+        if (!permissions[f] || !permissions[f].canView) {
+          permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+        }
+      });
+    } else if (user.role_code === 'NHAN_VIEN') {
+      ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'].forEach(f => {
+        if (!permissions[f] || !permissions[f].canView) {
+          permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+        }
+      });
+    }
   }
 
-  const { results: permRows } = await env.DB.prepare(`
-    SELECT feature_code, can_view, can_create, can_edit, can_delete
-    FROM role_permissions
-    WHERE role_code = ?
-  `).bind(user.role_code).all();
-
-  (permRows || []).forEach(p => {
-    permissions[p.feature_code] = {
-      canView: p.can_view === 1,
-      canCreate: p.can_create === 1,
-      canEdit: p.can_edit === 1,
-      canDelete: p.can_delete === 1
-    };
-  });
-
+  // 2. Cộng dồn quyền nếu có yêu cầu truy cập được duyệt (access_requests)
   if (user.email) {
     const { results: approvedRequests } = await env.DB.prepare(`
       SELECT requested_role, requested_feature
@@ -295,30 +329,17 @@ async function buildUserPermissions(env, user) {
 
       if (req.requested_feature) {
         const featureCode = FEATURE_NAME_TO_CODE[req.requested_feature] || req.requested_feature;
-        if (featureCode) {
-          permissions[featureCode] = {
-            canView: true,
-            canCreate: true,
-            canEdit: true,
-            canDelete: permissions[featureCode]?.canDelete || false
-          };
+        if (featureCode && permissions[featureCode]) {
+          permissions[featureCode].canView = true;
+          permissions[featureCode].canCreate = true;
+          permissions[featureCode].canEdit = true;
         }
       }
     }
   }
 
-  if (user.role_code === 'KHO_TRUONG') {
-    ['portal-kiemke', 'fnb-counts', 'portal-baocao', 'wh-stock', 'wh-dashboard', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-order', 'portal-history', 'fnb-stock', 'fnb-sites', 'fnb-receipts'].forEach(f => {
-      if (!permissions[f]) {
-        permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
-      } else {
-        permissions[f].canView = true;
-      }
-    });
-  }
-
-
-  // ÁP DỤNG MA TRẬN PHÂN QUYỀN TÙY CHỈNH CHO TỪNG USER (Cấp quyền hoặc Cắt quyền)
+  // 3. ÁP DỤNG MA TRẬN PHÂN QUYỀN TÙY CHỈNH CHO TỪNG USER (Cấp quyền hoặc Cắt quyền)
+  // ĐÂY LÀ QUYỀN TỐI CAO ĐÈ LÊN MỌI VAI TRÒ MẶC ĐỊNH
   if (user.email) {
     try {
       await ensureUserPermissionsTable(env);
@@ -330,21 +351,33 @@ async function buildUserPermissions(env, user) {
 
       (customPerms || []).forEach(cp => {
         if (cp.can_view === 0) {
-          // CẮT QUYỀN: Thu hồi quyền truy cập chức năng này đối với user
-          delete permissions[cp.feature_code];
-        } else {
-          // CẤP QUYỀN: Cấp quyền riêng biệt cho user
+          // CẮT / KHÓA QUYỀN TUYỆT ĐỐI (Dù vai trò là ADMIN hay KHO_TRUONG đều bị khóa)
+          permissions[cp.feature_code] = {
+            canView: false,
+            canCreate: false,
+            canEdit: false,
+            canDelete: false,
+            isRevoked: true
+          };
+        } else if (cp.can_view === 1) {
+          // CẤP QUYỀN RIÊNG BIỆT
           permissions[cp.feature_code] = {
             canView: true,
             canCreate: cp.can_create === 1,
             canEdit: cp.can_edit === 1,
-            canDelete: cp.can_delete === 1
+            canDelete: cp.can_delete === 1,
+            isCustom: true
           };
         }
       });
     } catch (err) {
       console.error('Error applying user_permissions:', err);
     }
+  }
+
+  // 4. Bảo vệ an toàn: Owner hệ thống luôn có quyền quản lý phân quyền (user-matrix)
+  if (user.email === 'trantuandai2508@gmail.com') {
+    permissions['user-matrix'] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
 
   return permissions;
@@ -1145,6 +1178,38 @@ export default {
       }
 
       
+            // 2.11.0 LẤY THÔNG TIN VÀ PHÂN QUYỀN MỚI NHẤT CỦA USER (/api/auth/me)
+      if (pathname === '/api/auth/me' && request.method === 'GET') {
+        const email = searchParams.get('email');
+        if (!email) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu email' }), { status: 400, headers: corsHeaders });
+        }
+        let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+        if (!user) {
+          return new Response(JSON.stringify({ success: false, error: 'User không tồn tại' }), { status: 404, headers: corsHeaders });
+        }
+        const permissions = await buildUserPermissions(env, user);
+        const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first();
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            user: {
+              id: user.id,
+              email: user.email,
+              fullName: repairAtobMojibake(user.full_name),
+              avatarUrl: user.avatar_url,
+              role: user.role_code,
+              roleName: roleInfo?.role_name || user.role_code,
+              status: user.status
+            },
+            role: user.role_code,
+            roleName: roleInfo?.role_name || user.role_code,
+            badgeColor: roleInfo?.badge_color || 'bg-brand-500',
+            permissions
+          }
+        }), { headers: corsHeaders });
+      }
+
       // 2.11.1 GOOGLE AUTHENTICATION & RBAC (/api/auth/google)
       if (pathname === '/api/auth/google' && request.method === 'POST') {
         try {
@@ -1440,13 +1505,13 @@ export default {
 
       // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)
       if (pathname === '/api/auth/switch-role' && request.method === 'POST') {
-        const { role } = await request.json();
+        const { role, email } = await request.json();
         const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(role).first();
         if (!roleInfo) {
           return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
         }
 
-        const permissions = await buildUserPermissions(env, { role_code: role, email: '' });
+        const permissions = await buildUserPermissions(env, { role_code: role, email: email || '' });
 
         return new Response(JSON.stringify({
           success: true,

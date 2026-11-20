@@ -6551,10 +6551,20 @@ window.addEventListener('keydown', (e) => {
 function filterMobileHubFeatures(val) {
   const q = String(val || '').toLowerCase().trim();
   document.querySelectorAll('.hub-item').forEach(el => {
+    const onclickStr = el.getAttribute('onclick') || '';
+    const m = onclickStr.match(/switchFromHub\('([^']+)'\)/) || onclickStr.match(/switchTab\('([^']+)'\)/);
+    const tabId = m ? m[1] : '';
+    if (tabId && typeof canAccessTab === 'function' && !canAccessTab(tabId)) {
+      el.style.display = 'none';
+      el.classList.add('hidden');
+      return;
+    }
     if (!q || el.textContent.toLowerCase().includes(q)) {
       el.style.display = 'flex';
+      el.classList.remove('hidden');
     } else {
       el.style.display = 'none';
+      el.classList.add('hidden');
     }
   });
 }
@@ -7374,15 +7384,16 @@ async function toggleUserPermission(userEmail, featureCode, currentlyGranted, cu
 
     showToast(res.message || 'Đã cập nhật phân quyền thành công', 'success');
 
-    // Nếu sửa quyền của chính mình -> đồng bộ session
+        // Nếu sửa quyền của chính mình -> đồng bộ session và cập nhật giao diện ngay lập tức
     if (window.gCurrentUser && window.gCurrentUser.email === userEmail) {
       if (!window.gCurrentUser.permissions) window.gCurrentUser.permissions = {};
       if (action === 'GRANT') {
-        window.gCurrentUser.permissions[featureCode] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
+        window.gCurrentUser.permissions[featureCode] = { canView: true, canCreate: true, canEdit: true, canDelete: true, isCustom: true };
       } else {
-        delete window.gCurrentUser.permissions[featureCode];
+        window.gCurrentUser.permissions[featureCode] = { canView: false, canCreate: false, canEdit: false, canDelete: false, isRevoked: true };
       }
-      try { localStorage.setItem('orbit_user_session', JSON.stringify(window.gCurrentUser)); } catch(e){}
+      try { localStorage.setItem('orbit_user', JSON.stringify(window.gCurrentUser)); } catch(e){}
+      applyUserSessionToUI();
     }
   } catch (err) {
     console.error('Error toggleUserPermission:', err);
@@ -12066,26 +12077,42 @@ function initRbacAuth() {
     checkPendingAccessRequests();
   }
 
-  // Đồng bộ quyền mới nhất từ server ở background (nếu Admin vừa phê duyệt thêm quyền)
-  if (gCurrentUser && gCurrentUser.email) {
-    fetch('/api/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: gCurrentUser.email })
-    }).then(r => r.json()).then(res => {
-      if (res.success && res.data && res.data.permissions) {
-        gCurrentUser.permissions = res.data.permissions;
-        gCurrentUser.role = res.data.role;
-        gCurrentUser.roleName = res.data.roleName;
-        if (res.data.fullName) gCurrentUser.fullName = res.data.fullName;
-        if (res.data.avatarUrl) gCurrentUser.avatarUrl = res.data.avatarUrl;
-        try { localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser)); } catch(e){}
-        saveAccountToList(gCurrentUser);
-        applyUserSessionToUI();
-      }
-    }).catch(() => {});
-  }
+  // Đồng bộ quyền mới nhất từ server CSDL D1 ngay khi mở ứng dụng
+  window.syncCurrentUserPermissions();
 }
+
+// Đồng bộ quyền thời gian thực từ CSDL Backend D1
+window.syncCurrentUserPermissions = async function() {
+  if (!gCurrentUser || !gCurrentUser.email) return;
+  try {
+    const res = await fetch(`/api/auth/me?email=${encodeURIComponent(gCurrentUser.email)}`);
+    const json = await res.json();
+    if (json.success && json.data && json.data.permissions) {
+      gCurrentUser.permissions = json.data.permissions;
+      gCurrentUser.role = json.data.role;
+      gCurrentUser.roleName = json.data.roleName;
+      if (json.data.user && json.data.user.fullName) gCurrentUser.fullName = json.data.user.fullName;
+      if (json.data.user && json.data.user.avatarUrl) gCurrentUser.avatarUrl = json.data.user.avatarUrl;
+      try { localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser)); } catch(e){}
+      saveAccountToList(gCurrentUser);
+      applyUserSessionToUI();
+    }
+  } catch (e) {
+    console.error('syncCurrentUserPermissions error:', e);
+  }
+};
+
+// Đồng bộ định kỳ mỗi 15 giây và mỗi khi user focus lại cửa sổ trình duyệt
+setInterval(() => {
+  if (!document.hidden && window.gCurrentUser && window.gCurrentUser.email) {
+    window.syncCurrentUserPermissions();
+  }
+}, 15000);
+window.addEventListener('focus', () => {
+  if (window.gCurrentUser && window.gCurrentUser.email) {
+    window.syncCurrentUserPermissions();
+  }
+});
 
 function updateUIForUnauthenticated() {
   const nameEl = document.getElementById('sidebarUserName');
@@ -12106,13 +12133,18 @@ function updateUIForUnauthenticated() {
     hdrRole.className = 'text-[9px] font-extrabold text-gray-400 uppercase';
   }
 
-  const financeCatUnauth = document.querySelector('.sidebar-category[data-cat="fnb-finance"]');
-  if (financeCatUnauth) financeCatUnauth.classList.add('hidden');
-
+  // Ẩn toàn bộ menu điều hướng khi chưa đăng nhập
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
-    btn.classList.add('opacity-40');
-    const lock = btn.querySelector('.lock-icon');
-    if (lock) lock.classList.remove('hidden');
+    btn.classList.add('hidden');
+    btn.style.display = 'none';
+    if (btn.closest('li')) {
+      btn.closest('li').classList.add('hidden');
+      btn.closest('li').style.display = 'none';
+    }
+  });
+  document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
+    cat.classList.add('hidden');
+    cat.style.display = 'none';
   });
 
   if (window.lucide) lucide.createIcons();
@@ -12171,97 +12203,191 @@ function applyUserSessionToUI() {
     }
   }
 
-  // Ẩn / Hiện mục "Hiệu Quả & Doanh Thu" (Chỉ hiển thị cho ADMIN)
-  const financeCategory = document.querySelector('.sidebar-category[data-cat="fnb-finance"]');
-  const isAdmin = gCurrentUser.role === 'ADMIN';
-  if (financeCategory) {
-    if (isAdmin) {
-      financeCategory.classList.remove('hidden');
-    } else {
-      financeCategory.classList.add('hidden');
-    }
-  }
-
-  // Ẩn / Hiện tất cả phần tử admin-only (bao gồm Mobile Menu Hub)
-  document.querySelectorAll('[data-role="admin-only"]').forEach(el => {
-    if (isAdmin) {
-      el.classList.remove('hidden');
-    } else {
-      el.classList.add('hidden');
-    }
-  });
-
-  // Đồng bộ nút điều hướng mobile cho tab đầu tiên
-  const mobFnbChainBtn = document.getElementById('mobTab-fnb-chain');
-  if (mobFnbChainBtn) {
-    if (isAdmin) {
-      mobFnbChainBtn.setAttribute('onclick', "switchTab('fnb-chain')");
-      const span = mobFnbChainBtn.querySelector('span');
-      if (span) span.textContent = 'Chuỗi F&B';
-      const ic = mobFnbChainBtn.querySelector('i');
-      if (ic) ic.setAttribute('data-lucide', 'trophy');
-    } else {
-      mobFnbChainBtn.setAttribute('onclick', "switchTab('fnb-stock')");
-      const span = mobFnbChainBtn.querySelector('span');
-      if (span) span.textContent = 'Tồn Kho';
-      const ic = mobFnbChainBtn.querySelector('i');
-      if (ic) ic.setAttribute('data-lucide', 'boxes');
-    }
-  }
-
-  // Tự động chuyển tab nếu người dùng hiện tại không phải ADMIN mà đang ở tab Hiệu Quả & Doanh Thu
-  const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
-  const curActivePanel = document.querySelector('.tab-panel.active');
-  const curTabId = curActivePanel ? curActivePanel.id : '';
-  if (!isAdmin && (!curTabId || financeTabs.includes(curTabId))) {
-    const defaultTab = (gCurrentUser.role === 'KHO_TRUONG') ? 'wh-dashboard' :
-                       (gCurrentUser.role === 'KE_TOAN') ? 'portal-voucher' : 'fnb-stock';
-    if (typeof _origSwitchTab === 'function') {
-      _origSwitchTab(defaultTab);
-    }
-  }
-
+  // 1. ẨN / HIỆN TRIỆT ĐỂ CÁC NÚT TAB TRÊN SIDEBAR THEO PHÂN QUYỀN
   document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
     const tabId = btn.getAttribute('data-tab');
     if (!tabId) return;
 
-    const lockIcon = btn.querySelector('.lock-icon');
-    const hasPerm = canAccessTab(tabId);
+    const allowed = canAccessTab(tabId);
+    const li = btn.closest('li');
 
-    if (hasPerm) {
-      btn.classList.remove('opacity-40', 'cursor-not-allowed');
-      if (lockIcon) lockIcon.classList.add('hidden');
+    if (allowed) {
+      btn.classList.remove('hidden', 'opacity-40', 'cursor-not-allowed');
+      btn.style.display = '';
+      if (li) {
+        li.classList.remove('hidden');
+        li.style.display = '';
+      }
     } else {
-      btn.classList.add('opacity-40');
-      if (lockIcon) lockIcon.classList.remove('hidden');
+      // ẨN HOÀN TOÀN KHỎI GIAO DIỆN
+      btn.classList.add('hidden');
+      btn.style.display = 'none';
+      if (li) {
+        li.classList.add('hidden');
+        li.style.display = 'none';
+      }
     }
   });
+
+  // 2. ẨN / HIỆN DANH MỤC / CATEGORY TRÊN SIDEBAR
+  // Nếu tất cả tab con trong danh mục bị ẩn -> Ẩn toàn bộ danh mục để không bị trống giao diện
+  document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
+    const visibleBtns = cat.querySelectorAll('.nav-btn:not(.hidden)');
+    if (visibleBtns.length === 0) {
+      cat.classList.add('hidden');
+      cat.style.display = 'none';
+    } else {
+      cat.classList.remove('hidden');
+      cat.style.display = '';
+    }
+  });
+
+  // 3. ẨN / HIỆN TỪNG MỤC TRONG MOBILE MENU HUB MODAL
+  document.querySelectorAll('.hub-item').forEach(item => {
+    const onclickStr = item.getAttribute('onclick') || '';
+    const m = onclickStr.match(/switchFromHub\('([^']+)'\)/) || onclickStr.match(/switchTab\('([^']+)'\)/);
+    if (m && m[1]) {
+      const tabId = m[1];
+      const allowed = canAccessTab(tabId);
+      if (allowed) {
+        item.classList.remove('hidden');
+        item.style.display = '';
+      } else {
+        item.classList.add('hidden');
+        item.style.display = 'none';
+      }
+    }
+  });
+
+  // Ẩn nhóm mobile hub nếu tất cả item con bị ẩn
+  document.querySelectorAll('#mobileMenuHub .space-y-4 > div').forEach(group => {
+    const visibleHubItems = group.querySelectorAll('.hub-item:not(.hidden)');
+    if (visibleHubItems.length === 0) {
+      group.classList.add('hidden');
+      group.style.display = 'none';
+    } else {
+      group.classList.remove('hidden');
+      group.style.display = '';
+    }
+  });
+
+  // 4. ĐỒNG BỘ THANH ĐIỀU HƯỚNG DƯỚI ĐÁY MOBILE (#mobileTabBar)
+  const mobChain = document.getElementById('mobTab-fnb-chain');
+  if (mobChain) {
+    if (canAccessTab('fnb-chain')) {
+      mobChain.classList.remove('hidden');
+      mobChain.style.display = '';
+      mobChain.setAttribute('onclick', "switchTab('fnb-chain')");
+      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Chuỗi F&B';
+    } else if (canAccessTab('fnb-stock')) {
+      mobChain.classList.remove('hidden');
+      mobChain.style.display = '';
+      mobChain.setAttribute('onclick', "switchTab('fnb-stock')");
+      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Tồn Kho';
+    } else if (canAccessTab('wh-dashboard')) {
+      mobChain.classList.remove('hidden');
+      mobChain.style.display = '';
+      mobChain.setAttribute('onclick', "switchTab('wh-dashboard')");
+      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Kho Tổng';
+    } else {
+      const firstAllowed = document.querySelector('#sidebar .nav-btn:not(.hidden)');
+      if (firstAllowed) {
+        const tId = firstAllowed.getAttribute('data-tab');
+        mobChain.classList.remove('hidden');
+        mobChain.style.display = '';
+        mobChain.setAttribute('onclick', `switchTab('${tId}')`);
+        const span = mobChain.querySelector('span'); if (span) span.textContent = firstAllowed.textContent.trim().slice(0, 10);
+      } else {
+        mobChain.classList.add('hidden');
+        mobChain.style.display = 'none';
+      }
+    }
+  }
+
+  const mobWhStock = document.getElementById('mobTab-wh-stock');
+  if (mobWhStock) {
+    if (canAccessTab('wh-stock')) {
+      mobWhStock.classList.remove('hidden');
+      mobWhStock.style.display = '';
+    } else {
+      mobWhStock.classList.add('hidden');
+      mobWhStock.style.display = 'none';
+    }
+  }
+
+  const mobVoucher = document.getElementById('mobTab-portal-voucher');
+  if (mobVoucher) {
+    if (canAccessTab('portal-voucher')) {
+      mobVoucher.classList.remove('hidden');
+      mobVoucher.style.display = '';
+    } else {
+      mobVoucher.classList.add('hidden');
+      mobVoucher.style.display = 'none';
+    }
+  }
+
+  const mobBaocao = document.getElementById('mobTab-portal-baocao');
+  if (mobBaocao) {
+    if (canAccessTab('portal-baocao')) {
+      mobBaocao.classList.remove('hidden');
+      mobBaocao.style.display = '';
+    } else {
+      mobBaocao.classList.add('hidden');
+      mobBaocao.style.display = 'none';
+    }
+  }
+
+  // 5. ĐỒNG BỘ CÁC NÚT SUB-TAB CON TRONG TRANG
+  document.querySelectorAll('button[onclick*="switchTab"]').forEach(subBtn => {
+    if (subBtn.classList.contains('nav-btn') || subBtn.classList.contains('mob-nav-btn')) return;
+    const onclickStr = subBtn.getAttribute('onclick') || '';
+    const m = onclickStr.match(/switchTab\('([^']+)'/);
+    if (m && m[1]) {
+      const tId = m[1];
+      if (!canAccessTab(tId)) {
+        subBtn.classList.add('hidden');
+        subBtn.style.display = 'none';
+      } else {
+        subBtn.classList.remove('hidden');
+        subBtn.style.display = '';
+      }
+    }
+  });
+
+  // 6. KIỂM TRA TAB HIỆN TẠI: NẾU BỊ KHÓA / KHÔNG CÓ QUYỀN -> TỰ ĐỘNG CHUYỂN VỀ TAB ĐẦU TIÊN ĐƯỢC PHÉP
+  const curActivePanel = document.querySelector('.tab-panel.active');
+  const curTabId = curActivePanel ? curActivePanel.id : (localStorage.getItem('orbit_active_tab') || 'fnb-chain');
+  if (!canAccessTab(curTabId)) {
+    const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
+    const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'wh-dashboard';
+    if (typeof _origSwitchTab === 'function') {
+      _origSwitchTab(safeTabId);
+    }
+  }
 
   if (window.lucide) lucide.createIcons();
 }
 
-function canAccessTab(tabId) {
+window.canAccessTab = function(tabId) {
   if (!gCurrentUser) return false;
 
-  // Mục Hiệu Quả & Doanh Thu CHỈ hiển thị và cho phép ADMIN truy cập
-  const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
-  if (financeTabs.includes(tabId)) {
-    return gCurrentUser.role === 'ADMIN';
+  // 1. Single Source of Truth: Nếu có permissions object từ CSDL D1 Backend
+  if (gCurrentUser.permissions && typeof gCurrentUser.permissions === 'object') {
+    const p = gCurrentUser.permissions[tabId];
+    if (p !== undefined) {
+      return Boolean(p.canView);
+    }
+    // Nếu trong permissions object đã có dữ liệu nhưng tabId này không được cấp quyền -> Chặn & Ẩn
+    return false;
   }
 
-  if (tabId === 'user-matrix') {
-    return gCurrentUser && (gCurrentUser.role === 'ADMIN' || (gCurrentUser.permissions && gCurrentUser.permissions['user-matrix']?.canView));
-  }
+  // 2. Fallback tạm thời chỉ khi permissions chưa kịp load xong từ backend
   if (gCurrentUser.role === 'ADMIN') return true;
 
-  // 1. Kiểm tra quyền chi tiết (Permissions động từ Backend bao gồm cả quyền Role và Quyền Cộng Dồn)
-  if (gCurrentUser.permissions && gCurrentUser.permissions[tabId] && gCurrentUser.permissions[tabId].canView) {
-    return true;
-  }
+  const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
+  if (financeTabs.includes(tabId)) return false;
 
-  // 2. Quyền mặc định theo Role
   if (gCurrentUser.role === 'KHO_TRUONG') {
-    // Quản lý kho có toàn quyền Kho Tổng + Kiểm kê kho tổng + Kiểm kê điểm bán + Báo cáo + Nhập hàng
     return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].includes(tabId);
   }
   if (gCurrentUser.role === 'BEP_TRUONG') {
@@ -12275,6 +12401,10 @@ function canAccessTab(tabId) {
   }
 
   return false;
+};
+
+function canAccessTab(tabId) {
+  return window.canAccessTab(tabId);
 }
 
 const _origSwitchTab = window.switchTab;
@@ -12287,7 +12417,16 @@ window.switchTab = function(tabId, btn) {
     return;
   }
   if (!canAccessTab(tabId)) {
-    openRequestAccessModal(tabId);
+    if (typeof showToast === 'function') {
+      showToast('Bạn không có quyền truy cập chức năng này', 'warning');
+    }
+    const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
+    if (firstAllowedBtn) {
+      const safeTabId = firstAllowedBtn.getAttribute('data-tab');
+      if (safeTabId !== tabId && typeof _origSwitchTab === 'function') {
+        _origSwitchTab(safeTabId);
+      }
+    }
     return;
   }
   if (typeof _origSwitchTab === 'function') {
@@ -12831,7 +12970,7 @@ window.switchRoleAction = async function(roleCode) {
     const res = await fetch('/api/auth/switch-role', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: roleCode })
+      body: JSON.stringify({ role: roleCode, email: (gCurrentUser && gCurrentUser.email) || '' })
     });
     const json = await res.json();
     if (!json.success) throw new Error('Không chuyển được vai trò');
@@ -12874,16 +13013,37 @@ window.filterSidebarMenu = function(query) {
   document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
     let catHasVisible = false;
     cat.querySelectorAll('.nav-btn').forEach(btn => {
+      const tabId = btn.getAttribute('data-tab');
+      const allowed = canAccessTab(tabId);
+      const li = btn.closest('li');
+
+      // Nếu không có quyền truy cập -> luôn ẩn hoàn toàn khỏi kết quả tìm kiếm
+      if (!allowed) {
+        btn.classList.add('hidden');
+        btn.style.display = 'none';
+        if (li) { li.classList.add('hidden'); li.style.display = 'none'; }
+        return;
+      }
+
       const text = btn.textContent.toLowerCase();
       if (!q || text.includes(q)) {
         btn.classList.remove('hidden');
+        btn.style.display = '';
+        if (li) { li.classList.remove('hidden'); li.style.display = ''; }
         catHasVisible = true;
       } else {
         btn.classList.add('hidden');
+        btn.style.display = 'none';
+        if (li) { li.classList.add('hidden'); li.style.display = 'none'; }
       }
     });
-    if (catHasVisible) cat.classList.remove('hidden');
-    else cat.classList.add('hidden');
+    if (catHasVisible) {
+      cat.classList.remove('hidden');
+      cat.style.display = '';
+    } else {
+      cat.classList.add('hidden');
+      cat.style.display = 'none';
+    }
   });
 };
 
