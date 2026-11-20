@@ -10638,6 +10638,28 @@ window.closeInvDetailModal = function() {
 // ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
 // ============================================================================
 
+window.repairAtobMojibake = function(str) {
+  if (!str || typeof str !== 'string') return str;
+  let isAllLatin1 = true;
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 255) {
+      isAllLatin1 = false;
+      break;
+    }
+  }
+  if (isAllLatin1) {
+    try {
+      const bytes = new Uint8Array(str.length);
+      for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+      }
+      const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      if (decoded && decoded !== str) return decoded;
+    } catch (e) {}
+  }
+  return str;
+};
+
 function loadPersistedUser() {
   try {
     if (sessionStorage.getItem('orbit_explicit_logout') === 'true') {
@@ -10646,7 +10668,7 @@ function loadPersistedUser() {
     const raw = localStorage.getItem('orbit_user');
     if (raw) {
       const u = JSON.parse(raw);
-      if (u && u.email) return u;
+      if (u && u.email) { if (u.fullName) u.fullName = repairAtobMojibake(u.fullName); return u; }
     }
     const savedListRaw = localStorage.getItem('orbit_saved_accounts');
     if (savedListRaw) {
@@ -10767,7 +10789,7 @@ window.saveAccountToList = function(user) {
   const entry = {
     id: user.id,
     email: user.email,
-    fullName: user.fullName || user.email.split('@')[0],
+    fullName: repairAtobMojibake(user.fullName || user.email.split('@')[0]),
     avatarUrl: user.avatarUrl || `https://ui-avatars.com/api/?name=${getCleanInitials(user.fullName || user.email)}&background=465fff&color=fff&bold=true`,
     role: user.role || 'NHAN_VIEN',
     roleName: user.roleName || 'Nhân Viên Vận Hành',
@@ -11635,7 +11657,7 @@ function renderAdminRequestsTable() {
     return `
       <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
         <td class="py-2.5 px-3">
-          <div class="font-bold text-gray-900 dark:text-white">${req.user_name || req.user_email}</div>
+          <div class="font-bold text-gray-900 dark:text-white">${repairAtobMojibake(req.user_name || req.user_email)}</div>
           <div class="text-[10.5px] text-gray-400 tabular-nums">${req.user_email}</div>
         </td>
         <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">${req.requested_feature || '--'}</td>

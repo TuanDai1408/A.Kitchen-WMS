@@ -16,6 +16,28 @@ function formatDate(date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
+function repairAtobMojibake(str) {
+  if (!str || typeof str !== 'string') return str;
+  let isAllLatin1 = true;
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 255) {
+      isAllLatin1 = false;
+      break;
+    }
+  }
+  if (isAllLatin1) {
+    try {
+      const bytes = new Uint8Array(str.length);
+      for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+      }
+      const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      if (decoded && decoded !== str) return decoded;
+    } catch (e) {}
+  }
+  return str;
+}
+
 function generateCode(prefix, site) {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
@@ -1028,6 +1050,14 @@ export default {
           // 1. Tìm kiếm user trong app_users
           let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
 
+          if (user && user.full_name) {
+            const repaired = repairAtobMojibake(user.full_name);
+            if (repaired !== user.full_name) {
+              user.full_name = repaired;
+              await env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, user.id).run().catch(() => {});
+            }
+          }
+
           if (!user) {
             // Xác định vai trò mặc định
             let defaultRole = 'NHAN_VIEN';
@@ -1103,7 +1133,15 @@ export default {
       if (pathname === '/api/auth/roles-permissions' && request.method === 'GET') {
         const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
         const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
-        const { results: users } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
+        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
+        const users = (rawUsers || []).map(u => {
+          const repaired = repairAtobMojibake(u.full_name);
+          if (repaired !== u.full_name) {
+            env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, u.id).run().catch(() => {});
+            return { ...u, full_name: repaired };
+          }
+          return u;
+        });
 
         return new Response(JSON.stringify({
           success: true,
@@ -1154,7 +1192,8 @@ export default {
         const { results } = await env.DB.prepare(`
           SELECT * FROM access_requests ORDER BY id DESC LIMIT 50
         `).all();
-        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+        const cleanedResults = (results || []).map(r => ({ ...r, user_name: repairAtobMojibake(r.user_name) }));
+        return new Response(JSON.stringify({ success: true, data: cleanedResults }), { headers: corsHeaders });
       }
 
       // 2.11.6 PHÊ DUYỆT / TỪ CHỐI YÊU CẦU CẤP QUYỀN (/api/auth/approve-access-request)
