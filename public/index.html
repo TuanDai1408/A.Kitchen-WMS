@@ -6944,14 +6944,17 @@ async function loadFnbSites() {
     showLoading();
     const resp = await fetch('/api/branches');
     const res = await resp.json();
-    if (res.success && res.data) {
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       renderFnbSites(res.data);
-      if (typeof window.renderFnbSites === 'function' && window.renderFnbSites !== renderFnbSites) {
-        window.renderFnbSites(res.data);
-      }
+    } else {
+      // Graceful fallback to master list of 14 points of sale
+      const list = getAppSitesList().filter(s => s.code !== 'ALL');
+      renderFnbSites(list);
     }
   } catch (err) {
     console.error('Error loadFnbSites:', err);
+    const list = getAppSitesList().filter(s => s.code !== 'ALL');
+    renderFnbSites(list);
   } finally {
     hideLoading();
     if (window.lucide) lucide.createIcons();

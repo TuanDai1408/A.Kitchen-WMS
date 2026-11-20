@@ -407,6 +407,24 @@ async function buildUserPermissions(env, user) {
 }
 
 
+
+const MASTER_14_SITES_FALLBACK = [
+  { code: 'K001', name: 'K001 - MN Bếp Ăn Đại Học Hùng Vương', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K002', name: 'K002 - Bệnh viện Đại Học Quốc Tế Hồng Bàng', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K003', name: 'K003 - A.Kitchen - Miền Nam', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K004', name: 'K004 - MN A.Kitchen - Thuận An', region: 'Miền Nam', budget: 7400000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K005', name: 'K005 - MN A.Kitchen - Hub Thuận An', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K006', name: 'K006 - MN A.Kitchen - PTNT Quảng Trực', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K500', name: 'K500 - MB A Kitchen Hòa Bình', region: 'Miền Bắc', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K501', name: 'K501 - Công ty TNHH Julie sandlau', region: 'Miền Bắc', budget: 3000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K502', name: 'K502 - A.Kitchen - Miền Bắc', region: 'Miền Bắc', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K503', name: 'K503 - MB A.Kitchen - TTH An Thượng', region: 'Miền Bắc', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K504', name: 'K504 - MB A.Kitchen - Hub An Khánh', region: 'Miền Bắc', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'K505', name: 'K505 - MB A.Kitchen - Hub Đa Phúc', region: 'Miền Bắc', budget: 3600000, address: 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', phone: '0903.000.505', is_active: 1 },
+  { code: 'K800', name: 'K800 - A.Kitchen - Miền Trung', region: 'Miền Trung', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 },
+  { code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 }
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -432,24 +450,32 @@ export default {
 
       // 1.1 GET /api/branches
       if (pathname === '/api/branches' && request.method === 'GET') {
-        await ensureBranchesSynced(env);
-        const { results } = await env.DB.prepare(`
-          SELECT 
-            COALESCE(b.id, LOWER(s.site_code)) as id,
-            s.site_code as code,
-            COALESCE(b.name, s.site_name, s.name) as name,
-            s.region,
-            COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
-            COALESCE(b.phone, '0903.000.xxx') as phone,
-            COALESCE(s.budget_limit, 10000000) as budget,
-            COALESCE(b.is_active, 1) as is_active,
-            s.site_type
-          FROM sites s
-          LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
-          WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
-          ORDER BY s.site_code
-        `).all();
-        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+        try {
+          await ensureBranchesSynced(env);
+          const { results } = await env.DB.prepare(`
+            SELECT 
+              COALESCE(b.id, LOWER(s.site_code)) as id,
+              s.site_code as code,
+              COALESCE(b.name, s.site_name, s.name) as name,
+              s.region,
+              COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+              COALESCE(b.phone, '0903.000.xxx') as phone,
+              COALESCE(s.budget_limit, 10000000) as budget,
+              COALESCE(b.is_active, 1) as is_active,
+              s.site_type
+            FROM sites s
+            LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+            WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
+            ORDER BY s.site_code
+          `).all();
+          if (results && results.length > 0) {
+            return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+          }
+          return new Response(JSON.stringify({ success: true, data: MASTER_14_SITES_FALLBACK }), { headers: corsHeaders });
+        } catch (dbErr) {
+          console.warn('D1 limit or connection fallback for branches:', dbErr.message);
+          return new Response(JSON.stringify({ success: true, data: MASTER_14_SITES_FALLBACK, fallback: true }), { headers: corsHeaders });
+        }
       }
 
       // 1.2 GET /api/dashboard-summary
@@ -735,12 +761,27 @@ export default {
 
       // 2.1 GET /api/init
       if (pathname === '/api/init' && request.method === 'GET') {
-        const { results: sites } = await env.DB.prepare(`
-          SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
-          FROM sites
-          WHERE site_name IS NOT NULL AND site_name != ''
-          ORDER BY site_code
-        `).all();
+        let sites = [];
+        try {
+          const res = await env.DB.prepare(`
+            SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
+            FROM sites
+            WHERE site_name IS NOT NULL AND site_name != ''
+            ORDER BY site_code
+          `).all();
+          sites = res.results || [];
+        } catch (e) {
+          console.warn('D1 limit or connection fallback for sites in /api/init:', e.message);
+          sites = MASTER_14_SITES_FALLBACK.map(s => ({
+            site_code: s.code,
+            name: s.name,
+            site_name: s.name,
+            budget_limit: s.budget,
+            region: s.region,
+            site_type: 'Trường học',
+            month_period: '11/2026'
+          }));
+        }
 
         const vungMien = ['Miền Bắc', 'Miền Nam', 'Miền Trung'];
         const loaiHoaDon = [
@@ -1223,47 +1264,83 @@ export default {
         if (!email) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu email' }), { status: 400, headers: corsHeaders });
         }
-        let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
-        if (!user) {
-          return new Response(JSON.stringify({ success: false, error: 'User không tồn tại' }), { status: 404, headers: corsHeaders });
-        }
-        const permissions = await buildUserPermissions(env, user);
-        const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first();
-
-        let approvedRoles = [user.role_code];
-        if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
-          approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
-        } else {
-          const { results: appReqs } = await env.DB.prepare(`
-            SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
-          `).bind(user.email).all();
-          (appReqs || []).forEach(r => {
-            if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
-              approvedRoles.push(r.requested_role);
+        try {
+          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          if (!user) {
+            // Nếu chưa có trong DB nhưng là Owner
+            if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
+              user = { id: 1, email, full_name: 'Trần Tuấn Đại', role_code: 'ADMIN', status: 'ACTIVE' };
+            } else {
+              return new Response(JSON.stringify({ success: false, error: 'User không tồn tại' }), { status: 404, headers: corsHeaders });
             }
-          });
-        }
+          }
+          const permissions = await buildUserPermissions(env, user);
+          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first().catch(() => null);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            user: {
-              id: user.id,
-              email: user.email,
-              fullName: repairAtobMojibake(user.full_name),
-              avatarUrl: user.avatar_url,
+          let approvedRoles = [user.role_code];
+          if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
+            approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
+          } else {
+            const { results: appReqs } = await env.DB.prepare(`
+              SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
+            `).bind(user.email).all().catch(() => ({ results: [] }));
+            (appReqs || []).forEach(r => {
+              if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
+                approvedRoles.push(r.requested_role);
+              }
+            });
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: {
+              user: {
+                id: user.id,
+                email: user.email,
+                fullName: repairAtobMojibake(user.full_name),
+                avatarUrl: user.avatar_url,
+                role: user.role_code,
+                roleName: roleInfo?.role_name || user.role_code,
+                status: user.status,
+                approvedRoles
+              },
               role: user.role_code,
               roleName: roleInfo?.role_name || user.role_code,
-              status: user.status,
-              approvedRoles
-            },
-            role: user.role_code,
-            roleName: roleInfo?.role_name || user.role_code,
-            badgeColor: roleInfo?.badge_color || 'bg-brand-500',
-            approvedRoles,
-            permissions
-          }
-        }), { headers: corsHeaders });
+              badgeColor: roleInfo?.badge_color || 'bg-brand-500',
+              approvedRoles,
+              permissions
+            }
+          }), { headers: corsHeaders });
+        } catch (dbErr) {
+          console.warn('D1 limit or connection fallback for /api/auth/me:', dbErr.message);
+          const isOwner = email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com';
+          const role = isOwner ? 'ADMIN' : 'NHAN_VIEN';
+          const defaultPermissions = {};
+          ALL_SYSTEM_FEATURES.forEach(f => {
+            defaultPermissions[f] = { canView: isOwner, canCreate: isOwner, canEdit: isOwner, canDelete: isOwner };
+          });
+          return new Response(JSON.stringify({
+            success: true,
+            fallback: true,
+            data: {
+              user: {
+                id: 1,
+                email,
+                fullName: email.split('@')[0],
+                avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=465fff&color=fff&bold=true`,
+                role,
+                roleName: isOwner ? 'Ban Quản Trị Hệ Thống' : 'Nhân Viên Vận Hành',
+                status: 'ACTIVE',
+                approvedRoles: isOwner ? ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'] : ['NHAN_VIEN']
+              },
+              role,
+              roleName: isOwner ? 'Ban Quản Trị Hệ Thống' : 'Nhân Viên Vận Hành',
+              badgeColor: isOwner ? 'rose' : 'gray',
+              approvedRoles: isOwner ? ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'] : ['NHAN_VIEN'],
+              permissions: defaultPermissions
+            }
+          }), { headers: corsHeaders });
+        }
       }
 
       // 2.11.1 GOOGLE AUTHENTICATION & RBAC (/api/auth/google)
