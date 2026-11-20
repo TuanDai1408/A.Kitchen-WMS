@@ -439,12 +439,12 @@ export default {
             s.region,
             COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
             COALESCE(b.phone, '0903.000.xxx') as phone,
-            COALESCE(s.budget, 10000000) as budget,
+            COALESCE(s.budget_limit, 10000000) as budget,
             COALESCE(b.is_active, 1) as is_active,
             s.site_type
           FROM sites s
           LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
-          WHERE COALESCE(b.is_active, 1) = 1
+          WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
           ORDER BY s.site_code
         `).all();
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
