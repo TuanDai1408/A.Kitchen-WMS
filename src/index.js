@@ -133,6 +133,79 @@ async function ensureRolePermissions(env) {
   }
 }
 
+
+async function autoCleanDemoData(env) {
+  try {
+    // 1. Xóa các tài khoản demo fake trong app_users
+    await env.DB.prepare(`
+      DELETE FROM app_users 
+      WHERE email LIKE '%@sibafood.vn' 
+         OR email = 'admin@sibafood.vn' 
+         OR email LIKE '%test%'
+    `).run();
+
+    // 2. Xóa phân quyền và yêu cầu cấp quyền của user demo
+    await env.DB.prepare(`
+      DELETE FROM user_permissions 
+      WHERE user_email LIKE '%@sibafood.vn' 
+         OR user_email LIKE '%test%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM access_requests 
+      WHERE user_email LIKE '%@sibafood.vn' 
+         OR user_email LIKE '%test%'
+    `).run().catch(() => {});
+
+    // 3. Xóa dữ liệu seed demo mock ban đầu
+    await env.DB.prepare(`
+      DELETE FROM purchase_orders 
+      WHERE id LIKE 'po_%' OR po_number LIKE 'PO #%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM purchase_order_items 
+      WHERE po_id LIKE 'po_%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM vouchers 
+      WHERE id LIKE 'vc_%' OR voucher_code LIKE 'CT-202611-%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM inventory_batches 
+      WHERE id LIKE 'bat_%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM stock_audits 
+      WHERE id LIKE 'sa_%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM branches 
+      WHERE id IN ('b_k505', 'b_q1', 'b_q7', 'b_td') OR id LIKE 'b_%'
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM items 
+      WHERE sku IN ('GV-BBQ-01', 'GV-SWCH-02', 'GV-MUSH-09', 'GV-PEP-01', 'GV-SUG-05', 'GV-OYST-04', 'GV-OYST-08', 'GV-FSH-01', 'VT-GLV-01', 'VT-WRP-02', 'CC-KNF-04')
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM daily_catering_reports
+    `).run().catch(() => {});
+
+    await env.DB.prepare(`
+      DELETE FROM don_hang 
+      WHERE ordered_by LIKE '%test%' OR ordered_by LIKE '%demo%' OR ordered_by LIKE '%sibafood.vn%'
+    `).run().catch(() => {});
+  } catch (err) {
+    console.error('autoCleanDemoData error:', err);
+  }
+}
+
 async function ensureUserPermissionsTable(env) {
   try {
     await env.DB.prepare(`
@@ -1209,7 +1282,20 @@ export default {
       // ======================================================================
       
       // 1. Lấy toàn bộ dữ liệu Ma Trận User x Chức Năng
+      
+      // 2.11.CLEAN DỌN DẸP TOÀN BỘ DỮ LIỆU DEMO (/api/admin/clean-demo-data)
+      if (pathname === '/api/admin/clean-demo-data') {
+        await autoCleanDemoData(env);
+        const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Đã xóa toàn bộ dữ liệu demo thành công',
+          remainingUsers: remainingUsers || []
+        }), { headers: corsHeaders });
+      }
+
       if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
+        await autoCleanDemoData(env);
         await ensureRolePermissions(env);
         await ensureUserPermissionsTable(env);
 

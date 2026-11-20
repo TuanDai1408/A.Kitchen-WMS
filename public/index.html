@@ -3727,7 +3727,7 @@
           <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-brand-500/30 shrink-0">
           <div class="min-w-0 flex-1">
             <h4 id="profModalName" class="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
-            <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 tabular-nums truncate">admin@sibafood.vn</div>
+            <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 tabular-nums truncate">--</div>
             <div class="mt-1 flex items-center gap-2 flex-wrap">
               <span id="profModalRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
               <span id="profModalSiteBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-50 text-brand-500 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
@@ -5862,7 +5862,7 @@
     function openAuthModal(type = 'login') {
       const html = type === 'login' ? `
         <div class="space-y-3">
-          <div><label class="font-bold block mb-1">Email:</label><input type="email" id="authEmail" value="vana@sibafood.vn" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg"></div>
+          <div><label class="font-bold block mb-1">Email:</label><input type="email" id="authEmail" value="" placeholder="user@gmail.com" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg"></div>
           <div><label class="font-bold block mb-1">Mật khẩu:</label><input type="password" id="authPass" value="123456" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg"></div>
           <div class="flex justify-between items-center pt-2">
             <button onclick="openAuthModal('reg')" class="text-brand-600 font-bold">Chưa có tài khoản? Đăng ký</button>
@@ -6429,23 +6429,14 @@ async function openItemDetailModal(sku) {
       chartItemDetail.render();
     }
 
-    // Mock history transactions for this SKU
+    // History transactions for this SKU
     const tbody = document.getElementById('detailTransactionsBody');
     if (tbody) {
       tbody.innerHTML = `
-        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/2">
-          <td class="p-2.5 tabular-nums text-gray-500">19/11 10:15</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-bold text-[10px]">NHẬP KHO</span></td>
-          <td class="p-2.5 tabular-nums">LOT-20261119</td>
-          <td class="p-2.5 text-right tabular-nums font-bold text-emerald-600">+5.0</td>
-          <td class="p-2.5 text-gray-500">Nhập kho bổ sung ca sáng</td>
-        </tr>
-        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/2">
-          <td class="p-2.5 tabular-nums text-gray-500">18/11 16:30</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 font-bold text-[10px]">XUẤT BẾP</span></td>
-          <td class="p-2.5 tabular-nums">LOT-20261028</td>
-          <td class="p-2.5 text-right tabular-nums font-bold text-amber-600">-2.0</td>
-          <td class="p-2.5 text-gray-500">Xuất nấu ca tối FEFO</td>
+        <tr>
+          <td colspan="5" class="py-6 text-center text-gray-400 dark:text-gray-500 text-xs">
+            Chưa có phát sinh giao dịch cho mặt hàng này.
+          </td>
         </tr>
       `;
     }
@@ -12847,8 +12838,8 @@ window.switchRoleAction = async function(roleCode) {
 
     if (!gCurrentUser) {
       gCurrentUser = {
-        email: 'user@sibafood.vn',
-        fullName: 'Nhân Viên Test'
+        email: (gCurrentUser && gCurrentUser.email) || '',
+        fullName: (gCurrentUser && gCurrentUser.fullName) || 'Người dùng'
       };
     }
     gCurrentUser.role = json.data.role;
