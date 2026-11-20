@@ -85,7 +85,7 @@
     </div>
 
     <!-- SIDEBAR SEARCH BAR (TailAdmin exact input styling) -->
-    <div class="mb-4">
+    <div class="mb-5">
       <div class="relative">
         <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
         <input type="text" id="sidebarMenuSearch" oninput="filterSidebarMenu(this.value)" placeholder="Tìm chức năng..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none focus:border-brand-500 transition-all">
@@ -94,17 +94,17 @@
 
     <!-- SIDEBAR NAVIGATION MENU (Scrollable Area) -->
     <div class="no-scrollbar flex flex-1 flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
-      <nav class="space-y-4">
+      <nav class="space-y-6">
         <!-- Group: Hiệu Quả & Doanh Thu (Chỉ hiển thị cho Admin) -->
         <div class="sidebar-category hidden" data-cat="fnb-finance">
-          <div class="mb-2 px-3 flex items-center justify-between">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hiệu Quả & Doanh Thu</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">P&L</span>
           </div>
-          <ul class="mb-3 flex flex-col gap-1">
+          <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-500 font-semibold dark:dark:bg-brand-500/[0.12] dark:text-brand-400">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-500 font-semibold dark:dark:bg-brand-500/[0.12] dark:text-brand-400">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-brand-500 dark:text-brand-400"></i>
                   <span class="truncate">Toàn Chuỗi & Xếp Hạng</span>
                 </div>
@@ -112,8 +112,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="pie-chart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Báo Cáo P&L Điểm Bán</span>
                 </div>
@@ -121,8 +121,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="zap" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Doanh Thu POS & Bán Lẻ</span>
                 </div>
@@ -133,14 +133,14 @@
         </div>
         <!-- Group: Vận Hành Kho Bếp -->
         <div class="sidebar-category" data-cat="fnb-inventory">
-          <div class="mb-2 px-3 flex items-center justify-between">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vận Hành Kho Bếp</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">Bếp</span>
           </div>
-          <ul class="mb-3 flex flex-col gap-1">
+          <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-stock', this)" data-tab="fnb-stock" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="boxes" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Tồn Kho Chuỗi (Matrix)</span>
                 </div>
@@ -148,8 +148,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="clipboard-check" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Kiểm Kê Hằng Ngày</span>
                 </div>
@@ -157,8 +157,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="package-plus" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Nhập Hàng Điểm Bán</span>
                 </div>
@@ -166,8 +166,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="trash-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Hủy Hàng & Hao Hụt</span>
                 </div>
@@ -178,14 +178,14 @@
         </div>
         <!-- Group: Kho Vận & WMS -->
         <div class="sidebar-category" data-cat="wh-wms">
-          <div class="mb-2 px-3 flex items-center justify-between">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Kho Vận & WMS</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">WMS</span>
           </div>
-          <ul class="mb-3 flex flex-col gap-1">
+          <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="layout-dashboard" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Tổng Quan Kho Vận</span>
                 </div>
@@ -193,8 +193,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="calendar-clock" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Hạn Dùng & Xuất FEFO</span>
                 </div>
@@ -202,8 +202,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="alert-triangle" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Cảnh Báo Tồn ROP</span>
                 </div>
@@ -211,8 +211,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="truck" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Lead Time & NCC</span>
                 </div>
@@ -220,8 +220,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="file-check-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Đơn Hàng PO SAP</span>
                 </div>
@@ -232,14 +232,14 @@
         </div>
         <!-- Group: Cổng Thông Tin & Đặt Hàng -->
         <div class="sidebar-category" data-cat="portal-ops">
-          <div class="mb-2 px-3 flex items-center justify-between">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Cổng Thông Tin & Đặt Hàng</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">Portal</span>
           </div>
-          <ul class="mb-3 flex flex-col gap-1">
+          <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="receipt" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Nhập Chứng Từ (Full)</span>
                 </div>
@@ -247,8 +247,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="search" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Tra Cứu Chứng Từ</span>
                 </div>
@@ -256,8 +256,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="shopping-cart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Đặt Hàng CCDC / Vật Tư</span>
                 </div>
@@ -265,8 +265,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="history" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Lịch Sử Đặt Hàng</span>
                 </div>
@@ -274,8 +274,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="clipboard-list" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Báo Cáo Suất Ăn Ca</span>
                 </div>
@@ -283,8 +283,8 @@
               </button>
             </li>
             <li>
-              <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="check-square" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Kiểm Kê Tồn Kho Kỳ</span>
                 </div>
@@ -295,14 +295,14 @@
         </div>
         <!-- Group: Hệ Thống & Danh Mục -->
         <div class="sidebar-category" data-cat="sys-admin">
-          <div class="mb-2 px-3 flex items-center justify-between">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
             <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hệ Thống & Danh Mục</h3>
             <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">System</span>
           </div>
-          <ul class="mb-3 flex flex-col gap-1">
+          <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
-                <div class="flex items-center gap-3 min-w-0">
+              <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="building-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Danh Mục 14 Điểm Bán</span>
                 </div>
@@ -11362,7 +11362,7 @@ window.renderSitesOptions = function() {
             : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
         }"
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-3.5 min-w-0">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
             site.code === 'ALL' ? 'bg-purple-100 dark:bg-purple-950 text-purple-600' : 'bg-blue-50 dark:bg-blue-950 text-brand-500'
           }">
