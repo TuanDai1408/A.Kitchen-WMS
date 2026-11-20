@@ -11078,6 +11078,8 @@ function initRbacAuth() {
         gCurrentUser.permissions = res.data.permissions;
         gCurrentUser.role = res.data.role;
         gCurrentUser.roleName = res.data.roleName;
+        if (res.data.fullName) gCurrentUser.fullName = res.data.fullName;
+        if (res.data.avatarUrl) gCurrentUser.avatarUrl = res.data.avatarUrl;
         try { localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser)); } catch(e){}
         saveAccountToList(gCurrentUser);
         applyUserSessionToUI();

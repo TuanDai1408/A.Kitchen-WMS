@@ -1006,8 +1006,11 @@ export default {
             try {
               const parts = credential.split('.');
               if (parts.length === 3) {
-                const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-                const decodedJson = JSON.parse(atob(payloadBase64));
+                let payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                while (payloadBase64.length % 4 !== 0) payloadBase64 += '=';
+                const binaryStr = atob(payloadBase64);
+                const bytes = Uint8Array.from(binaryStr, c => c.charCodeAt(0));
+                const decodedJson = JSON.parse(new TextDecoder('utf-8').decode(bytes));
                 email = decodedJson.email;
                 fullName = decodedJson.name || decodedJson.given_name;
                 avatarUrl = decodedJson.picture;
@@ -1040,15 +1043,16 @@ export default {
 
             user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(insertRes.meta.last_row_id).first();
           } else {
-            // Cập nhật thông tin Google và last_login
+            // Cập nhật thông tin Google, full_name chuẩn UTF-8 và last_login
             await env.DB.prepare(`
               UPDATE app_users
               SET last_login = datetime('now'),
+                  full_name = COALESCE(?, full_name),
                   avatar_url = COALESCE(?, avatar_url),
                   google_id = COALESCE(?, google_id),
                   updated_at = datetime('now')
               WHERE id = ?
-            `).bind(avatarUrl || user.avatar_url, googleId || user.google_id, user.id).run();
+            `).bind(fullName || null, avatarUrl || user.avatar_url, googleId || user.google_id, user.id).run();
             user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(user.id).first();
           }
 
