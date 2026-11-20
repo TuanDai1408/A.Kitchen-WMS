@@ -67,7 +67,7 @@
   <a class="sr-only" href="#main-content">skip to the main content</a>
 
   <!-- Sidebar Backdrop (Mobile Drawer) -->
-  <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 z-99 bg-gray-900/50 backdrop-blur-xs hidden xl:hidden" aria-hidden="true"></div>
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 z-99 bg-gray-900/50 backdrop-blur-xs hidden xl:hidden" aria-hidden="true"></div>
 
 
   <!-- Mobile / Tablet Drawer Overlay -->
@@ -88,7 +88,7 @@
         <img src="/assets/brand/logo-horizontal.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain block dark:hidden">
         <img src="/assets/brand/logo-horizontal-dark.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain hidden dark:block">
       </a>
-      <button onclick="toggleSidebar()" class="xl:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
+      <button onclick="closeSidebar()" class="xl:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
@@ -3632,40 +3632,29 @@
 
   
   <!-- =====================================================================
-       ORBIT SIBA FOOD: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
+       A.KITCHEN WMS: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
        ===================================================================== -->
-  <div id="googleAuthModal" class="fixed inset-0 z-[150] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up">
+  <div id="googleAuthModal" class="fixed inset-0 z-99999 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up" onclick="event.stopPropagation()">
       
       <!-- Modal Header with Centered Stacked Brand Logo -->
-      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 relative flex flex-col items-center text-center">
-        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800" title="Đóng">
+      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 relative flex flex-col items-center text-center bg-gray-50/50 dark:bg-white/[0.02]">
+        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors" title="Đóng">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
-        <div class="mb-3">
+        <div class="mb-3 flex items-center justify-center">
           <img src="/assets/brand/logo-stacked.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain block dark:hidden">
           <img src="/assets/brand/logo-stacked-dark.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain hidden dark:block">
         </div>
         <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Đăng Nhập Hệ Thống</h3>
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">A.Kitchen WMS • Chuỗi Bếp & Điểm Bán</p>
       </div>
-      <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
-      
-      </div>
 
       <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
       <div class="p-6 sm:p-7 space-y-5 text-center">
         
         <div class="space-y-1.5">
-          <div class="w-14 h-14 mx-auto rounded-3xl bg-blue-50 dark:bg-blue-950/40 text-brand-500 flex items-center justify-center shadow-inner">
-            <svg class="w-7 h-7" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-          </div>
-          <h4 class="font-extrabold text-base text-gray-900 dark:text-white">Đăng Nhập Bằng Google</h4>
+          <h4 class="font-semibold text-base text-gray-900 dark:text-white">Đăng Nhập Bằng Google</h4>
           <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
             Chọn tài khoản Google đã lưu trên máy hoặc đăng nhập tài khoản Gmail mới để tiếp tục
           </p>
@@ -3714,14 +3703,14 @@
 
         <!-- Privacy & Security note -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 text-[10.5px] text-gray-400">
-          Xác thực bảo mật OAuth 2.0 • Orbit Siba Food
+          Xác thực bảo mật OAuth 2.0 • A.Kitchen WMS
         </div>
 
       </div>
     </div>
   </div>
 
-    <!-- =====================================================================
+  <!-- =====================================================================
        POPUP THÔNG TIN USER & CHUYỂN ĐỔI TÀI KHOẢN (USER PROFILE MODAL)
        ===================================================================== -->
   <div id="userProfileModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
@@ -4328,23 +4317,61 @@
       document.getElementById('loading').classList.add('hidden');
     }
 
+    function openSidebar() {
+      if (window.innerWidth >= 1280) {
+        document.body.classList.remove('sidebar-collapsed');
+        return;
+      }
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const bottomNav = document.getElementById('mobileBottomNav');
+      if (sidebar) sidebar.classList.remove('-translate-x-full');
+      if (overlay) overlay.classList.remove('hidden');
+      if (bottomNav) bottomNav.classList.add('hidden');
+      document.body.classList.add('overflow-hidden');
+      if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
+    }
+
+    function closeSidebar() {
+      if (window.innerWidth >= 1280) {
+        document.body.classList.add('sidebar-collapsed');
+        return;
+      }
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const bottomNav = document.getElementById('mobileBottomNav');
+      if (sidebar) sidebar.classList.add('-translate-x-full');
+      if (overlay) overlay.classList.add('hidden');
+      if (bottomNav) bottomNav.classList.remove('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
     function toggleSidebar() {
       if (window.innerWidth >= 1280) {
         document.body.classList.toggle('sidebar-collapsed');
       } else {
         const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        if (sidebar) sidebar.classList.toggle('-translate-x-full');
-        if (overlay) overlay.classList.toggle('hidden');
+        const isClosed = !sidebar || sidebar.classList.contains('-translate-x-full');
+        if (isClosed) {
+          openSidebar();
+        } else {
+          closeSidebar();
+        }
       }
     }
 
     // Auto-clean responsive sidebar on window resize
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 1280) {
-        document.getElementById('overlay')?.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
+        closeSidebar();
         document.getElementById('sidebar')?.classList.remove('-translate-x-full');
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSidebar();
+        if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
       }
     });
 
@@ -4381,10 +4408,10 @@
         }
       }
 
-      // Close mobile drawer on tab click
-      if (window.innerWidth < 1024) {
-        document.getElementById('sidebar')?.classList.add('-translate-x-full');
-        document.getElementById('overlay')?.classList.add('hidden');
+      // Close mobile drawer on tab click (covers all responsive widths < 1280px)
+      if (window.innerWidth < 1280) {
+        closeSidebar();
+        if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
       }
       if (typeof updateMobileNavState === 'function') {
         updateMobileNavState(tabId);
