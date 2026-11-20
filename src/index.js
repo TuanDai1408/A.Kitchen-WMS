@@ -1213,7 +1213,7 @@ export default {
         await ensureRolePermissions(env);
         await ensureUserPermissionsTable(env);
 
-        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles ORDER BY id ASC`).all();
+        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
         const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
         const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`).all();
         const { results: userPerms } = await env.DB.prepare(`SELECT * FROM user_permissions`).all();
