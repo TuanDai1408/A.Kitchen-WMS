@@ -68,6 +68,23 @@ function normalizeMonth(thang) {
   return s;
 }
 
+function getMonthRange(yearMonth) {
+  if (!yearMonth || !yearMonth.includes('-')) {
+    return { start: '1970-01-01', end: '2099-12-31' };
+  }
+  const parts = yearMonth.trim().split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(y) || isNaN(m)) {
+    return { start: `${yearMonth}-01`, end: `${yearMonth}-28` };
+  }
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return {
+    start: `${parts[0]}-${String(m).padStart(2, '0')}-01`,
+    end: `${parts[0]}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  };
+}
+
 
 const FEATURE_NAME_TO_CODE = {
   'fnb-chain': 'fnb-chain',
@@ -2409,7 +2426,7 @@ export default {
       // PHÂN HỆ 3: ORBIT SIBA FOOD - P&L VÀ XẾP HẠNG TOÀN CHUỖI (F&B CHAIN)
       // ======================================================================
 
-      // 3.1 GET /api/fnb/pl - Báo cáo P&L chi tiết của điểm bán (Lấy từ bảng transactions trên D1)
+      // 3.1 GET /api/fnb/pl - Báo cáo P&L chi tiết của điểm bán (Lấy từ bảng transactions trên D1 hoặc Postgres)
       if (pathname === '/api/fnb/pl' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = normalizeMonth(searchParams.get('thang') || '2026-11');
@@ -2418,9 +2435,9 @@ export default {
         // Lấy thông tin site
         let siteRow = null;
         if (siteCode && siteCode !== 'ALL') {
-          siteRow = await env.DB.prepare(`
+          siteRow = await db.queryOne(env, `
             SELECT * FROM sites WHERE site_code = ? OR site_name = ? OR name LIKE ? LIMIT 1
-          `).bind(siteCode, site, `%${siteCode}%`).first();
+          `, [siteCode, site, `%${siteCode}%`]);
         }
 
         let siteName = 'Toàn Hệ Thống Bếp Ăn A.Kitchen';
@@ -2428,53 +2445,77 @@ export default {
           if (siteRow) {
             siteName = siteRow.site_name;
           } else {
-            const transSite = await env.DB.prepare(`
+            const transSite = await db.queryOne(env, `
               SELECT ten_cua_hang FROM transactions WHERE ma_cua_hang = ? LIMIT 1
-            `).bind(siteCode).first();
+            `, [siteCode]);
             siteName = transSite ? `${siteCode} - ${transSite.ten_cua_hang}` : (site || 'K001 - MN Bếp Ăn Đại Học Hùng Vương');
           }
         }
 
         const budget = siteRow ? (siteRow.budget_limit || 45000000) : 45000000;
 
-        // Kiểm tra xem tháng này có dữ liệu trong transactions không (Dùng LIMIT 1 để chỉ đọc 1 dòng duy nhất)
         let effectiveMonth = thang;
-        const startCheck = `${effectiveMonth}-01`;
-        const endCheck = `${effectiveMonth}-31`;
-        const countCheck = await env.DB.prepare(`
+        let checkRange = getMonthRange(effectiveMonth);
+        const countCheck = await db.queryOne(env, `
           SELECT 1 as cnt FROM transactions WHERE billing_date >= ? AND billing_date <= ? LIMIT 1
-        `).bind(startCheck, endCheck).first();
+        `, [checkRange.start, checkRange.end]);
 
         if (!countCheck) {
-          const latestRow = await env.DB.prepare(`
-            SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM') as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`
+          });
           if (latestRow && latestRow.ym) {
             effectiveMonth = latestRow.ym;
           }
         }
-        const effStart = `${effectiveMonth}-01`;
-        const effEnd = `${effectiveMonth}-31`;
+        const effRange = getMonthRange(effectiveMonth);
+        const effStart = effRange.start;
+        const effEnd = effRange.end;
 
-        // Truy vấn tổng hợp doanh thu và chi phí từ bảng transactions bằng Range Index (giảm 70% rows read)
-        let plQuery = `
+        // Ưu tiên đọc từ bảng tổng hợp fnb_monthly_summary
+        let stats = null;
+        let summaryQuery = `
           SELECT 
-            COUNT(DISTINCT so_hoa_don) as total_bills,
-            COUNT(DISTINCT billing_date) as active_days,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-            COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-            COALESCE(SUM(ck_truoc_thue), 0) as discount,
-            COALESCE(SUM(gia_von), 0) as food_cost
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
+            SUM(total_bills) as total_bills,
+            MAX(active_days) as active_days,
+            COALESCE(SUM(net_revenue), 0) as net_revenue,
+            COALESCE(SUM(gross_revenue), 0) as gross_revenue,
+            COALESCE(SUM(discount), 0) as discount,
+            COALESCE(SUM(food_cost), 0) as food_cost,
+            COALESCE(SUM(dine_in_rev), 0) as dine_in_rev,
+            COALESCE(SUM(takeaway_rev), 0) as takeaway_rev,
+            COALESCE(SUM(catering_rev), 0) as catering_rev
+          FROM fnb_monthly_summary
+          WHERE month_period = ?
         `;
-        let plBinds = [effStart, effEnd];
+        let sumBinds = [effectiveMonth];
         if (siteCode && siteCode !== 'ALL') {
-          plQuery += ` AND ma_cua_hang = ?`;
-          plBinds.push(siteCode);
+          summaryQuery += ` AND site_code = ?`;
+          sumBinds.push(siteCode);
         }
+        stats = await db.queryOne(env, summaryQuery, sumBinds).catch(() => null);
 
-        const stats = await env.DB.prepare(plQuery).bind(...plBinds).first();
+        // Fallback sang transactions nếu chưa có trong fnb_monthly_summary
+        if (!stats || !stats.net_revenue || Number(stats.net_revenue) === 0) {
+          let plQuery = `
+            SELECT 
+              COUNT(DISTINCT so_hoa_don) as total_bills,
+              COUNT(DISTINCT billing_date) as active_days,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+              COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+              COALESCE(SUM(ck_truoc_thue), 0) as discount,
+              COALESCE(SUM(gia_von), 0) as food_cost
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+          `;
+          let plBinds = [effStart, effEnd];
+          if (siteCode && siteCode !== 'ALL') {
+            plQuery += ` AND ma_cua_hang = ?`;
+            plBinds.push(siteCode);
+          }
+          stats = await db.queryOne(env, plQuery, plBinds);
+        }
 
         const plannedTargetRevenue = (siteCode === 'ALL') ? 4500000000 : (budget * 10);
         let grossRevenue = Math.round(stats?.gross_revenue || 0);
@@ -2496,57 +2537,72 @@ export default {
         const profitMargin = netRevenue > 0 ? ((operatingProfit / netRevenue) * 100).toFixed(1) : '0.0';
         const breakEvenRevenue = netRevenue > 0 ? Math.round(rentCost / Math.max(0.1, (1 - (foodCost + utilityCost + wasteCost) / netRevenue))) : 0;
 
-        // Phân rã doanh thu theo kênh bán hàng thực tế từ bảng transactions
-        let channelQuery = `
-          SELECT COALESCE(ten_kenh_ban_hang, 'Kênh khác') as ch_name, COALESCE(SUM(thanh_tien_truoc_thue), 0) as ch_rev
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
-        let chBinds = [effStart, effEnd];
-        if (siteCode && siteCode !== 'ALL') {
-          channelQuery += ` AND ma_cua_hang = ?`;
-          chBinds.push(siteCode);
-        }
-        channelQuery += ` GROUP BY ten_kenh_ban_hang ORDER BY ch_rev DESC`;
-        const { results: chRows } = await env.DB.prepare(channelQuery).bind(...chBinds).all();
-
+        // Phân rã doanh thu theo kênh bán hàng
         const channels = {
-          dineIn: 0,
-          takeaway: 0,
-          catering: 0
+          dineIn: Math.round(stats?.dine_in_rev || 0),
+          takeaway: Math.round(stats?.takeaway_rev || 0),
+          catering: Math.round(stats?.catering_rev || 0)
         };
-        (chRows || []).forEach(r => {
-          const name = (r.ch_name || '').toLowerCase();
-          if (name.includes('sỉ') || name.includes('b2b') || name.includes('suất ăn')) {
-            channels.catering += Math.round(r.ch_rev || 0);
-          } else if (name.includes('mang') || name.includes('online')) {
-            channels.takeaway += Math.round(r.ch_rev || 0);
-          } else {
-            channels.dineIn += Math.round(r.ch_rev || 0);
-          }
-        });
+
         if (channels.dineIn === 0 && channels.takeaway === 0 && channels.catering === 0 && netRevenue > 0) {
-          channels.dineIn = Math.round(netRevenue * 0.72);
-          channels.takeaway = Math.round(netRevenue * 0.20);
-          channels.catering = Math.round(netRevenue * 0.08);
+          let channelQuery = `
+            SELECT COALESCE(ten_kenh_ban_hang, 'Kênh khác') as ch_name, COALESCE(SUM(thanh_tien_truoc_thue), 0) as ch_rev
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+          `;
+          let chBinds = [effStart, effEnd];
+          if (siteCode && siteCode !== 'ALL') {
+            channelQuery += ` AND ma_cua_hang = ?`;
+            chBinds.push(siteCode);
+          }
+          channelQuery += ` GROUP BY ten_kenh_ban_hang ORDER BY ch_rev DESC`;
+          const { rows: chRows } = await db.query(env, channelQuery, chBinds);
+
+          (chRows || []).forEach(r => {
+            const name = (r.ch_name || '').toLowerCase();
+            if (name.includes('sỉ') || name.includes('b2b') || name.includes('suất ăn')) {
+              channels.catering += Math.round(r.ch_rev || 0);
+            } else if (name.includes('mang') || name.includes('online')) {
+              channels.takeaway += Math.round(r.ch_rev || 0);
+            } else {
+              channels.dineIn += Math.round(r.ch_rev || 0);
+            }
+          });
+          if (channels.dineIn === 0 && channels.takeaway === 0 && channels.catering === 0 && netRevenue > 0) {
+            channels.dineIn = Math.round(netRevenue * 0.72);
+            channels.takeaway = Math.round(netRevenue * 0.20);
+            channels.catering = Math.round(netRevenue * 0.08);
+          }
         }
 
         // Top 5 món bán chạy thực tế từ bảng transactions
-        let topQuery = `
-          SELECT ma_sp as code, ten_sp as name, 
-                 ROUND(SUM(so_luong), 0) as qty, 
-                 ROUND(SUM(thanh_tien_truoc_thue), 0) as rev,
-                 ROUND((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100, 1) as foodCostPct
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
+        let topQuery = {
+          d1: `
+            SELECT ma_sp as code, ten_sp as name, 
+                   ROUND(SUM(so_luong), 0) as qty, 
+                   ROUND(SUM(thanh_tien_truoc_thue), 0) as rev,
+                   ROUND((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100, 1) as "foodCostPct"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5
+          `,
+          pg: `
+            SELECT ma_sp as code, ten_sp as name, 
+                   ROUND(SUM(so_luong)::numeric, 0) as qty, 
+                   ROUND(SUM(thanh_tien_truoc_thue)::numeric, 0) as rev,
+                   ROUND(((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100)::numeric, 1) as "foodCostPct"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5
+          `
+        };
         let topBinds = [effStart, effEnd];
         if (siteCode && siteCode !== 'ALL') {
-          topQuery += ` AND ma_cua_hang = ?`;
           topBinds.push(siteCode);
         }
-        topQuery += ` GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5`;
-        const { results: topRows } = await env.DB.prepare(topQuery).bind(...topBinds).all();
+        const { rows: topRows } = await db.query(env, topQuery, topBinds);
 
         const topDishes = (topRows && topRows.length > 0) ? topRows.map(m => ({
           code: m.code || 'SP',
@@ -2558,27 +2614,45 @@ export default {
         })) : [];
 
         // Xu hướng 4 tuần theo dữ liệu giao dịch thật
-        let weeklyQuery = `
-          SELECT 
-            CASE 
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 7 THEN 'Tuần 1'
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 14 THEN 'Tuần 2'
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 21 THEN 'Tuần 3'
-              ELSE 'Tuần 4'
-            END as week,
-            COUNT(DISTINCT so_hoa_don) as bills,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as netRev,
-            COALESCE(SUM(gia_von), 0) as foodCost
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
+        let weeklyQuery = {
+          d1: `
+            SELECT 
+              CASE 
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 7 THEN 'Tuần 1'
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 14 THEN 'Tuần 2'
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 21 THEN 'Tuần 3'
+                ELSE 'Tuần 4'
+              END as week,
+              COUNT(DISTINCT so_hoa_don) as bills,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as "netRev",
+              COALESCE(SUM(gia_von), 0) as "foodCost"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY week ORDER BY week
+          `,
+          pg: `
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAY FROM billing_date) <= 7 THEN 'Tuần 1'
+                WHEN EXTRACT(DAY FROM billing_date) <= 14 THEN 'Tuần 2'
+                WHEN EXTRACT(DAY FROM billing_date) <= 21 THEN 'Tuần 3'
+                ELSE 'Tuần 4'
+              END as week,
+              COUNT(DISTINCT so_hoa_don) as bills,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as "netRev",
+              COALESCE(SUM(gia_von), 0) as "foodCost"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY week ORDER BY week
+          `
+        };
         let wBinds = [effStart, effEnd];
         if (siteCode && siteCode !== 'ALL') {
-          weeklyQuery += ` AND ma_cua_hang = ?`;
           wBinds.push(siteCode);
         }
-        weeklyQuery += ` GROUP BY week ORDER BY week`;
-        const { results: weekRows } = await env.DB.prepare(weeklyQuery).bind(...wBinds).all();
+        const { rows: weekRows } = await db.query(env, weeklyQuery, wBinds);
 
         const weeklyTrends = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'].map(wName => {
           const row = (weekRows || []).find(r => r.week === wName);
@@ -2661,31 +2735,32 @@ export default {
       if (pathname === '/api/fnb/chain' && request.method === 'GET') {
         const month = normalizeMonth(searchParams.get('month') || '2026-11');
         let effectiveMonth = month;
-        const startCheck = `${effectiveMonth}-01`;
-        const endCheck = `${effectiveMonth}-31`;
+        let checkRange = getMonthRange(effectiveMonth);
 
         // Kiểm tra xem tháng có data không (Đọc đúng 1 dòng qua LIMIT 1)
-        const countCheck = await env.DB.prepare(`
+        const countCheck = await db.queryOne(env, `
           SELECT 1 as cnt FROM transactions WHERE billing_date >= ? AND billing_date <= ? LIMIT 1
-        `).bind(startCheck, endCheck).first();
+        `, [checkRange.start, checkRange.end]);
 
         if (!countCheck) {
-          const latestRow = await env.DB.prepare(`
-            SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM') as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`
+          });
           if (latestRow && latestRow.ym) {
             effectiveMonth = latestRow.ym;
           }
         }
-        const effStart = `${effectiveMonth}-01`;
-        const effEnd = `${effectiveMonth}-31`;
+        const effRange = getMonthRange(effectiveMonth);
+        const effStart = effRange.start;
+        const effEnd = effRange.end;
 
         // Lấy danh sách điểm bán từ bảng sites
-        const { results: siteList } = await env.DB.prepare(`SELECT * FROM sites ORDER BY site_code`).all();
+        const { rows: siteList } = await db.query(env, `SELECT * FROM sites ORDER BY site_code`);
 
         // Ưu tiên đọc từ bảng tổng hợp fnb_monthly_summary (chỉ đọc ~15 dòng!)
         let transSums = [];
-        const { results: summaryRows } = await env.DB.prepare(`
+        const { rows: summaryRows } = await db.query(env, `
           SELECT 
             site_code as ma_cua_hang,
             site_name as ten_cua_hang,
@@ -2695,13 +2770,13 @@ export default {
             total_bills
           FROM fnb_monthly_summary
           WHERE month_period = ?
-        `).bind(effectiveMonth).all().catch(() => ({ results: [] }));
+        `, [effectiveMonth]).catch(() => ({ rows: [] }));
 
         if (summaryRows && summaryRows.length > 0) {
           transSums = summaryRows;
         } else {
-          // Fallback: Range Query trên transactions (giảm 72% rows read so với LIKE)
-          const { results: rawSums } = await env.DB.prepare(`
+          // Fallback: Range Query trên transactions
+          const { rows: rawSums } = await db.query(env, `
             SELECT 
               ma_cua_hang,
               ten_cua_hang,
@@ -2712,42 +2787,8 @@ export default {
             FROM transactions
             WHERE billing_date >= ? AND billing_date <= ?
             GROUP BY ma_cua_hang, ten_cua_hang, vung_mien
-          `).bind(effStart, effEnd).all();
+          `, [effStart, effEnd]);
           transSums = rawSums || [];
-
-          // Tự động lưu ngầm vào fnb_monthly_summary để các lượt truy cập sau không bao giờ bị scan lại bảng transactions
-          if (rawSums && rawSums.length > 0 && ctx && typeof ctx.waitUntil === 'function') {
-            ctx.waitUntil((async () => {
-              try {
-                await env.DB.prepare(`
-                  INSERT OR REPLACE INTO fnb_monthly_summary (
-                    month_period, site_code, site_name, region,
-                    total_bills, active_days, net_revenue, gross_revenue,
-                    discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
-                  )
-                  SELECT 
-                    SUBSTR(billing_date, 1, 7) as month_period,
-                    ma_cua_hang as site_code,
-                    COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
-                    COALESCE(vung_mien, 'Miền Nam') as region,
-                    COUNT(DISTINCT so_hoa_don) as total_bills,
-                    COUNT(DISTINCT billing_date) as active_days,
-                    COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-                    COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-                    COALESCE(SUM(ck_truoc_thue), 0) as discount,
-                    COALESCE(SUM(gia_von), 0) as food_cost,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
-                  FROM transactions
-                  WHERE billing_date >= ? AND billing_date <= ?
-                  GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
-                `).bind(effStart, effEnd).run();
-              } catch (e) {
-                console.warn('Auto-heal fnb_monthly_summary error:', e.message);
-              }
-            })());
-          }
         }
 
         const siteRevMap = {};
@@ -2770,10 +2811,10 @@ export default {
 
         const chainRankings = allKnownSites.map((s, idx) => {
           const trans = siteRevMap[s.site_code];
-          const hasTrans = !!trans && trans.net_rev > 0;
-          const rev = hasTrans ? Math.round(trans.net_rev) : 0;
-          const foodCostVal = hasTrans ? Math.round(trans.food_cost) : 0;
-          const totalBills = hasTrans ? trans.total_bills : 0;
+          const hasTrans = !!trans && Number(trans.net_rev) > 0;
+          const rev = hasTrans ? Math.round(Number(trans.net_rev)) : 0;
+          const foodCostVal = hasTrans ? Math.round(Number(trans.food_cost)) : 0;
+          const totalBills = hasTrans ? Number(trans.total_bills) : 0;
           const target = (s.budget_limit && s.budget_limit > 0) ? s.budget_limit * 10 : 450000000;
 
           const foodPct = rev > 0 ? ((foodCostVal / rev) * 100).toFixed(1) : '0.0';
@@ -2829,7 +2870,7 @@ export default {
         return createCachedResponse(chainResponseData, 180, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
-      // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS từ bảng transactions trên D1
+      // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS từ bảng transactions trên D1 hoặc Postgres
       if (pathname === '/api/fnb/pos' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const siteCode = extractSiteCode(site);
@@ -2837,54 +2878,98 @@ export default {
 
         // Nếu không có ngày, lấy ngày có giao dịch mới nhất trong bảng transactions
         if (!date) {
-          const latestRow = await env.DB.prepare(`
-            SELECT MAX(billing_date) as max_date FROM transactions
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT MAX(billing_date) as max_date FROM transactions`,
+            pg: `SELECT to_char(MAX(billing_date), 'YYYY-MM-DD') as max_date FROM transactions`
+          });
           date = latestRow?.max_date || '2026-11-19';
         }
 
-        // Truy vấn doanh thu trong ngày (Tận dụng index idx_trans_site_date)
-        let posQuery = `
-          SELECT 
-            COUNT(DISTINCT so_hoa_don) as bills_today,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
-            COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
-          FROM transactions
-          WHERE billing_date = ?
-        `;
-        let posBinds = [date];
+        // Ưu tiên đọc từ fnb_daily_summary
+        let dailyStats = null;
+        let dQuery = {
+          d1: `SELECT 
+                 SUM(total_bills) as bills_today,
+                 COALESCE(SUM(net_revenue), 0) as total_sales,
+                 COALESCE(ROUND(SUM(net_revenue) * 1.0 / NULLIF(SUM(total_bills), 0), 0), 0) as avg_bill
+               FROM fnb_daily_summary
+               WHERE daily_date = ?
+               ${siteCode && siteCode !== 'ALL' ? 'AND site_code = ?' : ''}`,
+          pg: `SELECT 
+                 SUM(total_bills) as bills_today,
+                 COALESCE(SUM(net_revenue), 0) as total_sales,
+                 COALESCE(ROUND((SUM(net_revenue)::numeric / NULLIF(SUM(total_bills), 0)), 0), 0) as avg_bill
+               FROM fnb_daily_summary
+               WHERE daily_date = ?::date
+               ${siteCode && siteCode !== 'ALL' ? 'AND site_code = ?' : ''}`
+        };
+        let dBinds = [date];
         if (siteCode && siteCode !== 'ALL') {
-          posQuery += ` AND ma_cua_hang = ?`;
-          posBinds.push(siteCode);
+          dBinds.push(siteCode);
         }
+        dailyStats = await db.queryOne(env, dQuery, dBinds).catch(() => null);
 
-        const posStats = await env.DB.prepare(posQuery).bind(...posBinds).first();
-        let totalSalesToday = Math.round(posStats?.total_sales || 0);
-        let billsToday = posStats?.bills_today || 0;
-        let avgBillToday = Math.round(posStats?.avg_bill || 0);
+        let totalSalesToday = Math.round(Number(dailyStats?.total_sales) || 0);
+        let billsToday = Number(dailyStats?.bills_today) || 0;
+        let avgBillToday = Math.round(Number(dailyStats?.avg_bill) || 0);
+
+        // Fallback sang transactions nếu daily summary chưa có
+        if (totalSalesToday === 0) {
+          let posQuery = {
+            d1: `SELECT 
+                   COUNT(DISTINCT so_hoa_don) as bills_today,
+                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                   COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE billing_date = ?
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}`,
+            pg: `SELECT 
+                   COUNT(DISTINCT so_hoa_don) as bills_today,
+                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                   COALESCE(ROUND((SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0))::numeric, 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE billing_date = ?::date
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}`
+          };
+          let posBinds = [date];
+          if (siteCode && siteCode !== 'ALL') posBinds.push(siteCode);
+          const posStats = await db.queryOne(env, posQuery, posBinds);
+          totalSalesToday = Math.round(Number(posStats?.total_sales) || 0);
+          billsToday = Number(posStats?.bills_today) || 0;
+          avgBillToday = Math.round(Number(posStats?.avg_bill) || 0);
+        }
 
         // Nếu ngày được chọn chưa có giao dịch, tìm ngày gần nhất có data của site
         if (totalSalesToday === 0) {
-          let fallbackQ = `
-            SELECT billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
-                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
-                   COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
-            FROM transactions
-            WHERE 1=1
-          `;
+          let fallbackQ = {
+            d1: `SELECT billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
+                        COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                        COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE 1=1
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+                 GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM-DD') as billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
+                        COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                        COALESCE(ROUND((SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0))::numeric, 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE 1=1
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+                 GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`
+          };
           let fbBinds = [];
-          if (siteCode && siteCode !== 'ALL') {
-            fallbackQ += ` AND ma_cua_hang = ?`;
-            fbBinds.push(siteCode);
-          }
-          fallbackQ += ` GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`;
-          const fbRow = await env.DB.prepare(fallbackQ).bind(...fbBinds).first();
-          if (fbRow && fbRow.total_sales > 0) {
+          if (siteCode && siteCode !== 'ALL') fbBinds.push(siteCode);
+          const fbRow = await db.queryOne(env, fallbackQ, fbBinds);
+          if (fbRow && Number(fbRow.total_sales) > 0) {
             date = fbRow.billing_date;
-            totalSalesToday = Math.round(fbRow.total_sales);
-            billsToday = fbRow.bills_today;
-            avgBillToday = Math.round(fbRow.avg_bill);
+            totalSalesToday = Math.round(Number(fbRow.total_sales));
+            billsToday = Number(fbRow.bills_today);
+            avgBillToday = Math.round(Number(fbRow.avg_bill));
           }
+        }
+
+        if (date instanceof Date) {
+          date = date.toISOString().split('T')[0];
         }
 
         // Phân bổ doanh thu theo khung giờ bán hàng thực tế trong ngày
