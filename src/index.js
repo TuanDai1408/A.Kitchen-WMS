@@ -54,8 +54,11 @@ function generateCode(prefix, site) {
 
 function extractSiteCode(site) {
   if (!site) return '';
-  const m = String(site).trim().match(/^[A-Za-z0-9]+/);
-  return m ? m[0] : site;
+  const str = String(site).trim();
+  const codeMatch = str.match(/\b([KD][0-9]{3}|R[0-9]{3})\b/i);
+  if (codeMatch) return codeMatch[1].toUpperCase();
+  const m = str.match(/^[A-Za-z0-9]+/);
+  return m ? m[0].toUpperCase() : str;
 }
 
 function normalizeMonth(thang) {
@@ -1624,15 +1627,71 @@ export default {
         if (request.method === 'GET') {
           const site = searchParams.get('site') || '';
           const siteCode = extractSiteCode(site);
-          let query = `SELECT * FROM kiemke_tonkho`;
-          const bindings = [];
-          if (site && site.trim()) {
-            query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ? OR site_code = ?`;
-            bindings.push(site, site, `%${site}%`, siteCode);
+          let results = [];
+
+          // 1. First priority: Load items from dim_article_stock for the selected site
+          if (siteCode && siteCode !== 'ALL') {
+            try {
+              const res = await db.query(env, `
+                SELECT 
+                  d.id,
+                  d.site as site_code,
+                  COALESCE(d.site_name, b.name, d.site) as site_name,
+                  d.material as item_code,
+                  d.material_desc as item_name,
+                  COALESCE(d.nganh_hang, 'Chưa phân loại') as nganh_hang,
+                  COALESCE(d.nhom_hang, 'Chưa phân loại') as nhom_hang,
+                  d.entry_unit as unit,
+                  COALESCE(d.price, 0) as price,
+                  COALESCE(k.closing_t10, bal.book_qty, 0) as closing_t10,
+                  COALESCE(k.closing_t9, bal.opening_qty, 0) as closing_t9,
+                  k.usage_t11,
+                  k.closing_t11,
+                  COALESCE(k.warehouse_code, 'KHO') as warehouse_code,
+                  k.warehouse_name
+                FROM dim_article_stock d
+                LEFT JOIN branches b ON d.site = b.code
+                LEFT JOIN kiemke_tonkho k ON d.site = k.site_code AND d.material = k.item_code
+                LEFT JOIN fnb_stock_balances bal ON d.site = bal.site_code AND d.material = bal.item_code
+                WHERE d.site = ?
+                ORDER BY d.nhom_hang, d.material
+              `, [siteCode]);
+              results = res.rows || [];
+            } catch (e) {
+              console.warn('dim_article_stock audit query failed:', e.message);
+            }
           }
-          query += ` ORDER BY item_code LIMIT 300`;
-          const { rows: results } = await db.query(env, query, bindings);
-          return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+
+          // 2. Fallback to kiemke_tonkho if dim_article_stock has no rows for this site (or ALL)
+          if (!results.length) {
+            let query = `SELECT * FROM kiemke_tonkho`;
+            const bindings = [];
+            if (siteCode && siteCode !== 'ALL') {
+              query += ` WHERE site_code = ? OR site_name = ? OR full_site_name LIKE ?`;
+              bindings.push(siteCode, site, `%${siteCode}%`);
+            }
+            query += ` ORDER BY item_code LIMIT 1000`;
+            try {
+              const res = await db.query(env, query, bindings);
+              results = res.rows || [];
+            } catch (e) {}
+          }
+
+          // Metadata for frontend filters
+          const nganhSet = new Set();
+          const nhomSet = new Set();
+          for (const r of results) {
+            if (r.nganh_hang && r.nganh_hang !== 'Chưa phân loại') nganhSet.add(r.nganh_hang);
+            if (r.nhom_hang && r.nhom_hang !== 'Chưa phân loại') nhomSet.add(r.nhom_hang);
+          }
+          const meta = {
+            site_code: siteCode,
+            nganh_hang: Array.from(nganhSet).sort(),
+            nhom_hang: Array.from(nhomSet).sort(),
+            total: results.length
+          };
+
+          return new Response(JSON.stringify({ success: true, data: results, meta }), { headers: corsHeaders });
         }
         if (request.method === 'POST') {
           const body = await request.json();
@@ -1640,7 +1699,21 @@ export default {
           if (items && items.length) {
             await db.withTransaction(env, async (tx) => {
               for (const it of items) {
-                await tx.exec(`UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?`, [it.usage, it.closing, it.id]);
+                const existing = await tx.queryOne(
+                  `SELECT id FROM kiemke_tonkho WHERE (id = ? AND ? IS NOT NULL) OR (site_code = ? AND item_code = ?) LIMIT 1`,
+                  [it.id, it.id, it.site_code, it.item_code]
+                );
+                if (existing) {
+                  await tx.exec(
+                    `UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?`,
+                    [it.usage, it.closing, existing.id]
+                  );
+                } else if (it.site_code && it.item_code) {
+                  await tx.exec(
+                    `INSERT INTO kiemke_tonkho (site_code, item_code, item_name, unit, usage_t11, closing_t11) VALUES (?, ?, ?, ?, ?, ?)`,
+                    [it.site_code, it.item_code, it.item_name || '', it.unit || '', it.usage, it.closing]
+                  );
+                }
               }
             });
           }

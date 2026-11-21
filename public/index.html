@@ -2878,6 +2878,7 @@
         </form>
       </section>
 <section id="portal-kiemke" class="tab-panel space-y-4">
+        <!-- Top Action Bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="kkVung" class="hidden"></select>
           <select id="kkSite" class="hidden"></select>
@@ -2894,18 +2895,95 @@
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
             <input type="month" id="kkMonth" onchange="loadAudit()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
           </div>
-          <button onclick="loadAudit()" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-lg border border-gray-300 dark:border-gray-700">Tải dữ liệu</button>
-          <button onclick="saveAudit()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm">Lưu kiểm kê</button>
-          <button onclick="exportAuditExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm ml-auto">
+          <button onclick="loadAudit()" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-lg border border-gray-300 dark:border-gray-700 flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải dữ liệu
+          </button>
+          <button onclick="saveAudit()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i> Lưu kiểm kê
+          </button>
+          <button onclick="exportAuditExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm ml-auto flex items-center gap-1.5">
             <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Xuất Excel
           </button>
+        </div>
+
+        <!-- Thanh Tìm Kiếm & Bộ Lọc Nâng Cao Cho Kiểm Kê Theo Site -->
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            <!-- Ô tìm kiếm chi tiết -->
+            <div class="relative flex-1 min-w-[260px]">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="kkSearchInput" oninput="filterAuditItems()" placeholder="Tìm kiếm theo mã vật tư, tên sản phẩm, ngành hàng, nhóm hàng..."
+                class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+            </div>
+
+            <!-- Các bộ lọc chi tiết -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <!-- Lọc Ngành hàng -->
+              <div class="flex items-center gap-1.5 min-w-[150px]">
+                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Ngành:</span>
+                <select id="kkNganhSelect" onchange="onAuditNganhChange()"
+                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                  <option value="">-- Tất cả ngành hàng --</option>
+                </select>
+              </div>
+
+              <!-- Lọc Nhóm hàng -->
+              <div class="flex items-center gap-1.5 min-w-[150px]">
+                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Nhóm:</span>
+                <select id="kkNhomSelect" onchange="filterAuditItems()"
+                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                  <option value="">-- Tất cả nhóm hàng --</option>
+                </select>
+              </div>
+
+              <!-- Lọc Đơn giá -->
+              <div class="flex items-center gap-1.5 min-w-[130px]">
+                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Giá:</span>
+                <select id="kkPriceSelect" onchange="filterAuditItems()"
+                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                  <option value="ALL">Tất cả đơn giá</option>
+                  <option value="WITH_PRICE">Có đơn giá (> 0đ)</option>
+                  <option value="NO_PRICE">Chưa có giá (0đ)</option>
+                </select>
+              </div>
+
+              <!-- Lọc Trạng thái kiểm kê -->
+              <div class="flex items-center gap-1.5 min-w-[140px]">
+                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Trạng thái:</span>
+                <select id="kkStatusSelect" onchange="filterAuditItems()"
+                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                  <option value="ALL">Tất cả trạng thái</option>
+                  <option value="COUNTED">Đã nhập số lượng</option>
+                  <option value="UNCOUNTED">Chưa nhập số lượng</option>
+                  <option value="DIFF">Có chênh lệch tồn</option>
+                </select>
+              </div>
+
+              <!-- Nút Reset Filter -->
+              <button onclick="resetAuditFilters()" title="Xóa toàn bộ bộ lọc và tìm kiếm"
+                class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold flex items-center gap-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Đặt lại</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Thông tin số lượng kết quả -->
+          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-800">
+            <div>
+              Hiển thị: <span id="kkFilteredCount" class="font-bold text-gray-900 dark:text-white tabular-nums font-mono">0</span> / <span id="kkTotalCount" class="font-bold tabular-nums font-mono">0</span> mặt hàng danh mục tồn kho site
+            </div>
+            <div id="kkActiveFilterBadge" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-300 font-medium">
+              Đang lọc dữ liệu
+            </div>
+          </div>
         </div>
 
         <!-- 4 KPI Cards Báo Cáo Kiểm Kê (TailAdmin Style) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
             <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng Mã Hàng Đã Kiểm</span>
+              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng Mặt Hàng Site</span>
               <h4 id="kkMetricTotalSkus" class="mt-1 text-title-sm font-bold tabular-nums text-gray-800 dark:text-white">0 Mã</h4>
             </div>
             <div class="h-11 w-11 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -2916,7 +2994,7 @@
           <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
             <div>
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tỷ Lệ Khớp Sổ Sách</span>
-              <h4 id="kkMetricMatchRate" class="mt-1 text-title-sm font-bold tabular-nums text-emerald-600">98.2%</h4>
+              <h4 id="kkMetricMatchRate" class="mt-1 text-title-sm font-bold tabular-nums text-emerald-600">100%</h4>
             </div>
             <div class="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <i data-lucide="shield-check" class="w-5 h-5"></i>
@@ -2925,8 +3003,8 @@
 
           <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
             <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Chênh Lệch Giá Trị (₫)</span>
-              <h4 id="kkMetricDiffValue" class="mt-1 text-title-sm font-bold tabular-nums text-brand-500">+0 ₫</h4>
+              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng Giá Trị Tồn Cuối</span>
+              <h4 id="kkMetricDiffValue" class="mt-1 text-title-sm font-bold tabular-nums text-brand-500">0 ₫</h4>
             </div>
             <div class="h-11 w-11 rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-400 flex items-center justify-center shrink-0">
               <i data-lucide="scale" class="w-5 h-5"></i>
@@ -2969,15 +3047,17 @@
                 <tr>
                   <th class="p-3">Mã hàng</th>
                   <th class="p-3">Tên hàng hóa</th>
-                  <th class="p-3">Kho</th>
-                  <th class="p-3">ĐVT</th>
+                  <th class="p-3">Ngành / Nhóm hàng</th>
+                  <th class="p-3 text-center">ĐVT</th>
+                  <th class="p-3 text-right">Đơn giá</th>
                   <th class="p-3 text-right">Tồn kỳ trước</th>
-                  <th class="p-3 text-right w-32">Sử dụng trong kỳ</th>
-                  <th class="p-3 text-right">Tồn cuối kỳ (Tự tính)</th>
+                  <th class="p-3 text-right w-28">Sử dụng kỳ</th>
+                  <th class="p-3 text-right">Tồn cuối kỳ</th>
+                  <th class="p-3 text-right">Thành tiền tồn</th>
                 </tr>
               </thead>
-              <tbody id="kkBody" class="divide-y divide-slate-100">
-                <tr><td colspan="7" class="p-8 text-center text-gray-400 dark:text-gray-500">Chọn Site để tải bảng kiểm kê.</td></tr>
+              <tbody id="kkBody" class="divide-y divide-slate-100 dark:divide-gray-800">
+                <tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải danh mục kiểm kê của site...</td></tr>
               </tbody>
             </table>
           </div>
@@ -2986,6 +3066,7 @@
 
         </div>
       </section>
+</section>
       <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
       <section id="tab-404" class="tab-panel py-16 px-4 text-center">
         <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
@@ -5606,63 +5687,303 @@
       }
     }
 
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ========================================================================
+    // PORTAL AUDIT (KIỂM KÊ TỒN KHO THEO SITE & BỘ LỌC CHI TIẾT)
+    // ========================================================================
+    App.auditRawItems = []; // Toàn bộ sản phẩm của site lấy từ dim_article_stock
+    App.auditItems = [];    // Danh sách sau khi áp dụng filter/search
+
     async function loadAudit() {
       const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
-      showLoading('Tải bảng kiểm kê...');
+      showLoading('Tải danh mục kiểm kê theo site...');
       try {
-        const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);
+        const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}&no-cache=1`);
         const json = await res.json();
         const tbody = document.getElementById('kkBody');
-        if (json.success && json.data.length) {
+        const mob = document.getElementById('kkMobileCards');
+
+        if (json.success && json.data && json.data.length) {
+          App.auditRawItems = json.data;
           App.auditItems = json.data;
-          if (typeof updateAuditKpisAndChart === "function") updateAuditKpisAndChart(App.auditItems);
-          tbody.innerHTML = App.auditItems.map(it => {
-            const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-            const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-            const tonCuoi = tonTruoc - suDung;
-            return `
-              <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-                <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${it.item_code}</td>
-                <td class="p-3 font-bold text-gray-900 dark:text-white">${it.item_name}</td>
-                <td class="p-3 tabular-nums">${it.warehouse_code || 'Kho'}</td>
-                <td class="p-3">${it.unit}</td>
-                <td class="p-3 text-right tabular-nums">${fmtNum(tonTruoc)}</td>
-                <td class="p-3 text-right">
-                  <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-gray-300 dark:border-gray-700 rounded tabular-nums text-right"
-                    oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
-                </td>
-                <td class="p-3 text-right tabular-nums font-bold text-brand-800" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
-              </tr>
-            `;
-          }).join('');
+
+          // Cập nhật bộ lọc Ngành hàng & Nhóm hàng theo metadata trả về
+          populateAuditFilters(json.meta || {});
+
+          // Lọc và render danh sách ra UI
+          filterAuditItems();
         } else {
-          tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400 dark:text-gray-500">Không có dữ liệu tồn kho.</td></tr>';
+          App.auditRawItems = [];
+          App.auditItems = [];
+          if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Điểm bán này chưa có danh mục mặt hàng nào trong dim_article_stock.</td></tr>';
+          if (mob) mob.innerHTML = '<div class="p-6 text-center text-gray-400 dark:text-gray-500 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Điểm bán này chưa có mặt hàng nào.</div>';
+          updateAuditCounts(0, 0);
+          if (typeof updateAuditKpisAndChart === "function") updateAuditKpisAndChart([]);
         }
       } catch (e) {
-        console.error(e);
+        console.error('loadAudit error:', e);
+        showToast('Lỗi tải bảng kiểm kê: ' + e.message);
       } finally {
         hideLoading();
+        if (window.lucide) lucide.createIcons();
       }
     }
+    window.loadAudit = loadAudit;
 
-    function onAuditChange(id, val, tonTruoc) {
-      const it = App.auditItems.find(i => i.id === id);
-      if (it) {
-        it.usage_t11 = Number(val) || 0;
-        const el = document.getElementById(`aud-close-${id}`);
-        if (el) el.textContent = fmtNum(tonTruoc - it.usage_t11);
+    function populateAuditFilters(meta) {
+      const nganhSel = document.getElementById('kkNganhSelect');
+      const nhomSel = document.getElementById('kkNhomSelect');
+      if (!nganhSel || !nhomSel) return;
+
+      const currentNganh = nganhSel.value;
+      const currentNhom = nhomSel.value;
+
+      const nganhs = (meta && meta.nganh_hang && meta.nganh_hang.length) ? meta.nganh_hang : 
+        Array.from(new Set(App.auditRawItems.map(i => i.nganh_hang).filter(Boolean))).sort();
+
+      nganhSel.innerHTML = '<option value="">-- Tất cả ngành hàng --</option>' + 
+        nganhs.map(ng => `<option value="${escapeHtml(ng)}">${escapeHtml(ng)}</option>`).join('');
+      if (nganhs.includes(currentNganh)) nganhSel.value = currentNganh;
+
+      onAuditNganhChange();
+    }
+    window.populateAuditFilters = populateAuditFilters;
+
+    function onAuditNganhChange() {
+      const nganhSel = document.getElementById('kkNganhSelect');
+      const nhomSel = document.getElementById('kkNhomSelect');
+      if (!nhomSel) return;
+
+      const selectedNganh = nganhSel ? nganhSel.value : '';
+      let nhoms = [];
+      if (selectedNganh) {
+        nhoms = Array.from(new Set(App.auditRawItems.filter(i => i.nganh_hang === selectedNganh).map(i => i.nhom_hang).filter(Boolean))).sort();
+      } else {
+        nhoms = Array.from(new Set(App.auditRawItems.map(i => i.nhom_hang).filter(Boolean))).sort();
+      }
+
+      nhomSel.innerHTML = '<option value="">-- Tất cả nhóm hàng --</option>' + 
+        nhoms.map(nh => `<option value="${escapeHtml(nh)}">${escapeHtml(nh)}</option>`).join('');
+
+      filterAuditItems();
+    }
+    window.onAuditNganhChange = onAuditNganhChange;
+
+    function filterAuditItems() {
+      const search = (document.getElementById('kkSearchInput')?.value || '').trim().toLowerCase();
+      const nganh = document.getElementById('kkNganhSelect')?.value || '';
+      const nhom = document.getElementById('kkNhomSelect')?.value || '';
+      const priceStatus = document.getElementById('kkPriceSelect')?.value || 'ALL';
+      const status = document.getElementById('kkStatusSelect')?.value || 'ALL';
+
+      const isFiltering = !!(search || nganh || nhom || priceStatus !== 'ALL' || status !== 'ALL');
+      const badge = document.getElementById('kkActiveFilterBadge');
+      if (badge) badge.classList.toggle('hidden', !isFiltering);
+
+      const filtered = App.auditRawItems.filter(it => {
+        // 1. Text search (mã, tên, ngành, nhóm)
+        if (search) {
+          const matchCode = (it.item_code || '').toLowerCase().includes(search);
+          const matchName = (it.item_name || '').toLowerCase().includes(search);
+          const matchNganh = (it.nganh_hang || '').toLowerCase().includes(search);
+          const matchNhom = (it.nhom_hang || '').toLowerCase().includes(search);
+          if (!matchCode && !matchName && !matchNganh && !matchNhom) return false;
+        }
+
+        // 2. Lọc theo Ngành hàng
+        if (nganh && it.nganh_hang !== nganh) return false;
+
+        // 3. Lọc theo Nhóm hàng
+        if (nhom && it.nhom_hang !== nhom) return false;
+
+        // 4. Lọc theo đơn giá
+        const price = parseFloat(it.price) || 0;
+        if (priceStatus === 'WITH_PRICE' && price <= 0) return false;
+        if (priceStatus === 'NO_PRICE' && price > 0) return false;
+
+        // 5. Lọc theo trạng thái kiểm kê
+        const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+        const suDung = it.usage_t11;
+        const isCounted = suDung !== null && suDung !== undefined;
+        if (status === 'COUNTED' && !isCounted) return false;
+        if (status === 'UNCOUNTED' && isCounted) return false;
+        if (status === 'DIFF') {
+          const tonCuoi = tonTruoc - (suDung || 0);
+          if (Math.abs(tonCuoi - tonTruoc) < 0.0001 && (!suDung || suDung === 0)) return false;
+        }
+
+        return true;
+      });
+
+      App.auditItems = filtered;
+      renderAuditList(filtered);
+      updateAuditCounts(filtered.length, App.auditRawItems.length);
+      if (typeof updateAuditKpisAndChart === "function") updateAuditKpisAndChart(filtered);
+    }
+    window.filterAuditItems = filterAuditItems;
+
+    function resetAuditFilters() {
+      const searchInput = document.getElementById('kkSearchInput');
+      const nganhSel = document.getElementById('kkNganhSelect');
+      const nhomSel = document.getElementById('kkNhomSelect');
+      const priceSel = document.getElementById('kkPriceSelect');
+      const statusSel = document.getElementById('kkStatusSelect');
+
+      if (searchInput) searchInput.value = '';
+      if (nganhSel) nganhSel.value = '';
+      if (nhomSel) nhomSel.value = '';
+      if (priceSel) priceSel.value = 'ALL';
+      if (statusSel) statusSel.value = 'ALL';
+
+      onAuditNganhChange();
+    }
+    window.resetAuditFilters = resetAuditFilters;
+
+    function updateAuditCounts(filteredCount, totalCount) {
+      const fEl = document.getElementById('kkFilteredCount');
+      const tEl = document.getElementById('kkTotalCount');
+      if (fEl) fEl.textContent = fmtNum(filteredCount);
+      if (tEl) tEl.textContent = fmtNum(totalCount);
+    }
+    window.updateAuditCounts = updateAuditCounts;
+
+    function renderAuditList(items) {
+      const tbody = document.getElementById('kkBody');
+      const mob = document.getElementById('kkMobileCards');
+
+      if (!items || !items.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Không tìm thấy sản phẩm nào khớp với bộ lọc / từ khóa.</td></tr>';
+        if (mob) mob.innerHTML = '<div class="p-6 text-center text-gray-400 dark:text-gray-500 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy sản phẩm nào khớp với bộ lọc.</div>';
+        return;
+      }
+
+      // Desktop Table
+      if (tbody) {
+        tbody.innerHTML = items.map(it => {
+          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+          const tonCuoi = tonTruoc - suDung;
+          const price = parseFloat(it.price) || 0;
+          const thanhTien = tonCuoi * price;
+          const catLabel = (it.nhom_hang && it.nhom_hang !== 'Chưa phân loại') ? it.nhom_hang : (it.nganh_hang || 'Vật tư');
+
+          return `
+            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+              <td class="p-3 tabular-nums font-mono font-bold text-gray-900 dark:text-white">${it.item_code}</td>
+              <td class="p-3">
+                <div class="font-bold text-gray-800 dark:text-gray-100">${escapeHtml(it.item_name)}</div>
+                <div class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">${it.warehouse_code || 'Kho'}</div>
+              </td>
+              <td class="p-3">
+                <span class="inline-block px-2 py-0.5 text-[10px] rounded-md font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 max-w-[160px] truncate" title="${escapeHtml(catLabel)}">
+                  ${escapeHtml(catLabel)}
+                </span>
+              </td>
+              <td class="p-3 text-center text-gray-600 dark:text-gray-300 font-semibold">${it.unit || ''}</td>
+              <td class="p-3 text-right tabular-nums font-mono text-gray-700 dark:text-gray-300">${price > 0 ? fmtNum(price) + ' ₫' : '<span class="text-gray-400">0 ₫</span>'}</td>
+              <td class="p-3 text-right tabular-nums font-mono text-gray-900 dark:text-white font-semibold">${fmtNum(tonTruoc)}</td>
+              <td class="p-3 text-right">
+                <input type="number" min="0" step="any" value="${suDung}"
+                  class="w-24 p-1.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg tabular-nums font-mono text-right text-xs focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"
+                  oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}, ${price})">
+              </td>
+              <td class="p-3 text-right tabular-nums font-mono font-bold text-brand-600 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+              <td class="p-3 text-right tabular-nums font-mono font-bold text-emerald-600 dark:text-emerald-400" id="aud-value-${it.id}">${fmtNum(thanhTien)} ₫</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Mobile Cards
+      if (mob) {
+        mob.innerHTML = items.map(it => {
+          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+          const tonCuoi = tonTruoc - suDung;
+          const price = parseFloat(it.price) || 0;
+          const thanhTien = tonCuoi * price;
+          const catLabel = (it.nhom_hang && it.nhom_hang !== 'Chưa phân loại') ? it.nhom_hang : (it.nganh_hang || 'Vật tư');
+
+          return `
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="font-extrabold text-xs text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
+                  <div class="text-[10.5px] tabular-nums font-mono text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit || ''} • Giá: ${fmtNum(price)} ₫</div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 shrink-0 max-w-[120px] truncate">${escapeHtml(catLabel)}</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50">
+                <div class="text-center">
+                  <div class="text-[10px] text-gray-400">Tồn đầu kỳ</div>
+                  <div class="tabular-nums font-mono font-bold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-[10px] text-gray-400">Sử dụng kỳ</div>
+                  <input type="number" min="0" step="any" value="${suDung}"
+                    class="w-full text-center p-1 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums font-mono text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}, ${price}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0)); const v = document.getElementById('aud-mob-value-${it.id}'); if(v) v.innerText = fmtNum((${tonTruoc} - (parseFloat(this.value)||0)) * ${price}) + ' ₫';">
+                </div>
+                <div class="text-center">
+                  <div class="text-[10px] text-gray-400">Tồn cuối kỳ</div>
+                  <div class="tabular-nums font-mono font-bold text-brand-500 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-1 px-1">
+                <span class="text-gray-400 text-[11px]">Thành tiền tồn:</span>
+                <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="aud-mob-value-${it.id}">${fmtNum(thanhTien)} ₫</span>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
     }
+    window.renderAuditList = renderAuditList;
+
+    function onAuditChange(id, val, tonTruoc, price = 0) {
+      const it = App.auditRawItems.find(i => i.id == id);
+      if (it) {
+        it.usage_t11 = val === '' ? null : (parseFloat(val) || 0);
+        const tonCuoi = tonTruoc - (it.usage_t11 || 0);
+        const el = document.getElementById(`aud-close-${id}`);
+        if (el) el.textContent = fmtNum(tonCuoi);
+        const valEl = document.getElementById(`aud-value-${id}`);
+        if (valEl) valEl.textContent = fmtNum(tonCuoi * (parseFloat(it.price) || price || 0)) + ' ₫';
+      }
+    }
+    window.onAuditChange = onAuditChange;
 
     async function saveAudit() {
+      if (!App.auditRawItems || !App.auditRawItems.length) {
+        showToast('Không có dữ liệu mặt hàng để lưu!');
+        return;
+      }
       showLoading('Lưu kết quả kiểm kê...');
       try {
         const payload = {
-          items: App.auditItems.map(it => ({
-            id: it.id,
-            usage: it.usage_t11 || 0,
-            closing: (it.closing_t10 || 0) - (it.usage_t11 || 0)
-          }))
+          items: App.auditRawItems.map(it => {
+            const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+            const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+            return {
+              id: it.id,
+              site_code: it.site_code,
+              item_code: it.item_code,
+              item_name: it.item_name,
+              unit: it.unit,
+              usage: suDung,
+              closing: tonTruoc - suDung
+            };
+          })
         };
         const res = await fetch('/api/inventory-audit', {
           method: 'POST',
@@ -5670,17 +5991,51 @@
           body: JSON.stringify(payload)
         });
         const json = await res.json();
-        if (json.success) showToast('Lưu kết quả kiểm kê thành công!');
+        if (json.success) {
+          showToast('Lưu kết quả kiểm kê thành công!');
+        } else {
+          showToast('Lỗi lưu kiểm kê: ' + (json.error || 'Thất bại'));
+        }
       } catch (e) {
         showToast('Lỗi: ' + e.message);
       } finally {
         hideLoading();
       }
     }
+    window.saveAudit = saveAudit;
 
-    
+    function exportAuditExcel() {
+      if (!App.auditItems || !App.auditItems.length) {
+        showToast('Không có dữ liệu để xuất Excel!');
+        return;
+      }
+      const headers = ['Mã Hàng', 'Tên Hàng Hóa', 'Ngành Hàng', 'Nhóm Hàng', 'Kho', 'ĐVT', 'Đơn Giá (₫)', 'Tồn Kỳ Trước', 'Sử Dụng Kỳ', 'Tồn Cuối Kỳ', 'Thành Tiền Tồn (₫)'];
+      const rows = App.auditItems.map(it => {
+        const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
+        const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+        const tonCuoi = tonTruoc - suDung;
+        const price = parseFloat(it.price) || 0;
+        return [
+          it.item_code,
+          it.item_name,
+          it.nganh_hang || '',
+          it.nhom_hang || '',
+          it.warehouse_code || 'Kho',
+          it.unit || '',
+          price,
+          tonTruoc,
+          suDung,
+          tonCuoi,
+          tonCuoi * price
+        ];
+      });
+      const site = document.getElementById('kkSite')?.value || 'Site';
+      const siteCode = (typeof extractSiteCode === 'function' ? extractSiteCode(site) : site) || 'Site';
+      exportStyledExcel(`Kiem_Ke_Ton_Kho_${siteCode}.xlsx`, 'KiemKe', headers, rows, [6, 7, 8, 9, 10], [0, 4, 5]);
+    }
+    window.exportAuditExcel = exportAuditExcel;
 
-    // ========================================================================
+        // ========================================================================
     // WMS FAST RECEIPT & ISSUE MODAL OPERATIONS
     // ========================================================================
     function openReceiptModal() {
@@ -5805,14 +6160,7 @@
       exportStyledExcel('De_Xuat_Dat_Hang_ROP.xlsx', 'ROP', headers, rows, [2, 3, 4, 5, 6, 7], [0]);
     }
 
-    function exportAuditExcel() {
-      const headers = ['Mã hàng', 'Tên hàng hóa', 'Mã kho', 'ĐVT', 'Tồn cuối kỳ trước', 'Sử dụng trong kỳ', 'Tồn cuối kỳ'];
-      const rows = App.auditItems.map(it => [
-        it.item_code, it.item_name, it.warehouse_code || '', it.unit,
-        it.closing_t10 || 0, it.usage_t11 || 0, (it.closing_t10 || 0) - (it.usage_t11 || 0)
-      ]);
-      exportStyledExcel('Kiem_Ke_Ton_Kho.xlsx', 'KiemKe', headers, rows, [4, 5, 6], [0, 2]);
-    }
+    // [exportAuditExcel defined in Portal Audit section above]
 
     function exportVouchersExcel() {
       fetch('/api/vouchers')
@@ -8532,87 +8880,7 @@ window.loadHistory = async function() {
   }
 };
 
-// 9. Upgraded loadAudit (Desktop Table + Mobile Cards)
-window.loadAudit = async function() {
-  const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
-  showLoading('Tải bảng kiểm kê...');
-  try {
-    const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);
-    const json = await res.json();
-    const tbody = document.getElementById('kkBody');
-    const mob = document.getElementById('kkMobileCards');
-
-    if (json.success && json.data.length) {
-      App.auditItems = json.data;
-
-      // Desktop Table
-      if (tbody) {
-        tbody.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${it.item_code}</td>
-              <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${it.item_name}</td>
-              <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">${it.unit}</td>
-              <td class="p-3 text-right tabular-nums text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</td>
-              <td class="p-3 text-right">
-                <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded tabular-nums text-right text-xs"
-                  oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
-              </td>
-              <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Mobile Cards
-      if (mob) {
-        mob.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
-                  <div class="text-[10.5px] tabular-nums text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit}</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] tabular-nums font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50">
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn đầu kỳ</div>
-                  <div class="tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Sử dụng kỳ</div>
-                  <input type="number" min="0" value="${suDung}"
-                         class="w-full text-center p-1 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                         oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0));">
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn cuối kỳ</div>
-                  <div class="tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 10. Upgraded renderFnbChainTable (Desktop Table + Mobile Cards)
+// [Delegated to primary loadAudit]
 window.renderFnbChainTable = function(items) {
   const tbody = document.getElementById('fnbChainTableBody');
   const mob = document.getElementById('fnbChainMobileCards');
@@ -9340,87 +9608,7 @@ window.loadHistory = async function() {
   }
 };
 
-// 9. Upgraded loadAudit (Desktop Table + Mobile Cards)
-window.loadAudit = async function() {
-  const site = document.getElementById('kkSite') ? document.getElementById('kkSite').value : '';
-  showLoading('Tải bảng kiểm kê...');
-  try {
-    const res = await fetch(`/api/inventory-audit?site=${encodeURIComponent(site)}`);
-    const json = await res.json();
-    const tbody = document.getElementById('kkBody');
-    const mob = document.getElementById('kkMobileCards');
-
-    if (json.success && json.data.length) {
-      App.auditItems = json.data;
-
-      // Desktop Table
-      if (tbody) {
-        tbody.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${it.item_code}</td>
-              <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${it.item_name}</td>
-              <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</td>
-              <td class="p-3 text-gray-600 dark:text-gray-300">${it.unit}</td>
-              <td class="p-3 text-right tabular-nums text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</td>
-              <td class="p-3 text-right">
-                <input type="number" min="0" value="${suDung}" class="w-20 p-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded tabular-nums text-right text-xs"
-                  oninput="onAuditChange(${it.id}, this.value, ${tonTruoc})">
-              </td>
-              <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Mobile Cards
-      if (mob) {
-        mob.innerHTML = App.auditItems.map(it => {
-          const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-          const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
-          const tonCuoi = tonTruoc - suDung;
-          return `
-            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-extrabold text-xs text-gray-900 dark:text-white">${it.item_name}</div>
-                  <div class="text-[10.5px] tabular-nums text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit}</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] tabular-nums font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${it.warehouse_code || 'Kho'}</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50">
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn đầu kỳ</div>
-                  <div class="tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Sử dụng kỳ</div>
-                  <input type="number" min="0" value="${suDung}"
-                         class="w-full text-center p-1 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                         oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0));">
-                </div>
-                <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn cuối kỳ</div>
-                  <div class="tabular-nums font-bold text-brand-500 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    hideLoading();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-// 10. Upgraded renderFnbChainTable (Desktop Table + Mobile Cards)
+// [Delegated to primary loadAudit]
 window.renderFnbChainTable = function(items) {
   const tbody = document.getElementById('fnbChainTableBody');
   const mob = document.getElementById('fnbChainMobileCards');
@@ -12774,36 +12962,46 @@ function saveItemSpecs() {
 let chartAuditComparison = null;
 
 function updateAuditKpisAndChart(items) {
-  if (!items || !items.length) return;
+  if (!items || !items.length) {
+    if (document.getElementById('kkMetricTotalSkus')) document.getElementById('kkMetricTotalSkus').textContent = '0 Mã';
+    if (document.getElementById('kkMetricMatchRate')) document.getElementById('kkMetricMatchRate').textContent = '100%';
+    if (document.getElementById('kkMetricDiffValue')) document.getElementById('kkMetricDiffValue').textContent = '0 ₫';
+    if (document.getElementById('kkMetricDiffCount')) document.getElementById('kkMetricDiffCount').textContent = '0 Mã';
+    if (chartAuditComparison) {
+      chartAuditComparison.updateOptions({ xaxis: { categories: [] } });
+      chartAuditComparison.updateSeries([{ name: 'Sổ sách', data: [] }, { name: 'Thực tế', data: [] }]);
+    }
+    return;
+  }
 
   const total = items.length;
   let matchCount = 0;
   let diffCount = 0;
-  let diffValue = 0;
-
-  const topItems = items.slice(0, 8);
-  const categories = topItems.map(i => i.item_name ? (i.item_name.length > 15 ? i.item_name.slice(0, 15) + '...' : i.item_name) : i.item_code);
-  const bookData = [];
-  const actualData = [];
+  let totalClosingValue = 0;
 
   items.forEach(it => {
     const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-    const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+    const suDung = it.usage_t11 !== null && it.usage_t11 !== undefined ? it.usage_t11 : 0;
     const tonCuoi = tonTruoc - suDung;
-    const thucTe = tonCuoi; // In current D1 audit, actual matches calculation or difference
-    const diff = thucTe - tonCuoi;
-    if (Math.abs(diff) < 0.01) matchCount++;
-    else {
+    const price = parseFloat(it.price) || 0;
+    totalClosingValue += Math.max(0, tonCuoi) * price;
+    if (it.usage_t11 === null || it.usage_t11 === undefined || suDung === 0) {
+      matchCount++;
+    } else {
       diffCount++;
-      diffValue += diff * 50000;
     }
   });
 
+  const topItems = items.slice(0, 10);
+  const categories = topItems.map(i => i.item_name ? (i.item_name.length > 16 ? i.item_name.slice(0, 16) + '...' : i.item_name) : i.item_code);
+  const bookData = [];
+  const actualData = [];
+
   topItems.forEach(it => {
     const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-    const suDung = it.usage_t11 !== null ? it.usage_t11 : 0;
+    const suDung = it.usage_t11 !== null && it.usage_t11 !== undefined ? it.usage_t11 : 0;
     const tonCuoi = tonTruoc - suDung;
-    bookData.push(parseFloat(tonCuoi.toFixed(1)));
+    bookData.push(parseFloat(tonTruoc.toFixed(1)));
     actualData.push(parseFloat(tonCuoi.toFixed(1)));
   });
 
@@ -12811,7 +13009,7 @@ function updateAuditKpisAndChart(items) {
 
   if (document.getElementById('kkMetricTotalSkus')) document.getElementById('kkMetricTotalSkus').textContent = `${total} Mã`;
   if (document.getElementById('kkMetricMatchRate')) document.getElementById('kkMetricMatchRate').textContent = `${matchRate}%`;
-  if (document.getElementById('kkMetricDiffValue')) document.getElementById('kkMetricDiffValue').textContent = formatVND(diffValue);
+  if (document.getElementById('kkMetricDiffValue')) document.getElementById('kkMetricDiffValue').textContent = formatVND(totalClosingValue);
   if (document.getElementById('kkMetricDiffCount')) document.getElementById('kkMetricDiffCount').textContent = `${diffCount} Mã`;
 
   // Render or update auditComparisonChart
