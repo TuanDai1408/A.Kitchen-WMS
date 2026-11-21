@@ -1688,11 +1688,7 @@ export default {
         const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
-          if (repaired !== u.full_name) {
-            env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, u.id).run().catch(() => {});
-            return { ...u, full_name: repaired };
-          }
-          return u;
+          return { ...u, full_name: repaired || u.full_name };
         });
 
         return new Response(JSON.stringify({
