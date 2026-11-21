@@ -24,3 +24,7 @@ test-font.html
 # Database backups
 backup/*.db
 backup/*_export.sql
+
+# Python
+__pycache__/
+*.pyc
