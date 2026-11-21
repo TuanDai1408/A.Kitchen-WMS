@@ -1730,6 +1730,43 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      
+      // Sync monthly summary from transactions table (Chuyển 37,329 dòng transactions thành ~28 dòng summary)
+      if (pathname === '/api/admin/sync-monthly-summary') {
+        await env.DB.prepare(`
+          INSERT OR REPLACE INTO fnb_monthly_summary (
+            month_period, site_code, site_name, region,
+            total_bills, active_days, net_revenue, gross_revenue,
+            discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
+          )
+          SELECT 
+            SUBSTR(billing_date, 1, 7) as month_period,
+            ma_cua_hang as site_code,
+            COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
+            COALESCE(vung_mien, 'Miền Nam') as region,
+            COUNT(DISTINCT so_hoa_don) as total_bills,
+            COUNT(DISTINCT billing_date) as active_days,
+            COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+            COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+            COALESCE(SUM(ck_truoc_thue), 0) as discount,
+            COALESCE(SUM(gia_von), 0) as food_cost,
+            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
+            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
+            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
+          FROM transactions
+          WHERE billing_date IS NOT NULL AND billing_date != ''
+          GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
+        `).run();
+        invalidateMemoryCache('/api/fnb');
+        const { results: summaries } = await env.DB.prepare('SELECT month_period, site_code, net_revenue FROM fnb_monthly_summary').all();
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Đã tổng hợp số liệu fnb_monthly_summary thành công!',
+          count: summaries ? summaries.length : 0,
+          summaries: summaries || []
+        }), { headers: corsHeaders });
+      }
+
       if (pathname === '/api/admin/clean-demo-data') {
         await autoCleanDemoData(env);
         const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
