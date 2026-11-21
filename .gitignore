@@ -8,6 +8,7 @@ dist/
 # Environment files
 .env
 .env.*
+.dev.vars
 !.env.example
 
 # OS and Editor files
