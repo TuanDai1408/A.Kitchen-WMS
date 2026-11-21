@@ -2951,33 +2951,36 @@ export default {
           sitesBinds.push(regionName);
         }
         sitesQuery += ` ORDER BY site_code`;
-        const { results: sites } = await env.DB.prepare(sitesQuery).bind(...sitesBinds).all();
+        const { rows: sites } = await db.query(env, sitesQuery, sitesBinds);
 
         // 2. Lấy danh mục mặt hàng F&B
-        let itemsQuery = `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
+        const isPostgres = db.isPg(env);
+        let itemsQuery = isPostgres
+          ? `SELECT * FROM fnb_stock_items WHERE is_active = true`
+          : `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
         let itemsBinds = [];
         if (groupParam && groupParam !== 'all') {
           itemsQuery += ` AND item_group = ?`;
           itemsBinds.push(groupParam);
         }
         itemsQuery += ` ORDER BY item_group, code`;
-        const { results: itemsList } = await env.DB.prepare(itemsQuery).bind(...itemsBinds).all();
+        const { rows: itemsList } = await db.query(env, itemsQuery, itemsBinds);
 
         // 3. Lấy toàn bộ số dư tồn kho
-        const { results: balances } = await env.DB.prepare(`
+        const { rows: balances } = await db.query(env, `
           SELECT item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, last_count_qty, last_count_date, no_opening, total_value
           FROM fnb_stock_balances
-        `).all();
+        `);
 
         // Tạo map (item_code -> site_code -> cell)
         const cellMap = {};
-        for (const b of balances) {
+        for (const b of (balances || [])) {
           if (!cellMap[b.item_code]) cellMap[b.item_code] = {};
           cellMap[b.item_code][b.site_code] = {
             book: b.book_qty,
             lastCount: b.last_count_qty,
             lastDate: b.last_count_date,
-            noOpening: b.no_opening === 1,
+            noOpening: b.no_opening === 1 || b.no_opening === true,
             value: b.total_value,
             opening: b.opening_qty,
             receipt: b.receipt_qty,
@@ -2987,9 +2990,9 @@ export default {
         }
 
         // Tạo cấu trúc rows ma trận
-        const rows = itemsList.map(item => {
+        const rows = (itemsList || []).map(item => {
           const cells = {};
-          for (const s of sites) {
+          for (const s of (sites || [])) {
             cells[s.id] = cellMap[item.code]?.[s.id] || {
               book: 0,
               lastCount: null,
@@ -3028,7 +3031,7 @@ export default {
           data: {
             regions,
             groups,
-            sites,
+            sites: sites || [],
             showValue: true,
             rows
           }
@@ -3058,7 +3061,7 @@ export default {
             COALESCE(b.book_qty, 0) as book_qty,
             COALESCE(b.last_count_qty, NULL) as last_count_qty,
             b.last_count_date,
-            COALESCE(b.no_opening, 1) as no_opening,
+            COALESCE(b.no_opening, ${db.isPg(env) ? 'true' : '1'}) as no_opening,
             COALESCE(b.total_value, 0) as total_value
           FROM dim_article_stock d
           LEFT JOIN fnb_stock_balances b ON d.material = b.item_code AND b.site_code = d.site
@@ -3073,24 +3076,25 @@ export default {
 
         let results = [];
         try {
-          const res = await env.DB.prepare(query).bind(...binds).all();
-          results = res.results || [];
+          const res = await db.query(env, query, binds);
+          results = res.rows || [];
         } catch (e) {
           console.warn('dim_article_stock not ready or empty:', e.message);
         }
 
         // 2. Fallback sang fnb_stock_items nếu site chưa có trong dim_article_stock
         if (!results.length) {
+          const isPostgres = db.isPg(env);
           let fbQuery = `
             SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
                    COALESCE(b.book_qty, 0) as book_qty,
                    COALESCE(b.last_count_qty, NULL) as last_count_qty,
                    b.last_count_date,
-                   COALESCE(b.no_opening, 1) as no_opening,
+                   COALESCE(b.no_opening, ${isPostgres ? 'true' : '1'}) as no_opening,
                    COALESCE(b.total_value, 0) as total_value
             FROM fnb_stock_items i
             LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
-            WHERE i.is_active = 1
+            WHERE i.is_active = ${isPostgres ? 'true' : '1'}
           `;
           let fbBinds = [siteCode];
           if (groupParam && groupParam !== 'all') {
@@ -3099,8 +3103,8 @@ export default {
           }
           fbQuery += ` ORDER BY i.item_group, i.code`;
           try {
-            const fbRes = await env.DB.prepare(fbQuery).bind(...fbBinds).all();
-            results = fbRes.results || [];
+            const fbRes = await db.query(env, fbQuery, fbBinds);
+            results = fbRes.rows || [];
           } catch (e) {}
         }
 
@@ -3125,13 +3129,13 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY count_date DESC, id DESC LIMIT 50`;
-          const { results: counts } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: counts } = await db.query(env, q, b);
 
           // Lấy chi tiết các dòng nếu cần
           const countId = searchParams.get('id');
           let lines = [];
           if (countId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, 
                      COALESCE(d.material_desc, i.name, l.item_code) as item_name, 
                      COALESCE(d.entry_unit, i.unit, '') as unit, 
@@ -3140,14 +3144,14 @@ export default {
               LEFT JOIN dim_article_stock d ON l.item_code = d.material
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.count_id = ?
-            `).bind(countId).all();
-            lines = l;
+            `, [countId]);
+            lines = l || [];
           }
 
           const fnbCountsData = {
             success: true,
             data: {
-              counts,
+              counts: counts || [],
               lines
             }
           };
@@ -3164,6 +3168,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const countCode = `KK-${(count_date || '').replace(/-/g, '')}-${site_code}-${randSuffix}`;
+            const validCountDate = count_date || new Date().toISOString().split('T')[0];
 
             let totalItems = lines.length;
             let matchedItems = 0;
@@ -3179,44 +3184,42 @@ export default {
             }
 
             // Insert Header
-            const insertHeader = await env.DB.prepare(`
+            const insertHeader = await db.queryOne(env, `
               INSERT INTO fnb_stock_counts (count_code, site_code, count_date, count_type, total_items, matched_items, diff_items, total_diff_val, notes, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(countCode, site_code, count_date, count_type, totalItems, matchedItems, diffItems, totalDiffVal, notes, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [countCode, site_code, validCountDate, count_type, totalItems, matchedItems, diffItems, totalDiffVal, notes, created_by]);
 
-            const countId = insertHeader.meta.last_row_id;
+            const countId = insertHeader.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const countBatchStmts = [];
-            for (const item of lines) {
-              const countQty = Number(item.count_qty) || 0;
-              const bookQty = Number(item.book_qty) || 0;
-              const diffQty = countQty - bookQty;
-              const unitPrice = Number(item.unit_price) || 0;
-              const diffVal = diffQty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const countQty = Number(item.count_qty) || 0;
+                const bookQty = Number(item.book_qty) || 0;
+                const diffQty = countQty - bookQty;
+                const unitPrice = Number(item.unit_price) || 0;
+                const diffVal = diffQty * unitPrice;
 
-              countBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-              `).bind(countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || ''));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `, [countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || '']);
 
-              countBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET last_count_qty = ?, last_count_date = ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(countQty, count_date, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET last_count_qty = ?, last_count_date = ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [countQty, validCountDate, item.item_code, site_code]);
 
-              if (Math.abs(diffQty) > 0.001) {
-                countBatchStmts.push(env.DB.prepare(`
-                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                  VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
-                `).bind(countCode, count_date, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by));
+                if (Math.abs(diffQty) > 0.001) {
+                  await tx.exec(`
+                    INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                    VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
+                  `, [countCode, validCountDate, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by]);
+                }
               }
-            }
+            });
 
-            if (countBatchStmts.length > 0) {
-              await env.DB.batch(countBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
@@ -3242,23 +3245,23 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY receipt_date DESC, id DESC LIMIT 50`;
-          const { results: receipts } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: receipts } = await db.query(env, q, b);
 
           const receiptId = searchParams.get('id');
           let lines = [];
           if (receiptId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, i.name as item_name, i.unit, i.item_group
               FROM fnb_stock_receipt_lines l
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.receipt_id = ?
-            `).bind(receiptId).all();
-            lines = l;
+            `, [receiptId]);
+            lines = l || [];
           }
 
           return new Response(JSON.stringify({
             success: true,
-            data: { receipts, lines }
+            data: { receipts: receipts || [], lines }
           }), { headers: corsHeaders });
         }
 
@@ -3272,6 +3275,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const receiptCode = `PN-${(receipt_date || '').replace(/-/g, '')}-${randSuffix}`;
+            const validReceiptDate = receipt_date || new Date().toISOString().split('T')[0];
 
             let totalAmount = 0;
             for (const item of lines) {
@@ -3281,42 +3285,40 @@ export default {
             }
 
             // Insert Header
-            const insertH = await env.DB.prepare(`
+            const insertH = await db.queryOne(env, `
               INSERT INTO fnb_stock_receipts (receipt_code, site_code, receipt_date, supplier, invoice_no, total_amount, notes, attachment_url, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(receiptCode, site_code, receipt_date, supplier, invoice_no, totalAmount, notes, attachment_url, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [receiptCode, site_code, validReceiptDate, supplier, invoice_no, totalAmount, notes, attachment_url, created_by]);
 
-            const receiptId = insertH.meta.last_row_id;
+            const receiptId = insertH.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const receiptBatchStmts = [];
-            for (const item of lines) {
-              const qty = Number(item.qty) || 0;
-              const unitPrice = Number(item.unit_price) || 0;
-              const lineAmount = qty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
-                VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || ''));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                `, [receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '']);
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET receipt_qty = receipt_qty + ?,
-                    book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
-                    total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET receipt_qty = receipt_qty + ?,
+                      book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
+                      total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
-              `).bind(receiptCode, receipt_date, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by));
-            }
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                  VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
+                `, [receiptCode, validReceiptDate, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by]);
+              }
+            });
 
-            if (receiptBatchStmts.length > 0) {
-              await env.DB.batch(receiptBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
@@ -3342,23 +3344,23 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY waste_date DESC, id DESC LIMIT 50`;
-          const { results: wastes } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: wastes } = await db.query(env, q, b);
 
           const wasteId = searchParams.get('id');
           let lines = [];
           if (wasteId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, i.name as item_name, i.unit, i.item_group
               FROM fnb_stock_waste_lines l
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.waste_id = ?
-            `).bind(wasteId).all();
-            lines = l;
+            `, [wasteId]);
+            lines = l || [];
           }
 
           return new Response(JSON.stringify({
             success: true,
-            data: { wastes, lines }
+            data: { wastes: wastes || [], lines }
           }), { headers: corsHeaders });
         }
 
@@ -3372,6 +3374,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const wasteCode = `BBH-${(waste_date || '').replace(/-/g, '')}-${randSuffix}`;
+            const validWasteDate = waste_date || new Date().toISOString().split('T')[0];
 
             let totalAmount = 0;
             for (const item of lines) {
@@ -3381,42 +3384,40 @@ export default {
             }
 
             // Insert Header
-            const insertH = await env.DB.prepare(`
+            const insertH = await db.queryOne(env, `
               INSERT INTO fnb_stock_wastes (waste_code, site_code, waste_date, reason, confirmed_by, total_amount, notes, attachment_url, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(wasteCode, site_code, waste_date, reason, confirmed_by, totalAmount, notes, attachment_url, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [wasteCode, site_code, validWasteDate, reason, confirmed_by, totalAmount, notes, attachment_url, created_by]);
 
-            const wasteId = insertH.meta.last_row_id;
+            const wasteId = insertH.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const wasteBatchStmts = [];
-            for (const item of lines) {
-              const qty = Number(item.qty) || 0;
-              const unitPrice = Number(item.unit_price) || 0;
-              const lineAmount = qty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
-                VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                `, [wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason]);
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET waste_qty = waste_qty + ?,
-                    book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
-                    total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET waste_qty = waste_qty + ?,
+                      book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
+                      total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
-              `).bind(wasteCode, waste_date, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by));
-            }
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                  VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
+                `, [wasteCode, validWasteDate, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by]);
+              }
+            });
 
-            if (wasteBatchStmts.length > 0) {
-              await env.DB.batch(wasteBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
