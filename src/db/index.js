@@ -30,7 +30,7 @@ export function translatePlaceholders(sql) {
  */
 export function resolveSql(sqlArg, isPostgres) {
   if (typeof sqlArg === 'object' && sqlArg !== null) {
-    if (isPostgres && sqlArg.pg) return sqlArg.pg;
+    if (isPostgres && sqlArg.pg) return translatePlaceholders(sqlArg.pg);
     if (!isPostgres && sqlArg.d1) return sqlArg.d1;
     throw new Error('Missing SQL query dialect for active backend');
   }

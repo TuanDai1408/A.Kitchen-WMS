@@ -728,72 +728,110 @@ export default {
         const branchCode = searchParams.get('branch') || 'k505';
         const upperCode = branchCode.toUpperCase();
 
-        const critRow = await env.DB.prepare(`
-          SELECT COUNT(*) as critical_count
-          FROM inventory_batches b
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0 AND (julianday(b.exp_date) - julianday('now')) <= 7
-        `).bind(upperCode).first();
+        const critRow = await db.queryOne(env, {
+          d1: `SELECT COUNT(*) as critical_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (julianday(b.exp_date) - julianday('now')) <= 7`,
+          pg: `SELECT COUNT(*) as critical_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (b.exp_date::date - CURRENT_DATE) <= 7`
+        }, [upperCode]);
 
-        const ropRow = await env.DB.prepare(`
+        const ropRow = await db.queryOne(env, `
           SELECT COUNT(*) as rop_count FROM (
             SELECT i.sku
             FROM items i
             LEFT JOIN branches br ON br.code = ?
             LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
             WHERE i.category = 'Gia vị'
-            GROUP BY i.sku
+            GROUP BY i.sku, i.daily_usage, i.lead_time_hours, i.safety_stock
             HAVING COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-          )
-        `).bind(upperCode).first();
+          ) sub
+        `, [upperCode]);
 
-        const leadRow = await env.DB.prepare(`
-          SELECT ROUND(AVG(lead_time_hours), 1) as avg_lead_time, COUNT(*) as total_orders
-          FROM purchase_orders
-          WHERE lead_time_hours IS NOT NULL
-        `).first();
+        const leadRow = await db.queryOne(env, {
+          d1: `SELECT ROUND(AVG(lead_time_hours), 1) as avg_lead_time, COUNT(*) as total_orders
+               FROM purchase_orders
+               WHERE lead_time_hours IS NOT NULL`,
+          pg: `SELECT ROUND(AVG(lead_time_hours)::numeric, 1) as avg_lead_time, COUNT(*) as total_orders
+               FROM purchase_orders
+               WHERE lead_time_hours IS NOT NULL`
+        });
 
-        const stockRow = await env.DB.prepare(`
-          SELECT 
-            COUNT(DISTINCT i.sku) as total_skus, 
-            ROUND(COALESCE(SUM(b.qty), 0), 1) as total_qty,
-            ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0), 0) as total_value
-          FROM items i
-          JOIN inventory_batches b ON i.sku = b.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0
-        `).bind(upperCode).first();
+        const stockRow = await db.queryOne(env, {
+          d1: `SELECT 
+                 COUNT(DISTINCT i.sku) as total_skus, 
+                 ROUND(COALESCE(SUM(b.qty), 0), 1) as total_qty,
+                 ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0), 0) as total_value
+               FROM items i
+               JOIN inventory_batches b ON i.sku = b.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0`,
+          pg: `SELECT 
+                 COUNT(DISTINCT i.sku) as total_skus, 
+                 ROUND(COALESCE(SUM(b.qty), 0)::numeric, 1) as total_qty,
+                 ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0)::numeric, 0) as total_value
+               FROM items i
+               JOIN inventory_batches b ON i.sku = b.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0`
+        }, [upperCode]);
 
         // Slow moving count (batches created > 20 days ago with stock remaining)
-        const slowRow = await env.DB.prepare(`
-          SELECT COUNT(DISTINCT b.sku) as slow_count
-          FROM inventory_batches b
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0 AND (julianday('now') - julianday(b.created_at)) >= 14
-        `).bind(upperCode).first().catch(() => ({ slow_count: 2 }));
+        const slowRow = await db.queryOne(env, {
+          d1: `SELECT COUNT(DISTINCT b.sku) as slow_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (julianday('now') - julianday(b.created_at)) >= 14`,
+          pg: `SELECT COUNT(DISTINCT b.sku) as slow_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (CURRENT_DATE - b.created_at::date) >= 14`
+        }, [upperCode]).catch(() => ({ slow_count: 2 }));
 
         // Stock alerts for recent-orders style table
-        const alertsRows = await env.DB.prepare(`
-          SELECT 
-            b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
-            ROUND(b.qty, 1) as qty,
-            ROUND((julianday(b.exp_date) - julianday('now')), 0) as days_left,
-            i.safety_stock,
-            CASE 
-              WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
-              WHEN (julianday(b.exp_date) - julianday('now')) <= 7 THEN 'NEAR_EXPIRY'
-              WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
-              ELSE 'NORMAL'
-            END as alert_level
-          FROM inventory_batches b
-          JOIN items i ON b.sku = i.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND (
-            b.qty <= i.safety_stock OR (julianday(b.exp_date) - julianday('now')) <= 15
-          )
-          ORDER BY days_left ASC, b.qty ASC
-          LIMIT 8
-        `).bind(upperCode).all().catch(() => ({ results: [] }));
+        const { rows: alertsRows } = await db.query(env, {
+          d1: `SELECT 
+                 b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
+                 ROUND(b.qty, 1) as qty,
+                 ROUND((julianday(b.exp_date) - julianday('now')), 0) as days_left,
+                 i.safety_stock,
+                 CASE 
+                   WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
+                   WHEN (julianday(b.exp_date) - julianday('now')) <= 7 THEN 'NEAR_EXPIRY'
+                   WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
+                   ELSE 'NORMAL'
+                 END as alert_level
+               FROM inventory_batches b
+               JOIN items i ON b.sku = i.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND (
+                 b.qty <= i.safety_stock OR (julianday(b.exp_date) - julianday('now')) <= 15
+               )
+               ORDER BY days_left ASC, b.qty ASC
+               LIMIT 8`,
+          pg: `SELECT 
+                 b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
+                 ROUND(b.qty::numeric, 1) as qty,
+                 (b.exp_date::date - CURRENT_DATE) as days_left,
+                 i.safety_stock,
+                 CASE 
+                   WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
+                   WHEN (b.exp_date::date - CURRENT_DATE) <= 7 THEN 'NEAR_EXPIRY'
+                   WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
+                   ELSE 'NORMAL'
+                 END as alert_level
+               FROM inventory_batches b
+               JOIN items i ON b.sku = i.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND (
+                 b.qty <= i.safety_stock OR (b.exp_date::date - CURRENT_DATE) <= 15
+               )
+               ORDER BY days_left ASC, b.qty ASC
+               LIMIT 8`
+        }, [upperCode]).catch(() => ({ rows: [] }));
 
         const totalSkus = stockRow ? (stockRow.total_skus || 0) : 0;
         const ropCount = ropRow ? (ropRow.rop_count || 0) : 0;
@@ -812,7 +850,7 @@ export default {
             total_value: stockRow && stockRow.total_value ? stockRow.total_value : 1258600000,
             slow_moving_count: slowRow && slowRow.slow_count ? slowRow.slow_count : 2,
             safety_rate: safetyRate,
-            alerts: alertsRows && alertsRows.results ? alertsRows.results : []
+            alerts: alertsRows || []
           }
         };
         return createCachedResponse(dashSummaryData, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
@@ -821,29 +859,50 @@ export default {
       // 1.3 GET /api/stock
       if (pathname === '/api/stock' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
-        const query = `
-          SELECT 
-            b.id as batch_id,
-            b.batch_code,
-            b.mfg_date,
-            b.exp_date,
-            b.qty,
-            b.storage_loc,
-            i.sku,
-            i.name as item_name,
-            i.category,
-            i.unit,
-            i.standard_cost_sap,
-            ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
-          FROM inventory_batches b
-          JOIN items i ON b.sku = i.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0
-          ORDER BY julianday(b.exp_date) ASC
-        `;
-        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+        const { rows: results } = await db.query(env, {
+          d1: `
+            SELECT 
+              b.id as batch_id,
+              b.batch_code,
+              b.mfg_date,
+              b.exp_date,
+              b.qty,
+              b.storage_loc,
+              i.sku,
+              i.name as item_name,
+              i.category,
+              i.unit,
+              i.standard_cost_sap,
+              ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
+            FROM inventory_batches b
+            JOIN items i ON b.sku = i.sku
+            JOIN branches br ON b.branch_id = br.id
+            WHERE br.code = ? AND b.qty > 0
+            ORDER BY julianday(b.exp_date) ASC
+          `,
+          pg: `
+            SELECT 
+              b.id as batch_id,
+              b.batch_code,
+              b.mfg_date,
+              b.exp_date,
+              b.qty,
+              b.storage_loc,
+              i.sku,
+              i.name as item_name,
+              i.category,
+              i.unit,
+              i.standard_cost_sap,
+              (b.exp_date::date - CURRENT_DATE) as days_remaining
+            FROM inventory_batches b
+            JOIN items i ON b.sku = i.sku
+            JOIN branches br ON b.branch_id = br.id
+            WHERE br.code = ? AND b.qty > 0
+            ORDER BY b.exp_date ASC
+          `
+        }, [branchCode.toUpperCase()]);
 
-        const enriched = results.map((r, idx) => {
+        const enriched = (results || []).map((r, idx) => {
           let dangerLevel = 'green';
           let statusText = 'An toàn';
           if (r.days_remaining <= 7) {
@@ -868,20 +927,20 @@ export default {
       if (pathname === '/api/stock/receipt' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, batch_code, mfg_date, exp_date, qty, storage_loc, ref_code } = body;
-        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        const branch = await db.queryOne(env, 'SELECT id FROM branches WHERE code = ?', [branch_code.toUpperCase()]);
         if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
 
         const batchId = 'bat_' + Date.now();
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO inventory_batches (id, branch_id, sku, batch_code, mfg_date, exp_date, qty, storage_loc)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(batchId, branch.id, sku, batch_code, mfg_date, exp_date, parseFloat(qty), storage_loc || 'Kho gia vị').run();
+        `, [batchId, branch.id, sku, batch_code, mfg_date, exp_date, parseFloat(qty), storage_loc || 'Kho gia vị']);
 
         const transId = 'tx_' + Date.now();
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note, ref_code)
           VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, 'Nhập kho lô mới', ?)
-        `).bind(transId, branch.id, sku, batchId, parseFloat(qty), ref_code || '').run();
+        `, [transId, branch.id, sku, batchId, parseFloat(qty), ref_code || '']);
 
         return new Response(JSON.stringify({ success: true, message: 'Nhập kho thành công', batch_id: batchId }), { headers: corsHeaders });
       }
@@ -890,25 +949,35 @@ export default {
       if (pathname === '/api/stock/issue' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, qty_needed, note } = body;
-        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        const branch = await db.queryOne(env, 'SELECT id FROM branches WHERE code = ?', [branch_code.toUpperCase()]);
+        if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
         let remain = parseFloat(qty_needed);
 
-        const { results: batches } = await env.DB.prepare(`
-          SELECT id, qty, batch_code, exp_date
-          FROM inventory_batches
-          WHERE branch_id = ? AND sku = ? AND qty > 0
-          ORDER BY julianday(exp_date) ASC
-        `).bind(branch.id, sku).all();
+        const { rows: batches } = await db.query(env, {
+          d1: `
+            SELECT id, qty, batch_code, exp_date
+            FROM inventory_batches
+            WHERE branch_id = ? AND sku = ? AND qty > 0
+            ORDER BY julianday(exp_date) ASC
+          `,
+          pg: `
+            SELECT id, qty, batch_code, exp_date
+            FROM inventory_batches
+            WHERE branch_id = ? AND sku = ? AND qty > 0
+            ORDER BY exp_date ASC
+          `
+        }, [branch.id, sku]);
 
-        const stmts = [];
-        for (const b of batches) {
+        const ops = [];
+        for (const b of (batches || [])) {
           if (remain <= 0) break;
           const deduct = Math.min(b.qty, remain);
-          stmts.push(env.DB.prepare('UPDATE inventory_batches SET qty = qty - ? WHERE id = ?').bind(deduct, b.id));
-          stmts.push(env.DB.prepare(`
-            INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
-            VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)
-          `).bind('tx_' + Math.random().toString(36).substr(2, 9), branch.id, sku, b.id, deduct, note || 'Xuất bếp ca nấu'));
+          ops.push({
+            updateSql: 'UPDATE inventory_batches SET qty = qty - ? WHERE id = ?',
+            updateParams: [deduct, b.id],
+            insertSql: `INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)`,
+            insertParams: ['tx_' + Math.random().toString(36).substr(2, 9), branch.id, sku, b.id, deduct, note || 'Xuất bếp ca nấu']
+          });
           remain -= deduct;
         }
 
@@ -916,88 +985,162 @@ export default {
           return new Response(JSON.stringify({ success: false, error: `Tồn kho không đủ (thiếu ${remain.toFixed(1)})` }), { status: 400, headers: corsHeaders });
         }
 
-        await env.DB.batch(stmts);
+        await db.withTransaction(env, async (tx) => {
+          for (const op of ops) {
+            await tx.exec(op.updateSql, op.updateParams);
+            await tx.exec(op.insertSql, op.insertParams);
+          }
+        });
+
         return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
       }
 
       // 1.6 GET /api/reorder
       if (pathname === '/api/reorder' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
-        const query = `
-          SELECT 
-            i.sku,
-            i.name as item_name,
-            i.unit,
-            i.category,
-            i.daily_usage,
-            i.lead_time_hours,
-            i.safety_stock,
-            i.standard_cost_sap,
-            COALESCE(SUM(b.qty), 0) as current_stock,
-            ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
-            CASE 
-              WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-              THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
-              ELSE 0
-            END as suggested_order_qty
-          FROM items i
-          LEFT JOIN branches br ON br.code = ?
-          LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
-          WHERE i.category = 'Gia vị'
-          GROUP BY i.sku
-          ORDER BY (current_stock - rop_threshold) ASC
-        `;
-        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+        const query = {
+          d1: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.category,
+              i.daily_usage,
+              i.lead_time_hours,
+              i.safety_stock,
+              i.standard_cost_sap,
+              COALESCE(SUM(b.qty), 0) as current_stock,
+              ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
+              CASE 
+                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+                THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
+                ELSE 0
+              END as suggested_order_qty
+            FROM items i
+            LEFT JOIN branches br ON br.code = ?
+            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
+            ORDER BY (current_stock - rop_threshold) ASC
+          `,
+          pg: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.category,
+              i.daily_usage,
+              i.lead_time_hours,
+              i.safety_stock,
+              i.standard_cost_sap,
+              COALESCE(SUM(b.qty), 0) as current_stock,
+              ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)::numeric, 1) as rop_threshold,
+              CASE 
+                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+                THEN ROUND((((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0))::numeric, 0)
+                ELSE 0
+              END as suggested_order_qty
+            FROM items i
+            LEFT JOIN branches br ON br.code = ?
+            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
+            ORDER BY (COALESCE(SUM(b.qty), 0) - ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)) ASC
+          `
+        };
+        const { rows: results } = await db.query(env, query, [branchCode.toUpperCase()]);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
       // 1.7 GET /api/leadtime
       if (pathname === '/api/leadtime' && request.method === 'GET') {
-        const query = `
-          SELECT 
-            po.id,
-            po.po_number,
-            br.name as branch_name,
-            br.code as branch_code,
-            po.vendor_name,
-            po.order_time,
-            po.received_time,
-            po.lead_time_hours,
-            po.sla_target_hours,
-            ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
-            CASE 
-              WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
-              ELSE 'Trễ hẹn NCC'
-            END as sla_status,
-            po.status,
-            po.total_amount
-          FROM purchase_orders po
-          JOIN branches br ON po.branch_id = br.id
-          ORDER BY po.order_time DESC
-        `;
-        const { results } = await env.DB.prepare(query).all();
+        const query = {
+          d1: `
+            SELECT 
+              po.id,
+              po.po_number,
+              br.name as branch_name,
+              br.code as branch_code,
+              po.vendor_name,
+              po.order_time,
+              po.received_time,
+              po.lead_time_hours,
+              po.sla_target_hours,
+              ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
+              CASE 
+                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
+                ELSE 'Trễ hẹn NCC'
+              END as sla_status,
+              po.status,
+              po.total_amount
+            FROM purchase_orders po
+            JOIN branches br ON po.branch_id = br.id
+            ORDER BY po.order_time DESC
+          `,
+          pg: `
+            SELECT 
+              po.id,
+              po.po_number,
+              br.name as branch_name,
+              br.code as branch_code,
+              po.vendor_name,
+              po.order_time,
+              po.received_time,
+              po.lead_time_hours,
+              po.sla_target_hours,
+              ROUND((po.lead_time_hours - po.sla_target_hours)::numeric, 1) as delay_hours,
+              CASE 
+                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
+                ELSE 'Trễ hẹn NCC'
+              END as sla_status,
+              po.status,
+              po.total_amount
+            FROM purchase_orders po
+            JOIN branches br ON po.branch_id = br.id
+            ORDER BY po.order_time DESC
+          `
+        };
+        const { rows: results } = await db.query(env, query);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
       // 1.8 GET /api/po-sap
       if (pathname === '/api/po-sap' && request.method === 'GET') {
-        const query = `
-          SELECT 
-            i.sku,
-            i.name as item_name,
-            i.unit,
-            i.standard_cost_sap,
-            i.old_cost_sap,
-            ROUND(((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100, 1) as price_change_pct,
-            po.po_number,
-            po.vendor_name
-          FROM items i
-          LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
-          WHERE i.category = 'Gia vị'
-          GROUP BY i.sku
-          ORDER BY price_change_pct DESC
-        `;
-        const { results } = await env.DB.prepare(query).all();
+        const query = {
+          d1: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.standard_cost_sap,
+              i.old_cost_sap,
+              ROUND(((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100, 1) as price_change_pct,
+              po.po_number,
+              po.vendor_name
+            FROM items i
+            LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.standard_cost_sap, i.old_cost_sap, po.po_number, po.vendor_name
+            ORDER BY price_change_pct DESC
+          `,
+          pg: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.standard_cost_sap,
+              i.old_cost_sap,
+              ROUND((((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100)::numeric, 1) as price_change_pct,
+              po.po_number,
+              po.vendor_name
+            FROM items i
+            LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.standard_cost_sap, i.old_cost_sap, po.po_number, po.vendor_name
+            ORDER BY price_change_pct DESC
+          `
+        };
+        const { rows: results } = await db.query(env, query);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
@@ -1437,17 +1580,18 @@ export default {
             bindings.push(site, site, `%${site}%`, siteCode);
           }
           query += ` ORDER BY item_code LIMIT 300`;
-          const { results } = await env.DB.prepare(query).bind(...bindings).all();
+          const { rows: results } = await db.query(env, query, bindings);
           return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
         }
         if (request.method === 'POST') {
           const body = await request.json();
           const { items } = body;
           if (items && items.length) {
-            const stmts = items.map(it => env.DB.prepare(`
-              UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?
-            `).bind(it.usage, it.closing, it.id));
-            await env.DB.batch(stmts);
+            await db.withTransaction(env, async (tx) => {
+              for (const it of items) {
+                await tx.exec(`UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?`, [it.usage, it.closing, it.id]);
+              }
+            });
           }
           return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
         }
@@ -1467,7 +1611,7 @@ export default {
           bindings.push(branch, branch);
         }
         query += ` ORDER BY r.report_date DESC, r.created_at DESC LIMIT 100`;
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
+        const { rows: results } = await db.query(env, query, bindings);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
@@ -1482,17 +1626,17 @@ export default {
         const nowStr = formatDate(new Date());
         const id = 'RPT-' + Date.now();
         const siteCode = extractSiteCode(site || branchCode || 'k001').toLowerCase();
-        const branchRow = await env.DB.prepare(`SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`).bind(siteCode, siteCode).first();
+        const branchRow = await db.queryOne(env, `SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`, [siteCode, siteCode]);
         const validBranchId = branchRow ? branchRow.id : 'k505';
         const imgLinkStr = Array.isArray(images) ? images.map(im => im.name || im.url).join(' , ') : (images || '');
 
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO daily_catering_reports (
             id, branch_id, report_date, planned_meals, actual_meals, wasted_meals,
             staff_actual, staff_standard, food_quality_note, customer_feedback, extra_cost,
             created_at, reporter_name, report_data, images_link
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(
+        `, [
           id, validBranchId, reportDate || nowStr,
           Number(plannedMeals) || 0, Number(actualMeals) || 0, Number(wastedMeals) || 0,
           Number(staffActual) || 0, Number(staffStandard) || 0,
@@ -1500,7 +1644,7 @@ export default {
           nowStr, reporterName || 'Quản lý Site',
           typeof reportData === 'object' ? JSON.stringify(reportData) : (reportData || '{}'),
           imgLinkStr
-        ).run();
+        ]);
 
         return new Response(JSON.stringify({
           success: true,
