@@ -1,6 +1,10 @@
 name = "akitchen-kho-app"
 main = "src/index.js"
 compatibility_date = "2026-11-16"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+DB_BACKEND = "d1"
 
 # Serve static frontend (HTML/Tailwind/JS) from public folder
 [assets]
