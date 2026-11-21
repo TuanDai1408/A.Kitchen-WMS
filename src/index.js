@@ -595,10 +595,12 @@ async function ensureDatabaseIndexes(env) {
     'CREATE INDEX IF NOT EXISTS idx_dim_art_site_mat ON dim_article_stock(site, material)'
   ];
 
-  for (const idxSql of indexes) {
-    try {
-      await env.DB.prepare(idxSql).run().catch(() => {});
-    } catch (e) {}
+  if (db.getBackend(env) === 'd1' && env.DB) {
+    for (const idxSql of indexes) {
+      try {
+        await env.DB.prepare(idxSql).run().catch(() => {});
+      } catch (e) {}
+    }
   }
 }
 
@@ -1956,20 +1958,49 @@ export default {
       
       // 2.11.CLEAN DỌN DẸP TOÀN BỘ DỮ LIỆU DEMO (/api/admin/clean-demo-data)
       
+      // Kiểm tra bảo mật cho tất cả route /api/admin/*
+      if (pathname.startsWith('/api/admin/')) {
+        if (env.ADMIN_KEY) {
+          const authKey = request.headers.get('X-Admin-Key') || searchParams.get('admin_key');
+          if (!authKey || authKey !== env.ADMIN_KEY) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'Không có quyền truy cập quản trị (Invalid X-Admin-Key)'
+            }), { status: 403, headers: corsHeaders });
+          }
+        }
+      }
+
       // Diagnostic DB status
       if (pathname === '/api/admin/db-status' && request.method === 'GET') {
-        const { results: indexes } = await env.DB.prepare("SELECT name, tbl_name FROM sqlite_master WHERE type='index'").all();
+        const isPg = db.getBackend(env) === 'supabase';
+        let indexes = [];
+        if (isPg) {
+          const { rows } = await db.query(env, `
+            SELECT indexname as name, tablename as tbl_name 
+            FROM pg_indexes 
+            WHERE schemaname = 'wms'
+            ORDER BY tablename, indexname
+          `);
+          indexes = rows;
+        } else {
+          const { rows } = await db.query(env, "SELECT name, tbl_name FROM sqlite_master WHERE type='index'");
+          indexes = rows;
+        }
+
         const counts = {};
-        for (const tbl of ['transactions', 'app_users', 'branches', 'sites', 'don_hang', 'dinh_muc', 'nvl_items', 'fnb_monthly_summary', 'inventory_batches', 'purchase_orders', 'vouchers']) {
+        const checkTables = ['transactions', 'app_users', 'branches', 'sites', 'don_hang', 'dinh_muc', 'nvl_items', 'fnb_monthly_summary', 'inventory_batches', 'purchase_orders', 'vouchers', 'dim_article_stock'];
+        for (const tbl of checkTables) {
           try {
-            const r = await env.DB.prepare(`SELECT COUNT(*) as c FROM ${tbl}`).first();
-            counts[tbl] = r ? r.c : 0;
+            const r = await db.queryOne(env, `SELECT COUNT(*) as c FROM ${tbl}`);
+            counts[tbl] = r ? Number(r.c) : 0;
           } catch (e) {
             counts[tbl] = 'error: ' + e.message;
           }
         }
         return new Response(JSON.stringify({
           success: true,
+          backend: db.getBackend(env),
           indexesCount: indexes ? indexes.length : 0,
           indexes: indexes || [],
           tableCounts: counts
@@ -1977,7 +2008,7 @@ export default {
       }
 
       
-      // Sync monthly summary from transactions table (Hỗ trợ sync riêng 1 tháng ?month=YYYY-MM chỉ mất 14 writes)
+      // Sync monthly summary from transactions table (Hỗ trợ sync riêng 1 tháng ?month=YYYY-MM)
       if (pathname === '/api/admin/sync-monthly-summary') {
         const monthParam = searchParams.get('month') || '';
         let targetMonth = monthParam ? normalizeMonth(monthParam) : '';
@@ -1986,39 +2017,47 @@ export default {
           if (parts.length === 2) targetMonth = `${parts[1]}-${parts[0].padStart(2, '0')}`;
         }
 
-        let syncSql = `
-          INSERT OR REPLACE INTO fnb_monthly_summary (
-            month_period, site_code, site_name, region,
-            total_bills, active_days, net_revenue, gross_revenue,
-            discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
-          )
-          SELECT 
-            SUBSTR(billing_date, 1, 7) as month_period,
-            ma_cua_hang as site_code,
-            COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
-            COALESCE(vung_mien, 'Miền Nam') as region,
-            COUNT(DISTINCT so_hoa_don) as total_bills,
-            COUNT(DISTINCT billing_date) as active_days,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-            COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-            COALESCE(SUM(ck_truoc_thue), 0) as discount,
-            COALESCE(SUM(gia_von), 0) as food_cost,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
-          FROM transactions
-          WHERE billing_date IS NOT NULL AND billing_date != ''
-        `;
+        const isPg = db.getBackend(env) === 'supabase';
+        if (isPg) {
+          if (targetMonth) {
+            await db.query(env, `SELECT wms.refresh_fnb_summaries($1)`, [targetMonth]);
+          } else {
+            await db.query(env, `SELECT wms.refresh_fnb_summaries(NULL)`);
+          }
+        } else {
+          let syncSql = `
+            INSERT OR REPLACE INTO fnb_monthly_summary (
+              month_period, site_code, site_name, region,
+              total_bills, active_days, net_revenue, gross_revenue,
+              discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
+            )
+            SELECT 
+              SUBSTR(billing_date, 1, 7) as month_period,
+              ma_cua_hang as site_code,
+              COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
+              COALESCE(vung_mien, 'Miền Nam') as region,
+              COUNT(DISTINCT so_hoa_don) as total_bills,
+              COUNT(DISTINCT billing_date) as active_days,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+              COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+              COALESCE(SUM(ck_truoc_thue), 0) as discount,
+              COALESCE(SUM(gia_von), 0) as food_cost,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
+            FROM transactions
+            WHERE billing_date IS NOT NULL AND billing_date != ''
+          `;
 
-        let binds = [];
-        if (targetMonth) {
-          syncSql += ` AND billing_date >= ? AND billing_date <= ?`;
-          binds.push(`${targetMonth}-01`, `${targetMonth}-31`);
+          let binds = [];
+          if (targetMonth) {
+            const mRange = getMonthRange(targetMonth);
+            syncSql += ` AND billing_date >= ? AND billing_date <= ?`;
+            binds.push(mRange.start, mRange.end);
+          }
+          syncSql += ` GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang`;
+          await db.exec(env, syncSql, binds);
         }
-        syncSql += ` GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang`;
-
-        const stmt = env.DB.prepare(syncSql);
-        await (binds.length ? stmt.bind(...binds) : stmt).run();
 
         // Xóa sạch bộ nhớ đệm RAM Cache và Edge Cache
         invalidateMemoryCache('/api/fnb');
@@ -2029,7 +2068,7 @@ export default {
           querySummaries += ' WHERE month_period = ?';
           queryBinds.push(targetMonth);
         }
-        const { results: summaries } = await env.DB.prepare(querySummaries).bind(...queryBinds).all();
+        const { rows: summaries } = await db.query(env, querySummaries, queryBinds);
 
         return new Response(JSON.stringify({
           success: true,
@@ -2050,65 +2089,41 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Không có dữ liệu items' }), { status: 400, headers: corsHeaders });
         }
 
-        // Đảm bảo cấu trúc bảng dim_article_stock tồn tại
-        await env.DB.prepare(`
-          CREATE TABLE IF NOT EXISTS dim_article_stock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            site TEXT NOT NULL,
-            site_name TEXT,
-            nganh_hang TEXT,
-            nhom_hang TEXT,
-            material TEXT NOT NULL,
-            material_desc TEXT NOT NULL,
-            entry_unit TEXT,
-            price REAL DEFAULT 0,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(site, material)
-          )
-        `).run();
-
-        const insertStmt = env.DB.prepare(`
-          INSERT OR REPLACE INTO dim_article_stock (
-            site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-        `);
-
-        const stmts = [];
-        for (const it of items) {
-          const site = it.site || '';
-          const mat = it.material || '';
-          if (!site || !mat) continue;
-          stmts.push(insertStmt.bind(
-            site,
-            it.site_name || '',
-            it.nganh_hang || '',
-            it.nhom_hang || '',
-            mat,
-            it.material_desc || '',
-            it.entry_unit || '',
-            Number(it.price) || 0
-          ));
-        }
-
-        if (stmts.length) {
-          const CHUNK = 100;
-          for (let i = 0; i < stmts.length; i += CHUNK) {
-            await env.DB.batch(stmts.slice(i, i + CHUNK));
+        let count = 0;
+        await db.withTransaction(env, async tx => {
+          for (const it of items) {
+            const site = it.site || '';
+            const mat = it.material || '';
+            if (!site || !mat) continue;
+            await tx.query({
+              d1: `INSERT OR REPLACE INTO dim_article_stock (site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+              pg: `INSERT INTO dim_article_stock (site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now()) ON CONFLICT (site, material) DO UPDATE SET site_name = EXCLUDED.site_name, nganh_hang = EXCLUDED.nganh_hang, nhom_hang = EXCLUDED.nhom_hang, material_desc = EXCLUDED.material_desc, entry_unit = EXCLUDED.entry_unit, price = EXCLUDED.price, updated_at = now()`
+            }, [
+              site,
+              it.site_name || '',
+              it.nganh_hang || '',
+              it.nhom_hang || '',
+              mat,
+              it.material_desc || '',
+              it.entry_unit || '',
+              Number(it.price) || 0
+            ]);
+            count++;
           }
-        }
+        });
 
         invalidateMemoryCache('/api/fnb/stock');
 
         return new Response(JSON.stringify({
           success: true,
-          count: stmts.length,
-          message: `Đã lưu thành công ${stmts.length} mặt hàng vào dim_article_stock`
+          count: count,
+          message: `Đã lưu thành công ${count} mặt hàng vào dim_article_stock`
         }), { headers: corsHeaders });
       }
 
       if (pathname === '/api/admin/clean-demo-data') {
         await autoCleanDemoData(env);
-        const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
+        const { rows: remainingUsers } = await db.query(env, `SELECT id, email, full_name, role_code, status FROM app_users`);
         return new Response(JSON.stringify({
           success: true,
           message: 'Đã xóa toàn bộ dữ liệu demo thành công',
