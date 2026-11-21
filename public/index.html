@@ -15,10 +15,10 @@
   <meta name="application-name" content="A.Kitchen WMS">
   <link rel="manifest" href="/manifest.webmanifest">
   
-  <!-- Google Fonts: Be Vietnam Pro (Brand Sans) & JetBrains Mono (Numbers/Tabular Figures) -->
+  <!-- Google Fonts: Inter (UI Sans) & JetBrains Mono (Technical IDs) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
   <link rel="stylesheet" href="/assets/app.css">
@@ -344,7 +344,7 @@
           <div class="min-w-0">
             <div id="sidebarUserName" class="font-bold text-xs text-gray-900 dark:text-white truncate">Tuấn Đại</div>
             <div class="flex items-center gap-1.5 mt-0.5">
-              <span id="sidebarUserRoleBadge" class="text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+              <span id="sidebarUserRoleBadge" class="text-[9.5px] px-1.5 py-0.2 rounded font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
             </div>
           </div>
         </div>
@@ -441,7 +441,7 @@
         <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="hidden h-9 sm:h-10 lg:h-11 px-2 sm:px-2.5 rounded-[10px] border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
           <i data-lucide="shield-alert" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400"></i>
           <span class="hidden xl:inline">Duyệt Quyền</span>
-          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[9.5px] font-black bg-rose-600 text-white">0</span>
+          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[9.5px] font-semibold bg-rose-600 text-white">0</span>
         </button>
 
         <!-- TailAdmin Theme Toggler Button -->
@@ -492,54 +492,99 @@
           </div>
         </div>
 
-        <!-- Inline Metric Toolbar: Chain Performance -->
-        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 xl:grid-cols-4 mb-4">
-          <!-- Metric 1: Tổng Doanh Thu Chuỗi -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Doanh Thu Chuỗi</span>
-              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainTotalRevenue" title="6,347,000,000đ">6.347.000.000 ₫</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">14 Điểm bán toàn chuỗi</span>
+        <!-- TailAdmin Unified KPI Grid: Chain Performance (Hero + 3 Core Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+          <!-- Card 1: Tổng Doanh Thu Chuỗi (Hero - Span 2 Cols) -->
+          <div class="kpi-card-hero">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tổng Doanh Thu Chuỗi</span>
+                <p class="kpi-sub mt-0.5">14 Điểm bán toàn hệ thống A.Kitchen</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="bar-chart-3" class="size-5"></i></div>
             </div>
-            <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shrink-0">
-              105,8% KH
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-hero" id="chainTotalRevenue" title="—">—</span>
+                <span class="kpi-unit" id="chainTotalRevenueUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="chainTotalRevenueDelta">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>105,8% KH</span>
+                </span>
+                <span class="kpi-sub">vượt kế hoạch tháng</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Metric 2: Lợi Nhuận EBITDA Chuỗi -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Lợi Nhuận EBITDA</span>
-              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainTotalProfit" title="1,548,000,000đ">1.548.000.000 ₫</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Biên EBITDA trung bình</span>
+          <!-- Card 2: Lợi Nhuận EBITDA -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Lợi Nhuận EBITDA</span>
+                <p class="kpi-sub mt-0.5">Lợi nhuận gộp toàn chuỗi</p>
+              </div>
+              <div class="kpi-icon-accent"><i data-lucide="dollar-sign" class="size-5"></i></div>
             </div>
-            <span class="inline-flex items-center gap-1 rounded-md bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-300 border border-brand-200/60 dark:border-brand-800/60 shrink-0" id="chainAvgMargin">
-              24,4%
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="chainTotalProfit" title="—">—</span>
+                <span class="kpi-unit" id="chainTotalProfitUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral" id="chainAvgMargin">
+                  <span>—</span>
+                </span>
+                <span class="kpi-sub">biên EBITDA TB</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Metric 3: Food Cost TB Chuỗi -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Food Cost TB Chuỗi</span>
-              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainAvgFoodCost">42,4%</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Mục tiêu định mức ≤ 43%</span>
+          <!-- Card 3: Food Cost TB Chuỗi (Lower is better) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Food Cost TB Chuỗi</span>
+                <p class="kpi-sub mt-0.5">Mục tiêu trần ≤ 43,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
             </div>
-            <span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-300 shrink-0">
-              Đạt chuẩn
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="chainAvgFoodCost">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" title="Đạt chuẩn định mức">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                  <span>Đạt chuẩn</span>
+                </span>
+                <span class="kpi-sub">dưới ngưỡng 43%</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Metric 4: Labor Cost (COL) Chuỗi -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Labor Cost (COL)</span>
-              <h4 class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate" id="chainAvgLaborCost">18,2%</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Định mức nhân công ≤ 19%</span>
+          <!-- Card 4: Labor Cost (COL) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Labor Cost (COL)</span>
+                <p class="kpi-sub mt-0.5">Mục tiêu nhân công ≤ 19,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="users" class="size-5"></i></div>
             </div>
-            <span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-300 shrink-0">
-              Tối ưu
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="chainAvgLaborCost">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                  <span>Tối ưu</span>
+                </span>
+                <span class="kpi-sub">dưới ngưỡng 19%</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -566,7 +611,7 @@
           <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i data-lucide="list-ordered" class="w-4 h-4 text-brand-500"></i>
-              <h2 class="font-extrabold text-sm text-gray-900 dark:text-white">Bảng Xếp Hạng 14 Điểm Bán Theo Doanh Thu &amp; Hiệu Quả Chi Phí</h2>
+              <h2 class="font-semibold text-sm text-gray-900 dark:text-white">Bảng Xếp Hạng 14 Điểm Bán Theo Doanh Thu &amp; Hiệu Quả Chi Phí</h2>
             </div>
             <span class="text-[11px] text-gray-500 dark:text-gray-400">Dữ liệu cập nhật thời gian thực</span>
           </div>
@@ -574,7 +619,7 @@
           <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 text-[11px] font-extrabold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                   <th class="py-3 px-3 text-center w-12">Hạng</th>
                   <th class="py-3 px-4">Điểm Bán &amp; Mã SAP</th>
                   <th class="py-3 px-3 text-center">Vùng</th>
@@ -611,7 +656,7 @@
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-brand-600 dark:bg-rose-950/60 dark:text-rose-300">P&amp;L REPORT</span>
-              <h1 class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white" id="plSiteTitle">Báo Cáo P&amp;L: K001 - MN Bếp Ăn ĐH Hùng Vương</h1>
+              <h1 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white" id="plSiteTitle">Báo Cáo P&amp;L: K001 - MN Bếp Ăn ĐH Hùng Vương</h1>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400">Chi tiết doanh thu thuần, Prime Cost (Food Cost + Labor Cost), chi phí cố định và EBITDA.</p>
           </div>
@@ -629,45 +674,99 @@
           </div>
         </div>
 
-        <!-- 6 KPI Strip -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
-          
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Thuần</div>
-            <div class="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white tabular-nums mt-0.5 truncate" id="plNetRev">470,450,000đ</div>
-            <div class="text-[10px] text-emerald-600 font-semibold truncate" id="plAchievement">102.3% Mục tiêu</div>
+        <!-- TailAdmin Unified KPI Grid: P&L Performance (4 Core Metric Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <!-- Card 1: Doanh Thu Thuần -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Doanh Thu Thuần</span>
+                <p class="kpi-sub mt-0.5">Doanh thu sau chiết khấu</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="trending-up" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="plNetRev" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="plAchievement">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>—%</span>
+                </span>
+                <span class="kpi-sub">so với mục tiêu</span>
+              </div>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Food Cost %</div>
-            <div class="text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400 tabular-nums mt-0.5 truncate" id="plFoodCostPct">42.8%</div>
-            <div class="text-[10px] text-gray-400 tabular-nums truncate" id="plFoodCostVal">201,352,600đ</div>
+          <!-- Card 2: Prime Cost % (Kèm Thanh Tiến Độ vs Trần 62%) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Prime Cost % (Food + Labor)</span>
+                <p class="kpi-sub mt-0.5">Định mức trần ≤ 62,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline justify-between">
+                <span class="kpi-value" id="plPrimeCostPct">—</span>
+                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Trần 62%</span>
+              </div>
+              <div class="kpi-progress-track">
+                <div id="plPrimeCostBar" class="kpi-progress-bar" style="width: 0%;"></div>
+              </div>
+              <div class="kpi-footer justify-between text-[11px] text-gray-500">
+                <span>Food: <b id="plFoodCostPct" class="text-gray-700 dark:text-gray-300 font-medium">—</b> <span id="plFoodCostVal" class="hidden"></span></span>
+                <span>Labor: <b id="plLaborCostPct" class="text-gray-700 dark:text-gray-300 font-medium">—</b> <span id="plLaborCostVal" class="hidden"></span></span>
+              </div>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Labor Cost (COL) %</div>
-            <div class="text-sm sm:text-base font-extrabold text-purple-600 dark:text-purple-400 tabular-nums mt-0.5 truncate" id="plLaborCostPct">18.5%</div>
-            <div class="text-[10px] text-gray-400 tabular-nums truncate" id="plLaborCostVal">87,033,250đ</div>
+          <!-- Card 3: Lợi Nhuận EBITDA -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Lợi Nhuận EBITDA</span>
+                <p class="kpi-sub mt-0.5">Lợi nhuận hoạt động</p>
+              </div>
+              <div class="kpi-icon-accent"><i data-lucide="dollar-sign" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="plProfitVal" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="plProfitMargin">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>—</span>
+                </span>
+                <span class="kpi-sub">biên EBITDA</span>
+              </div>
+            </div>
           </div>
 
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Prime Cost %</div>
-            <div class="text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400 tabular-nums mt-0.5 truncate" id="plPrimeCostPct">61.3%</div>
-            <div class="text-[10px] text-emerald-600 font-semibold truncate">&le; 62.0% Mục tiêu</div>
+          <!-- Card 4: Điểm Hòa Vốn -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Điểm Hòa Vốn</span>
+                <p class="kpi-sub mt-0.5">Doanh thu an toàn tối thiểu</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="target" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="plBreakEven" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Mức sàn</span>
+                </span>
+                <span class="kpi-sub">Cố định tháng</span>
+              </div>
+            </div>
           </div>
-
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Lợi Nhuận EBITDA</div>
-            <div class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5 truncate" id="plProfitVal">120,435,000đ</div>
-            <div class="text-[10px] text-emerald-600 tabular-nums font-bold truncate" id="plProfitMargin">25.6% Doanh thu</div>
-          </div>
-
-          <div class="bg-white dark:bg-white/3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs min-w-0 overflow-hidden">
-            <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase truncate">Doanh Thu Hòa Vốn</div>
-            <div class="text-sm sm:text-base font-extrabold text-gray-700 dark:text-gray-300 tabular-nums mt-0.5 truncate" id="plBreakEven">212,500,000đ</div>
-            <div class="text-[10px] text-gray-400 truncate">An toàn: 45.2%</div>
-          </div>
-
         </div>
 
         <!-- 2 Columns Grid: P&L Statement on Left, Analytics on Right -->
@@ -678,7 +777,7 @@
             <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
-                <h2 class="font-extrabold text-sm text-gray-900 dark:text-white">Bảng Cơ Cấu Doanh Thu &amp; Chi Phí Chuỗi (P&amp;L Statement)</h2>
+                <h2 class="font-semibold text-sm text-gray-900 dark:text-white">Bảng Cơ Cấu Doanh Thu &amp; Chi Phí Chuỗi (P&amp;L Statement)</h2>
               </div>
               <span class="text-[11px] tabular-nums text-gray-500">Đơn vị: VNĐ</span>
             </div>
@@ -712,10 +811,10 @@
                   </tr>
 
                   <!-- Doanh thu thuần -->
-                  <tr class="bg-rose-50/40 dark:bg-rose-950/20 font-extrabold text-brand-600 dark:text-rose-400 border-y border-rose-100 dark:border-rose-900/40">
-                    <td class="py-2.5 px-4 font-extrabold">2. DOANH THU THUẦN (Net Sales = 100%)</td>
-                    <td class="py-2.5 px-3 text-right tabular-nums font-extrabold" id="plRowNet">470,450,000đ</td>
-                    <td class="py-2.5 px-3 text-right tabular-nums font-extrabold">100.0%</td>
+                  <tr class="bg-rose-50/40 dark:bg-rose-950/20 font-semibold text-brand-600 dark:text-rose-400 border-y border-rose-100 dark:border-rose-900/40">
+                    <td class="py-2.5 px-4 font-semibold">2. DOANH THU THUẦN (Net Sales = 100%)</td>
+                    <td class="py-2.5 px-3 text-right tabular-nums font-semibold" id="plRowNet">470,450,000đ</td>
+                    <td class="py-2.5 px-3 text-right tabular-nums font-semibold">100.0%</td>
                     <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-200">Chuẩn căn cứ</span></td>
                   </tr>
 
@@ -756,11 +855,11 @@
                   </tr>
 
                   <!-- PRIME COST -->
-                  <tr class="bg-amber-50/60 dark:bg-amber-950/20 font-extrabold text-amber-800 dark:text-amber-300 border-y border-amber-200 dark:border-amber-800">
+                  <tr class="bg-amber-50/60 dark:bg-amber-950/20 font-semibold text-amber-800 dark:text-amber-300 border-y border-amber-200 dark:border-amber-800">
                     <td class="py-2.5 px-4">5. PRIME COST (Food Cost + Labor Cost)</td>
                     <td class="py-2.5 px-3 text-right tabular-nums" id="plRowPrimeCost">288,385,850đ</td>
                     <td class="py-2.5 px-3 text-right tabular-nums" id="plRowPrimeCostPct">61.3%</td>
-                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">ĐẠT CHỈ TIÊU (&le;62%)</span></td>
+                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-semibold">ĐẠT CHỈ TIÊU (&le;62%)</span></td>
                   </tr>
 
                   <!-- Chi phí cố định & vận hành -->
@@ -804,11 +903,11 @@
                   </tr>
 
                   <!-- LỢI NHUẬN HOẠT ĐỘNG EBITDA -->
-                  <tr class="bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-extrabold border-t-2 border-emerald-500">
+                  <tr class="bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-semibold border-t-2 border-emerald-500">
                     <td class="py-3 px-4 text-sm">LỢI NHUẬN VẬN HÀNH (EBITDA)</td>
                     <td class="py-3 px-3 text-right tabular-nums text-sm" id="plRowEBITDA">119,721,300đ</td>
                     <td class="py-3 px-3 text-right tabular-nums text-sm" id="plRowEBITDAPct">25.5%</td>
-                    <td class="py-3 px-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-600 text-white">VƯỢT KẾ HOẠCH</span></td>
+                    <td class="py-3 px-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white">VƯỢT KẾ HOẠCH</span></td>
                   </tr>
 
                 </tbody>
@@ -824,7 +923,7 @@
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                   <i data-lucide="trending-up" class="w-4 h-4 text-brand-500"></i>
-                  <h3 class="font-extrabold text-xs text-gray-900 dark:text-white">Xu Hướng 8 Tuần Gần Nhất</h3>
+                  <h3 class="font-semibold text-xs text-gray-900 dark:text-white">Xu Hướng 8 Tuần Gần Nhất</h3>
                 </div>
                 <span class="text-[10px] text-gray-400">Doanh thu &amp; Food Cost %</span>
               </div>
@@ -850,24 +949,24 @@
             <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
               <div class="flex items-center gap-2 mb-3">
                 <i data-lucide="activity" class="w-4 h-4 text-blue-500"></i>
-                <h3 class="font-extrabold text-xs text-gray-900 dark:text-white">Chỉ Số Vận Hành Điểm Bán</h3>
+                <h3 class="font-semibold text-xs text-gray-900 dark:text-white">Chỉ Số Vận Hành Điểm Bán</h3>
               </div>
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
                   <div class="text-[10.5px] text-gray-500 font-bold">Số Hóa Đơn / Ngày</div>
-                  <div class="text-base font-extrabold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpBillCount">450 bill</div>
+                  <div class="text-base font-semibold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpBillCount">450 bill</div>
                 </div>
                 <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
                   <div class="text-[10.5px] text-gray-500 font-bold">Giá Trị Bill TB (AOV)</div>
-                  <div class="text-base font-extrabold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpAvgBill">35,000đ</div>
+                  <div class="text-base font-semibold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpAvgBill">35,000đ</div>
                 </div>
                 <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
                   <div class="text-[10.5px] text-gray-500 font-bold">Doanh Thu / Ghế / Ngày</div>
-                  <div class="text-base font-extrabold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpRevSeat">135,000đ</div>
+                  <div class="text-base font-semibold text-gray-900 dark:text-white tabular-nums mt-0.5" id="plOpRevSeat">135,000đ</div>
                 </div>
                 <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
                   <div class="text-[10.5px] text-gray-500 font-bold">Tỷ Lệ Lấp Đầy Giờ Vàng</div>
-                  <div class="text-base font-extrabold text-emerald-600 tabular-nums mt-0.5" id="plOpOccupancy">92.5%</div>
+                  <div class="text-base font-semibold text-emerald-600 tabular-nums mt-0.5" id="plOpOccupancy">92.5%</div>
                 </div>
               </div>
             </div>
@@ -877,7 +976,7 @@
               <div>
                 <div class="flex items-center gap-2 mb-2">
                   <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
-                  <h3 class="font-extrabold text-xs text-gray-900 dark:text-white">Top Món Bán Chạy Nhất Tại Điểm</h3>
+                  <h3 class="font-semibold text-xs text-gray-900 dark:text-white">Top Món Bán Chạy Nhất Tại Điểm</h3>
                 </div>
                 <div id="plTopDishesList" class="space-y-1.5 text-xs">
                   <!-- Dynamically rendered -->
@@ -887,7 +986,7 @@
               <div class="pt-3 border-t border-gray-100 dark:border-gray-800">
                 <div class="flex items-center gap-2 mb-2">
                   <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
-                  <h3 class="font-extrabold text-xs text-gray-900 dark:text-white">Kế Hoạch Hành Động Tuần Tới</h3>
+                  <h3 class="font-semibold text-xs text-gray-900 dark:text-white">Kế Hoạch Hành Động Tuần Tới</h3>
                 </div>
                 <div id="plActionPlansList" class="space-y-1 text-xs text-gray-600 dark:text-gray-300">
                   <!-- Dynamically rendered -->
@@ -913,7 +1012,7 @@
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">POS METRICS</span>
-              <h1 class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white">Doanh Thu Máy POS &amp; Hiệu Suất Bán Lẻ</h1>
+              <h1 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Doanh Thu Máy POS &amp; Hiệu Suất Bán Lẻ</h1>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400">Giám sát doanh số theo khung giờ cao điểm, lưu lượng hóa đơn và phương thức thanh toán.</p>
           </div>
@@ -925,22 +1024,74 @@
           </div>
         </div>
 
-        <!-- 3 POS Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
-            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Doanh Thu POS Hôm Nay</div>
-            <div class="text-xl sm:text-title-sm font-bold text-gray-900 dark:text-white tabular-nums truncate" id="posDailyRevenue">16,850,000đ</div>
-            <div class="text-[11px] text-emerald-600 font-semibold mt-1 truncate">+12.4% so với trung bình tuần</div>
+        <!-- TailAdmin Unified KPI Grid: POS Daily Performance -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <!-- Card 1: Doanh Thu POS Hôm Nay -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Doanh Thu POS Hôm Nay</span>
+                <p class="kpi-sub mt-0.5">Điểm bán hiện tại</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="receipt" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="posDailyRevenue" title="—">—</span>
+                <span class="kpi-unit" id="posDailyRevenueUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>+12,4%</span>
+                </span>
+                <span class="kpi-sub">so với TB tuần</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
-            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Tổng Số Hóa Đơn POS</div>
-            <div class="text-xl sm:text-title-sm font-bold text-gray-900 dark:text-white tabular-nums truncate" id="posDailyBills">482 bill</div>
-            <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Cao điểm trưa: 295 bill (61.2%)</div>
+
+          <!-- Card 2: Tổng Số Hóa Đơn POS -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tổng Số Hóa Đơn POS</span>
+                <p class="kpi-sub mt-0.5">Số giao dịch thanh toán</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="file-text" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="posDailyBills">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Cao điểm trưa</span>
+                </span>
+                <span class="kpi-sub">61,2% lượng bill</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs min-w-0 overflow-hidden">
-            <div class="text-xs text-gray-500 font-bold mb-1 truncate">Giá Trị Trung Bình / Bill</div>
-            <div class="text-xl sm:text-title-sm font-bold text-brand-500 tabular-nums truncate" id="posDailyAOV">34,950đ</div>
-            <div class="text-[11px] text-gray-500 font-semibold mt-1 truncate">Chuẩn suất ăn trưa công sở</div>
+
+          <!-- Card 3: Giá Trị Trung Bình / Bill (AOV) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Giá Trị TB / Bill (AOV)</span>
+                <p class="kpi-sub mt-0.5">Mức chi tiêu trung bình</p>
+              </div>
+              <div class="kpi-icon-accent"><i data-lucide="circle-dollar-sign" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="posDailyAOV" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Chuẩn suất ăn</span>
+                </span>
+                <span class="kpi-sub">Suất trưa công sở</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -948,7 +1099,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <h3 class="font-extrabold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <i data-lucide="clock" class="w-4 h-4 text-brand-500"></i>
               <span>Phân Bổ Doanh Thu Theo Khung Giờ</span>
             </h3>
@@ -958,7 +1109,7 @@
           </div>
 
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-            <h3 class="font-extrabold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <i data-lucide="credit-card" class="w-4 h-4 text-emerald-500"></i>
               <span>Cơ Cấu Phương Thức Thanh Toán</span>
             </h3>
@@ -1008,7 +1159,7 @@
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">MASTER DATA</span>
-              <h1 class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <span>Danh Mục 14 Điểm Bán / Bếp Ăn Vận Hành</span>
                 <span id="fnbSitesCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-300">14 điểm bán</span>
               </h1>
@@ -1025,7 +1176,7 @@
           <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 text-[11px] font-extrabold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                   <th class="py-3 px-4">Mã SAP</th>
                   <th class="py-3 px-4">Tên Điểm Bán / Bếp Vận Hành</th>
                   <th class="py-3 px-3 text-center">Vùng Miền</th>
@@ -1078,66 +1229,98 @@
           </div>
         </div>
 
-        <!-- 4 KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+        <!-- TailAdmin Unified KPI Grid: User Matrix (Compact Variant) -->
+        <div class="kpi-grid mb-6">
           <!-- Card 1: Tổng số user -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Tổng Tài Khoản User</p>
-                <h3 id="userMatrixKpiTotal" class="text-xl sm:text-title-sm font-bold tabular-nums text-gray-900 dark:text-white mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Đăng nhập bằng Google</p>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Tổng Tài Khoản User</span>
+                <p class="kpi-sub mt-0.5">Đăng nhập bằng Google</p>
               </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center shrink-0">
-                <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <div class="kpi-icon-compact"><i data-lucide="users" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="userMatrixKpiTotal">—</span>
+                <span class="kpi-unit">User</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Toàn hệ thống</span>
+                </span>
+                <span class="kpi-sub">Google Auth</span>
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
           </div>
 
           <!-- Card 2: User đang hoạt động -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Đang Hoạt Động (Active)</p>
-                <h3 id="userMatrixKpiActive" class="text-xl sm:text-title-sm font-bold tabular-nums text-emerald-600 dark:text-emerald-400 mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Có quyền truy cập hợp lệ</p>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Đang Hoạt Động (Active)</span>
+                <p class="kpi-sub mt-0.5">Truy cập hợp lệ</p>
               </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center shrink-0">
-                <i data-lucide="user-check" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <div class="kpi-icon-compact"><i data-lucide="user-check" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="userMatrixKpiActive">—</span>
+                <span class="kpi-unit">User</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <span>Hợp lệ</span>
+                </span>
+                <span class="kpi-sub">Đã gán vai trò</span>
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
           </div>
 
           <!-- Card 3: Phân quyền tùy chỉnh -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Quyền Tùy Chỉnh Riêng</p>
-                <h3 id="userMatrixKpiCustomOverrides" class="text-xl sm:text-title-sm font-bold tabular-nums text-brand-500 dark:text-brand-400 mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Quyền cấp thêm hoặc bị cắt</p>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Quyền Tùy Chỉnh Riêng</span>
+                <p class="kpi-sub mt-0.5">Custom Overrides</p>
               </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-brand-500 flex items-center justify-center shrink-0">
-                <i data-lucide="sliders" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <div class="kpi-icon-compact"><i data-lucide="sliders" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="userMatrixKpiCustomOverrides">—</span>
+                <span class="kpi-unit">User</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Cấp thêm/bớt</span>
+                </span>
+                <span class="kpi-sub">Cần rà soát</span>
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-brand-500"></div>
           </div>
 
           <!-- Card 4: Quản trị viên & Kho trưởng -->
-          <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs relative overflow-hidden min-w-0">
-            <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">Quản Trị &amp; Kho Trưởng</p>
-                <h3 id="userMatrixKpiAdmins" class="text-xl sm:text-title-sm font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-1 truncate">--</h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 truncate">Admin, Kho Trưởng, Kế Toán</p>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Quản Trị &amp; Kho Trưởng</span>
+                <p class="kpi-sub mt-0.5">Quyền hạn cao</p>
               </div>
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center shrink-0">
-                <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <div class="kpi-icon-compact"><i data-lucide="shield" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="userMatrixKpiAdmins">—</span>
+                <span class="kpi-unit">User</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Admin/Kho</span>
+                </span>
+                <span class="kpi-sub">Đặc quyền cao</span>
               </div>
             </div>
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
           </div>
         </div>
 
@@ -1233,7 +1416,7 @@
                 <i data-lucide="user-plus" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-extrabold text-base text-gray-900 dark:text-white">Thêm Tài Khoản Mới</h3>
+                <h3 class="font-semibold text-base text-gray-900 dark:text-white">Thêm Tài Khoản Mới</h3>
                 <p class="text-[11px] text-gray-400">Tạo tài khoản và phân quyền khởi tạo</p>
               </div>
             </div>
@@ -1284,7 +1467,7 @@
                 <i data-lucide="shield" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-extrabold text-base text-gray-900 dark:text-white">Điều Chỉnh Tài Khoản</h3>
+                <h3 class="font-semibold text-base text-gray-900 dark:text-white">Điều Chỉnh Tài Khoản</h3>
                 <p id="editUserEmailDisplay" class="text-[11px] text-gray-400">user@gmail.com</p>
               </div>
             </div>
@@ -1355,60 +1538,95 @@
           </div>
         </div>
 
-        <!-- Inline Metric Toolbar: F&B Stock -->
-        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 lg:grid-cols-4 mb-4">
+        <!-- TailAdmin Unified KPI Grid: F&B Stock (Compact Variant) -->
+        <div class="kpi-grid mb-6">
           <!-- Item 1: Tổng Mặt Hàng F&B -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Mặt Hàng F&amp;B</span>
-              <h3 id="fnbStockKpiTotalItems" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">--</h3>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">5 nhóm danh mục</span>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Tổng Mặt Hàng F&amp;B</span>
+                <p class="kpi-sub mt-0.5">5 nhóm danh mục</p>
+              </div>
+              <div class="kpi-icon-compact"><i data-lucide="boxes" class="size-4"></i></div>
             </div>
-            <div class="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
-              <i data-lucide="boxes" class="w-4 h-4"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbStockKpiTotalItems">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Danh mục</span>
+                </span>
+                <span class="kpi-sub">5 nhóm ngành</span>
+              </div>
             </div>
           </div>
 
           <!-- Item 2: Tổng Giá Trị Tồn Chuỗi -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng Giá Trị Tồn Chuỗi</span>
-              <h3 id="fnbStockKpiTotalValue" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">--</h3>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">14 Điểm bán toàn hệ thống</span>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Tổng Giá Trị Tồn Chuỗi</span>
+                <p class="kpi-sub mt-0.5">14 Điểm bán toàn chuỗi</p>
+              </div>
+              <div class="kpi-icon-compact"><i data-lucide="circle-dollar-sign" class="size-4"></i></div>
             </div>
-            <div class="w-8 h-8 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
-              <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbStockKpiTotalValue" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Toàn chuỗi</span>
+                </span>
+                <span class="kpi-sub">14 Điểm bán</span>
+              </div>
             </div>
           </div>
 
-          <!-- Item 3: Cảnh Báo Âm Tồn -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-rose-700 dark:text-rose-400 block truncate flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                Cảnh Báo Âm Tồn
-              </span>
-              <h3 id="fnbStockKpiNegative" class="text-base sm:text-lg font-bold tabular-nums text-rose-600 dark:text-rose-400 mt-0.5 font-mono truncate">--</h3>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Cần kiểm kê đối soát</span>
+          <!-- Item 3: Cảnh Báo Âm Tồn (Lower is better) -->
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact font-medium text-rose-700 dark:text-rose-400">Cảnh Báo Âm Tồn</span>
+                <p class="kpi-sub mt-0.5">Cần đối soát ngay</p>
+              </div>
+              <div class="kpi-icon-compact !bg-error-50 !text-error-600 dark:!bg-error-500/15 dark:!text-error-500"><i data-lucide="alert-circle" class="size-4"></i></div>
             </div>
-            <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60 shrink-0">
-              Kiểm đếm
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbStockKpiNegative">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-bad">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>Kiểm đếm</span>
+                </span>
+                <span class="kpi-sub">Cần xử lý</span>
+              </div>
+            </div>
           </div>
 
           <!-- Item 4: Chưa Có Tồn Đầu -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                Chưa Có Tồn Đầu
-              </span>
-              <h3 id="fnbStockKpiNoOpening" class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono truncate">--</h3>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Chưa có số dư ban đầu</span>
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact font-medium text-amber-700 dark:text-amber-400">Chưa Có Tồn Đầu</span>
+                <p class="kpi-sub mt-0.5">Số dư ban đầu</p>
+              </div>
+              <div class="kpi-icon-compact !bg-warning-50 !text-warning-600 dark:!bg-warning-500/15 dark:!text-warning-500"><i data-lucide="alert-triangle" class="size-4"></i></div>
             </div>
-            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 shrink-0">
-              Cập nhật
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbStockKpiNoOpening">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Cập nhật</span>
+                </span>
+                <span class="kpi-sub">Cần nhập đầu kỳ</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1544,23 +1762,94 @@
           </div>
         </div>
 
-        <!-- Count Metrics Bar -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <span class="text-[10.5px] uppercase font-bold text-gray-400">Mặt Hàng Kiểm</span>
-            <div id="fnbCountMetricTotal" class="text-xl font-extrabold tabular-nums text-gray-900 dark:text-white mt-0.5">--</div>
+        <!-- TailAdmin Unified KPI Grid: F&B Count Metrics (Compact Variant) -->
+        <div class="kpi-grid mb-6">
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Mặt Hàng Kiểm</span>
+                <p class="kpi-sub mt-0.5">Tổng số danh mục</p>
+              </div>
+              <div class="kpi-icon-compact"><i data-lucide="clipboard-list" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbCountMetricTotal">—</span>
+                <span class="kpi-unit">Mã</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Kiểm đếm</span>
+                </span>
+                <span class="kpi-sub">Theo ca/ngày</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <span class="text-[10.5px] uppercase font-bold text-emerald-500">Khớp Sổ Sách</span>
-            <div id="fnbCountMetricMatched" class="text-xl font-extrabold tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5">--</div>
+
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact">Khớp Sổ Sách</span>
+                <p class="kpi-sub mt-0.5">Không chênh lệch</p>
+              </div>
+              <div class="kpi-icon-compact !bg-success-50 !text-success-600 dark:!bg-success-500/15 dark:!text-success-500"><i data-lucide="check-circle" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbCountMetricMatched">—</span>
+                <span class="kpi-unit">Mã</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>Khớp chuẩn</span>
+                </span>
+                <span class="kpi-sub">Trùng khớp</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <span class="text-[10.5px] uppercase font-bold text-rose-500">Lệch Thừa / Thiếu</span>
-            <div id="fnbCountMetricDiff" class="text-xl font-extrabold tabular-nums text-rose-600 dark:text-rose-400 mt-0.5">--</div>
+
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact font-medium text-rose-700 dark:text-rose-400">Lệch Thừa / Thiếu</span>
+                <p class="kpi-sub mt-0.5">Chênh lệch số lượng</p>
+              </div>
+              <div class="kpi-icon-compact !bg-error-50 !text-error-600 dark:!bg-error-500/15 dark:!text-error-500"><i data-lucide="alert-triangle" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbCountMetricDiff">—</span>
+                <span class="kpi-unit">Mã</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-bad">
+                  <span>Có sai lệch</span>
+                </span>
+                <span class="kpi-sub">Cần giải trình</span>
+              </div>
+            </div>
           </div>
-          <div class="bg-white dark:bg-white/3 p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <span class="text-[10.5px] uppercase font-bold text-blue-500">Tổng Tiền Lệch</span>
-            <div id="fnbCountMetricDiffVal" class="text-xl font-extrabold tabular-nums text-blue-600 dark:text-blue-400 mt-0.5">--</div>
+
+          <div class="kpi-card-compact">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label-compact font-medium text-gray-700 dark:text-gray-300">Tổng Tiền Lệch</span>
+                <p class="kpi-sub mt-0.5">Giá trị chênh lệch</p>
+              </div>
+              <div class="kpi-icon-compact"><i data-lucide="circle-dollar-sign" class="size-4"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-compact" id="fnbCountMetricDiffVal" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Giá trị</span>
+                </span>
+                <span class="kpi-sub">Quy đổi giá vốn</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1591,7 +1880,7 @@
         <!-- Recent Audit History -->
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3 mt-6">
           <div class="flex items-center justify-between">
-            <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> Lịch Sử Các Đợt Kiểm Kê Gần Đây
             </h3>
             <span class="text-xs text-gray-400">Lưu tự động trên Cloudflare D1</span>
@@ -1802,72 +2091,109 @@
           </div>
         </div>
 
-        <!-- Inline Metric Toolbar: Warehouse Overview -->
-        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mb-4">
-          <!-- Metric 1: Tổng SKU -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tổng SKU Quản Lý</span>
-              <h4 id="dashMetricSkus" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">0 Mã</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Toàn bộ danh mục kho</span>
+        <!-- TailAdmin Unified KPI Grid: Warehouse Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 mb-6">
+          <!-- Metric 1: Giá Trị Tồn Kho (Hero Card - Span 2 Cols) -->
+          <div class="kpi-card-hero">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Giá Trị Tồn Kho (SAP)</span>
+                <p class="kpi-sub mt-0.5">Theo giá bình quân kho tổng</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="circle-dollar-sign" class="size-5"></i></div>
             </div>
-            <div class="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
-              <i data-lucide="boxes" class="w-4 h-4"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-hero" id="dashMetricValue" title="—">—</span>
+                <span class="kpi-unit" id="dashMetricValueUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral" id="dashMetricValueDelta">
+                  <span class="size-1.5 rounded-full bg-gray-400"></span>
+                  <span>Thời gian thực</span>
+                </span>
+                <span class="kpi-sub">D1/Supabase live</span>
+              </div>
             </div>
           </div>
 
-          <!-- Metric 2: Tổng Giá Trị Tồn Kho -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Giá Trị Tồn Kho (SAP)</span>
-              <h4 id="dashMetricValue" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">0 ₫</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Theo giá bình quân</span>
+          <!-- Metric 2: Tổng SKU Quản Lý -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng SKU Quản Lý</span>
+              <div class="kpi-icon"><i data-lucide="boxes" class="size-5"></i></div>
             </div>
-            <div class="w-8 h-8 rounded-md bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
-              <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="dashMetricSkus">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span class="size-1.5 rounded-full bg-gray-400"></span>
+                  <span>Định mức</span>
+                </span>
+                <span class="kpi-sub">Toàn bộ danh mục</span>
+              </div>
             </div>
           </div>
 
-          <!-- Metric 3: Cảnh Báo ROP / Dưới mức tối thiểu -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                Dưới Mức Tối Thiểu
-              </span>
-              <h4 id="dashMetricRop" class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono truncate">0 Mã</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Chạm ngưỡng an toàn</span>
+          <!-- Metric 3: Cảnh Báo ROP / Dưới Mức Tối Thiểu -->
+          <div class="kpi-card cursor-pointer focus-visible:ring-4 focus-visible:ring-brand-500/20" role="button" tabindex="0" onclick="switchTab('wh-reorder')" title="Bấm để xem danh sách cần đặt hàng bổ sung">
+            <div class="kpi-header">
+              <span class="kpi-label font-medium text-gray-700 dark:text-gray-300">Dưới Mức Tối Thiểu</span>
+              <div class="kpi-icon-warning"><i data-lucide="alert-triangle" class="size-5"></i></div>
             </div>
-            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 shrink-0">
-              Cần đặt
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="dashMetricRop">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-bad" id="dashMetricRopDelta">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>Cần đặt</span>
+                </span>
+                <span class="kpi-sub">Ngưỡng an toàn</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Metric 4: Sắp Hết Hạn / Cận Date -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-rose-700 dark:text-rose-400 block truncate flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                Cận Date (≤ 7 Ngày)
-              </span>
-              <h4 id="dashMetricExp" class="text-base sm:text-lg font-bold tabular-nums text-rose-600 dark:text-rose-400 mt-0.5 font-mono truncate">0 Lô</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Ưu tiên xuất FEFO</span>
+          <!-- Metric 4: Cận Date (≤ 7 Ngày) -->
+          <div class="kpi-card cursor-pointer focus-visible:ring-4 focus-visible:ring-brand-500/20" role="button" tabindex="0" onclick="switchTab('wh-stock')" title="Bấm để xem danh sách cận date xuất FEFO">
+            <div class="kpi-header">
+              <span class="kpi-label font-medium text-gray-700 dark:text-gray-300">Cận Date (≤ 7 Ngày)</span>
+              <div class="kpi-icon-error"><i data-lucide="clock" class="size-5"></i></div>
             </div>
-            <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60 shrink-0">
-              Xuất gấp
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="dashMetricExp">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-bad" id="dashMetricExpDelta">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>Xuất gấp</span>
+                </span>
+                <span class="kpi-sub">Ưu tiên FEFO</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Metric 5: Hàng Tồn Chậm / Chết -->
-          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Tồn Chậm Luân Chuyển</span>
-              <h4 id="dashMetricSlow" class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono truncate">2 Mã</h4>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 block truncate mt-0.5">Lưu kho &gt; 20 ngày</span>
+          <!-- Metric 5: Tồn Chậm Luân Chuyển -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Tồn Chậm Luân Chuyển</span>
+              <div class="kpi-icon"><i data-lucide="shield-alert" class="size-5"></i></div>
             </div>
-            <span class="text-[10px] font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded shrink-0">
-              Chậm
-            </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="dashMetricSlow">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>> 20 ngày</span>
+                </span>
+                <span class="kpi-sub">Cần giải phóng</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2166,7 +2492,7 @@
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
             <div>
-              <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="shopping-cart" class="w-5 h-5 text-blue-600"></i>
                 Cảnh Báo Đặt Hàng Tự Động Theo Ngưỡng An Toàn (ROP)
               </h2>
@@ -2204,7 +2530,7 @@
 <section id="wh-leadtime" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="truck" class="w-5 h-5 text-emerald-600"></i>
               Hiệu Suất Giao Hàng Nhà Cung Cấp &amp; Cam Kết SLA
             </h2>
@@ -2237,7 +2563,7 @@
 <section id="wh-posap" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="file-diff" class="w-5 h-5 text-purple-600"></i>
               Đối Chiếu Biến Động Giá Đơn Mua PO So Với Giá Chuẩn SAP
             </h2>
@@ -2456,39 +2782,96 @@
           </button>
         </div>
 
-        <!-- Budget & Quota Toolbar: Consolidated High-Density Strip -->
-        <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs p-4 mb-4">
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800">
-            <!-- 1: Ngân Sách Tháng -->
-            <div class="min-w-0 pr-2">
-              <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 block truncate">Ngân Sách Tháng</span>
-              <div class="text-base sm:text-lg font-bold tabular-nums text-gray-900 dark:text-white mt-0.5 font-mono" id="kpiNganSach">0 ₫</div>
-              <span class="text-[10px] text-gray-400 block truncate" id="kpiSubSite">—</span>
-            </div>
-            <!-- 2: Đã Đặt Lũy Kế -->
-            <div class="min-w-0 sm:pl-3 pr-2 pt-2 sm:pt-0">
-              <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400 block truncate">Đã Đặt Lũy Kế</span>
-              <div class="text-base sm:text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400 mt-0.5 font-mono" id="kpiDaDat">0 ₫</div>
-              <span class="text-[10px] text-gray-400 block truncate">Các đơn trước trong tháng</span>
-            </div>
-            <!-- 3: Còn Lại -->
-            <div class="min-w-0 sm:pl-3 pr-2 pt-2 sm:pt-0">
-              <span class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 block truncate">Còn Lại (Khả Dụng)</span>
-              <div class="text-base sm:text-lg font-bold tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono" id="kpiConLai">0 ₫</div>
-              <span class="text-[10px] text-gray-400 block truncate" id="kpiDangNhapSub">Đang nhập: 0 ₫</span>
-            </div>
-            <!-- 4: Tỷ Lệ Sử Dụng & Progress -->
-            <div class="min-w-0 sm:pl-3 pt-2 sm:pt-0">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400 truncate">Tỷ Lệ Ngân Sách</span>
-                <span class="text-sm font-bold tabular-nums text-gray-900 dark:text-white font-mono" id="kpiTyLe">0%</span>
+        <!-- TailAdmin Unified KPI Grid: Portal Order Budget Strip -->
+        <div class="kpi-grid mb-6">
+          <!-- Card 1: Ngân Sách Tháng -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Ngân Sách Tháng</span>
+                <p class="kpi-sub mt-0.5" id="kpiSubSite">—</p>
               </div>
-              <div class="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1.5">
-                <div id="budFill" class="h-full bg-brand-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
+              <div class="kpi-icon"><i data-lucide="wallet" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kpiNganSach" title="—">—</span>
               </div>
-              <div class="flex items-center justify-between text-[10px] text-gray-400 mt-1">
-                <span>Dùng: <b id="budUsed" class="text-gray-700 dark:text-gray-200 font-semibold font-mono">0 ₫</b> / <span id="budTotal" class="font-mono">0 ₫</span></span>
-                <span id="budNote" class="text-gray-400 truncate max-w-[120px]">Chưa nhập mặt hàng</span>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Hạn mức</span>
+                </span>
+                <span class="kpi-sub">Định mức tháng</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Đã Đặt Lũy Kế -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Đã Đặt Lũy Kế</span>
+                <p class="kpi-sub mt-0.5">Các đơn trước trong tháng</p>
+              </div>
+              <div class="kpi-icon-warning"><i data-lucide="clock" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kpiDaDat" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Đã duyệt</span>
+                </span>
+                <span class="kpi-sub">Lũy kế tháng</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Còn Lại (Khả Dụng) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Còn Lại (Khả Dụng)</span>
+                <p class="kpi-sub mt-0.5" id="kpiDangNhapSub">Đang nhập: —</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="check-circle" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kpiConLai" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral" id="kpiConLaiDelta"><span>Khả dụng</span></span>
+                <span class="kpi-sub">Có thể đặt thêm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Tỷ Lệ Sử Dụng & Progress -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tỷ Lệ Ngân Sách</span>
+                <p class="kpi-sub mt-0.5" id="budNote">Chờ chọn điểm bán</p>
+              </div>
+              <div class="kpi-icon-accent"><i data-lucide="pie-chart" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline justify-between">
+                <span class="kpi-value" id="kpiTyLe">—</span>
+                <span class="text-xs text-gray-500">
+                  <span id="budUsed" class="font-medium text-gray-700 dark:text-gray-300">—</span> / <span id="budTotal">—</span>
+                </span>
+              </div>
+              <div class="kpi-progress-track">
+                <div id="budFill" class="kpi-progress-bar" style="width: 0%;"></div>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral" id="budBadge">
+                  <span>Tiến độ</span>
+                </span>
+                <span class="kpi-sub">Hạn mức chi tiêu</span>
               </div>
             </div>
           </div>
@@ -2497,7 +2880,7 @@
         <!-- Material Table Card -->
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 gap-3">
-            <h2 class="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
               Danh Sách Vật Tư &amp; Công Cụ Dụng Cụ
             </h2>
@@ -2620,7 +3003,7 @@
           <!-- NHÓM 1: THÔNG TIN CHUNG -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i>
                 1. Thông Tin Chung
               </h3>
@@ -2649,7 +3032,7 @@
           <!-- NHÓM 2: SỐ LIỆU SUẤT ĂN -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="utensils" class="w-4 h-4 text-orange-600"></i>
                 2. Số Liệu Suất Ăn Trong Ngày
               </h3>
@@ -2678,7 +3061,7 @@
               </div>
               <div>
                 <label class="font-bold text-emerald-800 block mb-1">Tổng suất đã xuất (Tự tính)</label>
-                <input type="text" id="bcTong" value="0" disabled readonly class="w-full p-2.5 border border-emerald-300 rounded-xl tabular-nums tabular-nums text-right font-extrabold bg-emerald-50 text-emerald-800 text-sm text-gray-900 dark:text-gray-100">
+                <input type="text" id="bcTong" value="0" disabled readonly class="w-full p-2.5 border border-emerald-300 rounded-xl tabular-nums tabular-nums text-right font-semibold bg-emerald-50 text-emerald-800 text-sm text-gray-900 dark:text-gray-100">
               </div>
               <div>
                 <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Suất Lưu mẫu <span class="text-rose-500">*</span></label>
@@ -2694,7 +3077,7 @@
           <!-- NHÓM 3: GIAO HÀNG · NGUYÊN VẬT LIỆU · THIẾT BỊ -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="truck" class="w-4 h-4 text-blue-600"></i>
                 3. Giao Hàng · Nguyên Vật Liệu · Thiết Bị
               </h3>
@@ -2727,7 +3110,7 @@
           <!-- NHÓM 4: DƯ / THẤT THOÁT -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="trash-2" class="w-4 h-4 text-amber-600"></i>
                 4. Suất Ăn Dư / Thất Thoát
               </h3>
@@ -2747,7 +3130,7 @@
           <!-- NHÓM 5: NHÂN SỰ -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
                 5. Nhân Sự Ca Bếp
               </h3>
@@ -2775,7 +3158,7 @@
           <!-- NHÓM 6: PHẢN HỒI KHÁCH HÀNG -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="message-square" class="w-4 h-4 text-violet-600"></i>
                 6. Phản Hồi Từ Khách Hàng
               </h3>
@@ -2821,7 +3204,7 @@
           <!-- NHÓM 7: CHI PHÍ PHÁT SINH NGOÀI KẾ HOẠCH -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="banknote" class="w-4 h-4 text-emerald-600"></i>
                 7. Chi Phí Ngoài Kế Hoạch
               </h3>
@@ -2844,7 +3227,7 @@
           <!-- NHÓM 8: HÌNH ẢNH & ĐỀ XUẤT -->
           <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
             <div class="pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="camera" class="w-4 h-4 text-rose-600"></i>
                 8. Hình Ảnh &amp; Kiến Nghị Đề Xuất
               </h3>
@@ -2979,45 +3362,94 @@
           </div>
         </div>
 
-        <!-- 4 KPI Cards Báo Cáo Kiểm Kê (TailAdmin Style) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
-            <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng Mặt Hàng Site</span>
-              <h4 id="kkMetricTotalSkus" class="mt-1 text-title-sm font-bold tabular-nums text-gray-800 dark:text-white">0 Mã</h4>
+        <!-- TailAdmin Unified KPI Grid: Báo Cáo Kiểm Kê -->
+        <div class="kpi-grid mb-6">
+          <!-- Card 1: Tổng Mặt Hàng Site -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tổng Mặt Hàng Site</span>
+                <p class="kpi-sub mt-0.5">Danh mục kiểm kê điểm bán</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="clipboard-check" class="size-5"></i></div>
             </div>
-            <div class="h-11 w-11 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <i data-lucide="clipboard-check" class="w-5 h-5"></i>
-            </div>
-          </div>
-
-          <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
-            <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tỷ Lệ Khớp Sổ Sách</span>
-              <h4 id="kkMetricMatchRate" class="mt-1 text-title-sm font-bold tabular-nums text-emerald-600">100%</h4>
-            </div>
-            <div class="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <i data-lucide="shield-check" class="w-5 h-5"></i>
-            </div>
-          </div>
-
-          <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
-            <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tổng Giá Trị Tồn Cuối</span>
-              <h4 id="kkMetricDiffValue" class="mt-1 text-title-sm font-bold tabular-nums text-brand-500">0 ₫</h4>
-            </div>
-            <div class="h-11 w-11 rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-400 flex items-center justify-center shrink-0">
-              <i data-lucide="scale" class="w-5 h-5"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kkMetricTotalSkus">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Toàn bộ SKU</span>
+                </span>
+                <span class="kpi-sub">Theo site</span>
+              </div>
             </div>
           </div>
 
-          <div class="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs flex items-center justify-between">
-            <div>
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Số Mã Có Độ Lệch</span>
-              <h4 id="kkMetricDiffCount" class="mt-1 text-title-sm font-bold tabular-nums text-amber-600">0 Mã</h4>
+          <!-- Card 2: Tỷ Lệ Khớp Sổ Sách -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tỷ Lệ Khớp Sổ Sách</span>
+                <p class="kpi-sub mt-0.5">Không chênh lệch tồn</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="shield-check" class="size-5"></i></div>
             </div>
-            <div class="h-11 w-11 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kkMetricMatchRate">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>Mục tiêu 95%</span>
+                </span>
+                <span class="kpi-sub">Độ tin cậy cao</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Tổng Giá Trị Tồn Cuối -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tổng Giá Trị Tồn Cuối</span>
+                <p class="kpi-sub mt-0.5">Quy đổi giá vốn</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="circle-dollar-sign" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kkMetricDiffValue" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Thực tế kiểm</span>
+                </span>
+                <span class="kpi-sub">Theo giá vốn kho</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Số Mã Có Độ Lệch -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Số Mã Có Độ Lệch</span>
+                <p class="kpi-sub mt-0.5">Cần đối soát biên bản</p>
+              </div>
+              <div class="kpi-icon-warning"><i data-lucide="alert-triangle" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value" id="kkMetricDiffCount">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Cần xử lý</span>
+                </span>
+                <span class="kpi-sub">Biên bản giải trình</span>
+              </div>
             </div>
           </div>
         </div>
@@ -3121,7 +3553,7 @@
         <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center border-4 border-white dark:border-gray-900 transition-all group-hover:scale-105">
           <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
-        <span class="text-[9.5px] font-extrabold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
+        <span class="text-[9.5px] font-semibold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
       </button>
 
       <!-- Tab 4: Suất Ăn Ca Bếp -->
@@ -3158,11 +3590,11 @@
         <div class="w-12 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700 mx-auto mb-3 cursor-grab"></div>
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-700 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-rose-900/20">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-700 text-white flex items-center justify-center font-semibold text-sm shadow-md shadow-rose-900/20">
               <i data-lucide="layout-grid" class="w-5 h-5"></i>
             </div>
             <div>
-              <div class="font-extrabold text-gray-900 dark:text-white text-base leading-tight">Trung Tâm Ứng Dụng</div>
+              <div class="font-semibold text-gray-900 dark:text-white text-base leading-tight">Trung Tâm Ứng Dụng</div>
               <div class="text-[11px] text-gray-500 dark:text-gray-400">A.Kitchen WMS • Chức năng vận hành</div>
             </div>
           </div>
@@ -3322,7 +3754,7 @@
                 <i data-lucide="receipt" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-extrabold text-brand-500 dark:text-brand-400 truncate">Nhập Chứng Từ</div>
+                <div class="font-semibold text-brand-500 dark:text-brand-400 truncate">Nhập Chứng Từ</div>
                 <div class="text-[10px] text-gray-500 truncate">Full Screen</div>
               </div>
             </button>
@@ -3474,7 +3906,7 @@
             <i data-lucide="package-plus" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-sm text-gray-900 dark:text-white">Tạo Phiếu Nhập Hàng Điểm Bán</h3>
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white">Tạo Phiếu Nhập Hàng Điểm Bán</h3>
             <p class="text-[10.5px] text-gray-400">Tự động cộng tồn kho và cập nhật số dư ma trận</p>
           </div>
         </div>
@@ -3527,7 +3959,7 @@
         <!-- Total & Notes -->
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between tabular-nums">
           <span class="font-bold text-gray-600 dark:text-gray-400">Tổng Tiền Phiếu Nhập:</span>
-          <span id="receiptModalTotalAmount" class="font-extrabold text-base text-indigo-600 dark:text-indigo-400">0 đ</span>
+          <span id="receiptModalTotalAmount" class="font-semibold text-base text-indigo-600 dark:text-indigo-400">0 đ</span>
         </div>
 
         <div>
@@ -3558,7 +3990,7 @@
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-sm text-gray-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
             <p class="text-[10.5px] text-gray-400">Tự động trừ số lượng tồn và hạch toán giá trị hủy</p>
           </div>
         </div>
@@ -3611,7 +4043,7 @@
         <!-- Total & Notes -->
         <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between tabular-nums">
           <span class="font-bold text-gray-600 dark:text-gray-400">Tổng Giá Trị Hủy:</span>
-          <span id="wasteModalTotalAmount" class="font-extrabold text-base text-rose-600 dark:text-rose-400">0 đ</span>
+          <span id="wasteModalTotalAmount" class="font-semibold text-base text-rose-600 dark:text-rose-400">0 đ</span>
         </div>
 
         <div>
@@ -3637,7 +4069,7 @@
     <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
-          <h3 id="invDetailModalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
+          <h3 id="invDetailModalTitle" class="font-semibold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
           <p id="invDetailModalSub" class="text-[10.5px] text-gray-400">A.Kitchen WMS Database</p>
         </div>
         <button onclick="closeInvDetailModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
@@ -3747,7 +4179,7 @@
             <i data-lucide="user-check" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Thông Tin Tài Khoản</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Thông Tin Tài Khoản</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400">A.Kitchen WMS • Phân Quyền & Vai Trò</p>
           </div>
         </div>
@@ -3763,10 +4195,10 @@
         <div class="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center gap-3.5">
           <img id="profModalAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-brand-500/30 shrink-0">
           <div class="min-w-0 flex-1">
-            <h4 id="profModalName" class="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
+            <h4 id="profModalName" class="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
             <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 tabular-nums truncate">--</div>
             <div class="mt-1 flex items-center gap-2 flex-wrap">
-              <span id="profModalRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+              <span id="profModalRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
               <span id="profModalSiteBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-50 text-brand-500 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
                 <i data-lucide="map-pin" class="w-3 h-3"></i>
                 <span id="profModalSiteName">K001 - Hùng Vương</span>
@@ -3843,7 +4275,7 @@
             <i data-lucide="map-pin" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Chọn Điểm Bán / Bếp Bạn Phụ Trách</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Chọn Điểm Bán / Bếp Bạn Phụ Trách</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400">Lựa chọn sẽ lưu lại trên máy cá nhân để không phải chọn lại lần sau</p>
           </div>
         </div>
@@ -3905,7 +4337,7 @@
             <i data-lucide="lock" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Yêu Cầu Cấp Quyền Truy Cập</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Yêu Cầu Cấp Quyền Truy Cập</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400">Gửi yêu cầu tới Ban Quản Trị Hệ Thống</p>
           </div>
         </div>
@@ -3982,7 +4414,7 @@
             <i data-lucide="user-check" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-gray-900 dark:text-white leading-tight">Phê Duyệt Yêu Cầu Cấp Quyền</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Phê Duyệt Yêu Cầu Cấp Quyền</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400">Danh sách nhân viên xin cấp quyền truy cập chức năng nâng cao</p>
           </div>
         </div>
@@ -4028,7 +4460,7 @@
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
         <div>
-          <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
+          <h4 class="font-semibold text-sm text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
           <p class="text-[10.5px] text-gray-400">Kiểm tra ngay giao diện phân quyền từng vị trí</p>
         </div>
         <button onclick="closeRoleSwitcherModal()" class="p-1.5 rounded-full text-gray-400 bg-gray-100 dark:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -4043,7 +4475,7 @@
   <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
-        <h3 id="modalTitle" class="font-extrabold text-sm text-gray-900 dark:text-white">Chi tiết</h3>
+        <h3 id="modalTitle" class="font-semibold text-sm text-gray-900 dark:text-white">Chi tiết</h3>
         <button onclick="closeGeneralModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 p-1 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -4198,7 +4630,7 @@
   <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+        <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="package-plus" class="w-4 h-4 text-emerald-600"></i> Nhập Kho Lô Mới (Cloudflare D1)
         </h3>
         <button onclick="closeModal('modalFastReceipt')" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -4252,7 +4684,7 @@
   <div id="modalFastIssue" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+        <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="package-minus" class="w-4 h-4 text-amber-600"></i> Xuất Kho Gia Vị (Chuẩn FEFO)
         </h3>
         <button onclick="closeModal('modalFastIssue')" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -4318,6 +4750,128 @@
     function fmtVND(n) {
       if (!n || isNaN(n)) return '0đ';
       return new Intl.NumberFormat('vi-VN').format(Math.round(n)) + 'đ';
+    }
+
+    function fmtCompactVND(n) {
+      if (n === null || n === undefined || isNaN(n) || n === '') {
+        return { v: '—', u: '', full: '—' };
+      }
+      const num = Number(n);
+      const abs = Math.abs(num);
+      const sign = num < 0 ? '-' : '';
+      const full = num.toLocaleString('vi-VN') + ' ₫';
+      
+      if (abs >= 1e9) {
+        const formatted = (abs / 1e9).toLocaleString('vi-VN', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        });
+        return { v: sign + formatted, u: 'tỷ ₫', full };
+      } else if (abs >= 1e6) {
+        const formatted = (abs / 1e6).toLocaleString('vi-VN', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 1
+        });
+        return { v: sign + formatted, u: 'tr ₫', full };
+      } else {
+        const formatted = abs.toLocaleString('vi-VN');
+        return { v: sign + formatted, u: '₫', full };
+      }
+    }
+
+    function renderKpi(id, opts = {}) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const card = el.closest('.kpi-card, .kpi-card-compact, .kpi-card-hero') || el.parentElement;
+
+      // 1. Loading state
+      if (opts.loading) {
+        if (card && card.querySelector('.kpi-skeleton')) return;
+        el.innerHTML = '<span class="inline-block h-6 w-24 kpi-skeleton animate-pulse rounded"></span>';
+        return;
+      }
+
+      // 2. Value & Unit
+      let valText = '—';
+      let unitText = '';
+      let titleText = '';
+
+      if (opts.value !== undefined && opts.value !== null && !isNaN(opts.value) && opts.value !== '') {
+        if (opts.isCurrency !== false && (typeof opts.value === 'number' || !isNaN(Number(opts.value)))) {
+          const compact = fmtCompactVND(opts.value);
+          valText = compact.v;
+          unitText = opts.unit || compact.u;
+          titleText = opts.rawFull || compact.full;
+        } else {
+          valText = String(opts.value);
+          unitText = opts.unit || '';
+          titleText = opts.rawFull || `${valText} ${unitText}`.trim();
+        }
+      } else if (typeof opts.text === 'string') {
+        valText = opts.text;
+        unitText = opts.unit || '';
+        titleText = opts.rawFull || `${valText} ${unitText}`.trim();
+      }
+
+      // Set value
+      el.textContent = valText;
+      if (titleText) {
+        el.title = titleText;
+        el.setAttribute('aria-label', titleText);
+      }
+
+      // Set unit
+      const unitEl = document.getElementById(id + 'Unit') || (card ? card.querySelector('.kpi-unit') : null);
+      if (unitEl) {
+        unitEl.textContent = unitText;
+      } else if (unitText && !el.textContent.includes(unitText)) {
+        el.textContent = `${valText} ${unitText}`.trim();
+      }
+
+      // 3. Delta badge
+      if (card && (opts.delta !== undefined || opts.deltaText !== undefined)) {
+        const deltaEl = document.getElementById(id + 'Delta') || card.querySelector('[class*="kpi-delta"]');
+        if (deltaEl) {
+          if (opts.delta === null || (opts.delta === undefined && !opts.deltaText)) {
+            deltaEl.classList.add('hidden');
+          } else {
+            deltaEl.classList.remove('hidden');
+            const dVal = typeof opts.delta === 'number' ? opts.delta : parseFloat(opts.delta) || 0;
+            const isGood = opts.deltaGood !== undefined ? opts.deltaGood : (dVal >= 0);
+            
+            deltaEl.className = isGood ? 'kpi-delta-good' : (dVal === 0 ? 'kpi-delta-neutral' : 'kpi-delta-bad');
+            
+            const arrowSvg = dVal >= 0
+              ? '<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>'
+              : '<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>';
+            
+            const srText = `<span class="sr-only">${dVal >= 0 ? 'tăng' : 'giảm'}</span>`;
+            const badgeText = opts.deltaText || (dVal > 0 ? `+${dVal.toLocaleString('vi-VN')}%` : `${dVal.toLocaleString('vi-VN')}%`);
+            deltaEl.innerHTML = `${arrowSvg}<span>${badgeText}</span>${srText}`;
+          }
+        }
+      }
+
+      // 4. Subtitle / subtext
+      if (opts.sub && card) {
+        const subEl = document.getElementById(id + 'Sub') || card.querySelector('.kpi-sub');
+        if (subEl) subEl.textContent = opts.sub;
+      }
+
+      // 5. Progress Bar
+      if (opts.progress !== undefined && card) {
+        const trackEl = card.querySelector('.kpi-progress-track');
+        const barEl = card.querySelector('.kpi-progress-bar, .kpi-progress-bar-error');
+        if (trackEl && barEl) {
+          const pct = Math.max(0, Math.min(100, opts.progress));
+          barEl.style.width = pct + '%';
+          if (opts.progress > 100) {
+            barEl.className = 'kpi-progress-bar-error';
+          } else {
+            barEl.className = 'kpi-progress-bar';
+          }
+        }
+      }
     }
 
     function fmtNum(n) {
@@ -4482,7 +5036,7 @@
       const taskbarName = document.getElementById('taskbarSiteName');
       if (taskbarRegion) {
         taskbarRegion.textContent = region;
-        taskbarRegion.className = `hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0 ${
+        taskbarRegion.className = `hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-semibold uppercase shrink-0 ${
           region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
           region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
           'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
@@ -4872,9 +5426,19 @@
         const json = await res.json();
         if (json.success) {
           App.items = json.data.items || [];
-          document.getElementById('kpiNganSach').textContent = fmtVND(json.data.nganSach);
+          const kpiNs = document.getElementById('kpiNganSach');
+          if (kpiNs) {
+            kpiNs.dataset.raw = json.data.nganSach;
+            kpiNs.textContent = fmtVND(json.data.nganSach);
+            kpiNs.title = fmtVND(json.data.nganSach);
+          }
           document.getElementById('kpiSubSite').textContent = json.data.site || site;
-          document.getElementById('kpiDaDat').textContent = fmtVND(json.data.tienDaDat);
+          const kpiDd = document.getElementById('kpiDaDat');
+          if (kpiDd) {
+            kpiDd.dataset.raw = json.data.tienDaDat;
+            kpiDd.textContent = fmtVND(json.data.tienDaDat);
+            kpiDd.title = fmtVND(json.data.tienDaDat);
+          }
           document.getElementById('budTotal').textContent = fmtVND(json.data.nganSach);
 
           const types = Array.from(new Set(App.items.map(i => i.tenLoai).filter(Boolean)));
@@ -4977,7 +5541,7 @@
                 </div>
                 <div class="text-right">
                   <div class="text-[10px] text-gray-400">Thành tiền:</div>
-                  <div class="font-black text-xs text-brand-600 dark:text-brand-400 tabular-nums" id="subtotal-mob-${it.maHang}">${fmtVND(thanhTien)}</div>
+                  <div class="font-semibold text-xs text-brand-600 dark:text-brand-400 tabular-nums" id="subtotal-mob-${it.maHang}">${fmtVND(thanhTien)}</div>
                 </div>
               </div>
             </div>
@@ -5008,33 +5572,73 @@
     }
 
     function calcBudget(forcedBudget, forcedDaDat) {
-      const nganSachStr = document.getElementById('kpiNganSach').textContent.replace(/[^\d]/g, '');
-      const daDatStr = document.getElementById('kpiDaDat').textContent.replace(/[^\d]/g, '');
+      const elNganSach = document.getElementById('kpiNganSach');
+      const elDaDat = document.getElementById('kpiDaDat');
 
-      const nganSach = forcedBudget !== undefined ? forcedBudget : (Number(nganSachStr) || 0);
-      const daDat = forcedDaDat !== undefined ? forcedDaDat : (Number(daDatStr) || 0);
+      const nganSach = forcedBudget !== undefined ? forcedBudget : (
+        Number(elNganSach?.dataset?.raw) || Number((elNganSach?.textContent || '').replace(/[^\d]/g, '')) || 0
+      );
+      const daDat = forcedDaDat !== undefined ? forcedDaDat : (
+        Number(elDaDat?.dataset?.raw) || Number((elDaDat?.textContent || '').replace(/[^\d]/g, '')) || 0
+      );
 
       const dangNhap = App.items.reduce((sum, it) => sum + ((it.soLuongDat || 0) * (it.donGia || 0)), 0);
       const tongDung = daDat + dangNhap;
       const conLai = nganSach - tongDung;
       const pct = nganSach > 0 ? Math.round((tongDung / nganSach) * 100) : 0;
 
-      document.getElementById('kpiConLai').textContent = fmtVND(conLai);
-      document.getElementById('kpiDangNhapSub').textContent = 'Đang nhập: ' + fmtVND(dangNhap);
-      document.getElementById('kpiTyLe').textContent = pct + '%';
-      document.getElementById('budUsed').textContent = fmtVND(tongDung);
+      const conLaiEl = document.getElementById('kpiConLai');
+      if (conLaiEl) {
+        conLaiEl.dataset.raw = conLai;
+        conLaiEl.textContent = fmtVND(conLai);
+        conLaiEl.title = fmtVND(conLai);
+      }
+      const dangNhapEl = document.getElementById('kpiDangNhapSub');
+      if (dangNhapEl) dangNhapEl.textContent = 'Đang nhập: ' + fmtVND(dangNhap);
+
+      const conLaiDelta = document.getElementById('kpiConLaiDelta');
+      if (conLaiDelta) {
+        if (conLai < 0) {
+          conLaiDelta.className = 'kpi-delta-bad';
+          conLaiDelta.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Âm hạn mức</span>`;
+        } else {
+          conLaiDelta.className = 'kpi-delta-good';
+          conLaiDelta.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>Khả dụng</span>`;
+        }
+      }
+
+      const tyLeEl = document.getElementById('kpiTyLe');
+      if (tyLeEl) tyLeEl.textContent = pct + '%';
+      const budUsedEl = document.getElementById('budUsed');
+      if (budUsedEl) budUsedEl.textContent = fmtVND(tongDung);
 
       const fill = document.getElementById('budFill');
-      fill.style.width = Math.min(pct, 100) + '%';
-      if (pct > 100) {
-        fill.className = 'h-full bg-rose-500 rounded-full transition-all duration-300';
-        document.getElementById('budNote').innerHTML = `<span class="text-rose-600 font-bold">⚠️ Vượt định mức ${pct - 100}%! Cần giải trình khi gửi đơn.</span>`;
-      } else if (pct > 80) {
-        fill.className = 'h-full bg-amber-500 rounded-full transition-all duration-300';
-        document.getElementById('budNote').textContent = `Đã sử dụng ${pct}% ngân sách. Gần chạm mức giới hạn.`;
-      } else {
-        fill.className = 'h-full bg-brand-600 rounded-full transition-all duration-300';
-        document.getElementById('budNote').textContent = `Ngân sách an toàn (${pct}%).`;
+      const budBadge = document.getElementById('budBadge');
+      const budNote = document.getElementById('budNote');
+      if (fill) {
+        fill.style.width = Math.min(pct, 100) + '%';
+        if (pct > 100) {
+          fill.className = 'kpi-progress-bar-error';
+          if (budBadge) {
+            budBadge.className = 'kpi-delta-bad';
+            budBadge.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Vượt ${pct - 100}%</span>`;
+          }
+          if (budNote) budNote.innerHTML = `<span class="text-error-600 dark:text-error-400 font-semibold">⚠️ Vượt định mức ${pct - 100}%! Cần giải trình.</span>`;
+        } else if (pct > 80) {
+          fill.className = 'h-full rounded-full bg-warning-500 transition-all duration-300 dark:bg-warning-500';
+          if (budBadge) {
+            budBadge.className = 'kpi-delta-neutral';
+            budBadge.innerHTML = `<span>Gần chạm trần</span>`;
+          }
+          if (budNote) budNote.textContent = `Đã sử dụng ${pct}% ngân sách. Gần chạm mức giới hạn.`;
+        } else {
+          fill.className = 'kpi-progress-bar';
+          if (budBadge) {
+            budBadge.className = 'kpi-delta-good';
+            budBadge.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>An toàn</span>`;
+          }
+          if (budNote) budNote.textContent = `Ngân sách an toàn (${pct}%).`;
+        }
       }
     }
 
@@ -5223,7 +5827,7 @@
           openGeneralModal('Lưu Chứng Từ Thành Công', `
             <div class="text-center py-4 space-y-3">
               <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-title-sm font-bold">✓</div>
-              <div class="text-base font-extrabold text-gray-800 dark:text-gray-100">Chứng từ đã được lưu vào hệ thống!</div>
+              <div class="text-base font-semibold text-gray-800 dark:text-gray-100">Chứng từ đã được lưu vào hệ thống!</div>
               <div class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">Mã chứng từ: <b class="text-brand-600 text-sm">${maCT}</b></div>
               <div class="text-xs text-gray-600 dark:text-gray-300">Đã cập nhật cơ sở dữ liệu Cloudflare D1. Bạn có thể tra cứu tại tab "Tra Cứu Chứng Từ".</div>
               <button onclick="closeGeneralModal(); switchTab('portal-search');" class="mt-2 px-5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">
@@ -5503,10 +6107,10 @@
           openGeneralModal('Gửi Báo Cáo Thành Công', `
             <div class="text-center py-4 space-y-3">
               <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-title-sm font-bold">✓</div>
-              <div class="text-base font-extrabold text-gray-800 dark:text-gray-100">Đã gửi báo cáo ca bếp thành công!</div>
+              <div class="text-base font-semibold text-gray-800 dark:text-gray-100">Đã gửi báo cáo ca bếp thành công!</div>
               <div class="text-xs text-gray-500 dark:text-gray-400">Site: <b>${site}</b> · Ngày: <b>${ngay}</b></div>
               <div class="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 inline-block tabular-nums text-xs">
-                Tổng suất ăn đã xuất: <b class="text-emerald-700 text-sm font-extrabold">${fmtNum(tongXuat)} suất</b>
+                Tổng suất ăn đã xuất: <b class="text-emerald-700 text-sm font-semibold">${fmtNum(tongXuat)} suất</b>
               </div>
               <div class="text-[11px] text-gray-500 dark:text-gray-400">Dữ liệu đã được lưu trữ an toàn trên Cloudflare D1.</div>
               <button onclick="closeGeneralModal();" class="mt-2 px-6 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">
@@ -5918,7 +6522,7 @@
             <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <div class="font-extrabold text-xs text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
+                  <div class="font-semibold text-xs text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
                   <div class="text-[10.5px] tabular-nums font-mono text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit || ''} • Giá: ${fmtNum(price)} ₫</div>
                 </div>
                 <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 shrink-0 max-w-[120px] truncate">${escapeHtml(catLabel)}</span>
@@ -6316,7 +6920,7 @@ function initTailadminCharts() {
     const optionsBar = {
       colors: ['#19723C', '#10B981'],
       chart: {
-        fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
+        fontFamily: "Inter, sans-serif",
         type: 'bar',
         height: 280,
         toolbar: { show: false }
@@ -6370,7 +6974,7 @@ function initTailadminCharts() {
       series: [92.4],
       colors: ['#599973'],
       chart: {
-        fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
+        fontFamily: "Inter, sans-serif",
         type: 'radialBar',
         height: 270,
         sparkline: { enabled: true }
@@ -6426,7 +7030,7 @@ function initTailadminCharts() {
       ],
       colors: ['#19723C', '#F59E0B'],
       chart: {
-        fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
+        fontFamily: "Inter, sans-serif",
         type: 'area',
         height: 300,
         toolbar: { show: false }
@@ -6490,23 +7094,39 @@ function initTailadminCharts() {
 }
 
 function updateTailadminDashboard(d) {
-  // 1. Metric Cards
-  if (document.getElementById('dashMetricSkus')) {
-    document.getElementById('dashMetricSkus').textContent = `${d.total_skus || 0} Mã`;
-  }
-  if (document.getElementById('dashMetricValue')) {
-    const val = d.total_value || 1258600000;
-    document.getElementById('dashMetricValue').textContent = formatVND(val);
-  }
-  if (document.getElementById('dashMetricRop')) {
-    document.getElementById('dashMetricRop').textContent = `${d.rop_reorder_count || 0} Mã`;
-  }
-  if (document.getElementById('dashMetricExp')) {
-    document.getElementById('dashMetricExp').textContent = `${d.critical_exp_count || 0} Lô`;
-  }
-  if (document.getElementById('dashMetricSlow')) {
-    document.getElementById('dashMetricSlow').textContent = `${d.slow_moving_count || 2} Mã`;
-  }
+  // 1. Metric Cards via renderKpi
+  renderKpi('dashMetricValue', {
+    value: d.total_value || 1258600000,
+    sub: 'Theo giá bình quân kho tổng'
+  });
+  renderKpi('dashMetricSkus', {
+    value: d.total_skus || 0,
+    unit: 'Mã',
+    isCurrency: false,
+    sub: 'Toàn bộ danh mục kho'
+  });
+  renderKpi('dashMetricRop', {
+    value: d.rop_reorder_count || 0,
+    unit: 'Mã',
+    isCurrency: false,
+    deltaText: (d.rop_reorder_count > 0 ? `${d.rop_reorder_count} mã cần đặt` : 'An toàn'),
+    deltaGood: (d.rop_reorder_count === 0),
+    sub: 'Chạm ngưỡng an toàn'
+  });
+  renderKpi('dashMetricExp', {
+    value: d.critical_exp_count || 0,
+    unit: 'Lô',
+    isCurrency: false,
+    deltaText: (d.critical_exp_count > 0 ? `${d.critical_exp_count} lô xuất gấp` : 'An toàn'),
+    deltaGood: (d.critical_exp_count === 0),
+    sub: 'Ưu tiên xuất FEFO'
+  });
+  renderKpi('dashMetricSlow', {
+    value: d.slow_moving_count !== undefined ? d.slow_moving_count : 2,
+    unit: 'Mã',
+    isCurrency: false,
+    sub: 'Lưu kho > 20 ngày'
+  });
   if (document.getElementById('dashLeadTimeText')) {
     document.getElementById('dashLeadTimeText').textContent = `${d.avg_lead_time || 24.5}h`;
   }
@@ -6743,7 +7363,7 @@ async function openItemDetailModal(sku) {
         series: [{ name: 'Tồn kho thực tế', data: [15, 14, 16, 12, 11, 14, 13, 15, 14, 12, item.qty || 10] }],
         colors: ['#19723C'],
         chart: {
-          fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
+          fontFamily: "Inter, sans-serif",
           type: 'area',
           height: 180,
           toolbar: { show: false },
@@ -6990,21 +7610,28 @@ async function loadFnbChain() {
       const d = res.data;
       gChainRankings = d.rankings || [];
 
-      // Update KPI Cards
-      const revEl = document.getElementById('chainTotalRevenue');
-      if (revEl) revEl.textContent = fmtVND(d.totalChainRevenue);
-
-      const profitEl = document.getElementById('chainTotalProfit');
-      if (profitEl) profitEl.textContent = fmtVND(d.totalChainProfit);
-
+      // Update KPI Cards via renderKpi
+      renderKpi('chainTotalRevenue', {
+        value: d.totalChainRevenue,
+        sub: '14 Điểm bán toàn hệ thống A.Kitchen'
+      });
+      renderKpi('chainTotalProfit', {
+        value: d.totalChainProfit,
+        sub: 'Lợi nhuận gộp toàn chuỗi'
+      });
       const marginEl = document.getElementById('chainAvgMargin');
       if (marginEl) marginEl.textContent = `${d.avgChainMargin}%`;
 
-      const fcEl = document.getElementById('chainAvgFoodCost');
-      if (fcEl) fcEl.textContent = `${d.avgFoodCostPct}%`;
-
-      const lcEl = document.getElementById('chainAvgLaborCost');
-      if (lcEl) lcEl.textContent = `${d.avgLaborCostPct}%`;
+      renderKpi('chainAvgFoodCost', {
+        text: `${d.avgFoodCostPct}%`,
+        sub: 'dưới ngưỡng 43%',
+        deltaGood: (d.avgFoodCostPct <= 43)
+      });
+      renderKpi('chainAvgLaborCost', {
+        text: `${d.avgLaborCostPct}%`,
+        sub: 'dưới ngưỡng 19%',
+        deltaGood: (d.avgLaborCostPct <= 19)
+      });
 
       renderFnbChainTable(gChainRankings);
     }
@@ -7030,19 +7657,19 @@ function renderFnbChainTable(items) {
   tbody.innerHTML = items.map((s, idx) => {
     let statusBadge = '';
     if (s.status === 'VƯỢT CHỈ TIÊU') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
     } else if (s.status === 'TRONG MỨC') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
     } else if (s.status === 'CHƯA PHÁT SINH') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">CHƯA PHÁT SINH</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">CHƯA PHÁT SINH</span>`;
     } else {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
     }
 
     let rankBadge = '';
-    if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
-    else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
-    else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
+    if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
+    else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
+    else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
     else rankBadge = `<span class="tabular-nums text-gray-500 font-bold">${s.rank}</span>`;
 
     return `
@@ -7173,46 +7800,59 @@ function renderFnbPL(d) {
   const titleEl = document.getElementById('plSiteTitle');
   if (titleEl) titleEl.textContent = `Báo Cáo P&L: ${d.site}`;
 
-  // KPI Strip
-  const netEl = document.getElementById('plNetRev');
-  if (netEl) netEl.textContent = fmtVND(d.netRevenue);
-
+  // KPI Strip via renderKpi
+  const achPct = d.targetRevenue > 0 ? (d.netRevenue / d.targetRevenue) * 100 : 0;
+  renderKpi('plNetRev', {
+    value: d.netRevenue,
+    sub: 'Doanh thu sau chiết khấu'
+  });
   const achEl = document.getElementById('plAchievement');
   if (achEl) {
-    achEl.textContent = d.targetRevenue > 0
-      ? `${((d.netRevenue / d.targetRevenue) * 100).toFixed(1)}% Mục tiêu`
-      : '0.0% Mục tiêu';
+    const achText = achPct > 0 ? `${achPct.toFixed(1)}%` : '0,0%';
+    const achGood = achPct >= 100;
+    achEl.className = achGood ? 'kpi-delta-good' : 'kpi-delta-bad';
+    achEl.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="${achGood ? 'M12 19V5m0 0l-6 6m6-6l6 6' : 'M12 5v14m0 0l-6-6m6 6l6-6'}"/></svg><span>${achText}</span><span class="sr-only">${achGood ? 'đạt' : 'chưa đạt'}</span>`;
   }
 
+  const fcPct = d.netRevenue > 0 ? (d.foodCost / d.netRevenue) * 100 : 0;
+  const lcPct = d.netRevenue > 0 ? (d.laborCost / d.netRevenue) * 100 : 0;
+  const primePct = d.netRevenue > 0 ? (d.primeCost / d.netRevenue) * 100 : 0;
+
+  renderKpi('plPrimeCostPct', {
+    text: `${primePct.toFixed(1)}%`,
+    sub: 'Mục tiêu ≤ 62,0%',
+    progress: Math.min(100, (primePct / 62.0) * 100)
+  });
+  const primeBar = document.getElementById('plPrimeCostBar');
+  if (primeBar) {
+    primeBar.style.width = Math.min(100, (primePct / 62.0) * 100) + '%';
+    primeBar.className = primePct > 62 ? 'kpi-progress-bar-error' : 'kpi-progress-bar';
+  }
   const fcPctEl = document.getElementById('plFoodCostPct');
-  if (fcPctEl) {
-    fcPctEl.textContent = d.netRevenue > 0 ? `${((d.foodCost / d.netRevenue) * 100).toFixed(1)}%` : '0.0%';
-  }
-
+  if (fcPctEl) fcPctEl.textContent = `${fcPct.toFixed(1)}%`;
   const fcValEl = document.getElementById('plFoodCostVal');
   if (fcValEl) fcValEl.textContent = fmtVND(d.foodCost);
 
   const lcPctEl = document.getElementById('plLaborCostPct');
-  if (lcPctEl) {
-    lcPctEl.textContent = d.netRevenue > 0 ? `${((d.laborCost / d.netRevenue) * 100).toFixed(1)}%` : '0.0%';
-  }
-
+  if (lcPctEl) lcPctEl.textContent = `${lcPct.toFixed(1)}%`;
   const lcValEl = document.getElementById('plLaborCostVal');
   if (lcValEl) lcValEl.textContent = fmtVND(d.laborCost);
 
-  const primePctEl = document.getElementById('plPrimeCostPct');
-  if (primePctEl) {
-    primePctEl.textContent = d.netRevenue > 0 ? `${((d.primeCost / d.netRevenue) * 100).toFixed(1)}%` : '0.0%';
+  renderKpi('plProfitVal', {
+    value: d.operatingProfit,
+    sub: 'Lợi nhuận hoạt động'
+  });
+  const profitMarginEl = document.getElementById('plProfitMargin');
+  if (profitMarginEl) {
+    const pmGood = d.profitMargin >= 20;
+    profitMarginEl.className = pmGood ? 'kpi-delta-good' : (d.profitMargin >= 0 ? 'kpi-delta-neutral' : 'kpi-delta-bad');
+    profitMarginEl.innerHTML = `<span>${d.profitMargin}%</span>`;
   }
 
-  const profitValEl = document.getElementById('plProfitVal');
-  if (profitValEl) profitValEl.textContent = fmtVND(d.operatingProfit);
-
-  const profitMarginEl = document.getElementById('plProfitMargin');
-  if (profitMarginEl) profitMarginEl.textContent = `${d.profitMargin}% Doanh thu`;
-
-  const breakEvenEl = document.getElementById('plBreakEven');
-  if (breakEvenEl) breakEvenEl.textContent = fmtVND(d.breakEvenRevenue);
+  renderKpi('plBreakEven', {
+    value: d.breakEvenRevenue,
+    sub: 'Cố định tháng'
+  });
 
   // P&L Statement rows
   const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -7334,9 +7974,20 @@ function renderFnbPOS(d) {
   if (!d) return;
   const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-  setTxt('posDailyRevenue', fmtVND(d.dailyRevenue || d.totalSalesToday || 0));
-  setTxt('posDailyBills', `${d.totalBills || d.billsToday || 0} bill`);
-  setTxt('posDailyAOV', fmtVND(d.avgSpendPerBill || d.avgBillToday || 0));
+  renderKpi('posDailyRevenue', {
+    value: d.dailyRevenue || d.totalSalesToday || 0,
+    sub: 'so với TB tuần'
+  });
+  renderKpi('posDailyBills', {
+    value: d.totalBills || d.billsToday || 0,
+    unit: 'bill',
+    isCurrency: false,
+    sub: 'Số giao dịch thanh toán'
+  });
+  renderKpi('posDailyAOV', {
+    value: d.avgSpendPerBill || d.avgBillToday || 0,
+    sub: 'Suất trưa công sở'
+  });
 
   const list = document.getElementById('posHourlyList');
   if (list && d.hourlyDistribution) {
@@ -7410,7 +8061,7 @@ function renderFnbSites(sites) {
         </td>
         <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</td>
         <td class="py-3 px-3 text-center">
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
         </td>
       </tr>
     `;
@@ -7593,7 +8244,7 @@ function renderUserMatrixTable(data) {
       : 'bg-purple-50/60 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300';
 
     headHtml += `
-      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-extrabold uppercase tracking-wider text-[11px] border-l border-gray-200 dark:border-gray-800 ${colColor}">
+      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-semibold uppercase tracking-wider text-[11px] border-l border-gray-200 dark:border-gray-800 ${colColor}">
         ${g.groupName} (${g.features.length})
       </th>
     `;
@@ -7632,12 +8283,12 @@ function renderUserMatrixTable(data) {
       ? u.avatar_url
       : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
 
-    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
-      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
-      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
-      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
-      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
-      : '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
+    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
+      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
+      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
+      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
+      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
+      : '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
 
     let rowHtml = `
       <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors ${isLocked ? 'opacity-60 bg-rose-50/20' : ''}">
@@ -7777,7 +8428,7 @@ function renderUserMatrixMobile(data) {
           </div>
           <button
             onclick="toggleUserPermission('${u.email}', '${f.code}', ${perm.isGranted}, '${perm.type}')"
-            class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
           >
             <span>${isGranted ? 'BẬT' : 'TẮT'}</span>
             <span class="text-[8px] opacity-80">(${perm.label})</span>
@@ -7792,12 +8443,12 @@ function renderUserMatrixMobile(data) {
           <div class="flex items-center gap-2.5 min-w-0">
             <img src="${avatarUrl}" class="size-9 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
             <div class="min-w-0">
-              <div class="font-extrabold text-xs text-gray-900 dark:text-white truncate">${u.full_name || 'Chưa đặt tên'}</div>
+              <div class="font-semibold text-xs text-gray-900 dark:text-white truncate">${u.full_name || 'Chưa đặt tên'}</div>
               <div class="text-[11px] text-gray-400 truncate">${u.email}</div>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[9.5px] px-2 py-0.5 rounded font-extrabold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
+            <span class="text-[9.5px] px-2 py-0.5 rounded font-semibold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
             <button onclick="openEditUserModal('${u.email}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
               <i data-lucide="more-vertical" class="w-4 h-4"></i>
             </button>
@@ -8632,7 +9283,7 @@ window.renderFefoRows = function(items) {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center tabular-nums font-bold text-xs">P${r.fefo_priority}</span>
-              <span class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</span>
+              <span class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</span>
             </div>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span>
           </div>
@@ -8643,7 +9294,7 @@ window.renderFefoRows = function(items) {
             <div>Vị trí kệ: <b class="tabular-nums text-gray-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
               <span class="text-gray-500 font-medium">Tồn khả dụng:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.qty} ${r.uom}</span>
+              <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${r.qty} ${r.uom}</span>
             </div>
           </div>
         </div>
@@ -8685,7 +9336,7 @@ window.loadReorderROP = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku}</div>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
@@ -8694,7 +9345,7 @@ window.loadReorderROP = async function() {
               <div>Tồn hiện tại: <b class="tabular-nums text-gray-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="tabular-nums text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="tabular-nums text-gray-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
+              <div>Đề xuất đặt: <b class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
             </div>
           </div>
         `).join('');
@@ -8735,7 +9386,7 @@ window.loadLeadTime = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number}</div>
               </div>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
@@ -8785,7 +9436,7 @@ window.loadPoSap = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku} • NCC: ${r.supplier_name}</div>
               </div>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
@@ -8863,7 +9514,7 @@ window.loadHistory = async function() {
             <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
               <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+              <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
             </div>
           </div>
           <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
@@ -8896,17 +9547,17 @@ window.renderFnbChainTable = function(items) {
     tbody.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankBadge = '';
-      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
-      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
-      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
+      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
+      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
+      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
       else rankBadge = `<span class="tabular-nums text-gray-500 font-bold">${s.rank}</span>`;
 
       return `
@@ -8942,11 +9593,11 @@ window.renderFnbChainTable = function(items) {
     mob.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
@@ -8955,9 +9606,9 @@ window.renderFnbChainTable = function(items) {
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-semibold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
               <div>
-                <div class="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
+                <div class="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
                 <div class="text-[10px] tabular-nums text-gray-400">Mã: ${s.code} • ${s.region}</div>
               </div>
             </div>
@@ -9028,7 +9679,7 @@ window.renderFnbSites = function(sites) {
           </td>
           <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</td>
           <td class="py-3 px-3 text-center">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
           </td>
         </tr>
       `;
@@ -9360,7 +10011,7 @@ window.renderFefoRows = function(items) {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-full bg-gray-800 dark:bg-gray-700 text-white flex items-center justify-center tabular-nums font-bold text-xs">P${r.fefo_priority}</span>
-              <span class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</span>
+              <span class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</span>
             </div>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">${r.days_left <= 0 ? 'Hết hạn' : 'Còn ' + r.days_left + ' ngày'}</span>
           </div>
@@ -9371,7 +10022,7 @@ window.renderFefoRows = function(items) {
             <div>Vị trí kệ: <b class="tabular-nums text-gray-900 dark:text-white">${r.location_bin || 'KHO-GIAVI'}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
               <span class="text-gray-500 font-medium">Tồn khả dụng:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.qty} ${r.uom}</span>
+              <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${r.qty} ${r.uom}</span>
             </div>
           </div>
         </div>
@@ -9413,7 +10064,7 @@ window.loadReorderROP = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku}</div>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
@@ -9422,7 +10073,7 @@ window.loadReorderROP = async function() {
               <div>Tồn hiện tại: <b class="tabular-nums text-gray-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="tabular-nums text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="tabular-nums text-gray-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
+              <div>Đề xuất đặt: <b class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
             </div>
           </div>
         `).join('');
@@ -9463,7 +10114,7 @@ window.loadLeadTime = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number}</div>
               </div>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
@@ -9513,7 +10164,7 @@ window.loadPoSap = async function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-extrabold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
                 <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku} • NCC: ${r.supplier_name}</div>
               </div>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
@@ -9591,7 +10242,7 @@ window.loadHistory = async function() {
             <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
             <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
               <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="tabular-nums font-extrabold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+              <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
             </div>
           </div>
           <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
@@ -9624,17 +10275,17 @@ window.renderFnbChainTable = function(items) {
     tbody.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankBadge = '';
-      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
-      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
-      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-extrabold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
+      if (s.rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥇1</span>`;
+      else if (s.rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-gray-900 font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥈2</span>`;
+      else if (s.rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-semibold inline-flex items-center justify-center text-xs shadow-xs">🥉3</span>`;
       else rankBadge = `<span class="tabular-nums text-gray-500 font-bold">${s.rank}</span>`;
 
       return `
@@ -9670,11 +10321,11 @@ window.renderFnbChainTable = function(items) {
     mob.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
@@ -9683,9 +10334,9 @@ window.renderFnbChainTable = function(items) {
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-extrabold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-semibold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
               <div>
-                <div class="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
+                <div class="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
                 <div class="text-[10px] tabular-nums text-gray-400">Mã: ${s.code} • ${s.region}</div>
               </div>
             </div>
@@ -9825,7 +10476,7 @@ window.renderFnbStock = function() {
       headHtml += `
         <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] border-b border-gray-200 dark:border-gray-800 min-w-[125px]">
           <div class="flex items-center justify-end gap-1.5">
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-extrabold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded font-semibold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
             <span title="${s.name}" class="text-gray-800 dark:text-gray-200">${s.code}</span>
           </div>
           <div class="text-[10px] font-normal text-gray-400 truncate max-w-[115px]" title="${s.name}">${s.name}</div>
@@ -9865,7 +10516,7 @@ window.renderFnbStock = function() {
           const cell = r.cells[s.id] || { book: 0, lastCount: null, noOpening: true, value: 0 };
           const isNegative = cell.book < 0;
           const bookClass = isNegative
-            ? 'text-rose-600 dark:text-rose-400 font-extrabold'
+            ? 'text-rose-600 dark:text-rose-400 font-semibold'
             : (cell.book > 0 ? 'text-gray-900 dark:text-white font-bold' : 'text-gray-400 dark:text-gray-600 font-medium');
           
           let lastCountHtml = '';
@@ -9957,11 +10608,11 @@ window.renderFnbStock = function() {
                   <div class="p-2.5 rounded-xl ${sc.isNeg ? 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40' : (sc.isZero ? 'bg-gray-50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60' : 'bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60')}">
                     <div class="flex items-center justify-between gap-1 mb-1">
                       <span class="font-bold text-gray-800 dark:text-gray-200 text-[11px]">${sc.site.code}</span>
-                      <span class="text-[8.5px] px-1 rounded font-extrabold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
+                      <span class="text-[8.5px] px-1 rounded font-semibold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
                     </div>
                     <div class="flex items-baseline justify-between tabular-nums">
                       <span class="text-[10px] text-gray-400">Tồn:</span>
-                      <span class="${sc.isNeg ? 'text-rose-600 dark:text-rose-400 font-extrabold text-sm' : (sc.isZero ? 'text-gray-400 font-medium' : 'text-gray-900 dark:text-white font-bold text-sm')}">${sc.bookFormatted} <span class="text-[10px] text-gray-400 font-normal">${sc.countText}</span></span>
+                      <span class="${sc.isNeg ? 'text-rose-600 dark:text-rose-400 font-semibold text-sm' : (sc.isZero ? 'text-gray-400 font-medium' : 'text-gray-900 dark:text-white font-bold text-sm')}">${sc.bookFormatted} <span class="text-[10px] text-gray-400 font-normal">${sc.countText}</span></span>
                     </div>
                     ${sc.cell.noOpening ? '<div class="text-[9px] text-amber-500 font-semibold mt-0.5">⚠️ Chưa có tồn đầu</div>' : ''}
                     ${gFnbStockFilter.showValue && sc.cell.value ? `<div class="text-[9.5px] text-gray-400 dark:text-gray-500 tabular-nums text-right mt-0.5">${Math.round(sc.cell.value).toLocaleString('vi-VN')} đ</div>` : ''}
@@ -10261,8 +10912,8 @@ window.renderFnbCountsTable = function() {
         const diffVal = diff * (item.unit_price || 0);
 
         let diffBadge = `<span class="text-gray-400 tabular-nums">0</span>`;
-        if (diff > 0) diffBadge = `<span class="text-emerald-600 dark:text-emerald-400 font-extrabold tabular-nums">+${diff.toFixed(1)}</span>`;
-        else if (diff < 0) diffBadge = `<span class="text-rose-600 dark:text-rose-400 font-extrabold tabular-nums">${diff.toFixed(1)}</span>`;
+        if (diff > 0) diffBadge = `<span class="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">+${diff.toFixed(1)}</span>`;
+        else if (diff < 0) diffBadge = `<span class="text-rose-600 dark:text-rose-400 font-semibold tabular-nums">${diff.toFixed(1)}</span>`;
 
         let diffValText = `<span class="text-gray-400 tabular-nums">0 đ</span>`;
         if (diffVal > 0) diffValText = `<span class="text-emerald-600 dark:text-emerald-400 font-bold tabular-nums">+${Math.round(diffVal).toLocaleString('vi-VN')} đ</span>`;
@@ -10285,7 +10936,7 @@ window.renderFnbCountsTable = function() {
             <td class="py-3 px-3 text-right fnb-count-book-col">${bookDisplay}</td>
             <td class="py-2.5 px-3 bg-blue-50/30 dark:bg-blue-950/10">
               <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
-                     class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-white/3 font-extrabold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
+                     class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-white/3 font-semibold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
             </td>
             <td class="py-3 px-3 text-right select-all">${diffBadge}</td>
             <td class="py-3 px-3 text-right select-all">${diffValText}</td>
@@ -10328,11 +10979,11 @@ window.renderFnbCountsTable = function() {
               <div class="flex-1">
                 <label class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-0.5">SL Đếm Thực Tế (${item.unit})</label>
                 <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
-                       class="w-full text-center py-2 px-3 rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 font-extrabold tabular-nums text-base text-gray-900 dark:text-white outline-none">
+                       class="w-full text-center py-2 px-3 rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 font-semibold tabular-nums text-base text-gray-900 dark:text-white outline-none">
               </div>
               <div class="w-32 text-right">
                 <span class="text-[10px] text-gray-400">Lệch:</span>
-                <div class="font-extrabold tabular-nums text-sm ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-gray-400')}">
+                <div class="font-semibold tabular-nums text-sm ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-gray-400')}">
                   ${diff > 0 ? '+' : ''}${diff.toFixed(1)} ${item.unit}
                 </div>
                 <div class="text-[9.5px] tabular-nums text-gray-400">${Math.round(diffVal).toLocaleString('vi-VN')} đ</div>
@@ -10585,7 +11236,7 @@ window.renderFnbReceiptsTable = function(receipts) {
           <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300">${r.receipt_date}</td>
           <td class="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">${r.supplier}</td>
           <td class="py-3 px-3 tabular-nums text-gray-500">${r.invoice_no || '--'}</td>
-          <td class="py-3 px-4 text-right tabular-nums font-extrabold text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
+          <td class="py-3 px-4 text-right tabular-nums font-semibold text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
           <td class="py-3 px-3 text-gray-500">${r.created_by || '--'}</td>
           <td class="py-3 px-3 text-center">
             <button onclick="viewReceiptDetail(${r.id})" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-[11px] transition-all">
@@ -10612,7 +11263,7 @@ window.renderFnbReceiptsTable = function(receipts) {
             </div>
             <div class="text-right">
               <span class="text-[10px] text-gray-400">Tổng tiền:</span>
-              <div class="font-extrabold tabular-nums text-sm text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</div>
+              <div class="font-semibold tabular-nums text-sm text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</div>
             </div>
           </div>
           <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px]">
@@ -10839,7 +11490,7 @@ window.renderFnbWasteTable = function(wastes) {
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">${w.reason}</span>
           </td>
           <td class="py-3 px-3 font-medium text-gray-700 dark:text-gray-300">${w.confirmed_by}</td>
-          <td class="py-3 px-4 text-right tabular-nums font-extrabold text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</td>
+          <td class="py-3 px-4 text-right tabular-nums font-semibold text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</td>
           <td class="py-3 px-4 text-gray-500 truncate max-w-[150px]">${w.notes || '--'}</td>
           <td class="py-3 px-3 text-center">
             <button onclick="viewWasteDetail(${w.id})" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[11px] transition-all">
@@ -10868,7 +11519,7 @@ window.renderFnbWasteTable = function(wastes) {
             </div>
             <div class="text-right">
               <span class="text-[10px] text-gray-400">Giá trị hủy:</span>
-              <div class="font-extrabold tabular-nums text-sm text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</div>
+              <div class="font-semibold tabular-nums text-sm text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</div>
             </div>
           </div>
           <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px]">
@@ -11076,7 +11727,7 @@ window.viewReceiptDetail = async function(receiptId) {
                 <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
                 <td class="py-2 px-3 text-right font-bold text-indigo-600">${l.qty}</td>
                 <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 text-right font-extrabold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 text-right font-semibold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
               </tr>
             `).join('')}
           </tbody>
@@ -11123,7 +11774,7 @@ window.viewWasteDetail = async function(wasteId) {
                 <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
                 <td class="py-2 px-3 text-right font-bold text-rose-600">${l.qty}</td>
                 <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 text-right font-extrabold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 text-right font-semibold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
               </tr>
             `).join('')}
           </tbody>
@@ -11170,8 +11821,8 @@ window.viewCountDetail = async function(countId) {
                 <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">${l.item_name || l.item_code}</td>
                 <td class="py-2 px-3 text-right">${l.book_qty}</td>
                 <td class="py-2 px-3 text-right font-bold text-blue-600">${l.count_qty}</td>
-                <td class="py-2 px-3 text-right font-extrabold ${l.diff_qty < 0 ? 'text-rose-600' : (l.diff_qty > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_qty > 0 ? '+' : ''}${l.diff_qty}</td>
-                <td class="py-2 px-3 text-right font-extrabold ${l.diff_val < 0 ? 'text-rose-600' : (l.diff_val > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_val > 0 ? '+' : ''}${Math.round(l.diff_val).toLocaleString('vi-VN')} đ</td>
+                <td class="py-2 px-3 text-right font-semibold ${l.diff_qty < 0 ? 'text-rose-600' : (l.diff_qty > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_qty > 0 ? '+' : ''}${l.diff_qty}</td>
+                <td class="py-2 px-3 text-right font-semibold ${l.diff_val < 0 ? 'text-rose-600' : (l.diff_val > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_val > 0 ? '+' : ''}${Math.round(l.diff_val).toLocaleString('vi-VN')} đ</td>
                 <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${l.note || '--'}</td>
               </tr>
             `).join('')}
@@ -11479,13 +12130,13 @@ window.renderSavedAccountsInLoginModal = function() {
           <div class="min-w-0 text-left">
             <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-1.5">
               <span>${acc.fullName}</span>
-              ${isCurrent ? '<span class="text-[9px] px-1 py-0.2 rounded font-black bg-brand-500 text-white">ĐANG DÙNG</span>' : ''}
+              ${isCurrent ? '<span class="text-[9px] px-1 py-0.2 rounded font-semibold bg-brand-500 text-white">ĐANG DÙNG</span>' : ''}
             </div>
             <div class="text-[10px] text-gray-400 tabular-nums truncate">${acc.email}</div>
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${roleBadgeColor}">${acc.role}</span>
+          <span class="text-[9px] px-1.5 py-0.5 rounded font-semibold uppercase ${roleBadgeColor}">${acc.role}</span>
           <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="p-1 rounded text-gray-400 hover:text-rose-600 hover:bg-gray-100 dark:hover:bg-gray-700">
             <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
@@ -11525,7 +12176,7 @@ window.renderSavedAccountsInProfileModal = function() {
         </div>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
-        <span class="text-[8.5px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">${acc.role}</span>
+        <span class="text-[8.5px] px-1.5 py-0.5 rounded font-semibold uppercase bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">${acc.role}</span>
         <span class="text-xs text-brand-500 font-bold">Chuyển ↗</span>
       </div>
     </div>
@@ -11577,7 +12228,7 @@ window.openUserProfileModal = function() {
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
-    roleEl.className = `text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase ${
+    roleEl.className = `text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${
       gCurrentUser.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
       gCurrentUser.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
       gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
@@ -11705,11 +12356,11 @@ function updateUIForUnauthenticated() {
   if (hdrName) hdrName.textContent = 'Đăng nhập';
   if (roleEl) {
     roleEl.textContent = 'CHƯA ĐĂNG NHẬP';
-    roleEl.className = 'text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
+    roleEl.className = 'text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
   }
   if (hdrRole) {
     hdrRole.textContent = 'CHƯA ĐĂNG NHẬP';
-    hdrRole.className = 'text-[9px] font-extrabold text-gray-400 uppercase';
+    hdrRole.className = 'text-[9px] font-semibold text-gray-400 uppercase';
   }
 
   // Ẩn toàn bộ menu điều hướng khi chưa đăng nhập
@@ -11765,12 +12416,12 @@ function applyUserSessionToUI() {
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
-    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-extrabold uppercase truncate ${curStyle.bg}`;
+    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-semibold uppercase truncate ${curStyle.bg}`;
   }
 
   if (hdrRole) {
     hdrRole.textContent = gCurrentUser.role || 'USER';
-    hdrRole.className = `text-[9px] font-extrabold uppercase truncate ${curStyle.text}`;
+    hdrRole.className = `text-[9px] font-semibold uppercase truncate ${curStyle.text}`;
   }
 
   const adminBtn = document.getElementById('adminPendingReqBtn');
@@ -12284,7 +12935,7 @@ window.checkPendingAccessRequests = async function() {
         btn.classList.remove('hidden');
         if (badge) {
           badge.textContent = pending.length;
-          badge.className = `px-1.5 py-0.2 rounded-full text-[9.5px] font-black ${
+          badge.className = `px-1.5 py-0.2 rounded-full text-[9.5px] font-semibold ${
             pending.length > 0 ? 'bg-rose-600 text-white animate-pulse' : 'bg-gray-400 text-white'
           }`;
         }
@@ -12575,13 +13226,13 @@ window.renderRoleSwitcherModal = function() {
             <div class="min-w-0 text-left">
               <div class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5 truncate">
                 <span>${r.name}</span>
-                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-black bg-brand-500 text-white shrink-0">ĐANG CHỌN</span>' : ''}
+                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-brand-500 text-white shrink-0">ĐANG CHỌN</span>' : ''}
               </div>
               <div class="text-[10px] text-gray-400 truncate mt-0.5">${r.desc}</div>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[9px] px-2 py-0.5 rounded font-extrabold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+            <span class="text-[9px] px-2 py-0.5 rounded font-semibold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
               <i data-lucide="check" class="w-3 h-3"></i> Đã duyệt
             </span>
           </div>
@@ -12963,10 +13614,10 @@ let chartAuditComparison = null;
 
 function updateAuditKpisAndChart(items) {
   if (!items || !items.length) {
-    if (document.getElementById('kkMetricTotalSkus')) document.getElementById('kkMetricTotalSkus').textContent = '0 Mã';
-    if (document.getElementById('kkMetricMatchRate')) document.getElementById('kkMetricMatchRate').textContent = '100%';
-    if (document.getElementById('kkMetricDiffValue')) document.getElementById('kkMetricDiffValue').textContent = '0 ₫';
-    if (document.getElementById('kkMetricDiffCount')) document.getElementById('kkMetricDiffCount').textContent = '0 Mã';
+    renderKpi('kkMetricTotalSkus', { value: 0, unit: 'Mã', isCurrency: false });
+    renderKpi('kkMetricMatchRate', { text: '100%', sub: 'Độ tin cậy cao' });
+    renderKpi('kkMetricDiffValue', { value: 0, sub: 'Theo giá vốn kho' });
+    renderKpi('kkMetricDiffCount', { value: 0, unit: 'Mã', isCurrency: false, sub: 'Biên bản giải trình' });
     if (chartAuditComparison) {
       chartAuditComparison.updateOptions({ xaxis: { categories: [] } });
       chartAuditComparison.updateSeries([{ name: 'Sổ sách', data: [] }, { name: 'Thực tế', data: [] }]);
@@ -13007,10 +13658,23 @@ function updateAuditKpisAndChart(items) {
 
   const matchRate = total > 0 ? ((matchCount / total) * 100).toFixed(1) : 100.0;
 
-  if (document.getElementById('kkMetricTotalSkus')) document.getElementById('kkMetricTotalSkus').textContent = `${total} Mã`;
-  if (document.getElementById('kkMetricMatchRate')) document.getElementById('kkMetricMatchRate').textContent = `${matchRate}%`;
-  if (document.getElementById('kkMetricDiffValue')) document.getElementById('kkMetricDiffValue').textContent = formatVND(totalClosingValue);
-  if (document.getElementById('kkMetricDiffCount')) document.getElementById('kkMetricDiffCount').textContent = `${diffCount} Mã`;
+  renderKpi('kkMetricTotalSkus', { value: total, unit: 'Mã', isCurrency: false, sub: 'Theo site' });
+  renderKpi('kkMetricMatchRate', {
+    text: `${matchRate}%`,
+    deltaGood: parseFloat(matchRate) >= 95,
+    sub: 'Độ tin cậy cao'
+  });
+  renderKpi('kkMetricDiffValue', {
+    value: totalClosingValue,
+    sub: 'Theo giá vốn kho'
+  });
+  renderKpi('kkMetricDiffCount', {
+    value: diffCount,
+    unit: 'Mã',
+    isCurrency: false,
+    deltaGood: diffCount === 0,
+    sub: 'Biên bản giải trình'
+  });
 
   // Render or update auditComparisonChart
   const chartEl = document.getElementById('auditComparisonChart');
@@ -13035,7 +13699,7 @@ function updateAuditKpisAndChart(items) {
         ],
         colors: ['#19723C', '#10B981'],
         chart: {
-          fontFamily: "Outfit, 'Be Vietnam Pro', sans-serif",
+          fontFamily: "Inter, sans-serif",
           type: 'bar',
           height: 240,
           toolbar: { show: false }
