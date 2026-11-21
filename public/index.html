@@ -8747,14 +8747,7 @@ function renderFnbSites(sites) {
 }
 
 
-// 12. Fix async issues on older functions
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (typeof loadFnbChain === 'function') loadFnbChain();
-    if (typeof updateMobileNavState === 'function') updateMobileNavState('fnb-chain');
-    if (window.lucide) lucide.createIcons();
-  }, 250);
-});
+// (Deduplicated redundant DOMContentLoaded listener)
 
 
 
@@ -9869,14 +9862,7 @@ window.exportFnbStockExcel = function() {
   }
 };
 
-// 12. Fix async issues on older functions
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (typeof loadFnbChain === 'function') loadFnbChain();
-    if (typeof updateMobileNavState === 'function') updateMobileNavState('fnb-chain');
-    if (window.lucide) lucide.createIcons();
-  }, 250);
-});
+// (Deduplicated redundant DOMContentLoaded listener)
 
 
 

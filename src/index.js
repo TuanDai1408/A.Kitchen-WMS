@@ -363,12 +363,11 @@ async function buildUserPermissions(env, user) {
   // ĐÂY LÀ QUYỀN TỐI CAO ĐÈ LÊN MỌI VAI TRÒ MẶC ĐỊNH
   if (user.email) {
     try {
-      await ensureUserPermissionsTable(env);
       const { results: customPerms } = await env.DB.prepare(`
         SELECT feature_code, can_view, can_create, can_edit, can_delete
         FROM user_permissions
         WHERE user_email = ?
-      `).bind(user.email).all();
+      `).bind(user.email).all().catch(() => ({ results: [] }));
 
       (customPerms || []).forEach(cp => {
         if (cp.can_view === 0) {
@@ -565,15 +564,21 @@ export default {
 
     // 0. High-Performance Multi-tier Caching Layer (RAM Cache + Edge Cache)
     const CACHEABLE_GET_ROUTES = [
+      '/api/init',
       '/api/fnb/chain',
       '/api/fnb/pl',
       '/api/fnb/pos',
+      '/api/fnb/stock',
+      '/api/fnb/stock/items-for-site',
       '/api/branches',
       '/api/dashboard-summary',
       '/api/stock',
       '/api/reorder',
       '/api/leadtime',
-      '/api/po-sap'
+      '/api/po-sap',
+      '/api/quota',
+      '/api/orders',
+      '/api/vouchers'
     ];
     const isCacheableReport = CACHEABLE_GET_ROUTES.includes(pathname) && request.method === 'GET';
     const isNoCache = searchParams.get('refresh') === 'true' || searchParams.get('nocache') === '1';
@@ -1704,6 +1709,27 @@ export default {
       // 1. Lấy toàn bộ dữ liệu Ma Trận User x Chức Năng
       
       // 2.11.CLEAN DỌN DẸP TOÀN BỘ DỮ LIỆU DEMO (/api/admin/clean-demo-data)
+      
+      // Diagnostic DB status
+      if (pathname === '/api/admin/db-status' && request.method === 'GET') {
+        const { results: indexes } = await env.DB.prepare("SELECT name, tbl_name FROM sqlite_master WHERE type='index'").all();
+        const counts = {};
+        for (const tbl of ['transactions', 'app_users', 'branches', 'sites', 'don_hang', 'dinh_muc', 'nvl_items', 'fnb_monthly_summary', 'inventory_batches', 'purchase_orders', 'vouchers']) {
+          try {
+            const r = await env.DB.prepare(`SELECT COUNT(*) as c FROM ${tbl}`).first();
+            counts[tbl] = r ? r.c : 0;
+          } catch (e) {
+            counts[tbl] = 'error: ' + e.message;
+          }
+        }
+        return new Response(JSON.stringify({
+          success: true,
+          indexesCount: indexes ? indexes.length : 0,
+          indexes: indexes || [],
+          tableCounts: counts
+        }), { headers: corsHeaders });
+      }
+
       if (pathname === '/api/admin/clean-demo-data') {
         await autoCleanDemoData(env);
         const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
@@ -2259,16 +2285,7 @@ export default {
           }
         };
 
-        const plHeaders = new Headers(corsHeaders);
-        plHeaders.set('Cache-Control', 'public, max-age=180, s-maxage=180');
-        plHeaders.set('X-D1-Cache', 'MISS');
-        const plResp = new Response(JSON.stringify(plResponseData), { headers: plHeaders });
-        if (!isNoCache) {
-          try {
-            ctx.waitUntil(caches.default.put(new Request(url.toString(), request), plResp.clone()));
-          } catch (e) {}
-        }
-        return plResp;
+        return createCachedResponse(plResponseData, 180, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 3.2 GET /api/fnb/chain - Báo cáo xếp hạng toàn chuỗi (Tối ưu: Đọc bảng summary trước, fallback Range query)
@@ -2406,16 +2423,7 @@ export default {
           }
         };
 
-        const chainHeaders = new Headers(corsHeaders);
-        chainHeaders.set('Cache-Control', 'public, max-age=180, s-maxage=180');
-        chainHeaders.set('X-D1-Cache', 'MISS');
-        const chainResp = new Response(JSON.stringify(chainResponseData), { headers: chainHeaders });
-        if (!isNoCache) {
-          try {
-            ctx.waitUntil(caches.default.put(new Request(url.toString(), request), chainResp.clone()));
-          } catch (e) {}
-        }
-        return chainResp;
+        return createCachedResponse(chainResponseData, 180, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS từ bảng transactions trên D1
@@ -2524,16 +2532,7 @@ export default {
           }
         };
 
-        const posHeaders = new Headers(corsHeaders);
-        posHeaders.set('Cache-Control', 'public, max-age=180, s-maxage=180');
-        posHeaders.set('X-D1-Cache', 'MISS');
-        const posResp = new Response(JSON.stringify(posResponseData), { headers: posHeaders });
-        if (!isNoCache) {
-          try {
-            ctx.waitUntil(caches.default.put(new Request(url.toString(), request), posResp.clone()));
-          } catch (e) {}
-        }
-        return posResp;
+        return createCachedResponse(posResponseData, 180, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 3.4 GET /api/fnb/stock & /fnb/stock - Báo cáo tồn kho toàn chuỗi F&B ma trận
