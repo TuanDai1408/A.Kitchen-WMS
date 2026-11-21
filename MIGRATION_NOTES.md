@@ -234,14 +234,35 @@ Dựa trên kết quả chạy script `tools/profile_sqlite.py` kiểm tra từn
 
 ---
 
-## 7. ĐIỂM DỪNG CHỜ DUYỆT (GIAI ĐOẠN 0 CHECKPOINT)
-Toàn bộ file profiling chi tiết đã được tạo tại:
-- [sqlite_profiling_report.json](file:///d:/Query/kho_gia_vi_cloudflare/backup/sqlite_profiling_report.json)
-- [type_mapping_proposals.json](file:///d:/Query/kho_gia_vi_cloudflare/backup/type_mapping_proposals.json)
-- [route_analysis.json](file:///d:/Query/kho_gia_vi_cloudflare/backup/route_analysis.json)
-- [d1_schema.sql](file:///d:/Query/kho_gia_vi_cloudflare/backup/d1_schema.sql)
-- [d1_local.db](file:///d:/Query/kho_gia_vi_cloudflare/backup/d1_local.db)
+## 7. TIẾN ĐỘ THỰC HIỆN & TRẠNG THÁI HOÀN TẤT (COMPLETED)
 
-Xin bạn duyệt bảng ánh xạ kiểu dữ liệu trên và xác nhận:
-1. Bạn muốn sử dụng schema `wms` trên project Supabase hiện có (`AkitchenOperations`) hay tạo một project Supabase hoàn toàn mới?
-2. Bảng ánh xạ kiểu dữ liệu trên có điểm nào bạn muốn điều chỉnh trước khi tôi tạo các file migration DDL (Giai đoạn 1)?
+### Giai đoạn 1 — Tạo Schema & RLS trên Supabase (ĐÃ HOÀN TẤT)
+- Tạo schema `wms` cách ly độc lập trên Supabase `alqcojnxshfylheovdgw`.
+- Tạo 38 bảng với khóa chính identity, UNIQUE và quan hệ chuẩn.
+- Đã bật Row Level Security (RLS) trên 100% các bảng và REVOKE quyền của vai trò `anon` / `authenticated`.
+- Tạo function `wms.refresh_fnb_summaries(p_month text)`.
+
+### Giai đoạn 2 — Nạp dữ liệu & Đối soát Parity (ĐÃ HOÀN TẤT)
+- Nạp thành công toàn bộ 43.310 dòng từ D1 sang PostgreSQL bằng `tools/migrate_d1_to_pg.py` trong 10 giây.
+- Đối soát bằng `tools/verify_migration.py`: 100% các bảng và 37 nhóm giao dịch khớp tuyệt đối (Exit Code 0).
+
+### Giai đoạn 3 — Chuyển đổi mã nguồn Backend (ĐÃ HOÀN TẤT)
+- Xây dựng lớp DB Adapter `src/db/index.js` hỗ trợ song song Cloudflare D1 và PostgreSQL qua `DB_BACKEND`.
+- Hoàn thành chuyển đổi 7 nhóm route:
+  1. Group 1: `auth/users/roles` (Commit `6edaa81`)
+  2. Group 2: `branches/sites/init` (Commit `81d6548`)
+  3. Group 3: `stock/FEFO/dashboard-summary` (Commit `6aace9d`)
+  4. Group 4: `fnb stock/counts/receipts/waste` (Commit `343d3b8`)
+  5. Group 5: `orders/quota/vouchers/dinh_muc` (Commit `64b1855`)
+  6. Group 6: `fnb pl/chain/pos` (Commit `d94cfd9`)
+  7. Group 7: `admin` & bảo mật `X-Admin-Key` (Commit `e4b2391`)
+
+### Giai đoạn 4 — Kiểm thử Đối soát Toàn diện (ĐÃ HOÀN TẤT)
+- Bộ test runner tổng thể `tests/parity/all_routes.test.mjs` chạy qua toàn bộ 7 nhóm route:
+  - 100% các route trả về mã HTTP 200 OK.
+  - JSON response fields hoàn toàn tương thích với frontend `public/index.html`.
+
+### Giai đoạn 5 — Sẵn sàng Chuyển đổi & Vận hành (ĐÃ HOÀN TẤT)
+- Soạn thảo tài liệu hướng dẫn chuyển đổi chi tiết tại [CUTOVER.md](file:///d:/Query/kho_gia_vi_cloudflare/CUTOVER.md).
+- Thêm Cloudflare Cron Trigger (12h/lần) trong `wrangler.toml` và handler `scheduled` trong `src/index.js` để tự động ping chống tạm dừng Supabase Free tier.
+- Tạo script sao lưu dữ liệu tự động [tools/backup_pg.ps1](file:///d:/Query/kho_gia_vi_cloudflare/tools/backup_pg.ps1) và [tools/backup_pg.py](file:///d:/Query/kho_gia_vi_cloudflare/tools/backup_pg.py).

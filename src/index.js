@@ -3557,5 +3557,21 @@ export default {
     } catch (err) {
       return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: corsHeaders });
     }
+  },
+
+  async scheduled(event, env, ctx) {
+    // Keep-alive ping định kỳ (12 tiếng/lần) để ngăn chặn Supabase Free tier bị tự động Pause sau 7 ngày không hoạt động
+    try {
+      console.log(`[Scheduled Cron] Keep-alive ping executed at ${new Date().toISOString()}`);
+      if (db.getBackend(env) === 'supabase') {
+        const res = await db.queryOne(env, 'SELECT count(*) as c FROM sites');
+        console.log(`[Scheduled Cron] Supabase ping successful (sites count: ${res?.c})`);
+      } else if (env.DB) {
+        const res = await db.queryOne(env, 'SELECT count(*) as c FROM sites');
+        console.log(`[Scheduled Cron] D1 ping successful (sites count: ${res?.c})`);
+      }
+    } catch (e) {
+      console.error(`[Scheduled Cron Error]`, e.message);
+    }
   }
 };

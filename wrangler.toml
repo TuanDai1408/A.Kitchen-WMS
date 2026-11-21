@@ -6,6 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 DB_BACKEND = "d1"
 
+# Keep-alive Cron Trigger: runs every 12 hours to prevent Supabase Free Tier auto-pause
+[triggers]
+crons = ["0 */12 * * *"]
+
 # Serve static frontend (HTML/Tailwind/JS) from public folder
 [assets]
 directory = "./public"
