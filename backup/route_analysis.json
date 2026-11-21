@@ -1,0 +1,642 @@
+[
+  {
+    "line": 634,
+    "path": "/api/branches",
+    "condition": "if (pathname === '/api/branches' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "branches",
+      "sites"
+    ],
+    "sqlite_syntax": [
+      "LOWER"
+    ]
+  },
+  {
+    "line": 675,
+    "path": "/api/dashboard-summary",
+    "condition": "if (pathname === '/api/dashboard-summary' && request.method === 'GET') {",
+    "db_queries": 6,
+    "tables": [
+      "branches",
+      "inventory_batches",
+      "items",
+      "purchase_orders"
+    ],
+    "sqlite_syntax": [
+      "julianday"
+    ]
+  },
+  {
+    "line": 770,
+    "path": "/api/stock",
+    "condition": "if (pathname === '/api/stock' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "branches",
+      "inventory_batches",
+      "items"
+    ],
+    "sqlite_syntax": [
+      "julianday"
+    ]
+  },
+  {
+    "line": 816,
+    "path": "/api/stock/receipt",
+    "condition": "if (pathname === '/api/stock/receipt' && request.method === 'POST') {",
+    "db_queries": 3,
+    "tables": [
+      "branches",
+      "inventory_batches",
+      "stock_transactions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 838,
+    "path": "/api/stock/issue",
+    "condition": "if (pathname === '/api/stock/issue' && request.method === 'POST') {",
+    "db_queries": 4,
+    "tables": [
+      "branches",
+      "inventory_batches",
+      "stock_transactions"
+    ],
+    "sqlite_syntax": [
+      "julianday",
+      "SUBSTR",
+      "env.DB.batch",
+      "RANDOM / Math.random"
+    ]
+  },
+  {
+    "line": 872,
+    "path": "/api/reorder",
+    "condition": "if (pathname === '/api/reorder' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "branches",
+      "inventory_batches",
+      "items"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 903,
+    "path": "/api/leadtime",
+    "condition": "if (pathname === '/api/leadtime' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "branches",
+      "purchase_orders"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 931,
+    "path": "/api/po-sap",
+    "condition": "if (pathname === '/api/po-sap' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "items",
+      "purchase_orders"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 957,
+    "path": "/api/init",
+    "condition": "if (pathname === '/api/init' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "sites"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1014,
+    "path": "/api/quota",
+    "condition": "if (pathname === '/api/quota' && request.method === 'GET') {",
+    "db_queries": 5,
+    "tables": [
+      "dinh_muc",
+      "don_hang",
+      "items",
+      "nvl_items",
+      "sites"
+    ],
+    "sqlite_syntax": [
+      "LIKE (case-insensitive in SQLite)"
+    ]
+  },
+  {
+    "line": 1102,
+    "path": "/api/order",
+    "condition": "if (pathname === '/api/order' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "don_hang",
+      "items",
+      "quy_trinh_don"
+    ],
+    "sqlite_syntax": [
+      "env.DB.batch"
+    ]
+  },
+  {
+    "line": 1160,
+    "path": "/api/orders",
+    "condition": "if (pathname === '/api/orders' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "don_hang",
+      "nvl_items"
+    ],
+    "sqlite_syntax": [
+      "LIKE (case-insensitive in SQLite)"
+    ]
+  },
+  {
+    "line": 1203,
+    "path": "/api/order-detail",
+    "condition": "if (pathname === '/api/order-detail' && request.method === 'GET') {",
+    "db_queries": 3,
+    "tables": [
+      "don_hang",
+      "items",
+      "nvl_items",
+      "quy_trinh_don",
+      "vouchers"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1235,
+    "path": "/api/vouchers",
+    "condition": "if (pathname === '/api/vouchers' && request.method === 'GET') {",
+    "db_queries": 2,
+    "tables": [
+      "chung_tu",
+      "chung_tu_file",
+      "vouchers"
+    ],
+    "sqlite_syntax": [
+      "LIKE (case-insensitive in SQLite)"
+    ]
+  },
+  {
+    "line": 1292,
+    "path": "/api/voucher",
+    "condition": "if (pathname === '/api/voucher' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "chung_tu",
+      "chung_tu_file",
+      "vouchers"
+    ],
+    "sqlite_syntax": [
+      "env.DB.batch"
+    ]
+  },
+  {
+    "line": 1316,
+    "path": "/api/vouchers/import",
+    "condition": "if (pathname === '/api/vouchers/import' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "chung_tu",
+      "chung_tu_file",
+      "items",
+      "vouchers"
+    ],
+    "sqlite_syntax": [
+      "env.DB.batch"
+    ]
+  },
+  {
+    "line": 1354,
+    "path": "/api/voucher-detail",
+    "condition": "if (pathname === '/api/voucher-detail' && request.method === 'GET') {",
+    "db_queries": 2,
+    "tables": [
+      "chung_tu",
+      "chung_tu_file"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1377,
+    "path": "/api/inventory-audit",
+    "condition": "if (pathname === '/api/inventory-audit') {",
+    "db_queries": 2,
+    "tables": [
+      "items",
+      "kiemke_tonkho"
+    ],
+    "sqlite_syntax": [
+      "LIKE (case-insensitive in SQLite)",
+      "env.DB.batch"
+    ]
+  },
+  {
+    "line": 1405,
+    "path": "/api/daily-report",
+    "condition": "if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "branches",
+      "daily_catering_reports"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1422,
+    "path": "/api/daily-report",
+    "condition": "if ((pathname === '/api/report' || pathname === '/api/daily-report') && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "branches",
+      "daily_catering_reports"
+    ],
+    "sqlite_syntax": [
+      "LOWER"
+    ]
+  },
+  {
+    "line": 1464,
+    "path": "/api/auth/me",
+    "condition": "if (pathname === '/api/auth/me' && request.method === 'GET') {",
+    "db_queries": 3,
+    "tables": [
+      "access_requests",
+      "app_roles",
+      "app_users"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1562,
+    "path": "/api/auth/google",
+    "condition": "if (pathname === '/api/auth/google' && request.method === 'POST') {",
+    "db_queries": 8,
+    "tables": [
+      "access_requests",
+      "app_roles",
+      "app_users"
+    ],
+    "sqlite_syntax": [
+      "date_now / datetime_now",
+      "last_row_id"
+    ]
+  },
+  {
+    "line": 1716,
+    "path": "/api/auth/roles-permissions",
+    "condition": "if (pathname === '/api/auth/roles-permissions' && request.method === 'GET') {",
+    "db_queries": 3,
+    "tables": [
+      "app_roles",
+      "app_users",
+      "role_permissions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1740,
+    "path": "/api/admin/db-status",
+    "condition": "if (pathname === '/api/admin/db-status' && request.method === 'GET') {",
+    "db_queries": 2,
+    "tables": [
+      "app_users",
+      "branches",
+      "dinh_muc",
+      "don_hang",
+      "fnb_monthly_summary",
+      "inventory_batches",
+      "nvl_items",
+      "purchase_orders",
+      "sites",
+      "transactions",
+      "vouchers"
+    ],
+    "sqlite_syntax": [
+      "sqlite_master"
+    ]
+  },
+  {
+    "line": 1761,
+    "path": "/api/admin/sync-monthly-summary",
+    "condition": "if (pathname === '/api/admin/sync-monthly-summary') {",
+    "db_queries": 2,
+    "tables": [
+      "fnb_monthly_summary",
+      "transactions"
+    ],
+    "sqlite_syntax": [
+      "INSERT OR REPLACE",
+      "SUBSTR",
+      "LIKE (case-insensitive in SQLite)",
+      "LOWER"
+    ]
+  },
+  {
+    "line": 1826,
+    "path": "/api/admin/sync-dim-article-stock",
+    "condition": "if (pathname === '/api/admin/sync-dim-article-stock' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "dim_article_stock",
+      "items"
+    ],
+    "sqlite_syntax": [
+      "INSERT OR REPLACE",
+      "date_now / datetime_now",
+      "env.DB.batch",
+      "AUTOINCREMENT",
+      "CURRENT_TIMESTAMP"
+    ]
+  },
+  {
+    "line": 1889,
+    "path": "/api/admin/clean-demo-data",
+    "condition": "if (pathname === '/api/admin/clean-demo-data') {",
+    "db_queries": 1,
+    "tables": [
+      "app_users"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1899,
+    "path": "/api/auth/users-matrix",
+    "condition": "if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {",
+    "db_queries": 4,
+    "tables": [
+      "app_roles",
+      "app_users",
+      "role_permissions",
+      "sites",
+      "user_permissions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1955,
+    "path": "/api/auth/user-permissions/toggle",
+    "condition": "if (pathname === '/api/auth/user-permissions/toggle' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "user_permissions"
+    ],
+    "sqlite_syntax": [
+      "date_now / datetime_now"
+    ]
+  },
+  {
+    "line": 1990,
+    "path": "/api/auth/user-permissions/reset-user",
+    "condition": "if (pathname === '/api/auth/user-permissions/reset-user' && request.method === 'POST') {",
+    "db_queries": 1,
+    "tables": [
+      "user_permissions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 1998,
+    "path": "/api/auth/users/update-role",
+    "condition": "if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "app_users",
+      "user_permissions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2009,
+    "path": "/api/auth/users/toggle-status",
+    "condition": "if (pathname === '/api/auth/users/toggle-status' && request.method === 'POST') {",
+    "db_queries": 1,
+    "tables": [
+      "app_users"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2017,
+    "path": "/api/auth/users/create",
+    "condition": "if (pathname === '/api/auth/users/create' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "app_users"
+    ],
+    "sqlite_syntax": [
+      "date_now / datetime_now"
+    ]
+  },
+  {
+    "line": 2037,
+    "path": "/api/auth/switch-role",
+    "condition": "if (pathname === '/api/auth/switch-role' && request.method === 'POST') {",
+    "db_queries": 3,
+    "tables": [
+      "access_requests",
+      "app_roles",
+      "app_users"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2087,
+    "path": "/api/auth/request-access",
+    "condition": "if (pathname === '/api/auth/request-access' && request.method === 'POST') {",
+    "db_queries": 1,
+    "tables": [
+      "access_requests"
+    ],
+    "sqlite_syntax": [
+      "CURRENT_TIMESTAMP"
+    ]
+  },
+  {
+    "line": 2104,
+    "path": "/api/auth/access-requests",
+    "condition": "if (pathname === '/api/auth/access-requests' && request.method === 'GET') {",
+    "db_queries": 1,
+    "tables": [
+      "access_requests"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2113,
+    "path": "/api/auth/approve-access-request",
+    "condition": "if (pathname === '/api/auth/approve-access-request' && request.method === 'POST') {",
+    "db_queries": 4,
+    "tables": [
+      "access_requests",
+      "app_users"
+    ],
+    "sqlite_syntax": [
+      "CURRENT_TIMESTAMP"
+    ]
+  },
+  {
+    "line": 2162,
+    "path": "/api/auth/login",
+    "condition": "if (pathname === '/api/auth/login' && request.method === 'POST') {",
+    "db_queries": 1,
+    "tables": [
+      "admin_users"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2178,
+    "path": "/api/auth/register",
+    "condition": "if (pathname === '/api/auth/register' && request.method === 'POST') {",
+    "db_queries": 2,
+    "tables": [
+      "admin_users",
+      "transactions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2200,
+    "path": "/api/fnb/pl",
+    "condition": "if (pathname === '/api/fnb/pl' && request.method === 'GET') {",
+    "db_queries": 8,
+    "tables": [
+      "sites",
+      "transactions"
+    ],
+    "sqlite_syntax": [
+      "SUBSTR",
+      "LIKE (case-insensitive in SQLite)"
+    ]
+  },
+  {
+    "line": 2448,
+    "path": "/api/fnb/chain",
+    "condition": "if (pathname === '/api/fnb/chain' && request.method === 'GET') {",
+    "db_queries": 6,
+    "tables": [
+      "fnb_monthly_summary",
+      "sites",
+      "transactions"
+    ],
+    "sqlite_syntax": [
+      "INSERT OR REPLACE",
+      "SUBSTR",
+      "LIKE (case-insensitive in SQLite)",
+      "LOWER"
+    ]
+  },
+  {
+    "line": 2620,
+    "path": "/api/fnb/pos",
+    "condition": "if (pathname === '/api/fnb/pos' && request.method === 'GET') {",
+    "db_queries": 3,
+    "tables": [
+      "transactions"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2729,
+    "path": "/fnb/stock",
+    "condition": "if ((pathname === '/api/fnb/stock' || pathname === '/fnb/stock') && request.method === 'GET') {",
+    "db_queries": 3,
+    "tables": [
+      "dim_article_stock",
+      "fnb_stock_balances",
+      "fnb_stock_items",
+      "items",
+      "sites"
+    ],
+    "sqlite_syntax": []
+  },
+  {
+    "line": 2830,
+    "path": "/fnb/stock/items-for-site",
+    "condition": "if ((pathname === '/api/fnb/stock/items-for-site' || pathname === '/fnb/stock/items-for-site') && request.method === 'GET') {",
+    "db_queries": 2,
+    "tables": [
+      "dim_article_stock",
+      "fnb_stock_balances",
+      "fnb_stock_items",
+      "items"
+    ],
+    "sqlite_syntax": [
+      "LIKE (case-insensitive in SQLite)"
+    ]
+  },
+  {
+    "line": 2906,
+    "path": "/fnb/counts",
+    "condition": "if ((pathname === '/api/fnb/counts' || pathname === '/fnb/counts')) {",
+    "db_queries": 6,
+    "tables": [
+      "dim_article_stock",
+      "fnb_stock_balances",
+      "fnb_stock_count_lines",
+      "fnb_stock_counts",
+      "fnb_stock_items",
+      "fnb_stock_transactions"
+    ],
+    "sqlite_syntax": [
+      "last_row_id",
+      "env.DB.batch",
+      "RANDOM / Math.random"
+    ]
+  },
+  {
+    "line": 3023,
+    "path": "/fnb/receipts",
+    "condition": "if ((pathname === '/api/fnb/receipts' || pathname === '/fnb/receipts')) {",
+    "db_queries": 6,
+    "tables": [
+      "fnb_stock_balances",
+      "fnb_stock_items",
+      "fnb_stock_receipt_lines",
+      "fnb_stock_receipts",
+      "fnb_stock_transactions"
+    ],
+    "sqlite_syntax": [
+      "last_row_id",
+      "env.DB.batch",
+      "RANDOM / Math.random"
+    ]
+  },
+  {
+    "line": 3123,
+    "path": "/fnb/wastes",
+    "condition": "if ((pathname === '/api/fnb/wastes' || pathname === '/fnb/wastes')) {",
+    "db_queries": 6,
+    "tables": [
+      "fnb_stock_balances",
+      "fnb_stock_items",
+      "fnb_stock_transactions",
+      "fnb_stock_waste_lines",
+      "fnb_stock_wastes"
+    ],
+    "sqlite_syntax": [
+      "last_row_id",
+      "env.DB.batch",
+      "RANDOM / Math.random"
+    ]
+  },
+  {
+    "line": 3227,
+    "path": "/index.html",
+    "condition": "if (pathname === '/' || pathname === '/index.html' || response.headers.get('content-type')?.includes('text/html')) {",
+    "db_queries": 0,
+    "tables": [],
+    "sqlite_syntax": [
+      "PRAGMA"
+    ]
+  }
+]

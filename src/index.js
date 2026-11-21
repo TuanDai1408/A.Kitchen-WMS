@@ -1,5 +1,7 @@
+import db from './db/index.js';
+
 // ============================================================================
-// A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1)
+// A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1 + POSTGRESQL)
 // ============================================================================
 
 async function sha256(str) {
@@ -66,6 +68,23 @@ function normalizeMonth(thang) {
   return s;
 }
 
+function getMonthRange(yearMonth) {
+  if (!yearMonth || !yearMonth.includes('-')) {
+    return { start: '1970-01-01', end: '2099-12-31' };
+  }
+  const parts = yearMonth.trim().split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(y) || isNaN(m)) {
+    return { start: `${yearMonth}-01`, end: `${yearMonth}-28` };
+  }
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return {
+    start: `${parts[0]}-${String(m).padStart(2, '0')}-01`,
+    end: `${parts[0]}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  };
+}
+
 
 const FEATURE_NAME_TO_CODE = {
   'fnb-chain': 'fnb-chain',
@@ -117,15 +136,15 @@ const FEATURE_NAME_TO_CODE = {
 async function ensureRolePermissions(env) {
   try {
     const essentialKhoPerms = [
-      ['KHO_TRUONG', 'portal-kiemke', 1, 1, 1, 1],
-      ['KHO_TRUONG', 'fnb-counts', 1, 1, 1, 1],
-      ['KHO_TRUONG', 'portal-baocao', 1, 1, 1, 0],
-      ['KHO_TRUONG', 'fnb-receipts', 1, 1, 1, 1]
+      ['KHO_TRUONG', 'portal-kiemke', true, true, true, true],
+      ['KHO_TRUONG', 'fnb-counts', true, true, true, true],
+      ['KHO_TRUONG', 'portal-baocao', true, true, true, false],
+      ['KHO_TRUONG', 'fnb-receipts', true, true, true, true]
     ];
     for (const [r, f, v, c, e, d] of essentialKhoPerms) {
-      const exists = await env.DB.prepare(`SELECT id FROM role_permissions WHERE role_code = ? AND feature_code = ? LIMIT 1`).bind(r, f).first();
+      const exists = await db.queryOne(env, `SELECT id FROM role_permissions WHERE role_code = ? AND feature_code = ? LIMIT 1`, [r, f]);
       if (!exists) {
-        await env.DB.prepare(`INSERT INTO role_permissions (role_code, feature_code, can_view, can_create, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)`).bind(r, f, v, c, e, d).run();
+        await db.exec(env, `INSERT INTO role_permissions (role_code, feature_code, can_view, can_create, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)`, [r, f, v, c, e, d]);
       }
     }
   } catch (err) {
@@ -137,72 +156,72 @@ async function ensureRolePermissions(env) {
 async function autoCleanDemoData(env) {
   try {
     // 1. Xóa các tài khoản demo fake trong app_users
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM app_users 
       WHERE email LIKE '%@sibafood.vn' 
          OR email = 'admin@sibafood.vn' 
          OR email LIKE '%test%'
-    `).run();
+    `).catch(() => {});
 
     // 2. Xóa phân quyền và yêu cầu cấp quyền của user demo
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM user_permissions 
       WHERE user_email LIKE '%@sibafood.vn' 
          OR user_email LIKE '%test%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM access_requests 
       WHERE user_email LIKE '%@sibafood.vn' 
          OR user_email LIKE '%test%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
     // 3. Xóa dữ liệu seed demo mock ban đầu
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM purchase_orders 
       WHERE id LIKE 'po_%' OR po_number LIKE 'PO #%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM purchase_order_items 
       WHERE po_id LIKE 'po_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM vouchers 
       WHERE id LIKE 'vc_%' OR voucher_code LIKE 'CT-202611-%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM inventory_batches 
       WHERE id LIKE 'bat_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM stock_audits 
       WHERE id LIKE 'sa_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM branches 
       WHERE id IN ('b_q1', 'b_q7', 'b_td')
-    `).run().catch(() => {});
+    `).catch(() => {});
 
     await ensureBranchesSynced(env);
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM items 
       WHERE sku IN ('GV-BBQ-01', 'GV-SWCH-02', 'GV-MUSH-09', 'GV-PEP-01', 'GV-SUG-05', 'GV-OYST-04', 'GV-OYST-08', 'GV-FSH-01', 'VT-GLV-01', 'VT-WRP-02', 'CC-KNF-04')
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM daily_catering_reports
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM don_hang 
       WHERE ordered_by LIKE '%test%' OR ordered_by LIKE '%demo%' OR ordered_by LIKE '%sibafood.vn%'
-    `).run().catch(() => {});
+    `).catch(() => {});
   } catch (err) {
     console.error('autoCleanDemoData error:', err);
   }
@@ -212,26 +231,55 @@ async function autoCleanDemoData(env) {
 async function ensureBranchesSynced(env) {
   try {
     // 1. Đồng bộ các điểm bán từ master sites sang branches nếu còn thiếu
-    await env.DB.prepare(`
-      INSERT OR IGNORE INTO branches (id, code, name, address, phone, is_active)
-      SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, 1 as is_active
-      FROM sites
-      WHERE site_code NOT IN (SELECT code FROM branches)
-    `).run().catch(() => {});
+    await db.exec(env, {
+      d1: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, 1 as is_active
+        FROM sites
+        WHERE site_code NOT IN (SELECT code FROM branches)
+        ON CONFLICT (id) DO NOTHING
+      `,
+      pg: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, true as is_active
+        FROM sites
+        WHERE site_code NOT IN (SELECT code FROM branches)
+        ON CONFLICT (id) DO NOTHING
+      `
+    }).catch(() => {});
 
     // 2. Đảm bảo K505 luôn có mặt và active trong branches
-    await env.DB.prepare(`
-      INSERT OR REPLACE INTO branches (id, code, name, address, phone, is_active)
-      VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', 1)
-    `).run().catch(() => {});
+    await db.exec(env, {
+      d1: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', 1)
+        ON CONFLICT (id) DO UPDATE SET
+          code = excluded.code,
+          name = excluded.name,
+          address = excluded.address,
+          phone = excluded.phone,
+          is_active = excluded.is_active
+      `,
+      pg: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', true)
+        ON CONFLICT (id) DO UPDATE SET
+          code = excluded.code,
+          name = excluded.name,
+          address = excluded.address,
+          phone = excluded.phone,
+          is_active = excluded.is_active
+      `
+    }).catch(() => {});
   } catch (err) {
     console.error('ensureBranchesSynced notice:', err);
   }
 }
 
 async function ensureUserPermissionsTable(env) {
+  if (db.isPg(env)) return;
   try {
-    await env.DB.prepare(`
+    await db.exec(env, `
       CREATE TABLE IF NOT EXISTS user_permissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT NOT NULL,
@@ -243,8 +291,8 @@ async function ensureUserPermissionsTable(env) {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_email, feature_code)
       )
-    `).run();
-    await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)`).run().catch(() => {});
+    `);
+    await db.exec(env, `CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)`).catch(() => {});
   } catch (err) {
     console.error('ensureUserPermissionsTable notice:', err);
   }
@@ -272,18 +320,18 @@ async function buildUserPermissions(env, user) {
       permissions[f] = { canView: false, canCreate: false, canEdit: false, canDelete: false };
     });
 
-    const { results: permRows } = await env.DB.prepare(`
+    const { rows: permRows } = await db.query(env, `
       SELECT feature_code, can_view, can_create, can_edit, can_delete
       FROM role_permissions
       WHERE role_code = ?
-    `).bind(user.role_code).all().catch(() => ({ results: [] }));
+    `, [user.role_code]).catch(() => ({ rows: [] }));
 
     (permRows || []).forEach(p => {
       permissions[p.feature_code] = {
-        canView: p.can_view === 1,
-        canCreate: p.can_create === 1,
-        canEdit: p.can_edit === 1,
-        canDelete: p.can_delete === 1
+        canView: p.can_view === 1 || p.can_view === true,
+        canCreate: p.can_create === 1 || p.can_create === true,
+        canEdit: p.can_edit === 1 || p.can_edit === true,
+        canDelete: p.can_delete === 1 || p.can_delete === true
       };
     });
 
@@ -317,33 +365,33 @@ async function buildUserPermissions(env, user) {
 
   // 2. Cộng dồn quyền nếu có yêu cầu truy cập được duyệt (access_requests)
   if (user.email) {
-    const { results: approvedRequests } = await env.DB.prepare(`
+    const { rows: approvedRequests } = await db.query(env, `
       SELECT requested_role, requested_feature
       FROM access_requests
       WHERE user_email = ? AND status = 'APPROVED'
-    `).bind(user.email).all();
+    `, [user.email]);
 
     for (const req of (approvedRequests || [])) {
       if (req.requested_role && req.requested_role !== user.role_code) {
-        const { results: rolePerms } = await env.DB.prepare(`
+        const { rows: rolePerms } = await db.query(env, `
           SELECT feature_code, can_view, can_create, can_edit, can_delete
           FROM role_permissions
           WHERE role_code = ?
-        `).bind(req.requested_role).all();
+        `, [req.requested_role]);
 
         (rolePerms || []).forEach(p => {
+          const cv = p.can_view === 1 || p.can_view === true;
+          const cc = p.can_create === 1 || p.can_create === true;
+          const ce = p.can_edit === 1 || p.can_edit === true;
+          const cd = p.can_delete === 1 || p.can_delete === true;
+
           if (!permissions[p.feature_code]) {
-            permissions[p.feature_code] = {
-              canView: p.can_view === 1,
-              canCreate: p.can_create === 1,
-              canEdit: p.can_edit === 1,
-              canDelete: p.can_delete === 1
-            };
+            permissions[p.feature_code] = { canView: cv, canCreate: cc, canEdit: ce, canDelete: cd };
           } else {
-            permissions[p.feature_code].canView = permissions[p.feature_code].canView || (p.can_view === 1);
-            permissions[p.feature_code].canCreate = permissions[p.feature_code].canCreate || (p.can_create === 1);
-            permissions[p.feature_code].canEdit = permissions[p.feature_code].canEdit || (p.can_edit === 1);
-            permissions[p.feature_code].canDelete = permissions[p.feature_code].canDelete || (p.can_delete === 1);
+            permissions[p.feature_code].canView = permissions[p.feature_code].canView || cv;
+            permissions[p.feature_code].canCreate = permissions[p.feature_code].canCreate || cc;
+            permissions[p.feature_code].canEdit = permissions[p.feature_code].canEdit || ce;
+            permissions[p.feature_code].canDelete = permissions[p.feature_code].canDelete || cd;
           }
         });
       }
@@ -363,14 +411,17 @@ async function buildUserPermissions(env, user) {
   // ĐÂY LÀ QUYỀN TỐI CAO ĐÈ LÊN MỌI VAI TRÒ MẶC ĐỊNH
   if (user.email) {
     try {
-      const { results: customPerms } = await env.DB.prepare(`
+      const { rows: customPerms } = await db.query(env, `
         SELECT feature_code, can_view, can_create, can_edit, can_delete
         FROM user_permissions
         WHERE user_email = ?
-      `).bind(user.email).all().catch(() => ({ results: [] }));
+      `, [user.email]).catch(() => ({ rows: [] }));
 
       (customPerms || []).forEach(cp => {
-        if (cp.can_view === 0) {
+        const isGranted = cp.can_view === 1 || cp.can_view === true;
+        const isRevoked = cp.can_view === 0 || cp.can_view === false;
+
+        if (isRevoked) {
           // CẮT / KHÓA QUYỀN TUYỆT ĐỐI (Dù vai trò là ADMIN hay KHO_TRUONG đều bị khóa)
           permissions[cp.feature_code] = {
             canView: false,
@@ -379,13 +430,13 @@ async function buildUserPermissions(env, user) {
             canDelete: false,
             isRevoked: true
           };
-        } else if (cp.can_view === 1) {
+        } else if (isGranted) {
           // CẤP QUYỀN RIÊNG BIỆT
           permissions[cp.feature_code] = {
             canView: true,
-            canCreate: cp.can_create === 1,
-            canEdit: cp.can_edit === 1,
-            canDelete: cp.can_delete === 1,
+            canCreate: cp.can_create === 1 || cp.can_create === true,
+            canEdit: cp.can_edit === 1 || cp.can_edit === true,
+            canDelete: cp.can_delete === 1 || cp.can_delete === true,
             isCustom: true
           };
         }
@@ -544,10 +595,12 @@ async function ensureDatabaseIndexes(env) {
     'CREATE INDEX IF NOT EXISTS idx_dim_art_site_mat ON dim_article_stock(site, material)'
   ];
 
-  for (const idxSql of indexes) {
-    try {
-      await env.DB.prepare(idxSql).run().catch(() => {});
-    } catch (e) {}
+  if (db.getBackend(env) === 'd1' && env.DB) {
+    for (const idxSql of indexes) {
+      try {
+        await env.DB.prepare(idxSql).run().catch(() => {});
+      } catch (e) {}
+    }
   }
 }
 
@@ -640,22 +693,40 @@ export default {
         }
 
         try {
-          let { results } = await env.DB.prepare(`
-            SELECT 
-              COALESCE(b.id, LOWER(s.site_code)) as id,
-              s.site_code as code,
-              COALESCE(b.name, s.site_name, s.name) as name,
-              s.region,
-              COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
-              COALESCE(b.phone, '0903.000.xxx') as phone,
-              COALESCE(s.budget_limit, 10000000) as budget,
-              COALESCE(b.is_active, 1) as is_active,
-              s.site_type
-            FROM sites s
-            LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
-            WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
-            ORDER BY s.site_code
-          `).all();
+          let { rows: results } = await db.query(env, {
+            d1: `
+              SELECT 
+                COALESCE(b.id, LOWER(s.site_code)) as id,
+                s.site_code as code,
+                COALESCE(b.name, s.site_name, s.name) as name,
+                s.region,
+                COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+                COALESCE(b.phone, '0903.000.xxx') as phone,
+                COALESCE(s.budget_limit, 10000000) as budget,
+                COALESCE(b.is_active, 1) as is_active,
+                s.site_type
+              FROM sites s
+              LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+              WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
+              ORDER BY s.site_code
+            `,
+            pg: `
+              SELECT 
+                COALESCE(b.id, LOWER(s.site_code)) as id,
+                s.site_code as code,
+                COALESCE(b.name, s.site_name, s.name) as name,
+                s.region,
+                COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+                COALESCE(b.phone, '0903.000.xxx') as phone,
+                COALESCE(s.budget_limit, 10000000) as budget,
+                CASE WHEN COALESCE(b.is_active, true) = true THEN 1 ELSE 0 END as is_active,
+                s.site_type
+              FROM sites s
+              LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+              WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, true) = true
+              ORDER BY s.site_code
+            `
+          });
 
           if (!results || results.length === 0) {
             await ensureBranchesSynced(env);
@@ -676,72 +747,110 @@ export default {
         const branchCode = searchParams.get('branch') || 'k505';
         const upperCode = branchCode.toUpperCase();
 
-        const critRow = await env.DB.prepare(`
-          SELECT COUNT(*) as critical_count
-          FROM inventory_batches b
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0 AND (julianday(b.exp_date) - julianday('now')) <= 7
-        `).bind(upperCode).first();
+        const critRow = await db.queryOne(env, {
+          d1: `SELECT COUNT(*) as critical_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (julianday(b.exp_date) - julianday('now')) <= 7`,
+          pg: `SELECT COUNT(*) as critical_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (b.exp_date::date - CURRENT_DATE) <= 7`
+        }, [upperCode]);
 
-        const ropRow = await env.DB.prepare(`
+        const ropRow = await db.queryOne(env, `
           SELECT COUNT(*) as rop_count FROM (
             SELECT i.sku
             FROM items i
             LEFT JOIN branches br ON br.code = ?
             LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
             WHERE i.category = 'Gia vị'
-            GROUP BY i.sku
+            GROUP BY i.sku, i.daily_usage, i.lead_time_hours, i.safety_stock
             HAVING COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-          )
-        `).bind(upperCode).first();
+          ) sub
+        `, [upperCode]);
 
-        const leadRow = await env.DB.prepare(`
-          SELECT ROUND(AVG(lead_time_hours), 1) as avg_lead_time, COUNT(*) as total_orders
-          FROM purchase_orders
-          WHERE lead_time_hours IS NOT NULL
-        `).first();
+        const leadRow = await db.queryOne(env, {
+          d1: `SELECT ROUND(AVG(lead_time_hours), 1) as avg_lead_time, COUNT(*) as total_orders
+               FROM purchase_orders
+               WHERE lead_time_hours IS NOT NULL`,
+          pg: `SELECT ROUND(AVG(lead_time_hours)::numeric, 1) as avg_lead_time, COUNT(*) as total_orders
+               FROM purchase_orders
+               WHERE lead_time_hours IS NOT NULL`
+        });
 
-        const stockRow = await env.DB.prepare(`
-          SELECT 
-            COUNT(DISTINCT i.sku) as total_skus, 
-            ROUND(COALESCE(SUM(b.qty), 0), 1) as total_qty,
-            ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0), 0) as total_value
-          FROM items i
-          JOIN inventory_batches b ON i.sku = b.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0
-        `).bind(upperCode).first();
+        const stockRow = await db.queryOne(env, {
+          d1: `SELECT 
+                 COUNT(DISTINCT i.sku) as total_skus, 
+                 ROUND(COALESCE(SUM(b.qty), 0), 1) as total_qty,
+                 ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0), 0) as total_value
+               FROM items i
+               JOIN inventory_batches b ON i.sku = b.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0`,
+          pg: `SELECT 
+                 COUNT(DISTINCT i.sku) as total_skus, 
+                 ROUND(COALESCE(SUM(b.qty), 0)::numeric, 1) as total_qty,
+                 ROUND(COALESCE(SUM(b.qty * COALESCE(i.standard_cost_sap, 0)), 0)::numeric, 0) as total_value
+               FROM items i
+               JOIN inventory_batches b ON i.sku = b.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0`
+        }, [upperCode]);
 
         // Slow moving count (batches created > 20 days ago with stock remaining)
-        const slowRow = await env.DB.prepare(`
-          SELECT COUNT(DISTINCT b.sku) as slow_count
-          FROM inventory_batches b
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0 AND (julianday('now') - julianday(b.created_at)) >= 14
-        `).bind(upperCode).first().catch(() => ({ slow_count: 2 }));
+        const slowRow = await db.queryOne(env, {
+          d1: `SELECT COUNT(DISTINCT b.sku) as slow_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (julianday('now') - julianday(b.created_at)) >= 14`,
+          pg: `SELECT COUNT(DISTINCT b.sku) as slow_count
+               FROM inventory_batches b
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND b.qty > 0 AND (CURRENT_DATE - b.created_at::date) >= 14`
+        }, [upperCode]).catch(() => ({ slow_count: 2 }));
 
         // Stock alerts for recent-orders style table
-        const alertsRows = await env.DB.prepare(`
-          SELECT 
-            b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
-            ROUND(b.qty, 1) as qty,
-            ROUND((julianday(b.exp_date) - julianday('now')), 0) as days_left,
-            i.safety_stock,
-            CASE 
-              WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
-              WHEN (julianday(b.exp_date) - julianday('now')) <= 7 THEN 'NEAR_EXPIRY'
-              WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
-              ELSE 'NORMAL'
-            END as alert_level
-          FROM inventory_batches b
-          JOIN items i ON b.sku = i.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND (
-            b.qty <= i.safety_stock OR (julianday(b.exp_date) - julianday('now')) <= 15
-          )
-          ORDER BY days_left ASC, b.qty ASC
-          LIMIT 8
-        `).bind(upperCode).all().catch(() => ({ results: [] }));
+        const { rows: alertsRows } = await db.query(env, {
+          d1: `SELECT 
+                 b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
+                 ROUND(b.qty, 1) as qty,
+                 ROUND((julianday(b.exp_date) - julianday('now')), 0) as days_left,
+                 i.safety_stock,
+                 CASE 
+                   WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
+                   WHEN (julianday(b.exp_date) - julianday('now')) <= 7 THEN 'NEAR_EXPIRY'
+                   WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
+                   ELSE 'NORMAL'
+                 END as alert_level
+               FROM inventory_batches b
+               JOIN items i ON b.sku = i.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND (
+                 b.qty <= i.safety_stock OR (julianday(b.exp_date) - julianday('now')) <= 15
+               )
+               ORDER BY days_left ASC, b.qty ASC
+               LIMIT 8`,
+          pg: `SELECT 
+                 b.id, b.sku, i.name as item_name, i.category, i.unit, b.batch_code, b.exp_date,
+                 ROUND(b.qty::numeric, 1) as qty,
+                 (b.exp_date::date - CURRENT_DATE) as days_left,
+                 i.safety_stock,
+                 CASE 
+                   WHEN b.qty <= 0 THEN 'OUT_OF_STOCK'
+                   WHEN (b.exp_date::date - CURRENT_DATE) <= 7 THEN 'NEAR_EXPIRY'
+                   WHEN b.qty <= i.safety_stock THEN 'LOW_STOCK'
+                   ELSE 'NORMAL'
+                 END as alert_level
+               FROM inventory_batches b
+               JOIN items i ON b.sku = i.sku
+               JOIN branches br ON b.branch_id = br.id
+               WHERE br.code = ? AND (
+                 b.qty <= i.safety_stock OR (b.exp_date::date - CURRENT_DATE) <= 15
+               )
+               ORDER BY days_left ASC, b.qty ASC
+               LIMIT 8`
+        }, [upperCode]).catch(() => ({ rows: [] }));
 
         const totalSkus = stockRow ? (stockRow.total_skus || 0) : 0;
         const ropCount = ropRow ? (ropRow.rop_count || 0) : 0;
@@ -760,7 +869,7 @@ export default {
             total_value: stockRow && stockRow.total_value ? stockRow.total_value : 1258600000,
             slow_moving_count: slowRow && slowRow.slow_count ? slowRow.slow_count : 2,
             safety_rate: safetyRate,
-            alerts: alertsRows && alertsRows.results ? alertsRows.results : []
+            alerts: alertsRows || []
           }
         };
         return createCachedResponse(dashSummaryData, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
@@ -769,29 +878,50 @@ export default {
       // 1.3 GET /api/stock
       if (pathname === '/api/stock' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
-        const query = `
-          SELECT 
-            b.id as batch_id,
-            b.batch_code,
-            b.mfg_date,
-            b.exp_date,
-            b.qty,
-            b.storage_loc,
-            i.sku,
-            i.name as item_name,
-            i.category,
-            i.unit,
-            i.standard_cost_sap,
-            ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
-          FROM inventory_batches b
-          JOIN items i ON b.sku = i.sku
-          JOIN branches br ON b.branch_id = br.id
-          WHERE br.code = ? AND b.qty > 0
-          ORDER BY julianday(b.exp_date) ASC
-        `;
-        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+        const { rows: results } = await db.query(env, {
+          d1: `
+            SELECT 
+              b.id as batch_id,
+              b.batch_code,
+              b.mfg_date,
+              b.exp_date,
+              b.qty,
+              b.storage_loc,
+              i.sku,
+              i.name as item_name,
+              i.category,
+              i.unit,
+              i.standard_cost_sap,
+              ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
+            FROM inventory_batches b
+            JOIN items i ON b.sku = i.sku
+            JOIN branches br ON b.branch_id = br.id
+            WHERE br.code = ? AND b.qty > 0
+            ORDER BY julianday(b.exp_date) ASC
+          `,
+          pg: `
+            SELECT 
+              b.id as batch_id,
+              b.batch_code,
+              b.mfg_date,
+              b.exp_date,
+              b.qty,
+              b.storage_loc,
+              i.sku,
+              i.name as item_name,
+              i.category,
+              i.unit,
+              i.standard_cost_sap,
+              (b.exp_date::date - CURRENT_DATE) as days_remaining
+            FROM inventory_batches b
+            JOIN items i ON b.sku = i.sku
+            JOIN branches br ON b.branch_id = br.id
+            WHERE br.code = ? AND b.qty > 0
+            ORDER BY b.exp_date ASC
+          `
+        }, [branchCode.toUpperCase()]);
 
-        const enriched = results.map((r, idx) => {
+        const enriched = (results || []).map((r, idx) => {
           let dangerLevel = 'green';
           let statusText = 'An toàn';
           if (r.days_remaining <= 7) {
@@ -816,20 +946,20 @@ export default {
       if (pathname === '/api/stock/receipt' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, batch_code, mfg_date, exp_date, qty, storage_loc, ref_code } = body;
-        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        const branch = await db.queryOne(env, 'SELECT id FROM branches WHERE code = ?', [branch_code.toUpperCase()]);
         if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
 
         const batchId = 'bat_' + Date.now();
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO inventory_batches (id, branch_id, sku, batch_code, mfg_date, exp_date, qty, storage_loc)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(batchId, branch.id, sku, batch_code, mfg_date, exp_date, parseFloat(qty), storage_loc || 'Kho gia vị').run();
+        `, [batchId, branch.id, sku, batch_code, mfg_date, exp_date, parseFloat(qty), storage_loc || 'Kho gia vị']);
 
         const transId = 'tx_' + Date.now();
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note, ref_code)
           VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, 'Nhập kho lô mới', ?)
-        `).bind(transId, branch.id, sku, batchId, parseFloat(qty), ref_code || '').run();
+        `, [transId, branch.id, sku, batchId, parseFloat(qty), ref_code || '']);
 
         return new Response(JSON.stringify({ success: true, message: 'Nhập kho thành công', batch_id: batchId }), { headers: corsHeaders });
       }
@@ -838,25 +968,35 @@ export default {
       if (pathname === '/api/stock/issue' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, qty_needed, note } = body;
-        const branch = await env.DB.prepare('SELECT id FROM branches WHERE code = ?').bind(branch_code.toUpperCase()).first();
+        const branch = await db.queryOne(env, 'SELECT id FROM branches WHERE code = ?', [branch_code.toUpperCase()]);
+        if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
         let remain = parseFloat(qty_needed);
 
-        const { results: batches } = await env.DB.prepare(`
-          SELECT id, qty, batch_code, exp_date
-          FROM inventory_batches
-          WHERE branch_id = ? AND sku = ? AND qty > 0
-          ORDER BY julianday(exp_date) ASC
-        `).bind(branch.id, sku).all();
+        const { rows: batches } = await db.query(env, {
+          d1: `
+            SELECT id, qty, batch_code, exp_date
+            FROM inventory_batches
+            WHERE branch_id = ? AND sku = ? AND qty > 0
+            ORDER BY julianday(exp_date) ASC
+          `,
+          pg: `
+            SELECT id, qty, batch_code, exp_date
+            FROM inventory_batches
+            WHERE branch_id = ? AND sku = ? AND qty > 0
+            ORDER BY exp_date ASC
+          `
+        }, [branch.id, sku]);
 
-        const stmts = [];
-        for (const b of batches) {
+        const ops = [];
+        for (const b of (batches || [])) {
           if (remain <= 0) break;
           const deduct = Math.min(b.qty, remain);
-          stmts.push(env.DB.prepare('UPDATE inventory_batches SET qty = qty - ? WHERE id = ?').bind(deduct, b.id));
-          stmts.push(env.DB.prepare(`
-            INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
-            VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)
-          `).bind('tx_' + Math.random().toString(36).substr(2, 9), branch.id, sku, b.id, deduct, note || 'Xuất bếp ca nấu'));
+          ops.push({
+            updateSql: 'UPDATE inventory_batches SET qty = qty - ? WHERE id = ?',
+            updateParams: [deduct, b.id],
+            insertSql: `INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)`,
+            insertParams: ['tx_' + Math.random().toString(36).substr(2, 9), branch.id, sku, b.id, deduct, note || 'Xuất bếp ca nấu']
+          });
           remain -= deduct;
         }
 
@@ -864,88 +1004,162 @@ export default {
           return new Response(JSON.stringify({ success: false, error: `Tồn kho không đủ (thiếu ${remain.toFixed(1)})` }), { status: 400, headers: corsHeaders });
         }
 
-        await env.DB.batch(stmts);
+        await db.withTransaction(env, async (tx) => {
+          for (const op of ops) {
+            await tx.exec(op.updateSql, op.updateParams);
+            await tx.exec(op.insertSql, op.insertParams);
+          }
+        });
+
         return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
       }
 
       // 1.6 GET /api/reorder
       if (pathname === '/api/reorder' && request.method === 'GET') {
         const branchCode = searchParams.get('branch') || 'k505';
-        const query = `
-          SELECT 
-            i.sku,
-            i.name as item_name,
-            i.unit,
-            i.category,
-            i.daily_usage,
-            i.lead_time_hours,
-            i.safety_stock,
-            i.standard_cost_sap,
-            COALESCE(SUM(b.qty), 0) as current_stock,
-            ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
-            CASE 
-              WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-              THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
-              ELSE 0
-            END as suggested_order_qty
-          FROM items i
-          LEFT JOIN branches br ON br.code = ?
-          LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
-          WHERE i.category = 'Gia vị'
-          GROUP BY i.sku
-          ORDER BY (current_stock - rop_threshold) ASC
-        `;
-        const { results } = await env.DB.prepare(query).bind(branchCode.toUpperCase()).all();
+        const query = {
+          d1: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.category,
+              i.daily_usage,
+              i.lead_time_hours,
+              i.safety_stock,
+              i.standard_cost_sap,
+              COALESCE(SUM(b.qty), 0) as current_stock,
+              ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
+              CASE 
+                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+                THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
+                ELSE 0
+              END as suggested_order_qty
+            FROM items i
+            LEFT JOIN branches br ON br.code = ?
+            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
+            ORDER BY (current_stock - rop_threshold) ASC
+          `,
+          pg: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.category,
+              i.daily_usage,
+              i.lead_time_hours,
+              i.safety_stock,
+              i.standard_cost_sap,
+              COALESCE(SUM(b.qty), 0) as current_stock,
+              ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)::numeric, 1) as rop_threshold,
+              CASE 
+                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
+                THEN ROUND((((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0))::numeric, 0)
+                ELSE 0
+              END as suggested_order_qty
+            FROM items i
+            LEFT JOIN branches br ON br.code = ?
+            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
+            ORDER BY (COALESCE(SUM(b.qty), 0) - ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)) ASC
+          `
+        };
+        const { rows: results } = await db.query(env, query, [branchCode.toUpperCase()]);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
       // 1.7 GET /api/leadtime
       if (pathname === '/api/leadtime' && request.method === 'GET') {
-        const query = `
-          SELECT 
-            po.id,
-            po.po_number,
-            br.name as branch_name,
-            br.code as branch_code,
-            po.vendor_name,
-            po.order_time,
-            po.received_time,
-            po.lead_time_hours,
-            po.sla_target_hours,
-            ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
-            CASE 
-              WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
-              ELSE 'Trễ hẹn NCC'
-            END as sla_status,
-            po.status,
-            po.total_amount
-          FROM purchase_orders po
-          JOIN branches br ON po.branch_id = br.id
-          ORDER BY po.order_time DESC
-        `;
-        const { results } = await env.DB.prepare(query).all();
+        const query = {
+          d1: `
+            SELECT 
+              po.id,
+              po.po_number,
+              br.name as branch_name,
+              br.code as branch_code,
+              po.vendor_name,
+              po.order_time,
+              po.received_time,
+              po.lead_time_hours,
+              po.sla_target_hours,
+              ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
+              CASE 
+                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
+                ELSE 'Trễ hẹn NCC'
+              END as sla_status,
+              po.status,
+              po.total_amount
+            FROM purchase_orders po
+            JOIN branches br ON po.branch_id = br.id
+            ORDER BY po.order_time DESC
+          `,
+          pg: `
+            SELECT 
+              po.id,
+              po.po_number,
+              br.name as branch_name,
+              br.code as branch_code,
+              po.vendor_name,
+              po.order_time,
+              po.received_time,
+              po.lead_time_hours,
+              po.sla_target_hours,
+              ROUND((po.lead_time_hours - po.sla_target_hours)::numeric, 1) as delay_hours,
+              CASE 
+                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
+                ELSE 'Trễ hẹn NCC'
+              END as sla_status,
+              po.status,
+              po.total_amount
+            FROM purchase_orders po
+            JOIN branches br ON po.branch_id = br.id
+            ORDER BY po.order_time DESC
+          `
+        };
+        const { rows: results } = await db.query(env, query);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
       // 1.8 GET /api/po-sap
       if (pathname === '/api/po-sap' && request.method === 'GET') {
-        const query = `
-          SELECT 
-            i.sku,
-            i.name as item_name,
-            i.unit,
-            i.standard_cost_sap,
-            i.old_cost_sap,
-            ROUND(((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100, 1) as price_change_pct,
-            po.po_number,
-            po.vendor_name
-          FROM items i
-          LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
-          WHERE i.category = 'Gia vị'
-          GROUP BY i.sku
-          ORDER BY price_change_pct DESC
-        `;
-        const { results } = await env.DB.prepare(query).all();
+        const query = {
+          d1: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.standard_cost_sap,
+              i.old_cost_sap,
+              ROUND(((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100, 1) as price_change_pct,
+              po.po_number,
+              po.vendor_name
+            FROM items i
+            LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.standard_cost_sap, i.old_cost_sap, po.po_number, po.vendor_name
+            ORDER BY price_change_pct DESC
+          `,
+          pg: `
+            SELECT 
+              i.sku,
+              i.name as item_name,
+              i.unit,
+              i.standard_cost_sap,
+              i.old_cost_sap,
+              ROUND((((i.standard_cost_sap - i.old_cost_sap) / NULLIF(i.old_cost_sap, 0)) * 100)::numeric, 1) as price_change_pct,
+              po.po_number,
+              po.vendor_name
+            FROM items i
+            LEFT JOIN purchase_orders po ON po.status IN ('DA_DAT', 'DA_NHAN', 'DANG_GIAO')
+            WHERE i.category = 'Gia vị'
+            GROUP BY i.sku, i.name, i.unit, i.standard_cost_sap, i.old_cost_sap, po.po_number, po.vendor_name
+            ORDER BY price_change_pct DESC
+          `
+        };
+        const { rows: results } = await db.query(env, query);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
@@ -957,13 +1171,13 @@ export default {
       if (pathname === '/api/init' && request.method === 'GET') {
         let sites = [];
         try {
-          const res = await env.DB.prepare(`
+          const res = await db.query(env, `
             SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
             FROM sites
             WHERE site_name IS NOT NULL AND site_name != ''
             ORDER BY site_code
-          `).all();
-          sites = res.results || [];
+          `);
+          sites = res.rows || [];
         } catch (e) {
           console.warn('D1 limit or connection fallback for sites in /api/init:', e.message);
           sites = MASTER_14_SITES_FALLBACK.map(s => ({
@@ -1017,9 +1231,9 @@ export default {
         const siteCode = extractSiteCode(site);
         const normMonth = normalizeMonth(thang);
 
-        let siteRow = await env.DB.prepare(`
+        let siteRow = await db.queryOne(env, `
           SELECT * FROM sites WHERE site_name = ? OR site_code = ? OR name = ? LIMIT 1
-        `).bind(site, siteCode, site).first();
+        `, [site, siteCode, site]);
 
         const nganSach = siteRow ? (siteRow.budget_limit || 0) : 0;
         const region = siteRow ? siteRow.region : '';
@@ -1039,13 +1253,11 @@ export default {
             )
           GROUP BY dh.item_code
         `;
-        const { results: daDatRows } = await env.DB.prepare(daDatQuery)
-          .bind(site, `%${siteCode}%`, thang, `%${normMonth}%`, `%${thang}%`)
-          .all();
+        const { rows: daDatRows } = await db.query(env, daDatQuery, [site, `%${siteCode}%`, thang, `%${normMonth}%`, `%${thang}%`]);
 
         const daDatMap = {};
         let tienDaDat = 0;
-        for (const r of daDatRows) {
+        for (const r of (daDatRows || [])) {
           daDatMap[r.item_code] = r.total_sl || 0;
           tienDaDat += r.total_tien || 0;
         }
@@ -1060,22 +1272,22 @@ export default {
           nvlQuery += ` ORDER BY name`;
         }
 
-        let { results: nvlList } = await env.DB.prepare(nvlQuery).bind(...nvlBindings).all();
+        let { rows: nvlList } = await db.query(env, nvlQuery, nvlBindings);
         if (!nvlList || nvlList.length === 0) {
-          const fallback = await env.DB.prepare(`SELECT * FROM nvl_items ORDER BY name`).all();
-          nvlList = fallback.results;
+          const fallback = await db.query(env, `SELECT * FROM nvl_items ORDER BY name`);
+          nvlList = fallback.rows || [];
         }
 
-        const { results: dmList } = await env.DB.prepare(`
+        const { rows: dmList } = await db.query(env, `
           SELECT item_code, quota_qty FROM dinh_muc 
           WHERE (site_name = ? OR site_name LIKE ?) AND (month_period = ? OR month_period = ?)
-        `).bind(site, `%${siteCode}%`, thang, normMonth).all();
+        `, [site, `%${siteCode}%`, thang, normMonth]);
         const dmMap = {};
-        for (const dm of dmList) {
+        for (const dm of (dmList || [])) {
           dmMap[dm.item_code] = dm.quota_qty || 0;
         }
 
-        const items = nvlList.map(item => ({
+        const items = (nvlList || []).map(item => ({
           maHang: item.item_code,
           tenSP: item.name,
           dvt: item.unit,
@@ -1113,47 +1325,43 @@ export default {
         const maDon = generateCode('DH', site);
         const nowStr = formatDate(new Date());
 
-        const insertDhStmt = env.DB.prepare(`
-          INSERT INTO don_hang (
-            order_code, order_date, site_name, ordered_by, applied_month,
-            item_code, item_name, unit, order_qty, accumulated_qty,
-            over_quota_note, status
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        const stmts = [];
-        for (const it of items) {
-          const qty = Number(it.soLuong) || 0;
-          if (qty <= 0) continue;
-          const luyKe = (Number(it.daDat) || 0) + qty;
-          stmts.push(insertDhStmt.bind(
-            maDon, nowStr, site, nguoiDat || 'Người dùng', thang,
-            it.maHang, it.tenSP, it.dvt, qty, luyKe,
-            it.ghiChu || ghiChu || '', 'Mới tạo'
-          ));
-        }
-
-        if (stmts.length === 0) {
+        const validItems = items.filter(it => (Number(it.soLuong) || 0) > 0);
+        if (validItems.length === 0) {
           return new Response(JSON.stringify({ success: false, error: 'Số lượng đặt phải lớn hơn 0.' }), {
             status: 400,
             headers: corsHeaders
           });
         }
 
-        const insertQtStmt = env.DB.prepare(`
-          INSERT INTO quy_trinh_don (
-            order_code, step, step_name, status, action_time, actor, note
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(maDon, 1, 'Gửi đơn hàng', 'Hoàn tất', nowStr, nguoiDat || 'Người dùng', 'Tạo đơn hàng thành công qua Portal');
+        await db.withTransaction(env, async (tx) => {
+          for (const it of validItems) {
+            const qty = Number(it.soLuong) || 0;
+            const luyKe = (Number(it.daDat) || 0) + qty;
+            await tx.exec(`
+              INSERT INTO don_hang (
+                order_code, order_date, site_name, ordered_by, applied_month,
+                item_code, item_name, unit, order_qty, accumulated_qty,
+                over_quota_note, status
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+              maDon, nowStr, site, nguoiDat || 'Người dùng', thang,
+              it.maHang, it.tenSP, it.dvt, qty, luyKe,
+              it.ghiChu || ghiChu || '', 'Mới tạo'
+            ]);
+          }
 
-        stmts.push(insertQtStmt);
-        await env.DB.batch(stmts);
+          await tx.exec(`
+            INSERT INTO quy_trinh_don (
+              order_code, step, step_name, status, action_time, actor, note
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          `, [maDon, 1, 'Gửi đơn hàng', 'Hoàn tất', nowStr, nguoiDat || 'Người dùng', 'Tạo đơn hàng thành công qua Portal']);
+        });
 
         invalidateMemoryCache('/api/orders');
         invalidateMemoryCache('/api/quota');
         invalidateMemoryCache('/api/dashboard-summary');
 
-        return new Response(JSON.stringify({ success: true, data: { maDon, soDong: stmts.length - 1 } }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, data: { maDon, soDong: validItems.length } }), { headers: corsHeaders });
       }
 
       // 2.4 GET /api/orders
@@ -1193,16 +1401,16 @@ export default {
         if (conditions.length) {
           query += ' WHERE ' + conditions.join(' AND ');
         }
-        query += ` GROUP BY dh.order_code ORDER BY dh.order_date DESC`;
+        query += ` GROUP BY dh.order_code, dh.order_date, dh.site_name, dh.ordered_by, dh.applied_month, dh.status ORDER BY dh.order_date DESC`;
 
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
-        return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx);
+        const { rows: results } = await db.query(env, query, bindings);
+        return createCachedResponse({ success: true, data: results || [] }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.5 GET /api/order-detail
       if (pathname === '/api/order-detail' && request.method === 'GET') {
         const orderCode = searchParams.get('orderCode') || '';
-        const { results: items } = await env.DB.prepare(`
+        const { rows: items } = await db.query(env, `
           SELECT 
             dh.item_code as maHang,
             dh.item_name as tenSP,
@@ -1216,19 +1424,19 @@ export default {
           LEFT JOIN nvl_items nvl ON dh.item_code = nvl.item_code
           WHERE dh.order_code = ?
           ORDER BY dh.id
-        `).bind(orderCode).all();
+        `, [orderCode]);
 
-        const { results: timeline } = await env.DB.prepare(`
+        const { rows: timeline } = await db.query(env, `
           SELECT step as buoc, step_name as tenBuoc, status as trangThai, action_time as thoiGian, actor as nguoiXuLy, note as ghiChu
           FROM quy_trinh_don WHERE order_code = ? ORDER BY step ASC, action_time ASC
-        `).bind(orderCode).all();
+        `, [orderCode]);
 
-        const summary = await env.DB.prepare(`
+        const summary = await db.queryOne(env, `
           SELECT order_code, order_date, site_name, ordered_by, applied_month, status
           FROM don_hang WHERE order_code = ? LIMIT 1
-        `).bind(orderCode).first();
+        `, [orderCode]);
 
-        return createCachedResponse({ success: true, data: { info: summary, items, timeline } }, 120, corsHeaders, isNoCache, url, request, ctx);
+        return createCachedResponse({ success: true, data: { info: summary, items: items || [], timeline: timeline || [] } }, 120, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.6 GET /api/vouchers
@@ -1263,14 +1471,14 @@ export default {
         if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
         query += ` ORDER BY created_at DESC`;
 
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
-        const { results: fileCounts } = await env.DB.prepare(`
+        const { rows: results } = await db.query(env, query, bindings);
+        const { rows: fileCounts } = await db.query(env, `
           SELECT voucher_code, COUNT(id) as cnt FROM chung_tu_file GROUP BY voucher_code
-        `).all();
+        `);
         const fileMap = {};
-        for (const f of fileCounts) fileMap[f.voucher_code] = f.cnt;
+        for (const f of (fileCounts || [])) fileMap[f.voucher_code] = f.cnt;
 
-        const data = results.map(r => ({
+        const data = (results || []).map(r => ({
           maCT: r.voucher_code,
           site: r.site_name,
           loaiHoaDon: r.invoice_type,
@@ -1295,18 +1503,21 @@ export default {
         const maCT = generateCode('CT', site);
         const nowStr = formatDate(new Date());
 
-        await env.DB.prepare(`
-          INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr, nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '', nowStr, nguoiNhap || 'Thủ kho').run();
+        await db.withTransaction(env, async (tx) => {
+          await tx.exec(`
+            INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `, [maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr, nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '', nowStr, nguoiNhap || 'Thủ kho']);
 
-        if (files && files.length) {
-          const fileStmts = files.map(f => env.DB.prepare(`
-            INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
-            VALUES (?, ?, ?, ?, ?)
-          `).bind(maCT, f.name || 'Tài liệu', f.url || '', f.type || 'IMAGE', nowStr));
-          await env.DB.batch(fileStmts);
-        }
+          if (files && files.length) {
+            for (const f of files) {
+              await tx.exec(`
+                INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+                VALUES (?, ?, ?, ?, ?)
+              `, [maCT, f.name || 'Tài liệu', f.url || '', f.type || 'IMAGE', nowStr]);
+            }
+          }
+        });
 
         invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
@@ -1321,31 +1532,35 @@ export default {
         }
         const nowStr = formatDate(new Date());
         let count = 0;
-        for (const item of items) {
-          const site = item.site || item.site_name || '';
-          if (!site) continue;
-          const maCT = generateCode('CT', site);
-          await env.DB.prepare(`
-            INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(
-            maCT, site, item.loaiHoaDon || 'Hóa đơn GTGT',
-            item.ngayXuat || nowStr, item.ngayNhan || nowStr,
-            item.nguoiGiao || '', item.nguoiNhan || '',
-            item.nhaCungCap || '', item.ghiChu || '',
-            nowStr, item.nguoiNhap || 'Import Excel'
-          ).run();
+        await db.withTransaction(env, async (tx) => {
+          for (const item of items) {
+            const site = item.site || item.site_name || '';
+            if (!site) continue;
+            const maCT = generateCode('CT', site);
+            await tx.exec(`
+              INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+              maCT, site, item.loaiHoaDon || 'Hóa đơn GTGT',
+              item.ngayXuat || nowStr, item.ngayNhan || nowStr,
+              item.nguoiGiao || '', item.nguoiNhan || '',
+              item.nhaCungCap || '', item.ghiChu || '',
+              nowStr, item.nguoiNhap || 'Import Excel'
+            ]);
 
-          if (item.linkAnh && String(item.linkAnh).trim()) {
-            const links = String(item.linkAnh).split(',').map(s => s.trim()).filter(Boolean);
-            const fileStmts = links.map((lnk, idx) => env.DB.prepare(`
-              INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
-              VALUES (?, ?, ?, ?, ?)
-            `).bind(maCT, `Ảnh đính kèm ${idx + 1}`, lnk, 'DRIVE_LINK', nowStr));
-            if (fileStmts.length) await env.DB.batch(fileStmts);
+            if (item.linkAnh && String(item.linkAnh).trim()) {
+              const links = String(item.linkAnh).split(',').map(s => s.trim()).filter(Boolean);
+              for (let idx = 0; idx < links.length; idx++) {
+                await tx.exec(`
+                  INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+                  VALUES (?, ?, ?, ?, ?)
+                `, [maCT, `Ảnh đính kèm ${idx + 1}`, links[idx], 'DRIVE_LINK', nowStr]);
+              }
+            }
+            count++;
           }
-          count++;
-        }
+        });
+
         invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, count, message: `Đã import thành công ${count} chứng từ` }), { headers: corsHeaders });
       }
@@ -1353,12 +1568,12 @@ export default {
       // 2.8 GET /api/voucher-detail
       if (pathname === '/api/voucher-detail' && request.method === 'GET') {
         const maCT = searchParams.get('maCT');
-        const voucher = await env.DB.prepare(`SELECT * FROM chung_tu WHERE voucher_code = ?`).bind(maCT).first();
+        const voucher = await db.queryOne(env, `SELECT * FROM chung_tu WHERE voucher_code = ?`, [maCT]);
         if (!voucher) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ' }), { status: 404, headers: corsHeaders });
 
-        const { results: files } = await env.DB.prepare(`
+        const { rows: files } = await db.query(env, `
           SELECT file_name, file_link, file_type, upload_date FROM chung_tu_file WHERE voucher_code = ?
-        `).bind(maCT).all();
+        `, [maCT]);
 
         const allFiles = [...(files || [])];
         if (voucher.attachment_link && !allFiles.some(f => f.file_link === voucher.attachment_link)) {
@@ -1385,17 +1600,18 @@ export default {
             bindings.push(site, site, `%${site}%`, siteCode);
           }
           query += ` ORDER BY item_code LIMIT 300`;
-          const { results } = await env.DB.prepare(query).bind(...bindings).all();
+          const { rows: results } = await db.query(env, query, bindings);
           return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
         }
         if (request.method === 'POST') {
           const body = await request.json();
           const { items } = body;
           if (items && items.length) {
-            const stmts = items.map(it => env.DB.prepare(`
-              UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?
-            `).bind(it.usage, it.closing, it.id));
-            await env.DB.batch(stmts);
+            await db.withTransaction(env, async (tx) => {
+              for (const it of items) {
+                await tx.exec(`UPDATE kiemke_tonkho SET usage_t11 = ?, closing_t11 = ? WHERE id = ?`, [it.usage, it.closing, it.id]);
+              }
+            });
           }
           return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
         }
@@ -1415,7 +1631,7 @@ export default {
           bindings.push(branch, branch);
         }
         query += ` ORDER BY r.report_date DESC, r.created_at DESC LIMIT 100`;
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
+        const { rows: results } = await db.query(env, query, bindings);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
@@ -1430,17 +1646,17 @@ export default {
         const nowStr = formatDate(new Date());
         const id = 'RPT-' + Date.now();
         const siteCode = extractSiteCode(site || branchCode || 'k001').toLowerCase();
-        const branchRow = await env.DB.prepare(`SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`).bind(siteCode, siteCode).first();
+        const branchRow = await db.queryOne(env, `SELECT id FROM branches WHERE id = ? OR LOWER(code) = ? LIMIT 1`, [siteCode, siteCode]);
         const validBranchId = branchRow ? branchRow.id : 'k505';
         const imgLinkStr = Array.isArray(images) ? images.map(im => im.name || im.url).join(' , ') : (images || '');
 
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO daily_catering_reports (
             id, branch_id, report_date, planned_meals, actual_meals, wasted_meals,
             staff_actual, staff_standard, food_quality_note, customer_feedback, extra_cost,
             created_at, reporter_name, report_data, images_link
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(
+        `, [
           id, validBranchId, reportDate || nowStr,
           Number(plannedMeals) || 0, Number(actualMeals) || 0, Number(wastedMeals) || 0,
           Number(staffActual) || 0, Number(staffStandard) || 0,
@@ -1448,7 +1664,7 @@ export default {
           nowStr, reporterName || 'Quản lý Site',
           typeof reportData === 'object' ? JSON.stringify(reportData) : (reportData || '{}'),
           imgLinkStr
-        ).run();
+        ]);
 
         return new Response(JSON.stringify({
           success: true,
@@ -1478,7 +1694,7 @@ export default {
         }
 
         try {
-          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
           if (!user) {
             // Nếu chưa có trong DB nhưng là Owner
             if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
@@ -1488,15 +1704,15 @@ export default {
             }
           }
           const permissions = await buildUserPermissions(env, user);
-          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first().catch(() => null);
+          const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [user.role_code]).catch(() => null);
 
           let approvedRoles = [user.role_code];
           if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
             approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
           } else {
-            const { results: appReqs } = await env.DB.prepare(`
+            const { rows: appReqs } = await db.query(env, `
               SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
-            `).bind(user.email).all().catch(() => ({ results: [] }));
+            `, [user.email]).catch(() => ({ rows: [] }));
             (appReqs || []).forEach(r => {
               if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
                 approvedRoles.push(r.requested_role);
@@ -1590,13 +1806,13 @@ export default {
           }
 
           // 1. Tìm kiếm user trong app_users
-          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
 
           if (user && user.full_name) {
             const repaired = repairAtobMojibake(user.full_name);
             if (repaired !== user.full_name) {
               user.full_name = repaired;
-              await env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, user.id).run().catch(() => {});
+              await db.exec(env, `UPDATE app_users SET full_name = ? WHERE id = ?`, [repaired, user.id]).catch(() => {});
             }
           }
 
@@ -1608,28 +1824,34 @@ export default {
               defaultRole = 'ADMIN';
             }
 
-            const insertRes = await env.DB.prepare(`
-              INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
-              VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', datetime('now'))
-            `).bind(email, fullName || email.split('@')[0], avatarUrl || '', googleId || '', defaultRole).run();
-
-            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(insertRes.meta.last_row_id).first();
+            user = await db.queryOne(env, {
+              d1: `INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
+                   VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', datetime('now')) RETURNING *`,
+              pg: `INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
+                   VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', now()) RETURNING *`
+            }, [email, fullName || email.split('@')[0], avatarUrl || '', googleId || '', defaultRole]);
           } else {
             // Cập nhật thông tin Google, full_name chuẩn UTF-8 và last_login
-            await env.DB.prepare(`
-              UPDATE app_users
-              SET last_login = datetime('now'),
-                  full_name = COALESCE(?, full_name),
-                  avatar_url = COALESCE(?, avatar_url),
-                  google_id = COALESCE(?, google_id),
-                  updated_at = datetime('now')
-              WHERE id = ?
-            `).bind(fullName || null, avatarUrl || user.avatar_url, googleId || user.google_id, user.id).run();
-            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(user.id).first();
+            user = await db.queryOne(env, {
+              d1: `UPDATE app_users
+                   SET last_login = datetime('now'),
+                       full_name = COALESCE(?, full_name),
+                       avatar_url = COALESCE(?, avatar_url),
+                       google_id = COALESCE(?, google_id),
+                       updated_at = datetime('now')
+                   WHERE id = ? RETURNING *`,
+              pg: `UPDATE app_users
+                   SET last_login = now(),
+                       full_name = COALESCE(?, full_name),
+                       avatar_url = COALESCE(?, avatar_url),
+                       google_id = COALESCE(?, google_id),
+                       updated_at = now()
+                   WHERE id = ? RETURNING *`
+            }, [fullName || null, avatarUrl || user.avatar_url, googleId || user.google_id, user.id]);
           }
 
           // 2. Lấy thông tin Role & Permissions
-          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first() || {
+          const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [user.role_code]) || {
             role_code: user.role_code,
             role_name: user.role_code,
             badge_color: 'stone'
@@ -1654,9 +1876,9 @@ export default {
           if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
             approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
           } else {
-            const { results: appReqs } = await env.DB.prepare(`
+            const { rows: appReqs } = await db.query(env, `
               SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
-            `).bind(user.email).all();
+            `, [user.email]);
             (appReqs || []).forEach(r => {
               if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
                 approvedRoles.push(r.requested_role);
@@ -1714,9 +1936,9 @@ export default {
 
       // 2.11.2 LẤY QUYỀN & VAI TRÒ HỆ THỐNG (/api/auth/roles-permissions)
       if (pathname === '/api/auth/roles-permissions' && request.method === 'GET') {
-        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
-        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
-        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
+        const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
+        const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
+        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`);
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
           return { ...u, full_name: repaired || u.full_name };
@@ -1736,20 +1958,49 @@ export default {
       
       // 2.11.CLEAN DỌN DẸP TOÀN BỘ DỮ LIỆU DEMO (/api/admin/clean-demo-data)
       
+      // Kiểm tra bảo mật cho tất cả route /api/admin/*
+      if (pathname.startsWith('/api/admin/')) {
+        if (env.ADMIN_KEY) {
+          const authKey = request.headers.get('X-Admin-Key') || searchParams.get('admin_key');
+          if (!authKey || authKey !== env.ADMIN_KEY) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'Không có quyền truy cập quản trị (Invalid X-Admin-Key)'
+            }), { status: 403, headers: corsHeaders });
+          }
+        }
+      }
+
       // Diagnostic DB status
       if (pathname === '/api/admin/db-status' && request.method === 'GET') {
-        const { results: indexes } = await env.DB.prepare("SELECT name, tbl_name FROM sqlite_master WHERE type='index'").all();
+        const isPg = db.getBackend(env) === 'supabase';
+        let indexes = [];
+        if (isPg) {
+          const { rows } = await db.query(env, `
+            SELECT indexname as name, tablename as tbl_name 
+            FROM pg_indexes 
+            WHERE schemaname = 'wms'
+            ORDER BY tablename, indexname
+          `);
+          indexes = rows;
+        } else {
+          const { rows } = await db.query(env, "SELECT name, tbl_name FROM sqlite_master WHERE type='index'");
+          indexes = rows;
+        }
+
         const counts = {};
-        for (const tbl of ['transactions', 'app_users', 'branches', 'sites', 'don_hang', 'dinh_muc', 'nvl_items', 'fnb_monthly_summary', 'inventory_batches', 'purchase_orders', 'vouchers']) {
+        const checkTables = ['transactions', 'app_users', 'branches', 'sites', 'don_hang', 'dinh_muc', 'nvl_items', 'fnb_monthly_summary', 'inventory_batches', 'purchase_orders', 'vouchers', 'dim_article_stock'];
+        for (const tbl of checkTables) {
           try {
-            const r = await env.DB.prepare(`SELECT COUNT(*) as c FROM ${tbl}`).first();
-            counts[tbl] = r ? r.c : 0;
+            const r = await db.queryOne(env, `SELECT COUNT(*) as c FROM ${tbl}`);
+            counts[tbl] = r ? Number(r.c) : 0;
           } catch (e) {
             counts[tbl] = 'error: ' + e.message;
           }
         }
         return new Response(JSON.stringify({
           success: true,
+          backend: db.getBackend(env),
           indexesCount: indexes ? indexes.length : 0,
           indexes: indexes || [],
           tableCounts: counts
@@ -1757,7 +2008,7 @@ export default {
       }
 
       
-      // Sync monthly summary from transactions table (Hỗ trợ sync riêng 1 tháng ?month=YYYY-MM chỉ mất 14 writes)
+      // Sync monthly summary from transactions table (Hỗ trợ sync riêng 1 tháng ?month=YYYY-MM)
       if (pathname === '/api/admin/sync-monthly-summary') {
         const monthParam = searchParams.get('month') || '';
         let targetMonth = monthParam ? normalizeMonth(monthParam) : '';
@@ -1766,39 +2017,47 @@ export default {
           if (parts.length === 2) targetMonth = `${parts[1]}-${parts[0].padStart(2, '0')}`;
         }
 
-        let syncSql = `
-          INSERT OR REPLACE INTO fnb_monthly_summary (
-            month_period, site_code, site_name, region,
-            total_bills, active_days, net_revenue, gross_revenue,
-            discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
-          )
-          SELECT 
-            SUBSTR(billing_date, 1, 7) as month_period,
-            ma_cua_hang as site_code,
-            COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
-            COALESCE(vung_mien, 'Miền Nam') as region,
-            COUNT(DISTINCT so_hoa_don) as total_bills,
-            COUNT(DISTINCT billing_date) as active_days,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-            COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-            COALESCE(SUM(ck_truoc_thue), 0) as discount,
-            COALESCE(SUM(gia_von), 0) as food_cost,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
-            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
-          FROM transactions
-          WHERE billing_date IS NOT NULL AND billing_date != ''
-        `;
+        const isPg = db.getBackend(env) === 'supabase';
+        if (isPg) {
+          if (targetMonth) {
+            await db.query(env, `SELECT wms.refresh_fnb_summaries($1)`, [targetMonth]);
+          } else {
+            await db.query(env, `SELECT wms.refresh_fnb_summaries(NULL)`);
+          }
+        } else {
+          let syncSql = `
+            INSERT OR REPLACE INTO fnb_monthly_summary (
+              month_period, site_code, site_name, region,
+              total_bills, active_days, net_revenue, gross_revenue,
+              discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
+            )
+            SELECT 
+              SUBSTR(billing_date, 1, 7) as month_period,
+              ma_cua_hang as site_code,
+              COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
+              COALESCE(vung_mien, 'Miền Nam') as region,
+              COUNT(DISTINCT so_hoa_don) as total_bills,
+              COUNT(DISTINCT billing_date) as active_days,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+              COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+              COALESCE(SUM(ck_truoc_thue), 0) as discount,
+              COALESCE(SUM(gia_von), 0) as food_cost,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
+              COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
+            FROM transactions
+            WHERE billing_date IS NOT NULL AND billing_date != ''
+          `;
 
-        let binds = [];
-        if (targetMonth) {
-          syncSql += ` AND billing_date >= ? AND billing_date <= ?`;
-          binds.push(`${targetMonth}-01`, `${targetMonth}-31`);
+          let binds = [];
+          if (targetMonth) {
+            const mRange = getMonthRange(targetMonth);
+            syncSql += ` AND billing_date >= ? AND billing_date <= ?`;
+            binds.push(mRange.start, mRange.end);
+          }
+          syncSql += ` GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang`;
+          await db.exec(env, syncSql, binds);
         }
-        syncSql += ` GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang`;
-
-        const stmt = env.DB.prepare(syncSql);
-        await (binds.length ? stmt.bind(...binds) : stmt).run();
 
         // Xóa sạch bộ nhớ đệm RAM Cache và Edge Cache
         invalidateMemoryCache('/api/fnb');
@@ -1809,7 +2068,7 @@ export default {
           querySummaries += ' WHERE month_period = ?';
           queryBinds.push(targetMonth);
         }
-        const { results: summaries } = await env.DB.prepare(querySummaries).bind(...queryBinds).all();
+        const { rows: summaries } = await db.query(env, querySummaries, queryBinds);
 
         return new Response(JSON.stringify({
           success: true,
@@ -1830,65 +2089,41 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Không có dữ liệu items' }), { status: 400, headers: corsHeaders });
         }
 
-        // Đảm bảo cấu trúc bảng dim_article_stock tồn tại
-        await env.DB.prepare(`
-          CREATE TABLE IF NOT EXISTS dim_article_stock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            site TEXT NOT NULL,
-            site_name TEXT,
-            nganh_hang TEXT,
-            nhom_hang TEXT,
-            material TEXT NOT NULL,
-            material_desc TEXT NOT NULL,
-            entry_unit TEXT,
-            price REAL DEFAULT 0,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(site, material)
-          )
-        `).run();
-
-        const insertStmt = env.DB.prepare(`
-          INSERT OR REPLACE INTO dim_article_stock (
-            site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-        `);
-
-        const stmts = [];
-        for (const it of items) {
-          const site = it.site || '';
-          const mat = it.material || '';
-          if (!site || !mat) continue;
-          stmts.push(insertStmt.bind(
-            site,
-            it.site_name || '',
-            it.nganh_hang || '',
-            it.nhom_hang || '',
-            mat,
-            it.material_desc || '',
-            it.entry_unit || '',
-            Number(it.price) || 0
-          ));
-        }
-
-        if (stmts.length) {
-          const CHUNK = 100;
-          for (let i = 0; i < stmts.length; i += CHUNK) {
-            await env.DB.batch(stmts.slice(i, i + CHUNK));
+        let count = 0;
+        await db.withTransaction(env, async tx => {
+          for (const it of items) {
+            const site = it.site || '';
+            const mat = it.material || '';
+            if (!site || !mat) continue;
+            await tx.query({
+              d1: `INSERT OR REPLACE INTO dim_article_stock (site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+              pg: `INSERT INTO dim_article_stock (site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now()) ON CONFLICT (site, material) DO UPDATE SET site_name = EXCLUDED.site_name, nganh_hang = EXCLUDED.nganh_hang, nhom_hang = EXCLUDED.nhom_hang, material_desc = EXCLUDED.material_desc, entry_unit = EXCLUDED.entry_unit, price = EXCLUDED.price, updated_at = now()`
+            }, [
+              site,
+              it.site_name || '',
+              it.nganh_hang || '',
+              it.nhom_hang || '',
+              mat,
+              it.material_desc || '',
+              it.entry_unit || '',
+              Number(it.price) || 0
+            ]);
+            count++;
           }
-        }
+        });
 
         invalidateMemoryCache('/api/fnb/stock');
 
         return new Response(JSON.stringify({
           success: true,
-          count: stmts.length,
-          message: `Đã lưu thành công ${stmts.length} mặt hàng vào dim_article_stock`
+          count: count,
+          message: `Đã lưu thành công ${count} mặt hàng vào dim_article_stock`
         }), { headers: corsHeaders });
       }
 
       if (pathname === '/api/admin/clean-demo-data') {
         await autoCleanDemoData(env);
-        const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
+        const { rows: remainingUsers } = await db.query(env, `SELECT id, email, full_name, role_code, status FROM app_users`);
         return new Response(JSON.stringify({
           success: true,
           message: 'Đã xóa toàn bộ dữ liệu demo thành công',
@@ -1897,10 +2132,10 @@ export default {
       }
 
       if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
-        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
-        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
-        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`).all();
-        const { results: userPerms } = await env.DB.prepare(`SELECT * FROM user_permissions`).all();
+        const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
+        const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
+        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`);
+        const { rows: userPerms } = await db.query(env, `SELECT * FROM user_permissions`);
 
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
@@ -1960,25 +2195,33 @@ export default {
         }
 
         if (action === 'RESET') {
-          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`).bind(userEmail, featureCode).run();
+          await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`, [userEmail, featureCode]);
           return new Response(JSON.stringify({ success: true, message: 'Đã khôi phục quyền mặc định theo vai trò' }), { headers: corsHeaders });
         }
 
-        const canView = action === 'GRANT' ? 1 : 0;
-        const canCreate = action === 'GRANT' ? 1 : 0;
-        const canEdit = action === 'GRANT' ? 1 : 0;
-        const canDelete = action === 'GRANT' ? 1 : 0;
+        const canView = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canCreate = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canEdit = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canDelete = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
 
-        await env.DB.prepare(`
-          INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-          ON CONFLICT(user_email, feature_code) DO UPDATE SET
-            can_view = excluded.can_view,
-            can_create = excluded.can_create,
-            can_edit = excluded.can_edit,
-            can_delete = excluded.can_delete,
-            updated_at = datetime('now')
-        `).bind(userEmail, featureCode, canView, canCreate, canEdit, canDelete).run();
+        await db.exec(env, {
+          d1: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+               ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                 can_view = excluded.can_view,
+                 can_create = excluded.can_create,
+                 can_edit = excluded.can_edit,
+                 can_delete = excluded.can_delete,
+                 updated_at = datetime('now')`,
+          pg: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, now())
+               ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                 can_view = excluded.can_view,
+                 can_create = excluded.can_create,
+                 can_edit = excluded.can_edit,
+                 can_delete = excluded.can_delete,
+                 updated_at = now()`
+        }, [userEmail, featureCode, canView, canCreate, canEdit, canDelete]);
 
         return new Response(JSON.stringify({
           success: true,
@@ -1990,7 +2233,7 @@ export default {
       if (pathname === '/api/auth/user-permissions/reset-user' && request.method === 'POST') {
         const { userEmail } = await request.json();
         if (!userEmail) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+        await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
         return new Response(JSON.stringify({ success: true, message: `Đã khôi phục toàn bộ quyền của ${userEmail} về vai trò gốc` }), { headers: corsHeaders });
       }
 
@@ -1998,9 +2241,9 @@ export default {
       if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
         const { userEmail, roleCode, resetPermissions } = await request.json();
         if (!userEmail || !roleCode) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc roleCode' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`UPDATE app_users SET role_code = ? WHERE email = ?`).bind(roleCode, userEmail).run();
+        await db.exec(env, `UPDATE app_users SET role_code = ? WHERE email = ?`, [roleCode, userEmail]);
         if (resetPermissions) {
-          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+          await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
         }
         return new Response(JSON.stringify({ success: true, message: `Đã cập nhật vai trò ${roleCode} cho ${userEmail}` }), { headers: corsHeaders });
       }
@@ -2009,7 +2252,7 @@ export default {
       if (pathname === '/api/auth/users/toggle-status' && request.method === 'POST') {
         const { userEmail, status } = await request.json(); // 'ACTIVE' or 'LOCKED'
         if (!userEmail || !status) return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`UPDATE app_users SET status = ? WHERE email = ?`).bind(status, userEmail).run();
+        await db.exec(env, `UPDATE app_users SET status = ? WHERE email = ?`, [status, userEmail]);
         return new Response(JSON.stringify({ success: true, message: `Đã ${status === 'ACTIVE' ? 'mở khóa' : 'khóa'} tài khoản ${userEmail}` }), { headers: corsHeaders });
       }
 
@@ -2018,17 +2261,19 @@ export default {
         const { email, fullName, roleCode } = await request.json();
         if (!email) return new Response(JSON.stringify({ success: false, error: 'Email là bắt buộc' }), { status: 400, headers: corsHeaders });
         const cleanEmail = email.trim().toLowerCase();
-        const existing = await env.DB.prepare(`SELECT id FROM app_users WHERE email = ? LIMIT 1`).bind(cleanEmail).first();
+        const existing = await db.queryOne(env, `SELECT id FROM app_users WHERE email = ? LIMIT 1`, [cleanEmail]);
         if (existing) {
           return new Response(JSON.stringify({ success: false, error: 'Tài khoản email này đã tồn tại trong hệ thống' }), { status: 400, headers: corsHeaders });
         }
         const safeName = (fullName || cleanEmail.split('@')[0]).trim();
         const initialRole = roleCode || 'NHAN_VIEN';
         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=465fff&color=fff&bold=true`;
-        await env.DB.prepare(`
-          INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
-          VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', datetime('now'))
-        `).bind(cleanEmail, safeName, avatarUrl, initialRole).run();
+        await db.exec(env, {
+          d1: `INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
+               VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', datetime('now'))`,
+          pg: `INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
+               VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', now())`
+        }, [cleanEmail, safeName, avatarUrl, initialRole]);
 
         return new Response(JSON.stringify({ success: true, message: `Đã thêm người dùng ${cleanEmail} thành công` }), { headers: corsHeaders });
       }
@@ -2039,14 +2284,14 @@ export default {
         if (!role) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu vai trò' }), { status: 400, headers: corsHeaders });
         }
-        const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(role).first();
+        const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [role]);
         if (!roleInfo) {
           return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
         }
 
         let user = null;
         if (email) {
-          user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
         }
 
         // BẢO VỆ PHÂN QUYỀN: Chỉ Admin (Owner) hoặc user đã được Admin phê duyệt vai trò này mới được phép chuyển
@@ -2055,11 +2300,11 @@ export default {
 
         let isApprovedRole = false;
         if (email) {
-          const approvedReq = await env.DB.prepare(`
+          const approvedReq = await db.queryOne(env, `
             SELECT id FROM access_requests 
             WHERE user_email = ? AND requested_role = ? AND status = 'APPROVED' 
             LIMIT 1
-          `).bind(email, role).first();
+          `, [email, role]);
           if (approvedReq) isApprovedRole = true;
         }
 
@@ -2089,10 +2334,10 @@ export default {
         if (!email) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu email người yêu cầu' }), { status: 400, headers: corsHeaders });
         }
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, reason, status, created_at)
           VALUES (?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
-        `).bind(email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '').run();
+        `, [email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '']);
 
         return new Response(JSON.stringify({
           success: true,
@@ -2102,9 +2347,9 @@ export default {
 
       // 2.11.5 DANH SÁCH YÊU CẦU CẤP QUYỀN (/api/auth/access-requests)
       if (pathname === '/api/auth/access-requests' && request.method === 'GET') {
-        const { results } = await env.DB.prepare(`
+        const { rows: results } = await db.query(env, `
           SELECT * FROM access_requests ORDER BY id DESC LIMIT 50
-        `).all();
+        `);
         const cleanedResults = (results || []).map(r => ({ ...r, user_name: repairAtobMojibake(r.user_name) }));
         return new Response(JSON.stringify({ success: true, data: cleanedResults }), { headers: corsHeaders });
       }
@@ -2112,20 +2357,20 @@ export default {
       // 2.11.6 PHÊ DUYỆT / TỪ CHỐI YÊU CẦU CẤP QUYỀN (/api/auth/approve-access-request)
       if (pathname === '/api/auth/approve-access-request' && request.method === 'POST') {
         const { requestId, action, reviewedBy } = await request.json();
-        const req = await env.DB.prepare(`SELECT * FROM access_requests WHERE id = ?`).bind(requestId).first();
+        const req = await db.queryOne(env, `SELECT * FROM access_requests WHERE id = ?`, [requestId]);
         if (!req) {
           return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy yêu cầu' }), { status: 404, headers: corsHeaders });
         }
 
         const newStatus = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
-        await env.DB.prepare(`
+        await db.exec(env, `
           UPDATE access_requests
           SET status = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ?
           WHERE id = ?
-        `).bind(newStatus, reviewedBy || 'Admin', requestId).run();
+        `, [newStatus, reviewedBy || 'Admin', requestId]);
 
         if (action === 'APPROVE') {
-          const currentUser = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(req.user_email).first();
+          const currentUser = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [req.user_email]);
           if (currentUser) {
             const roleHierarchy = {
               'ADMIN': 100,
@@ -2144,11 +2389,11 @@ export default {
               newRole = 'KHO_TRUONG';
             }
 
-            await env.DB.prepare(`
+            await db.exec(env, `
               UPDATE app_users
               SET role_code = ?
               WHERE email = ?
-            `).bind(newRole, req.user_email).run();
+            `, [newRole, req.user_email]);
           }
         }
 
@@ -2161,7 +2406,7 @@ export default {
       // 2.11 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
         const { email, password } = await request.json();
-        const user = await env.DB.prepare(`SELECT * FROM admin_users WHERE email = ? LIMIT 1`).bind(email).first();
+        const user = await db.queryOne(env, `SELECT * FROM admin_users WHERE email = ? LIMIT 1`, [email]);
         if (!user) return new Response(JSON.stringify({ success: false, error: 'Email hoặc mật khẩu không đúng' }), { status: 401, headers: corsHeaders });
 
         const computedHash = await sha256(`${user.salt}::${password}`);
@@ -2177,17 +2422,17 @@ export default {
 
       if (pathname === '/api/auth/register' && request.method === 'POST') {
         const { email, fullName, phone, role, password } = await request.json();
-        const existing = await env.DB.prepare(`SELECT email FROM admin_users WHERE email = ?`).bind(email).first();
+        const existing = await db.queryOne(env, `SELECT email FROM admin_users WHERE email = ?`, [email]);
         if (existing) return new Response(JSON.stringify({ success: false, error: 'Email đã tồn tại' }), { status: 400, headers: corsHeaders });
 
         const salt = crypto.randomUUID();
         const hash = await sha256(`${salt}::${password}`);
         const nowStr = formatDate(new Date());
 
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO admin_users (email, full_name, phone, role, password_raw, password_hash, salt, status, registered_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt', ?)
-        `).bind(email, fullName, phone, role || 'Quản lý Site', password, hash, salt, nowStr).run();
+        `, [email, fullName, phone, role || 'Quản lý Site', password, hash, salt, nowStr]);
 
         return new Response(JSON.stringify({ success: true, message: 'Đăng ký thành công. Vui lòng chờ phê duyệt.' }), { headers: corsHeaders });
       }
@@ -2196,7 +2441,7 @@ export default {
       // PHÂN HỆ 3: ORBIT SIBA FOOD - P&L VÀ XẾP HẠNG TOÀN CHUỖI (F&B CHAIN)
       // ======================================================================
 
-      // 3.1 GET /api/fnb/pl - Báo cáo P&L chi tiết của điểm bán (Lấy từ bảng transactions trên D1)
+      // 3.1 GET /api/fnb/pl - Báo cáo P&L chi tiết của điểm bán (Lấy từ bảng transactions trên D1 hoặc Postgres)
       if (pathname === '/api/fnb/pl' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const thang = normalizeMonth(searchParams.get('thang') || '2026-11');
@@ -2205,9 +2450,9 @@ export default {
         // Lấy thông tin site
         let siteRow = null;
         if (siteCode && siteCode !== 'ALL') {
-          siteRow = await env.DB.prepare(`
+          siteRow = await db.queryOne(env, `
             SELECT * FROM sites WHERE site_code = ? OR site_name = ? OR name LIKE ? LIMIT 1
-          `).bind(siteCode, site, `%${siteCode}%`).first();
+          `, [siteCode, site, `%${siteCode}%`]);
         }
 
         let siteName = 'Toàn Hệ Thống Bếp Ăn A.Kitchen';
@@ -2215,53 +2460,77 @@ export default {
           if (siteRow) {
             siteName = siteRow.site_name;
           } else {
-            const transSite = await env.DB.prepare(`
+            const transSite = await db.queryOne(env, `
               SELECT ten_cua_hang FROM transactions WHERE ma_cua_hang = ? LIMIT 1
-            `).bind(siteCode).first();
+            `, [siteCode]);
             siteName = transSite ? `${siteCode} - ${transSite.ten_cua_hang}` : (site || 'K001 - MN Bếp Ăn Đại Học Hùng Vương');
           }
         }
 
         const budget = siteRow ? (siteRow.budget_limit || 45000000) : 45000000;
 
-        // Kiểm tra xem tháng này có dữ liệu trong transactions không (Dùng LIMIT 1 để chỉ đọc 1 dòng duy nhất)
         let effectiveMonth = thang;
-        const startCheck = `${effectiveMonth}-01`;
-        const endCheck = `${effectiveMonth}-31`;
-        const countCheck = await env.DB.prepare(`
+        let checkRange = getMonthRange(effectiveMonth);
+        const countCheck = await db.queryOne(env, `
           SELECT 1 as cnt FROM transactions WHERE billing_date >= ? AND billing_date <= ? LIMIT 1
-        `).bind(startCheck, endCheck).first();
+        `, [checkRange.start, checkRange.end]);
 
         if (!countCheck) {
-          const latestRow = await env.DB.prepare(`
-            SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM') as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`
+          });
           if (latestRow && latestRow.ym) {
             effectiveMonth = latestRow.ym;
           }
         }
-        const effStart = `${effectiveMonth}-01`;
-        const effEnd = `${effectiveMonth}-31`;
+        const effRange = getMonthRange(effectiveMonth);
+        const effStart = effRange.start;
+        const effEnd = effRange.end;
 
-        // Truy vấn tổng hợp doanh thu và chi phí từ bảng transactions bằng Range Index (giảm 70% rows read)
-        let plQuery = `
+        // Ưu tiên đọc từ bảng tổng hợp fnb_monthly_summary
+        let stats = null;
+        let summaryQuery = `
           SELECT 
-            COUNT(DISTINCT so_hoa_don) as total_bills,
-            COUNT(DISTINCT billing_date) as active_days,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-            COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-            COALESCE(SUM(ck_truoc_thue), 0) as discount,
-            COALESCE(SUM(gia_von), 0) as food_cost
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
+            SUM(total_bills) as total_bills,
+            MAX(active_days) as active_days,
+            COALESCE(SUM(net_revenue), 0) as net_revenue,
+            COALESCE(SUM(gross_revenue), 0) as gross_revenue,
+            COALESCE(SUM(discount), 0) as discount,
+            COALESCE(SUM(food_cost), 0) as food_cost,
+            COALESCE(SUM(dine_in_rev), 0) as dine_in_rev,
+            COALESCE(SUM(takeaway_rev), 0) as takeaway_rev,
+            COALESCE(SUM(catering_rev), 0) as catering_rev
+          FROM fnb_monthly_summary
+          WHERE month_period = ?
         `;
-        let plBinds = [effStart, effEnd];
+        let sumBinds = [effectiveMonth];
         if (siteCode && siteCode !== 'ALL') {
-          plQuery += ` AND ma_cua_hang = ?`;
-          plBinds.push(siteCode);
+          summaryQuery += ` AND site_code = ?`;
+          sumBinds.push(siteCode);
         }
+        stats = await db.queryOne(env, summaryQuery, sumBinds).catch(() => null);
 
-        const stats = await env.DB.prepare(plQuery).bind(...plBinds).first();
+        // Fallback sang transactions nếu chưa có trong fnb_monthly_summary
+        if (!stats || !stats.net_revenue || Number(stats.net_revenue) === 0) {
+          let plQuery = `
+            SELECT 
+              COUNT(DISTINCT so_hoa_don) as total_bills,
+              COUNT(DISTINCT billing_date) as active_days,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+              COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+              COALESCE(SUM(ck_truoc_thue), 0) as discount,
+              COALESCE(SUM(gia_von), 0) as food_cost
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+          `;
+          let plBinds = [effStart, effEnd];
+          if (siteCode && siteCode !== 'ALL') {
+            plQuery += ` AND ma_cua_hang = ?`;
+            plBinds.push(siteCode);
+          }
+          stats = await db.queryOne(env, plQuery, plBinds);
+        }
 
         const plannedTargetRevenue = (siteCode === 'ALL') ? 4500000000 : (budget * 10);
         let grossRevenue = Math.round(stats?.gross_revenue || 0);
@@ -2283,57 +2552,72 @@ export default {
         const profitMargin = netRevenue > 0 ? ((operatingProfit / netRevenue) * 100).toFixed(1) : '0.0';
         const breakEvenRevenue = netRevenue > 0 ? Math.round(rentCost / Math.max(0.1, (1 - (foodCost + utilityCost + wasteCost) / netRevenue))) : 0;
 
-        // Phân rã doanh thu theo kênh bán hàng thực tế từ bảng transactions
-        let channelQuery = `
-          SELECT COALESCE(ten_kenh_ban_hang, 'Kênh khác') as ch_name, COALESCE(SUM(thanh_tien_truoc_thue), 0) as ch_rev
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
-        let chBinds = [effStart, effEnd];
-        if (siteCode && siteCode !== 'ALL') {
-          channelQuery += ` AND ma_cua_hang = ?`;
-          chBinds.push(siteCode);
-        }
-        channelQuery += ` GROUP BY ten_kenh_ban_hang ORDER BY ch_rev DESC`;
-        const { results: chRows } = await env.DB.prepare(channelQuery).bind(...chBinds).all();
-
+        // Phân rã doanh thu theo kênh bán hàng
         const channels = {
-          dineIn: 0,
-          takeaway: 0,
-          catering: 0
+          dineIn: Math.round(stats?.dine_in_rev || 0),
+          takeaway: Math.round(stats?.takeaway_rev || 0),
+          catering: Math.round(stats?.catering_rev || 0)
         };
-        (chRows || []).forEach(r => {
-          const name = (r.ch_name || '').toLowerCase();
-          if (name.includes('sỉ') || name.includes('b2b') || name.includes('suất ăn')) {
-            channels.catering += Math.round(r.ch_rev || 0);
-          } else if (name.includes('mang') || name.includes('online')) {
-            channels.takeaway += Math.round(r.ch_rev || 0);
-          } else {
-            channels.dineIn += Math.round(r.ch_rev || 0);
-          }
-        });
+
         if (channels.dineIn === 0 && channels.takeaway === 0 && channels.catering === 0 && netRevenue > 0) {
-          channels.dineIn = Math.round(netRevenue * 0.72);
-          channels.takeaway = Math.round(netRevenue * 0.20);
-          channels.catering = Math.round(netRevenue * 0.08);
+          let channelQuery = `
+            SELECT COALESCE(ten_kenh_ban_hang, 'Kênh khác') as ch_name, COALESCE(SUM(thanh_tien_truoc_thue), 0) as ch_rev
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+          `;
+          let chBinds = [effStart, effEnd];
+          if (siteCode && siteCode !== 'ALL') {
+            channelQuery += ` AND ma_cua_hang = ?`;
+            chBinds.push(siteCode);
+          }
+          channelQuery += ` GROUP BY ten_kenh_ban_hang ORDER BY ch_rev DESC`;
+          const { rows: chRows } = await db.query(env, channelQuery, chBinds);
+
+          (chRows || []).forEach(r => {
+            const name = (r.ch_name || '').toLowerCase();
+            if (name.includes('sỉ') || name.includes('b2b') || name.includes('suất ăn')) {
+              channels.catering += Math.round(r.ch_rev || 0);
+            } else if (name.includes('mang') || name.includes('online')) {
+              channels.takeaway += Math.round(r.ch_rev || 0);
+            } else {
+              channels.dineIn += Math.round(r.ch_rev || 0);
+            }
+          });
+          if (channels.dineIn === 0 && channels.takeaway === 0 && channels.catering === 0 && netRevenue > 0) {
+            channels.dineIn = Math.round(netRevenue * 0.72);
+            channels.takeaway = Math.round(netRevenue * 0.20);
+            channels.catering = Math.round(netRevenue * 0.08);
+          }
         }
 
         // Top 5 món bán chạy thực tế từ bảng transactions
-        let topQuery = `
-          SELECT ma_sp as code, ten_sp as name, 
-                 ROUND(SUM(so_luong), 0) as qty, 
-                 ROUND(SUM(thanh_tien_truoc_thue), 0) as rev,
-                 ROUND((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100, 1) as foodCostPct
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
+        let topQuery = {
+          d1: `
+            SELECT ma_sp as code, ten_sp as name, 
+                   ROUND(SUM(so_luong), 0) as qty, 
+                   ROUND(SUM(thanh_tien_truoc_thue), 0) as rev,
+                   ROUND((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100, 1) as "foodCostPct"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5
+          `,
+          pg: `
+            SELECT ma_sp as code, ten_sp as name, 
+                   ROUND(SUM(so_luong)::numeric, 0) as qty, 
+                   ROUND(SUM(thanh_tien_truoc_thue)::numeric, 0) as rev,
+                   ROUND(((SUM(gia_von) * 1.0 / NULLIF(SUM(thanh_tien_truoc_thue), 0)) * 100)::numeric, 1) as "foodCostPct"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5
+          `
+        };
         let topBinds = [effStart, effEnd];
         if (siteCode && siteCode !== 'ALL') {
-          topQuery += ` AND ma_cua_hang = ?`;
           topBinds.push(siteCode);
         }
-        topQuery += ` GROUP BY ma_sp, ten_sp ORDER BY rev DESC LIMIT 5`;
-        const { results: topRows } = await env.DB.prepare(topQuery).bind(...topBinds).all();
+        const { rows: topRows } = await db.query(env, topQuery, topBinds);
 
         const topDishes = (topRows && topRows.length > 0) ? topRows.map(m => ({
           code: m.code || 'SP',
@@ -2345,27 +2629,45 @@ export default {
         })) : [];
 
         // Xu hướng 4 tuần theo dữ liệu giao dịch thật
-        let weeklyQuery = `
-          SELECT 
-            CASE 
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 7 THEN 'Tuần 1'
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 14 THEN 'Tuần 2'
-              WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 21 THEN 'Tuần 3'
-              ELSE 'Tuần 4'
-            END as week,
-            COUNT(DISTINCT so_hoa_don) as bills,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as netRev,
-            COALESCE(SUM(gia_von), 0) as foodCost
-          FROM transactions
-          WHERE billing_date >= ? AND billing_date <= ?
-        `;
+        let weeklyQuery = {
+          d1: `
+            SELECT 
+              CASE 
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 7 THEN 'Tuần 1'
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 14 THEN 'Tuần 2'
+                WHEN CAST(SUBSTR(billing_date, 9, 2) AS INTEGER) <= 21 THEN 'Tuần 3'
+                ELSE 'Tuần 4'
+              END as week,
+              COUNT(DISTINCT so_hoa_don) as bills,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as "netRev",
+              COALESCE(SUM(gia_von), 0) as "foodCost"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY week ORDER BY week
+          `,
+          pg: `
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAY FROM billing_date) <= 7 THEN 'Tuần 1'
+                WHEN EXTRACT(DAY FROM billing_date) <= 14 THEN 'Tuần 2'
+                WHEN EXTRACT(DAY FROM billing_date) <= 21 THEN 'Tuần 3'
+                ELSE 'Tuần 4'
+              END as week,
+              COUNT(DISTINCT so_hoa_don) as bills,
+              COALESCE(SUM(thanh_tien_truoc_thue), 0) as "netRev",
+              COALESCE(SUM(gia_von), 0) as "foodCost"
+            FROM transactions
+            WHERE billing_date >= ? AND billing_date <= ?
+            ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+            GROUP BY week ORDER BY week
+          `
+        };
         let wBinds = [effStart, effEnd];
         if (siteCode && siteCode !== 'ALL') {
-          weeklyQuery += ` AND ma_cua_hang = ?`;
           wBinds.push(siteCode);
         }
-        weeklyQuery += ` GROUP BY week ORDER BY week`;
-        const { results: weekRows } = await env.DB.prepare(weeklyQuery).bind(...wBinds).all();
+        const { rows: weekRows } = await db.query(env, weeklyQuery, wBinds);
 
         const weeklyTrends = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'].map(wName => {
           const row = (weekRows || []).find(r => r.week === wName);
@@ -2448,31 +2750,32 @@ export default {
       if (pathname === '/api/fnb/chain' && request.method === 'GET') {
         const month = normalizeMonth(searchParams.get('month') || '2026-11');
         let effectiveMonth = month;
-        const startCheck = `${effectiveMonth}-01`;
-        const endCheck = `${effectiveMonth}-31`;
+        let checkRange = getMonthRange(effectiveMonth);
 
         // Kiểm tra xem tháng có data không (Đọc đúng 1 dòng qua LIMIT 1)
-        const countCheck = await env.DB.prepare(`
+        const countCheck = await db.queryOne(env, `
           SELECT 1 as cnt FROM transactions WHERE billing_date >= ? AND billing_date <= ? LIMIT 1
-        `).bind(startCheck, endCheck).first();
+        `, [checkRange.start, checkRange.end]);
 
         if (!countCheck) {
-          const latestRow = await env.DB.prepare(`
-            SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT SUBSTR(billing_date, 1, 7) as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM') as ym FROM transactions ORDER BY billing_date DESC LIMIT 1`
+          });
           if (latestRow && latestRow.ym) {
             effectiveMonth = latestRow.ym;
           }
         }
-        const effStart = `${effectiveMonth}-01`;
-        const effEnd = `${effectiveMonth}-31`;
+        const effRange = getMonthRange(effectiveMonth);
+        const effStart = effRange.start;
+        const effEnd = effRange.end;
 
         // Lấy danh sách điểm bán từ bảng sites
-        const { results: siteList } = await env.DB.prepare(`SELECT * FROM sites ORDER BY site_code`).all();
+        const { rows: siteList } = await db.query(env, `SELECT * FROM sites ORDER BY site_code`);
 
         // Ưu tiên đọc từ bảng tổng hợp fnb_monthly_summary (chỉ đọc ~15 dòng!)
         let transSums = [];
-        const { results: summaryRows } = await env.DB.prepare(`
+        const { rows: summaryRows } = await db.query(env, `
           SELECT 
             site_code as ma_cua_hang,
             site_name as ten_cua_hang,
@@ -2482,13 +2785,13 @@ export default {
             total_bills
           FROM fnb_monthly_summary
           WHERE month_period = ?
-        `).bind(effectiveMonth).all().catch(() => ({ results: [] }));
+        `, [effectiveMonth]).catch(() => ({ rows: [] }));
 
         if (summaryRows && summaryRows.length > 0) {
           transSums = summaryRows;
         } else {
-          // Fallback: Range Query trên transactions (giảm 72% rows read so với LIKE)
-          const { results: rawSums } = await env.DB.prepare(`
+          // Fallback: Range Query trên transactions
+          const { rows: rawSums } = await db.query(env, `
             SELECT 
               ma_cua_hang,
               ten_cua_hang,
@@ -2499,42 +2802,8 @@ export default {
             FROM transactions
             WHERE billing_date >= ? AND billing_date <= ?
             GROUP BY ma_cua_hang, ten_cua_hang, vung_mien
-          `).bind(effStart, effEnd).all();
+          `, [effStart, effEnd]);
           transSums = rawSums || [];
-
-          // Tự động lưu ngầm vào fnb_monthly_summary để các lượt truy cập sau không bao giờ bị scan lại bảng transactions
-          if (rawSums && rawSums.length > 0 && ctx && typeof ctx.waitUntil === 'function') {
-            ctx.waitUntil((async () => {
-              try {
-                await env.DB.prepare(`
-                  INSERT OR REPLACE INTO fnb_monthly_summary (
-                    month_period, site_code, site_name, region,
-                    total_bills, active_days, net_revenue, gross_revenue,
-                    discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
-                  )
-                  SELECT 
-                    SUBSTR(billing_date, 1, 7) as month_period,
-                    ma_cua_hang as site_code,
-                    COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
-                    COALESCE(vung_mien, 'Miền Nam') as region,
-                    COUNT(DISTINCT so_hoa_don) as total_bills,
-                    COUNT(DISTINCT billing_date) as active_days,
-                    COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
-                    COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
-                    COALESCE(SUM(ck_truoc_thue), 0) as discount,
-                    COALESCE(SUM(gia_von), 0) as food_cost,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
-                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
-                  FROM transactions
-                  WHERE billing_date >= ? AND billing_date <= ?
-                  GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
-                `).bind(effStart, effEnd).run();
-              } catch (e) {
-                console.warn('Auto-heal fnb_monthly_summary error:', e.message);
-              }
-            })());
-          }
         }
 
         const siteRevMap = {};
@@ -2557,10 +2826,10 @@ export default {
 
         const chainRankings = allKnownSites.map((s, idx) => {
           const trans = siteRevMap[s.site_code];
-          const hasTrans = !!trans && trans.net_rev > 0;
-          const rev = hasTrans ? Math.round(trans.net_rev) : 0;
-          const foodCostVal = hasTrans ? Math.round(trans.food_cost) : 0;
-          const totalBills = hasTrans ? trans.total_bills : 0;
+          const hasTrans = !!trans && Number(trans.net_rev) > 0;
+          const rev = hasTrans ? Math.round(Number(trans.net_rev)) : 0;
+          const foodCostVal = hasTrans ? Math.round(Number(trans.food_cost)) : 0;
+          const totalBills = hasTrans ? Number(trans.total_bills) : 0;
           const target = (s.budget_limit && s.budget_limit > 0) ? s.budget_limit * 10 : 450000000;
 
           const foodPct = rev > 0 ? ((foodCostVal / rev) * 100).toFixed(1) : '0.0';
@@ -2616,7 +2885,7 @@ export default {
         return createCachedResponse(chainResponseData, 180, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
-      // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS từ bảng transactions trên D1
+      // 3.3 GET /api/fnb/pos - Thống kê doanh thu POS từ bảng transactions trên D1 hoặc Postgres
       if (pathname === '/api/fnb/pos' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
         const siteCode = extractSiteCode(site);
@@ -2624,54 +2893,98 @@ export default {
 
         // Nếu không có ngày, lấy ngày có giao dịch mới nhất trong bảng transactions
         if (!date) {
-          const latestRow = await env.DB.prepare(`
-            SELECT MAX(billing_date) as max_date FROM transactions
-          `).first();
+          const latestRow = await db.queryOne(env, {
+            d1: `SELECT MAX(billing_date) as max_date FROM transactions`,
+            pg: `SELECT to_char(MAX(billing_date), 'YYYY-MM-DD') as max_date FROM transactions`
+          });
           date = latestRow?.max_date || '2026-11-19';
         }
 
-        // Truy vấn doanh thu trong ngày (Tận dụng index idx_trans_site_date)
-        let posQuery = `
-          SELECT 
-            COUNT(DISTINCT so_hoa_don) as bills_today,
-            COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
-            COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
-          FROM transactions
-          WHERE billing_date = ?
-        `;
-        let posBinds = [date];
+        // Ưu tiên đọc từ fnb_daily_summary
+        let dailyStats = null;
+        let dQuery = {
+          d1: `SELECT 
+                 SUM(total_bills) as bills_today,
+                 COALESCE(SUM(net_revenue), 0) as total_sales,
+                 COALESCE(ROUND(SUM(net_revenue) * 1.0 / NULLIF(SUM(total_bills), 0), 0), 0) as avg_bill
+               FROM fnb_daily_summary
+               WHERE daily_date = ?
+               ${siteCode && siteCode !== 'ALL' ? 'AND site_code = ?' : ''}`,
+          pg: `SELECT 
+                 SUM(total_bills) as bills_today,
+                 COALESCE(SUM(net_revenue), 0) as total_sales,
+                 COALESCE(ROUND((SUM(net_revenue)::numeric / NULLIF(SUM(total_bills), 0)), 0), 0) as avg_bill
+               FROM fnb_daily_summary
+               WHERE daily_date = ?::date
+               ${siteCode && siteCode !== 'ALL' ? 'AND site_code = ?' : ''}`
+        };
+        let dBinds = [date];
         if (siteCode && siteCode !== 'ALL') {
-          posQuery += ` AND ma_cua_hang = ?`;
-          posBinds.push(siteCode);
+          dBinds.push(siteCode);
         }
+        dailyStats = await db.queryOne(env, dQuery, dBinds).catch(() => null);
 
-        const posStats = await env.DB.prepare(posQuery).bind(...posBinds).first();
-        let totalSalesToday = Math.round(posStats?.total_sales || 0);
-        let billsToday = posStats?.bills_today || 0;
-        let avgBillToday = Math.round(posStats?.avg_bill || 0);
+        let totalSalesToday = Math.round(Number(dailyStats?.total_sales) || 0);
+        let billsToday = Number(dailyStats?.bills_today) || 0;
+        let avgBillToday = Math.round(Number(dailyStats?.avg_bill) || 0);
+
+        // Fallback sang transactions nếu daily summary chưa có
+        if (totalSalesToday === 0) {
+          let posQuery = {
+            d1: `SELECT 
+                   COUNT(DISTINCT so_hoa_don) as bills_today,
+                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                   COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE billing_date = ?
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}`,
+            pg: `SELECT 
+                   COUNT(DISTINCT so_hoa_don) as bills_today,
+                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                   COALESCE(ROUND((SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0))::numeric, 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE billing_date = ?::date
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}`
+          };
+          let posBinds = [date];
+          if (siteCode && siteCode !== 'ALL') posBinds.push(siteCode);
+          const posStats = await db.queryOne(env, posQuery, posBinds);
+          totalSalesToday = Math.round(Number(posStats?.total_sales) || 0);
+          billsToday = Number(posStats?.bills_today) || 0;
+          avgBillToday = Math.round(Number(posStats?.avg_bill) || 0);
+        }
 
         // Nếu ngày được chọn chưa có giao dịch, tìm ngày gần nhất có data của site
         if (totalSalesToday === 0) {
-          let fallbackQ = `
-            SELECT billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
-                   COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
-                   COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
-            FROM transactions
-            WHERE 1=1
-          `;
+          let fallbackQ = {
+            d1: `SELECT billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
+                        COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                        COALESCE(ROUND(SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0), 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE 1=1
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+                 GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`,
+            pg: `SELECT to_char(billing_date, 'YYYY-MM-DD') as billing_date, COUNT(DISTINCT so_hoa_don) as bills_today,
+                        COALESCE(SUM(thanh_tien_truoc_thue), 0) as total_sales,
+                        COALESCE(ROUND((SUM(thanh_tien_truoc_thue) * 1.0 / NULLIF(COUNT(DISTINCT so_hoa_don), 0))::numeric, 0), 0) as avg_bill
+                 FROM transactions
+                 WHERE 1=1
+                 ${siteCode && siteCode !== 'ALL' ? 'AND ma_cua_hang = ?' : ''}
+                 GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`
+          };
           let fbBinds = [];
-          if (siteCode && siteCode !== 'ALL') {
-            fallbackQ += ` AND ma_cua_hang = ?`;
-            fbBinds.push(siteCode);
-          }
-          fallbackQ += ` GROUP BY billing_date ORDER BY billing_date DESC LIMIT 1`;
-          const fbRow = await env.DB.prepare(fallbackQ).bind(...fbBinds).first();
-          if (fbRow && fbRow.total_sales > 0) {
+          if (siteCode && siteCode !== 'ALL') fbBinds.push(siteCode);
+          const fbRow = await db.queryOne(env, fallbackQ, fbBinds);
+          if (fbRow && Number(fbRow.total_sales) > 0) {
             date = fbRow.billing_date;
-            totalSalesToday = Math.round(fbRow.total_sales);
-            billsToday = fbRow.bills_today;
-            avgBillToday = Math.round(fbRow.avg_bill);
+            totalSalesToday = Math.round(Number(fbRow.total_sales));
+            billsToday = Number(fbRow.bills_today);
+            avgBillToday = Math.round(Number(fbRow.avg_bill));
           }
+        }
+
+        if (date instanceof Date) {
+          date = date.toISOString().split('T')[0];
         }
 
         // Phân bổ doanh thu theo khung giờ bán hàng thực tế trong ngày
@@ -2739,33 +3052,36 @@ export default {
           sitesBinds.push(regionName);
         }
         sitesQuery += ` ORDER BY site_code`;
-        const { results: sites } = await env.DB.prepare(sitesQuery).bind(...sitesBinds).all();
+        const { rows: sites } = await db.query(env, sitesQuery, sitesBinds);
 
         // 2. Lấy danh mục mặt hàng F&B
-        let itemsQuery = `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
+        const isPostgres = db.isPg(env);
+        let itemsQuery = isPostgres
+          ? `SELECT * FROM fnb_stock_items WHERE is_active = true`
+          : `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
         let itemsBinds = [];
         if (groupParam && groupParam !== 'all') {
           itemsQuery += ` AND item_group = ?`;
           itemsBinds.push(groupParam);
         }
         itemsQuery += ` ORDER BY item_group, code`;
-        const { results: itemsList } = await env.DB.prepare(itemsQuery).bind(...itemsBinds).all();
+        const { rows: itemsList } = await db.query(env, itemsQuery, itemsBinds);
 
         // 3. Lấy toàn bộ số dư tồn kho
-        const { results: balances } = await env.DB.prepare(`
+        const { rows: balances } = await db.query(env, `
           SELECT item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, last_count_qty, last_count_date, no_opening, total_value
           FROM fnb_stock_balances
-        `).all();
+        `);
 
         // Tạo map (item_code -> site_code -> cell)
         const cellMap = {};
-        for (const b of balances) {
+        for (const b of (balances || [])) {
           if (!cellMap[b.item_code]) cellMap[b.item_code] = {};
           cellMap[b.item_code][b.site_code] = {
             book: b.book_qty,
             lastCount: b.last_count_qty,
             lastDate: b.last_count_date,
-            noOpening: b.no_opening === 1,
+            noOpening: b.no_opening === 1 || b.no_opening === true,
             value: b.total_value,
             opening: b.opening_qty,
             receipt: b.receipt_qty,
@@ -2775,9 +3091,9 @@ export default {
         }
 
         // Tạo cấu trúc rows ma trận
-        const rows = itemsList.map(item => {
+        const rows = (itemsList || []).map(item => {
           const cells = {};
-          for (const s of sites) {
+          for (const s of (sites || [])) {
             cells[s.id] = cellMap[item.code]?.[s.id] || {
               book: 0,
               lastCount: null,
@@ -2816,7 +3132,7 @@ export default {
           data: {
             regions,
             groups,
-            sites,
+            sites: sites || [],
             showValue: true,
             rows
           }
@@ -2846,7 +3162,7 @@ export default {
             COALESCE(b.book_qty, 0) as book_qty,
             COALESCE(b.last_count_qty, NULL) as last_count_qty,
             b.last_count_date,
-            COALESCE(b.no_opening, 1) as no_opening,
+            COALESCE(b.no_opening, ${db.isPg(env) ? 'true' : '1'}) as no_opening,
             COALESCE(b.total_value, 0) as total_value
           FROM dim_article_stock d
           LEFT JOIN fnb_stock_balances b ON d.material = b.item_code AND b.site_code = d.site
@@ -2861,24 +3177,25 @@ export default {
 
         let results = [];
         try {
-          const res = await env.DB.prepare(query).bind(...binds).all();
-          results = res.results || [];
+          const res = await db.query(env, query, binds);
+          results = res.rows || [];
         } catch (e) {
           console.warn('dim_article_stock not ready or empty:', e.message);
         }
 
         // 2. Fallback sang fnb_stock_items nếu site chưa có trong dim_article_stock
         if (!results.length) {
+          const isPostgres = db.isPg(env);
           let fbQuery = `
             SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
                    COALESCE(b.book_qty, 0) as book_qty,
                    COALESCE(b.last_count_qty, NULL) as last_count_qty,
                    b.last_count_date,
-                   COALESCE(b.no_opening, 1) as no_opening,
+                   COALESCE(b.no_opening, ${isPostgres ? 'true' : '1'}) as no_opening,
                    COALESCE(b.total_value, 0) as total_value
             FROM fnb_stock_items i
             LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
-            WHERE i.is_active = 1
+            WHERE i.is_active = ${isPostgres ? 'true' : '1'}
           `;
           let fbBinds = [siteCode];
           if (groupParam && groupParam !== 'all') {
@@ -2887,8 +3204,8 @@ export default {
           }
           fbQuery += ` ORDER BY i.item_group, i.code`;
           try {
-            const fbRes = await env.DB.prepare(fbQuery).bind(...fbBinds).all();
-            results = fbRes.results || [];
+            const fbRes = await db.query(env, fbQuery, fbBinds);
+            results = fbRes.rows || [];
           } catch (e) {}
         }
 
@@ -2913,13 +3230,13 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY count_date DESC, id DESC LIMIT 50`;
-          const { results: counts } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: counts } = await db.query(env, q, b);
 
           // Lấy chi tiết các dòng nếu cần
           const countId = searchParams.get('id');
           let lines = [];
           if (countId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, 
                      COALESCE(d.material_desc, i.name, l.item_code) as item_name, 
                      COALESCE(d.entry_unit, i.unit, '') as unit, 
@@ -2928,14 +3245,14 @@ export default {
               LEFT JOIN dim_article_stock d ON l.item_code = d.material
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.count_id = ?
-            `).bind(countId).all();
-            lines = l;
+            `, [countId]);
+            lines = l || [];
           }
 
           const fnbCountsData = {
             success: true,
             data: {
-              counts,
+              counts: counts || [],
               lines
             }
           };
@@ -2952,6 +3269,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const countCode = `KK-${(count_date || '').replace(/-/g, '')}-${site_code}-${randSuffix}`;
+            const validCountDate = count_date || new Date().toISOString().split('T')[0];
 
             let totalItems = lines.length;
             let matchedItems = 0;
@@ -2967,44 +3285,42 @@ export default {
             }
 
             // Insert Header
-            const insertHeader = await env.DB.prepare(`
+            const insertHeader = await db.queryOne(env, `
               INSERT INTO fnb_stock_counts (count_code, site_code, count_date, count_type, total_items, matched_items, diff_items, total_diff_val, notes, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(countCode, site_code, count_date, count_type, totalItems, matchedItems, diffItems, totalDiffVal, notes, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [countCode, site_code, validCountDate, count_type, totalItems, matchedItems, diffItems, totalDiffVal, notes, created_by]);
 
-            const countId = insertHeader.meta.last_row_id;
+            const countId = insertHeader.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const countBatchStmts = [];
-            for (const item of lines) {
-              const countQty = Number(item.count_qty) || 0;
-              const bookQty = Number(item.book_qty) || 0;
-              const diffQty = countQty - bookQty;
-              const unitPrice = Number(item.unit_price) || 0;
-              const diffVal = diffQty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const countQty = Number(item.count_qty) || 0;
+                const bookQty = Number(item.book_qty) || 0;
+                const diffQty = countQty - bookQty;
+                const unitPrice = Number(item.unit_price) || 0;
+                const diffVal = diffQty * unitPrice;
 
-              countBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-              `).bind(countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || ''));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `, [countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || '']);
 
-              countBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET last_count_qty = ?, last_count_date = ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(countQty, count_date, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET last_count_qty = ?, last_count_date = ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [countQty, validCountDate, item.item_code, site_code]);
 
-              if (Math.abs(diffQty) > 0.001) {
-                countBatchStmts.push(env.DB.prepare(`
-                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                  VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
-                `).bind(countCode, count_date, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by));
+                if (Math.abs(diffQty) > 0.001) {
+                  await tx.exec(`
+                    INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                    VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
+                  `, [countCode, validCountDate, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by]);
+                }
               }
-            }
+            });
 
-            if (countBatchStmts.length > 0) {
-              await env.DB.batch(countBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
@@ -3030,23 +3346,23 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY receipt_date DESC, id DESC LIMIT 50`;
-          const { results: receipts } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: receipts } = await db.query(env, q, b);
 
           const receiptId = searchParams.get('id');
           let lines = [];
           if (receiptId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, i.name as item_name, i.unit, i.item_group
               FROM fnb_stock_receipt_lines l
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.receipt_id = ?
-            `).bind(receiptId).all();
-            lines = l;
+            `, [receiptId]);
+            lines = l || [];
           }
 
           return new Response(JSON.stringify({
             success: true,
-            data: { receipts, lines }
+            data: { receipts: receipts || [], lines }
           }), { headers: corsHeaders });
         }
 
@@ -3060,6 +3376,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const receiptCode = `PN-${(receipt_date || '').replace(/-/g, '')}-${randSuffix}`;
+            const validReceiptDate = receipt_date || new Date().toISOString().split('T')[0];
 
             let totalAmount = 0;
             for (const item of lines) {
@@ -3069,42 +3386,40 @@ export default {
             }
 
             // Insert Header
-            const insertH = await env.DB.prepare(`
+            const insertH = await db.queryOne(env, `
               INSERT INTO fnb_stock_receipts (receipt_code, site_code, receipt_date, supplier, invoice_no, total_amount, notes, attachment_url, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(receiptCode, site_code, receipt_date, supplier, invoice_no, totalAmount, notes, attachment_url, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [receiptCode, site_code, validReceiptDate, supplier, invoice_no, totalAmount, notes, attachment_url, created_by]);
 
-            const receiptId = insertH.meta.last_row_id;
+            const receiptId = insertH.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const receiptBatchStmts = [];
-            for (const item of lines) {
-              const qty = Number(item.qty) || 0;
-              const unitPrice = Number(item.unit_price) || 0;
-              const lineAmount = qty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
-                VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || ''));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                `, [receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '']);
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET receipt_qty = receipt_qty + ?,
-                    book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
-                    total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET receipt_qty = receipt_qty + ?,
+                      book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
+                      total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
 
-              receiptBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
-              `).bind(receiptCode, receipt_date, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by));
-            }
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                  VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
+                `, [receiptCode, validReceiptDate, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by]);
+              }
+            });
 
-            if (receiptBatchStmts.length > 0) {
-              await env.DB.batch(receiptBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
@@ -3130,23 +3445,23 @@ export default {
             b.push(siteCode);
           }
           q += ` ORDER BY waste_date DESC, id DESC LIMIT 50`;
-          const { results: wastes } = await env.DB.prepare(q).bind(...b).all();
+          const { rows: wastes } = await db.query(env, q, b);
 
           const wasteId = searchParams.get('id');
           let lines = [];
           if (wasteId) {
-            const { results: l } = await env.DB.prepare(`
+            const { rows: l } = await db.query(env, `
               SELECT l.*, i.name as item_name, i.unit, i.item_group
               FROM fnb_stock_waste_lines l
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.waste_id = ?
-            `).bind(wasteId).all();
-            lines = l;
+            `, [wasteId]);
+            lines = l || [];
           }
 
           return new Response(JSON.stringify({
             success: true,
-            data: { wastes, lines }
+            data: { wastes: wastes || [], lines }
           }), { headers: corsHeaders });
         }
 
@@ -3160,6 +3475,7 @@ export default {
 
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const wasteCode = `BBH-${(waste_date || '').replace(/-/g, '')}-${randSuffix}`;
+            const validWasteDate = waste_date || new Date().toISOString().split('T')[0];
 
             let totalAmount = 0;
             for (const item of lines) {
@@ -3169,42 +3485,40 @@ export default {
             }
 
             // Insert Header
-            const insertH = await env.DB.prepare(`
+            const insertH = await db.queryOne(env, `
               INSERT INTO fnb_stock_wastes (waste_code, site_code, waste_date, reason, confirmed_by, total_amount, notes, attachment_url, created_by)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(wasteCode, site_code, waste_date, reason, confirmed_by, totalAmount, notes, attachment_url, created_by).run();
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [wasteCode, site_code, validWasteDate, reason, confirmed_by, totalAmount, notes, attachment_url, created_by]);
 
-            const wasteId = insertH.meta.last_row_id;
+            const wasteId = insertH.id;
 
-            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
-            const wasteBatchStmts = [];
-            for (const item of lines) {
-              const qty = Number(item.qty) || 0;
-              const unitPrice = Number(item.unit_price) || 0;
-              const lineAmount = qty * unitPrice;
+            // Batch insert lines & update balances in a single transaction (ACID)
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
-                VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason));
+                await tx.exec(`
+                  INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                `, [wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason]);
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                UPDATE fnb_stock_balances
-                SET waste_qty = waste_qty + ?,
-                    book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
-                    total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
-                WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET waste_qty = waste_qty + ?,
+                      book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
+                      total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
+                  WHERE item_code = ? AND site_code = ?
+                `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
 
-              wasteBatchStmts.push(env.DB.prepare(`
-                INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
-              `).bind(wasteCode, waste_date, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by));
-            }
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
+                  VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
+                `, [wasteCode, validWasteDate, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by]);
+              }
+            });
 
-            if (wasteBatchStmts.length > 0) {
-              await env.DB.batch(wasteBatchStmts);
-            }
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
@@ -3242,6 +3556,22 @@ export default {
 
     } catch (err) {
       return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: corsHeaders });
+    }
+  },
+
+  async scheduled(event, env, ctx) {
+    // Keep-alive ping định kỳ (12 tiếng/lần) để ngăn chặn Supabase Free tier bị tự động Pause sau 7 ngày không hoạt động
+    try {
+      console.log(`[Scheduled Cron] Keep-alive ping executed at ${new Date().toISOString()}`);
+      if (db.getBackend(env) === 'supabase') {
+        const res = await db.queryOne(env, 'SELECT count(*) as c FROM sites');
+        console.log(`[Scheduled Cron] Supabase ping successful (sites count: ${res?.c})`);
+      } else if (env.DB) {
+        const res = await db.queryOne(env, 'SELECT count(*) as c FROM sites');
+        console.log(`[Scheduled Cron] D1 ping successful (sites count: ${res?.c})`);
+      }
+    } catch (e) {
+      console.error(`[Scheduled Cron Error]`, e.message);
     }
   }
 };

@@ -8,6 +8,7 @@ dist/
 # Environment files
 .env
 .env.*
+.dev.vars
 !.env.example
 
 # OS and Editor files
@@ -20,3 +21,11 @@ Thumbs.db
 
 # Internal test files
 test-font.html
+
+# Database backups
+backup/*.db
+backup/*_export.sql
+
+# Python
+__pycache__/
+*.pyc

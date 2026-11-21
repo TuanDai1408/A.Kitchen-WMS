@@ -1,0 +1,2776 @@
+{
+  "access_requests": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "user_email": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "user_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "requested_role": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "requested_feature": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "reason": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "reviewed_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "reviewed_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "admin_users": {
+    "email": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "full_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "phone": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "role": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "password_raw": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "password_hash": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "salt": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "registered_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "approved_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "approved_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "app_roles": {
+    "role_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "role_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "description": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "badge_color": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "app_users": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "email": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "full_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "avatar_url": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "google_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "role_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "phone": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "password_hash": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "salt": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "auth_provider": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "last_login": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "branches": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "address": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "phone": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "is_active": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "chung_tu": {
+    "voucher_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "invoice_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "invoice_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "receive_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "deliverer_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "receiver_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "supplier_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "attachment_link": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['trantuandai2508@gmail.com', 'unknown', 'Admin Test', 'Import Excel']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    }
+  },
+  "chung_tu_file": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "voucher_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "file_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "file_link": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "file_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "upload_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "daily_catering_reports": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "report_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "planned_meals": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": true,
+      "notes": ""
+    },
+    "actual_meals": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": true,
+      "notes": ""
+    },
+    "wasted_meals": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "staff_actual": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "staff_standard": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "food_quality_note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "customer_feedback": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "extra_cost": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "reporter_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "report_data": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "images_link": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "dim_article_stock": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "site": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "nganh_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "nhom_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "material": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "material_desc": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "entry_unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "dinh_muc": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "month_period": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['09/2026']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "quota_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "don_hang": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "order_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "order_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ordered_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "applied_month": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "order_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "accumulated_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "over_quota_note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_monthly_summary": {
+    "month_period": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_month_text_YYYY_MM",
+      "not_null": true,
+      "notes": "Lưu định dạng kỳ YYYY-MM (e.g. 2026-11), giữ text để khớp truy vấn"
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "region": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_bills": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "active_days": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "net_revenue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "gross_revenue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "discount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "food_cost": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "dine_in_rev": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "takeaway_rev": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "catering_rev": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_balances": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "region": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "opening_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "receipt_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "sales_bom_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "waste_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "book_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "last_count_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "last_count_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": false,
+      "notes": ""
+    },
+    "no_opening": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_value": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_count_lines": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "count_id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "book_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "count_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "diff_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "diff_val": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_counts": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "count_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "count_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": true,
+      "notes": ""
+    },
+    "count_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_items": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "matched_items": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "diff_items": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_diff_val": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "notes": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['Nguyễn Văn Hùng - Bếp trưởng', 'Trần Thị Mai - Quản lý', 'Lê Hoàng Nam - Giám sát']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_items": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_group": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "min_stock": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "is_active": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_receipt_lines": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "receipt_id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_receipts": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "receipt_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "receipt_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": true,
+      "notes": ""
+    },
+    "supplier": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "invoice_no": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "notes": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "attachment_url": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['Phan Văn Đức', 'Trần Thị Mai', 'Lê Hoàng Nam']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_transactions": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "trans_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "trans_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_waste_lines": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "waste_id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": true,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "reason_detail": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "fnb_stock_wastes": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "waste_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "waste_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": true,
+      "notes": ""
+    },
+    "reason": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "confirmed_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "total_amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "notes": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "attachment_url": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_by": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['Nguyễn Văn Hùng', 'Trần Thị Mai', 'Lê Hoàng Nam']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "inventory_batches": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "batch_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "mfg_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "exp_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "storage_loc": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "items": {
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "category": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "standard_cost_sap": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "old_cost_sap": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "last_cost_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "daily_usage": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "safety_stock": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "lead_time_hours": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "kiemke_tonkho": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "material_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "cost_center": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "full_site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "warehouse_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "warehouse_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "gl_account": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "closing_t7": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "closing_t8": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "usage_t8": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "usage_t9": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "closing_t9": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "usage_t10": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "closing_t10": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "usage_t11": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "closing_t11": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "nvl_items": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "item_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "type_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "type_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "unit_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "region": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "purchase_order_items": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "po_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "unit": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "po_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "sap_price": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "variance_pct": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "purchase_orders": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "po_number": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "vendor_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "order_time": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "received_time": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "lead_time_hours": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "sla_target_hours": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "total_amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "quy_trinh_don": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "order_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "step": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "step_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "action_time": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    },
+    "actor": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "role_permissions": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "role_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "feature_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "can_view": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_create": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_edit": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_delete": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "sites": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "postal_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "city": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "month_period": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "keep_text_due_to_mixed_formats",
+      "not_null": false,
+      "notes": "Không đồng nhất 100% ISO (0.0% ISO). Chứa định dạng khác: ['09/2026']. Cần giữ text hoặc chuẩn hóa lúc migrate."
+    },
+    "budget_limit": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "region": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "site_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "stock_audits": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "period_month": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "opening_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "used_qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "stock_transactions": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "batch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "trans_type": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "note": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ref_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "stock_transfers": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "transfer_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "from_branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "to_branch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "sku": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "batch_id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "qty": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "received_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "transactions": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "orig_id": {
+      "declared_sqlite": "BIGINT",
+      "proposed_pg": "bigint",
+      "conversion": "integer_to_bigint",
+      "not_null": false,
+      "notes": ""
+    },
+    "so_chung_tu_billing": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "nguon": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ma_cua_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "ten_cua_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "vung_mien": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "loai_cua_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ma_kh": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ten_kh": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ma_sp": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ten_sp": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "dvt": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "nhom_sp": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "nganh_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "so_hoa_don": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "so_don_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "kenh_ban_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "ten_kenh_ban_hang": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "billing_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": true,
+      "notes": ""
+    },
+    "ngay_tao_billing": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "date",
+      "conversion": "text_to_date",
+      "not_null": false,
+      "notes": ""
+    },
+    "so_luong": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "don_gia_khong_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "don_gia_co_thue_ck": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "thanh_tien_truoc_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "tien_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "tong_tien_billing": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "ck_truoc_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "ck_sau_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "gia_von": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "phan_tram_thue": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "user_permissions": {
+    "id": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "user_email": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "feature_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "can_view": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_create": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_edit": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "can_delete": {
+      "declared_sqlite": "INTEGER",
+      "proposed_pg": "boolean",
+      "conversion": "int_to_bool",
+      "not_null": false,
+      "notes": ""
+    },
+    "updated_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "timestamptz",
+      "conversion": "text_to_timestamptz",
+      "not_null": false,
+      "notes": ""
+    }
+  },
+  "vouchers": {
+    "id": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "bigint GENERATED ALWAYS AS IDENTITY",
+      "conversion": "identity_pk",
+      "not_null": false,
+      "notes": ""
+    },
+    "voucher_code": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "invoice_number": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "vendor_name": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "doc_date": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": true,
+      "notes": ""
+    },
+    "amount": {
+      "declared_sqlite": "REAL",
+      "proposed_pg": "numeric(18,4)",
+      "conversion": "real_to_numeric_18_4",
+      "not_null": true,
+      "notes": ""
+    },
+    "status": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "po_number": {
+      "declared_sqlite": "TEXT",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    },
+    "created_at": {
+      "declared_sqlite": "DATETIME",
+      "proposed_pg": "text",
+      "conversion": "text",
+      "not_null": false,
+      "notes": ""
+    }
+  }
+}
