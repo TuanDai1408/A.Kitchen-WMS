@@ -7339,7 +7339,8 @@ function renderStockAlertsTable(alerts) {
   }).join('');
 
   lucide.createIcons();
-  if (typeof updateApexChartsTheme === 'function') updateApexChartsTheme(!isDark);
+  const isDarkTheme = document.documentElement.classList.contains('dark');
+  if (typeof updateApexChartsTheme === 'function') updateApexChartsTheme(isDarkTheme);
 }
 
 function exportFefoToExcel() {
@@ -14744,8 +14745,8 @@ function updateAuditKpisAndChart(items) {
   let totalClosingValue = 0;
 
   items.forEach(it => {
-    const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-    const suDung = it.usage_t11 !== null && it.usage_t11 !== undefined ? it.usage_t11 : 0;
+    const tonTruoc = parseFloat(it.closing_t10 || it.closing_t9 || 0) || 0;
+    const suDung = (it.usage_t11 !== null && it.usage_t11 !== undefined) ? (parseFloat(it.usage_t11) || 0) : 0;
     const tonCuoi = tonTruoc - suDung;
     const price = parseFloat(it.price) || 0;
     totalClosingValue += Math.max(0, tonCuoi) * price;
@@ -14762,8 +14763,8 @@ function updateAuditKpisAndChart(items) {
   const actualData = [];
 
   topItems.forEach(it => {
-    const tonTruoc = it.closing_t10 || it.closing_t9 || 0;
-    const suDung = it.usage_t11 !== null && it.usage_t11 !== undefined ? it.usage_t11 : 0;
+    const tonTruoc = parseFloat(it.closing_t10 || it.closing_t9 || 0) || 0;
+    const suDung = (it.usage_t11 !== null && it.usage_t11 !== undefined) ? (parseFloat(it.usage_t11) || 0) : 0;
     const tonCuoi = tonTruoc - suDung;
     bookData.push(parseFloat(tonTruoc.toFixed(1)));
     actualData.push(parseFloat(tonCuoi.toFixed(1)));

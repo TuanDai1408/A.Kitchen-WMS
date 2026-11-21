@@ -654,7 +654,7 @@ export default {
       '/api/vouchers'
     ];
     const isCacheableReport = CACHEABLE_GET_ROUTES.includes(pathname) && request.method === 'GET';
-    const isNoCache = searchParams.get('refresh') === 'true' || searchParams.get('nocache') === '1';
+    const isNoCache = searchParams.get('refresh') === 'true' || searchParams.get('nocache') === '1' || searchParams.get('no-cache') === '1';
 
     const canonicalKey = url.pathname + (url.search || '');
     if (isCacheableReport && !isNoCache) {
@@ -3441,12 +3441,14 @@ export default {
           binds = [siteCode, siteCode, siteCode, siteCode];
         }
         if (groupParam && groupParam !== 'all') {
-          query.pg += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
-          query.d1 += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
+          const filterSql = inStockOnly ? ' AND' : ' WHERE';
+          query.pg += `${filterSql} (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
+          query.d1 += `${filterSql} (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
           binds.push(groupParam, groupParam, `%${groupParam}%`);
         }
-        query.pg += ` ORDER BY nhom_hang, sub.item_code`;
-        query.d1 += ` ORDER BY nhom_hang, sub.item_code`;
+        const orderCodeCol = inStockOnly ? 'b.item_code' : 'sub.item_code';
+        query.pg += ` ORDER BY nhom_hang, ${orderCodeCol}`;
+        query.d1 += ` ORDER BY nhom_hang, ${orderCodeCol}`;
 
         let results = [];
         try {
