@@ -20,3 +20,7 @@ Thumbs.db
 
 # Internal test files
 test-font.html
+
+# Database backups
+backup/*.db
+backup/*_export.sql
