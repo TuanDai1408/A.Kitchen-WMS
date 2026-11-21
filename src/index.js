@@ -907,64 +907,230 @@ export default {
         return createCachedResponse(dashSummaryData, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
-      // 1.3 GET /api/stock
+      // 1.3 GET /api/stock - Danh mục tồn kho FEFO thực tế từ fnb_stock_balances
       if (pathname === '/api/stock' && request.method === 'GET') {
-        const branchCode = searchParams.get('branch') || 'k505';
-        const { rows: results } = await db.query(env, {
-          d1: `
-            SELECT 
-              b.id as batch_id,
-              b.batch_code,
-              b.mfg_date,
-              b.exp_date,
-              b.qty,
-              b.storage_loc,
-              i.sku,
-              i.name as item_name,
-              i.category,
-              i.unit,
-              i.standard_cost_sap,
-              ROUND(julianday(b.exp_date) - julianday('now')) as days_remaining
-            FROM inventory_batches b
-            JOIN items i ON b.sku = i.sku
-            JOIN branches br ON b.branch_id = br.id
-            WHERE br.code = ? AND b.qty > 0
-            ORDER BY julianday(b.exp_date) ASC
-          `,
-          pg: `
-            SELECT 
-              b.id as batch_id,
-              b.batch_code,
-              b.mfg_date,
-              b.exp_date,
-              b.qty,
-              b.storage_loc,
-              i.sku,
-              i.name as item_name,
-              i.category,
-              i.unit,
-              i.standard_cost_sap,
-              (b.exp_date::date - CURRENT_DATE) as days_remaining
-            FROM inventory_batches b
-            JOIN items i ON b.sku = i.sku
-            JOIN branches br ON b.branch_id = br.id
-            WHERE br.code = ? AND b.qty > 0
-            ORDER BY b.exp_date ASC
-          `
-        }, [branchCode.toUpperCase()]);
+        const branchParam = searchParams.get('branch') || '';
+        const branchCode = (!branchParam || branchParam.toLowerCase() === 'all') ? 'ALL' : branchParam.toUpperCase();
+
+        const isPg = db.isPg(env);
+        let results = [];
+
+        if (isPg) {
+          if (branchCode === 'ALL') {
+            const pgAllQuery = `
+              SELECT 
+                'all_' || b.item_code as id,
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as item_name,
+                COALESCE(d.nhom_hang, p.merch_category, i.category, 'Hàng hóa') as category,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                'Toàn chuỗi' as batch_code,
+                'ALL' as site_code,
+                COALESCE(MAX(b.last_count_date::text), (CURRENT_DATE + INTERVAL '30 days')::text) as exp_date,
+                ROUND(SUM(b.book_qty)::numeric, 1) as qty,
+                ROUND(SUM(b.total_value)::numeric, 0) as total_value,
+                ROUND((CASE WHEN SUM(b.book_qty) > 0 THEN SUM(b.total_value) / SUM(b.book_qty) ELSE COALESCE(MAX(p.net_price), MAX(i.standard_cost_sap), 0) END)::numeric, 0) as standard_cost_sap,
+                COALESCE(MAX(i.safety_stock), 5.0) as safety_stock,
+                CASE 
+                  WHEN BOOL_OR(b.no_opening) THEN 3
+                  WHEN SUM(b.book_qty) < 0 THEN 0
+                  WHEN SUM(b.book_qty) = 0 THEN 0
+                  ELSE 45
+                END as days_remaining,
+                'ALL' as branch_code,
+                'Toàn Hệ Thống' as branch_name
+              FROM fnb_stock_balances b
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price 
+                FROM dim_article_stock 
+                GROUP BY material
+              ) d ON b.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+                FROM sap_po_items 
+                GROUP BY article
+              ) p ON b.item_code = p.article
+              LEFT JOIN items i ON b.item_code = i.sku
+              GROUP BY b.item_code, d.material_desc, p.article_desc, i.name, d.nhom_hang, p.merch_category, i.category, d.entry_unit, p.order_unit, i.unit
+              ORDER BY 
+                CASE 
+                  WHEN SUM(b.book_qty) < 0 THEN 1
+                  WHEN BOOL_OR(b.no_opening) THEN 2
+                  WHEN SUM(b.book_qty) = 0 THEN 3
+                  ELSE 4
+                END ASC,
+                SUM(b.book_qty) DESC, 
+                b.item_code ASC
+            `;
+            const res = await db.query(env, pgAllQuery);
+            results = res.rows || [];
+          } else {
+            const pgSiteQuery = `
+              SELECT 
+                COALESCE(b.id::text, 'bal_' || b.item_code || '_' || b.site_code) as id,
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as item_name,
+                COALESCE(d.nhom_hang, p.merch_category, i.category, 'Hàng hóa') as category,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(bat.batch_code, b.site_code) as batch_code,
+                b.site_code as site_code,
+                COALESCE(bat.exp_date::text, b.last_count_date::text, (CURRENT_DATE + INTERVAL '30 days')::text) as exp_date,
+                ROUND(COALESCE(bat.qty, b.book_qty)::numeric, 1) as qty,
+                ROUND(b.total_value::numeric, 0) as total_value,
+                ROUND((CASE WHEN b.book_qty > 0 THEN b.total_value / b.book_qty ELSE COALESCE(p.net_price, i.standard_cost_sap, 0) END)::numeric, 0) as standard_cost_sap,
+                COALESCE(i.safety_stock, 5.0) as safety_stock,
+                CASE 
+                  WHEN bat.exp_date IS NOT NULL THEN (bat.exp_date::date - CURRENT_DATE)
+                  WHEN b.no_opening = true THEN 3
+                  WHEN b.book_qty < 0 THEN 0
+                  WHEN b.book_qty = 0 THEN 0
+                  ELSE 45
+                END as days_remaining,
+                b.site_code as branch_code,
+                COALESCE(br.name, b.site_code) as branch_name
+              FROM fnb_stock_balances b
+              LEFT JOIN branches br ON UPPER(b.site_code) = UPPER(br.code)
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price 
+                FROM dim_article_stock 
+                GROUP BY material
+              ) d ON b.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+                FROM sap_po_items 
+                GROUP BY article
+              ) p ON b.item_code = p.article
+              LEFT JOIN items i ON b.item_code = i.sku
+              LEFT JOIN inventory_batches bat ON b.item_code = bat.sku AND (br.id = bat.branch_id) AND bat.qty > 0
+              WHERE UPPER(b.site_code) = ?
+              ORDER BY 
+                CASE 
+                  WHEN b.book_qty < 0 THEN 1
+                  WHEN b.no_opening = true THEN 2
+                  WHEN b.book_qty = 0 THEN 3
+                  ELSE 4
+                END ASC,
+                b.book_qty DESC, 
+                b.item_code ASC
+            `;
+            const res = await db.query(env, pgSiteQuery, [branchCode]);
+            results = res.rows || [];
+          }
+        } else {
+          // D1 / SQLite fallback
+          if (branchCode === 'ALL') {
+            const d1AllQuery = `
+              SELECT 
+                'all_' || b.item_code as id,
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as item_name,
+                COALESCE(d.nhom_hang, p.merch_category, i.category, 'Hàng hóa') as category,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                'Toàn chuỗi' as batch_code,
+                'ALL' as site_code,
+                COALESCE(MAX(b.last_count_date), date('now', '+30 days')) as exp_date,
+                ROUND(SUM(b.book_qty), 1) as qty,
+                ROUND(SUM(b.total_value), 0) as total_value,
+                ROUND(CASE WHEN SUM(b.book_qty) > 0 THEN SUM(b.total_value) / SUM(b.book_qty) ELSE COALESCE(MAX(p.net_price), MAX(i.standard_cost_sap), 0) END, 0) as standard_cost_sap,
+                COALESCE(MAX(i.safety_stock), 5.0) as safety_stock,
+                CASE 
+                  WHEN MAX(b.no_opening) = 1 THEN 3
+                  WHEN SUM(b.book_qty) < 0 THEN 0
+                  WHEN SUM(b.book_qty) = 0 THEN 0
+                  ELSE 45
+                END as days_remaining,
+                'ALL' as branch_code,
+                'Toàn Hệ Thống' as branch_name
+              FROM fnb_stock_balances b
+              LEFT JOIN (SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit FROM dim_article_stock GROUP BY material) d ON b.item_code = d.material
+              LEFT JOIN (SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
+              LEFT JOIN items i ON b.item_code = i.sku
+              GROUP BY b.item_code
+              ORDER BY 
+                CASE 
+                  WHEN SUM(b.book_qty) < 0 THEN 1
+                  WHEN MAX(b.no_opening) = 1 THEN 2
+                  WHEN SUM(b.book_qty) = 0 THEN 3
+                  ELSE 4
+                END ASC,
+                SUM(b.book_qty) DESC, 
+                b.item_code ASC
+            `;
+            const res = await db.query(env, d1AllQuery);
+            results = res.rows || [];
+          } else {
+            const d1SiteQuery = `
+              SELECT 
+                b.id,
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as item_name,
+                COALESCE(d.nhom_hang, p.merch_category, i.category, 'Hàng hóa') as category,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(bat.batch_code, b.site_code) as batch_code,
+                b.site_code as site_code,
+                COALESCE(bat.exp_date, b.last_count_date, date('now', '+30 days')) as exp_date,
+                ROUND(COALESCE(bat.qty, b.book_qty), 1) as qty,
+                ROUND(b.total_value, 0) as total_value,
+                ROUND(CASE WHEN b.book_qty > 0 THEN b.total_value / b.book_qty ELSE COALESCE(p.net_price, i.standard_cost_sap, 0) END, 0) as standard_cost_sap,
+                COALESCE(i.safety_stock, 5.0) as safety_stock,
+                CASE 
+                  WHEN bat.exp_date IS NOT NULL THEN ROUND(julianday(bat.exp_date) - julianday('now'))
+                  WHEN b.no_opening = 1 THEN 3
+                  WHEN b.book_qty < 0 THEN 0
+                  WHEN b.book_qty = 0 THEN 0
+                  ELSE 45
+                END as days_remaining,
+                b.site_code as branch_code,
+                COALESCE(br.name, b.site_code) as branch_name
+              FROM fnb_stock_balances b
+              LEFT JOIN branches br ON UPPER(b.site_code) = UPPER(br.code)
+              LEFT JOIN (SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit FROM dim_article_stock GROUP BY material) d ON b.item_code = d.material
+              LEFT JOIN (SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
+              LEFT JOIN items i ON b.item_code = i.sku
+              LEFT JOIN inventory_batches bat ON b.item_code = bat.sku AND (br.id = bat.branch_id) AND bat.qty > 0
+              WHERE UPPER(b.site_code) = ?
+              ORDER BY 
+                CASE 
+                  WHEN b.book_qty < 0 THEN 1
+                  WHEN b.no_opening = 1 THEN 2
+                  WHEN b.book_qty = 0 THEN 3
+                  ELSE 4
+                END ASC,
+                b.book_qty DESC, 
+                b.item_code ASC
+            `;
+            const res = await db.query(env, d1SiteQuery, [branchCode]);
+            results = res.rows || [];
+          }
+        }
 
         const enriched = (results || []).map((r, idx) => {
           let dangerLevel = 'green';
           let statusText = 'An toàn';
-          if (r.days_remaining <= 7) {
+          const qty = parseFloat(r.qty) || 0;
+          const days = parseInt(r.days_remaining, 10) || 0;
+          
+          if (qty < 0) {
+            dangerLevel = 'red';
+            statusText = 'Tồn âm (Cần kiểm kê)';
+          } else if (qty === 0) {
+            dangerLevel = 'yellow';
+            statusText = 'Hết hàng (ROP)';
+          } else if (days <= 7) {
             dangerLevel = 'red';
             statusText = 'Cận Date (≤ 7 ngày)';
-          } else if (r.days_remaining <= 30) {
+          } else if (days <= 30) {
             dangerLevel = 'yellow';
             statusText = 'Cần dùng sớm (≤ 30 ngày)';
           }
+
           return {
             ...r,
+            qty: qty,
+            days_left: days,
+            days_remaining: days,
+            batch_no: r.batch_code,
+            uom: r.unit,
             fefo_priority: idx + 1,
             danger_level: dangerLevel,
             status_text: statusText
@@ -1046,61 +1212,82 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
       }
 
-      // 1.6 GET /api/reorder
+      // 1.6 GET /api/reorder - Cảnh báo đặt hàng ROP từ fnb_stock_balances
       if (pathname === '/api/reorder' && request.method === 'GET') {
-        const branchCode = searchParams.get('branch') || 'k505';
-        const query = {
-          d1: `
+        const branchParam = searchParams.get('branch') || '';
+        const branchCode = (!branchParam || branchParam.toLowerCase() === 'all') ? 'ALL' : branchParam.toUpperCase();
+
+        const isPg = db.isPg(env);
+        let results = [];
+
+        if (isPg) {
+          const pgQuery = `
             SELECT 
-              i.sku,
-              i.name as item_name,
-              i.unit,
-              i.category,
-              i.daily_usage,
-              i.lead_time_hours,
-              i.safety_stock,
-              i.standard_cost_sap,
-              COALESCE(SUM(b.qty), 0) as current_stock,
-              ROUND((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock, 1) as rop_threshold,
+              b.item_code as sku,
+              COALESCE(d.material_desc, p.article_desc, b.item_code) as item_name,
+              COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
+              COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
+              10.0 as daily_usage,
+              48.0 as lead_time_hours,
+              5.0 as safety_stock,
+              COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
+              ROUND(SUM(b.book_qty)::numeric, 1) as current_stock,
+              25.0 as rop_threshold,
               CASE 
-                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-                THEN ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0), 0)
+                WHEN SUM(b.book_qty) < 25.0 
+                THEN ROUND((35.0 - SUM(b.book_qty))::numeric, 0)
                 ELSE 0
               END as suggested_order_qty
-            FROM items i
-            LEFT JOIN branches br ON br.code = ?
-            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
-            WHERE i.category = 'Gia vị'
-            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
-            ORDER BY (current_stock - rop_threshold) ASC
-          `,
-          pg: `
+            FROM fnb_stock_balances b
+            LEFT JOIN (
+              SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price 
+              FROM dim_article_stock 
+              GROUP BY material
+            ) d ON b.item_code = d.material
+            LEFT JOIN (
+              SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+              FROM sap_po_items 
+              GROUP BY article
+            ) p ON b.item_code = p.article
+            WHERE (? = 'ALL' OR UPPER(b.site_code) = ?)
+            GROUP BY b.item_code, d.material_desc, p.article_desc, d.entry_unit, p.order_unit, d.nhom_hang, p.merch_category, d.price, p.net_price
+            HAVING SUM(b.book_qty) <= 25.0
+            ORDER BY SUM(b.book_qty) ASC
+          `;
+          const res = await db.query(env, pgQuery, [branchCode, branchCode]);
+          results = res.rows || [];
+        } else {
+          // D1 fallback
+          const d1Query = `
             SELECT 
-              i.sku,
-              i.name as item_name,
-              i.unit,
-              i.category,
-              i.daily_usage,
-              i.lead_time_hours,
-              i.safety_stock,
-              i.standard_cost_sap,
-              COALESCE(SUM(b.qty), 0) as current_stock,
-              ROUND(((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)::numeric, 1) as rop_threshold,
+              b.item_code as sku,
+              COALESCE(d.material_desc, p.article_desc, b.item_code) as item_name,
+              COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
+              COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
+              10.0 as daily_usage,
+              48.0 as lead_time_hours,
+              5.0 as safety_stock,
+              COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
+              ROUND(SUM(b.book_qty), 1) as current_stock,
+              25.0 as rop_threshold,
               CASE 
-                WHEN COALESCE(SUM(b.qty), 0) < ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)
-                THEN ROUND((((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock) * 1.5 - COALESCE(SUM(b.qty), 0))::numeric, 0)
+                WHEN SUM(b.book_qty) < 25.0 
+                THEN ROUND(35.0 - SUM(b.book_qty), 0)
                 ELSE 0
               END as suggested_order_qty
-            FROM items i
-            LEFT JOIN branches br ON br.code = ?
-            LEFT JOIN inventory_batches b ON i.sku = b.sku AND b.branch_id = br.id AND b.qty > 0
-            WHERE i.category = 'Gia vị'
-            GROUP BY i.sku, i.name, i.unit, i.category, i.daily_usage, i.lead_time_hours, i.safety_stock, i.standard_cost_sap
-            ORDER BY (COALESCE(SUM(b.qty), 0) - ((i.daily_usage * (i.lead_time_hours / 24.0)) + i.safety_stock)) ASC
-          `
-        };
-        const { rows: results } = await db.query(env, query, [branchCode.toUpperCase()]);
-        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+            FROM fnb_stock_balances b
+            LEFT JOIN (SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit FROM dim_article_stock GROUP BY material) d ON b.item_code = d.material
+            LEFT JOIN (SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
+            WHERE (? = 'ALL' OR UPPER(b.site_code) = ?)
+            GROUP BY b.item_code
+            HAVING SUM(b.book_qty) <= 25.0
+            ORDER BY SUM(b.book_qty) ASC
+          `;
+          const res = await db.query(env, d1Query, [branchCode, branchCode]);
+          results = res.rows || [];
+        }
+
+        return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 1.7 GET /api/leadtime
