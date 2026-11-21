@@ -1,5 +1,7 @@
+import db from './db/index.js';
+
 // ============================================================================
-// A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1)
+// A.KITCHEN ENTERPRISE PORTAL BACKEND (CLOUDFLARE WORKER + D1 + POSTGRESQL)
 // ============================================================================
 
 async function sha256(str) {
@@ -117,15 +119,15 @@ const FEATURE_NAME_TO_CODE = {
 async function ensureRolePermissions(env) {
   try {
     const essentialKhoPerms = [
-      ['KHO_TRUONG', 'portal-kiemke', 1, 1, 1, 1],
-      ['KHO_TRUONG', 'fnb-counts', 1, 1, 1, 1],
-      ['KHO_TRUONG', 'portal-baocao', 1, 1, 1, 0],
-      ['KHO_TRUONG', 'fnb-receipts', 1, 1, 1, 1]
+      ['KHO_TRUONG', 'portal-kiemke', true, true, true, true],
+      ['KHO_TRUONG', 'fnb-counts', true, true, true, true],
+      ['KHO_TRUONG', 'portal-baocao', true, true, true, false],
+      ['KHO_TRUONG', 'fnb-receipts', true, true, true, true]
     ];
     for (const [r, f, v, c, e, d] of essentialKhoPerms) {
-      const exists = await env.DB.prepare(`SELECT id FROM role_permissions WHERE role_code = ? AND feature_code = ? LIMIT 1`).bind(r, f).first();
+      const exists = await db.queryOne(env, `SELECT id FROM role_permissions WHERE role_code = ? AND feature_code = ? LIMIT 1`, [r, f]);
       if (!exists) {
-        await env.DB.prepare(`INSERT INTO role_permissions (role_code, feature_code, can_view, can_create, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)`).bind(r, f, v, c, e, d).run();
+        await db.exec(env, `INSERT INTO role_permissions (role_code, feature_code, can_view, can_create, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)`, [r, f, v, c, e, d]);
       }
     }
   } catch (err) {
@@ -230,8 +232,9 @@ async function ensureBranchesSynced(env) {
 }
 
 async function ensureUserPermissionsTable(env) {
+  if (db.isPg(env)) return;
   try {
-    await env.DB.prepare(`
+    await db.exec(env, `
       CREATE TABLE IF NOT EXISTS user_permissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_email TEXT NOT NULL,
@@ -243,8 +246,8 @@ async function ensureUserPermissionsTable(env) {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_email, feature_code)
       )
-    `).run();
-    await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)`).run().catch(() => {});
+    `);
+    await db.exec(env, `CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)`).catch(() => {});
   } catch (err) {
     console.error('ensureUserPermissionsTable notice:', err);
   }
@@ -272,18 +275,18 @@ async function buildUserPermissions(env, user) {
       permissions[f] = { canView: false, canCreate: false, canEdit: false, canDelete: false };
     });
 
-    const { results: permRows } = await env.DB.prepare(`
+    const { rows: permRows } = await db.query(env, `
       SELECT feature_code, can_view, can_create, can_edit, can_delete
       FROM role_permissions
       WHERE role_code = ?
-    `).bind(user.role_code).all().catch(() => ({ results: [] }));
+    `, [user.role_code]).catch(() => ({ rows: [] }));
 
     (permRows || []).forEach(p => {
       permissions[p.feature_code] = {
-        canView: p.can_view === 1,
-        canCreate: p.can_create === 1,
-        canEdit: p.can_edit === 1,
-        canDelete: p.can_delete === 1
+        canView: p.can_view === 1 || p.can_view === true,
+        canCreate: p.can_create === 1 || p.can_create === true,
+        canEdit: p.can_edit === 1 || p.can_edit === true,
+        canDelete: p.can_delete === 1 || p.can_delete === true
       };
     });
 
@@ -317,33 +320,33 @@ async function buildUserPermissions(env, user) {
 
   // 2. Cộng dồn quyền nếu có yêu cầu truy cập được duyệt (access_requests)
   if (user.email) {
-    const { results: approvedRequests } = await env.DB.prepare(`
+    const { rows: approvedRequests } = await db.query(env, `
       SELECT requested_role, requested_feature
       FROM access_requests
       WHERE user_email = ? AND status = 'APPROVED'
-    `).bind(user.email).all();
+    `, [user.email]);
 
     for (const req of (approvedRequests || [])) {
       if (req.requested_role && req.requested_role !== user.role_code) {
-        const { results: rolePerms } = await env.DB.prepare(`
+        const { rows: rolePerms } = await db.query(env, `
           SELECT feature_code, can_view, can_create, can_edit, can_delete
           FROM role_permissions
           WHERE role_code = ?
-        `).bind(req.requested_role).all();
+        `, [req.requested_role]);
 
         (rolePerms || []).forEach(p => {
+          const cv = p.can_view === 1 || p.can_view === true;
+          const cc = p.can_create === 1 || p.can_create === true;
+          const ce = p.can_edit === 1 || p.can_edit === true;
+          const cd = p.can_delete === 1 || p.can_delete === true;
+
           if (!permissions[p.feature_code]) {
-            permissions[p.feature_code] = {
-              canView: p.can_view === 1,
-              canCreate: p.can_create === 1,
-              canEdit: p.can_edit === 1,
-              canDelete: p.can_delete === 1
-            };
+            permissions[p.feature_code] = { canView: cv, canCreate: cc, canEdit: ce, canDelete: cd };
           } else {
-            permissions[p.feature_code].canView = permissions[p.feature_code].canView || (p.can_view === 1);
-            permissions[p.feature_code].canCreate = permissions[p.feature_code].canCreate || (p.can_create === 1);
-            permissions[p.feature_code].canEdit = permissions[p.feature_code].canEdit || (p.can_edit === 1);
-            permissions[p.feature_code].canDelete = permissions[p.feature_code].canDelete || (p.can_delete === 1);
+            permissions[p.feature_code].canView = permissions[p.feature_code].canView || cv;
+            permissions[p.feature_code].canCreate = permissions[p.feature_code].canCreate || cc;
+            permissions[p.feature_code].canEdit = permissions[p.feature_code].canEdit || ce;
+            permissions[p.feature_code].canDelete = permissions[p.feature_code].canDelete || cd;
           }
         });
       }
@@ -363,14 +366,17 @@ async function buildUserPermissions(env, user) {
   // ĐÂY LÀ QUYỀN TỐI CAO ĐÈ LÊN MỌI VAI TRÒ MẶC ĐỊNH
   if (user.email) {
     try {
-      const { results: customPerms } = await env.DB.prepare(`
+      const { rows: customPerms } = await db.query(env, `
         SELECT feature_code, can_view, can_create, can_edit, can_delete
         FROM user_permissions
         WHERE user_email = ?
-      `).bind(user.email).all().catch(() => ({ results: [] }));
+      `, [user.email]).catch(() => ({ rows: [] }));
 
       (customPerms || []).forEach(cp => {
-        if (cp.can_view === 0) {
+        const isGranted = cp.can_view === 1 || cp.can_view === true;
+        const isRevoked = cp.can_view === 0 || cp.can_view === false;
+
+        if (isRevoked) {
           // CẮT / KHÓA QUYỀN TUYỆT ĐỐI (Dù vai trò là ADMIN hay KHO_TRUONG đều bị khóa)
           permissions[cp.feature_code] = {
             canView: false,
@@ -379,13 +385,13 @@ async function buildUserPermissions(env, user) {
             canDelete: false,
             isRevoked: true
           };
-        } else if (cp.can_view === 1) {
+        } else if (isGranted) {
           // CẤP QUYỀN RIÊNG BIỆT
           permissions[cp.feature_code] = {
             canView: true,
-            canCreate: cp.can_create === 1,
-            canEdit: cp.can_edit === 1,
-            canDelete: cp.can_delete === 1,
+            canCreate: cp.can_create === 1 || cp.can_create === true,
+            canEdit: cp.can_edit === 1 || cp.can_edit === true,
+            canDelete: cp.can_delete === 1 || cp.can_delete === true,
             isCustom: true
           };
         }
@@ -1478,7 +1484,7 @@ export default {
         }
 
         try {
-          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
           if (!user) {
             // Nếu chưa có trong DB nhưng là Owner
             if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
@@ -1488,15 +1494,15 @@ export default {
             }
           }
           const permissions = await buildUserPermissions(env, user);
-          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first().catch(() => null);
+          const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [user.role_code]).catch(() => null);
 
           let approvedRoles = [user.role_code];
           if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
             approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
           } else {
-            const { results: appReqs } = await env.DB.prepare(`
+            const { rows: appReqs } = await db.query(env, `
               SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
-            `).bind(user.email).all().catch(() => ({ results: [] }));
+            `, [user.email]).catch(() => ({ rows: [] }));
             (appReqs || []).forEach(r => {
               if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
                 approvedRoles.push(r.requested_role);
@@ -1590,13 +1596,13 @@ export default {
           }
 
           // 1. Tìm kiếm user trong app_users
-          let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
 
           if (user && user.full_name) {
             const repaired = repairAtobMojibake(user.full_name);
             if (repaired !== user.full_name) {
               user.full_name = repaired;
-              await env.DB.prepare(`UPDATE app_users SET full_name = ? WHERE id = ?`).bind(repaired, user.id).run().catch(() => {});
+              await db.exec(env, `UPDATE app_users SET full_name = ? WHERE id = ?`, [repaired, user.id]).catch(() => {});
             }
           }
 
@@ -1608,28 +1614,34 @@ export default {
               defaultRole = 'ADMIN';
             }
 
-            const insertRes = await env.DB.prepare(`
-              INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
-              VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', datetime('now'))
-            `).bind(email, fullName || email.split('@')[0], avatarUrl || '', googleId || '', defaultRole).run();
-
-            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(insertRes.meta.last_row_id).first();
+            user = await db.queryOne(env, {
+              d1: `INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
+                   VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', datetime('now')) RETURNING *`,
+              pg: `INSERT INTO app_users (email, full_name, avatar_url, google_id, role_code, auth_provider, status, last_login)
+                   VALUES (?, ?, ?, ?, ?, 'google', 'ACTIVE', now()) RETURNING *`
+            }, [email, fullName || email.split('@')[0], avatarUrl || '', googleId || '', defaultRole]);
           } else {
             // Cập nhật thông tin Google, full_name chuẩn UTF-8 và last_login
-            await env.DB.prepare(`
-              UPDATE app_users
-              SET last_login = datetime('now'),
-                  full_name = COALESCE(?, full_name),
-                  avatar_url = COALESCE(?, avatar_url),
-                  google_id = COALESCE(?, google_id),
-                  updated_at = datetime('now')
-              WHERE id = ?
-            `).bind(fullName || null, avatarUrl || user.avatar_url, googleId || user.google_id, user.id).run();
-            user = await env.DB.prepare(`SELECT * FROM app_users WHERE id = ?`).bind(user.id).first();
+            user = await db.queryOne(env, {
+              d1: `UPDATE app_users
+                   SET last_login = datetime('now'),
+                       full_name = COALESCE(?, full_name),
+                       avatar_url = COALESCE(?, avatar_url),
+                       google_id = COALESCE(?, google_id),
+                       updated_at = datetime('now')
+                   WHERE id = ? RETURNING *`,
+              pg: `UPDATE app_users
+                   SET last_login = now(),
+                       full_name = COALESCE(?, full_name),
+                       avatar_url = COALESCE(?, avatar_url),
+                       google_id = COALESCE(?, google_id),
+                       updated_at = now()
+                   WHERE id = ? RETURNING *`
+            }, [fullName || null, avatarUrl || user.avatar_url, googleId || user.google_id, user.id]);
           }
 
           // 2. Lấy thông tin Role & Permissions
-          const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(user.role_code).first() || {
+          const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [user.role_code]) || {
             role_code: user.role_code,
             role_name: user.role_code,
             badge_color: 'stone'
@@ -1654,9 +1666,9 @@ export default {
           if (user.role_code === 'ADMIN' || user.email === 'trantuandai2508@gmail.com') {
             approvedRoles = ['ADMIN', 'BEP_TRUONG', 'KHO_TRUONG', 'KE_TOAN', 'NHAN_VIEN'];
           } else {
-            const { results: appReqs } = await env.DB.prepare(`
+            const { rows: appReqs } = await db.query(env, `
               SELECT requested_role FROM access_requests WHERE user_email = ? AND status = 'APPROVED'
-            `).bind(user.email).all();
+            `, [user.email]);
             (appReqs || []).forEach(r => {
               if (r.requested_role && !approvedRoles.includes(r.requested_role)) {
                 approvedRoles.push(r.requested_role);
@@ -1714,9 +1726,9 @@ export default {
 
       // 2.11.2 LẤY QUYỀN & VAI TRÒ HỆ THỐNG (/api/auth/roles-permissions)
       if (pathname === '/api/auth/roles-permissions' && request.method === 'GET') {
-        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
-        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
-        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`).all();
+        const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
+        const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
+        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login FROM app_users ORDER BY id`);
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
           return { ...u, full_name: repaired || u.full_name };
@@ -1897,10 +1909,10 @@ export default {
       }
 
       if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
-        const { results: roles } = await env.DB.prepare(`SELECT * FROM app_roles`).all();
-        const { results: perms } = await env.DB.prepare(`SELECT * FROM role_permissions`).all();
-        const { results: rawUsers } = await env.DB.prepare(`SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`).all();
-        const { results: userPerms } = await env.DB.prepare(`SELECT * FROM user_permissions`).all();
+        const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
+        const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
+        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`);
+        const { rows: userPerms } = await db.query(env, `SELECT * FROM user_permissions`);
 
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
@@ -1960,25 +1972,33 @@ export default {
         }
 
         if (action === 'RESET') {
-          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`).bind(userEmail, featureCode).run();
+          await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`, [userEmail, featureCode]);
           return new Response(JSON.stringify({ success: true, message: 'Đã khôi phục quyền mặc định theo vai trò' }), { headers: corsHeaders });
         }
 
-        const canView = action === 'GRANT' ? 1 : 0;
-        const canCreate = action === 'GRANT' ? 1 : 0;
-        const canEdit = action === 'GRANT' ? 1 : 0;
-        const canDelete = action === 'GRANT' ? 1 : 0;
+        const canView = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canCreate = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canEdit = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canDelete = action === 'GRANT' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
 
-        await env.DB.prepare(`
-          INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-          ON CONFLICT(user_email, feature_code) DO UPDATE SET
-            can_view = excluded.can_view,
-            can_create = excluded.can_create,
-            can_edit = excluded.can_edit,
-            can_delete = excluded.can_delete,
-            updated_at = datetime('now')
-        `).bind(userEmail, featureCode, canView, canCreate, canEdit, canDelete).run();
+        await db.exec(env, {
+          d1: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+               ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                 can_view = excluded.can_view,
+                 can_create = excluded.can_create,
+                 can_edit = excluded.can_edit,
+                 can_delete = excluded.can_delete,
+                 updated_at = datetime('now')`,
+          pg: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, now())
+               ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                 can_view = excluded.can_view,
+                 can_create = excluded.can_create,
+                 can_edit = excluded.can_edit,
+                 can_delete = excluded.can_delete,
+                 updated_at = now()`
+        }, [userEmail, featureCode, canView, canCreate, canEdit, canDelete]);
 
         return new Response(JSON.stringify({
           success: true,
@@ -1990,7 +2010,7 @@ export default {
       if (pathname === '/api/auth/user-permissions/reset-user' && request.method === 'POST') {
         const { userEmail } = await request.json();
         if (!userEmail) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+        await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
         return new Response(JSON.stringify({ success: true, message: `Đã khôi phục toàn bộ quyền của ${userEmail} về vai trò gốc` }), { headers: corsHeaders });
       }
 
@@ -1998,9 +2018,9 @@ export default {
       if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
         const { userEmail, roleCode, resetPermissions } = await request.json();
         if (!userEmail || !roleCode) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc roleCode' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`UPDATE app_users SET role_code = ? WHERE email = ?`).bind(roleCode, userEmail).run();
+        await db.exec(env, `UPDATE app_users SET role_code = ? WHERE email = ?`, [roleCode, userEmail]);
         if (resetPermissions) {
-          await env.DB.prepare(`DELETE FROM user_permissions WHERE user_email = ?`).bind(userEmail).run();
+          await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
         }
         return new Response(JSON.stringify({ success: true, message: `Đã cập nhật vai trò ${roleCode} cho ${userEmail}` }), { headers: corsHeaders });
       }
@@ -2009,7 +2029,7 @@ export default {
       if (pathname === '/api/auth/users/toggle-status' && request.method === 'POST') {
         const { userEmail, status } = await request.json(); // 'ACTIVE' or 'LOCKED'
         if (!userEmail || !status) return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin' }), { status: 400, headers: corsHeaders });
-        await env.DB.prepare(`UPDATE app_users SET status = ? WHERE email = ?`).bind(status, userEmail).run();
+        await db.exec(env, `UPDATE app_users SET status = ? WHERE email = ?`, [status, userEmail]);
         return new Response(JSON.stringify({ success: true, message: `Đã ${status === 'ACTIVE' ? 'mở khóa' : 'khóa'} tài khoản ${userEmail}` }), { headers: corsHeaders });
       }
 
@@ -2018,17 +2038,19 @@ export default {
         const { email, fullName, roleCode } = await request.json();
         if (!email) return new Response(JSON.stringify({ success: false, error: 'Email là bắt buộc' }), { status: 400, headers: corsHeaders });
         const cleanEmail = email.trim().toLowerCase();
-        const existing = await env.DB.prepare(`SELECT id FROM app_users WHERE email = ? LIMIT 1`).bind(cleanEmail).first();
+        const existing = await db.queryOne(env, `SELECT id FROM app_users WHERE email = ? LIMIT 1`, [cleanEmail]);
         if (existing) {
           return new Response(JSON.stringify({ success: false, error: 'Tài khoản email này đã tồn tại trong hệ thống' }), { status: 400, headers: corsHeaders });
         }
         const safeName = (fullName || cleanEmail.split('@')[0]).trim();
         const initialRole = roleCode || 'NHAN_VIEN';
         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=465fff&color=fff&bold=true`;
-        await env.DB.prepare(`
-          INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
-          VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', datetime('now'))
-        `).bind(cleanEmail, safeName, avatarUrl, initialRole).run();
+        await db.exec(env, {
+          d1: `INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
+               VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', datetime('now'))`,
+          pg: `INSERT INTO app_users (email, full_name, avatar_url, role_code, auth_provider, status, created_at)
+               VALUES (?, ?, ?, ?, 'GOOGLE', 'ACTIVE', now())`
+        }, [cleanEmail, safeName, avatarUrl, initialRole]);
 
         return new Response(JSON.stringify({ success: true, message: `Đã thêm người dùng ${cleanEmail} thành công` }), { headers: corsHeaders });
       }
@@ -2039,14 +2061,14 @@ export default {
         if (!role) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu vai trò' }), { status: 400, headers: corsHeaders });
         }
-        const roleInfo = await env.DB.prepare(`SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`).bind(role).first();
+        const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [role]);
         if (!roleInfo) {
           return new Response(JSON.stringify({ success: false, error: 'Vai trò không hợp lệ' }), { status: 400, headers: corsHeaders });
         }
 
         let user = null;
         if (email) {
-          user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
+          user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
         }
 
         // BẢO VỆ PHÂN QUYỀN: Chỉ Admin (Owner) hoặc user đã được Admin phê duyệt vai trò này mới được phép chuyển
@@ -2055,11 +2077,11 @@ export default {
 
         let isApprovedRole = false;
         if (email) {
-          const approvedReq = await env.DB.prepare(`
+          const approvedReq = await db.queryOne(env, `
             SELECT id FROM access_requests 
             WHERE user_email = ? AND requested_role = ? AND status = 'APPROVED' 
             LIMIT 1
-          `).bind(email, role).first();
+          `, [email, role]);
           if (approvedReq) isApprovedRole = true;
         }
 
@@ -2089,10 +2111,10 @@ export default {
         if (!email) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu email người yêu cầu' }), { status: 400, headers: corsHeaders });
         }
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, reason, status, created_at)
           VALUES (?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
-        `).bind(email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '').run();
+        `, [email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '']);
 
         return new Response(JSON.stringify({
           success: true,
@@ -2102,9 +2124,9 @@ export default {
 
       // 2.11.5 DANH SÁCH YÊU CẦU CẤP QUYỀN (/api/auth/access-requests)
       if (pathname === '/api/auth/access-requests' && request.method === 'GET') {
-        const { results } = await env.DB.prepare(`
+        const { rows: results } = await db.query(env, `
           SELECT * FROM access_requests ORDER BY id DESC LIMIT 50
-        `).all();
+        `);
         const cleanedResults = (results || []).map(r => ({ ...r, user_name: repairAtobMojibake(r.user_name) }));
         return new Response(JSON.stringify({ success: true, data: cleanedResults }), { headers: corsHeaders });
       }
@@ -2112,20 +2134,20 @@ export default {
       // 2.11.6 PHÊ DUYỆT / TỪ CHỐI YÊU CẦU CẤP QUYỀN (/api/auth/approve-access-request)
       if (pathname === '/api/auth/approve-access-request' && request.method === 'POST') {
         const { requestId, action, reviewedBy } = await request.json();
-        const req = await env.DB.prepare(`SELECT * FROM access_requests WHERE id = ?`).bind(requestId).first();
+        const req = await db.queryOne(env, `SELECT * FROM access_requests WHERE id = ?`, [requestId]);
         if (!req) {
           return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy yêu cầu' }), { status: 404, headers: corsHeaders });
         }
 
         const newStatus = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
-        await env.DB.prepare(`
+        await db.exec(env, `
           UPDATE access_requests
           SET status = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ?
           WHERE id = ?
-        `).bind(newStatus, reviewedBy || 'Admin', requestId).run();
+        `, [newStatus, reviewedBy || 'Admin', requestId]);
 
         if (action === 'APPROVE') {
-          const currentUser = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(req.user_email).first();
+          const currentUser = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [req.user_email]);
           if (currentUser) {
             const roleHierarchy = {
               'ADMIN': 100,
@@ -2144,11 +2166,11 @@ export default {
               newRole = 'KHO_TRUONG';
             }
 
-            await env.DB.prepare(`
+            await db.exec(env, `
               UPDATE app_users
               SET role_code = ?
               WHERE email = ?
-            `).bind(newRole, req.user_email).run();
+            `, [newRole, req.user_email]);
           }
         }
 
@@ -2161,7 +2183,7 @@ export default {
       // 2.11 Admin Auth
       if (pathname === '/api/auth/login' && request.method === 'POST') {
         const { email, password } = await request.json();
-        const user = await env.DB.prepare(`SELECT * FROM admin_users WHERE email = ? LIMIT 1`).bind(email).first();
+        const user = await db.queryOne(env, `SELECT * FROM admin_users WHERE email = ? LIMIT 1`, [email]);
         if (!user) return new Response(JSON.stringify({ success: false, error: 'Email hoặc mật khẩu không đúng' }), { status: 401, headers: corsHeaders });
 
         const computedHash = await sha256(`${user.salt}::${password}`);
@@ -2177,17 +2199,17 @@ export default {
 
       if (pathname === '/api/auth/register' && request.method === 'POST') {
         const { email, fullName, phone, role, password } = await request.json();
-        const existing = await env.DB.prepare(`SELECT email FROM admin_users WHERE email = ?`).bind(email).first();
+        const existing = await db.queryOne(env, `SELECT email FROM admin_users WHERE email = ?`, [email]);
         if (existing) return new Response(JSON.stringify({ success: false, error: 'Email đã tồn tại' }), { status: 400, headers: corsHeaders });
 
         const salt = crypto.randomUUID();
         const hash = await sha256(`${salt}::${password}`);
         const nowStr = formatDate(new Date());
 
-        await env.DB.prepare(`
+        await db.exec(env, `
           INSERT INTO admin_users (email, full_name, phone, role, password_raw, password_hash, salt, status, registered_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt', ?)
-        `).bind(email, fullName, phone, role || 'Quản lý Site', password, hash, salt, nowStr).run();
+        `, [email, fullName, phone, role || 'Quản lý Site', password, hash, salt, nowStr]);
 
         return new Response(JSON.stringify({ success: true, message: 'Đăng ký thành công. Vui lòng chờ phê duyệt.' }), { headers: corsHeaders });
       }
