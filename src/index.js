@@ -537,7 +537,11 @@ async function ensureDatabaseIndexes(env) {
     'CREATE INDEX IF NOT EXISTS idx_fnb_bal_site_item ON fnb_stock_balances(site_code, item_code)',
     'CREATE INDEX IF NOT EXISTS idx_fnb_count_lines_cid ON fnb_stock_count_lines(count_id)',
     'CREATE INDEX IF NOT EXISTS idx_fnb_receipt_lines_rid ON fnb_stock_receipt_lines(receipt_id)',
-    'CREATE INDEX IF NOT EXISTS idx_fnb_waste_lines_wid ON fnb_stock_waste_lines(waste_id)'
+    'CREATE INDEX IF NOT EXISTS idx_fnb_waste_lines_wid ON fnb_stock_waste_lines(waste_id)',
+    'CREATE TABLE IF NOT EXISTS dim_article_stock (id INTEGER PRIMARY KEY AUTOINCREMENT, site TEXT NOT NULL, site_name TEXT, nganh_hang TEXT, nhom_hang TEXT, material TEXT NOT NULL, material_desc TEXT NOT NULL, entry_unit TEXT, price REAL DEFAULT 0, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(site, material))',
+    'CREATE INDEX IF NOT EXISTS idx_dim_art_site ON dim_article_stock(site)',
+    'CREATE INDEX IF NOT EXISTS idx_dim_art_mat ON dim_article_stock(material)',
+    'CREATE INDEX IF NOT EXISTS idx_dim_art_site_mat ON dim_article_stock(site, material)'
   ];
 
   for (const idxSql of indexes) {
@@ -1818,6 +1822,70 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 3.4.2 POST /api/admin/sync-dim-article-stock - Nạp danh mục mặt hàng theo từng điểm bán từ local SQL Server
+      if (pathname === '/api/admin/sync-dim-article-stock' && request.method === 'POST') {
+        const body = await request.json().catch(() => ({}));
+        const items = body.items || [];
+        if (!items.length) {
+          return new Response(JSON.stringify({ success: false, error: 'Không có dữ liệu items' }), { status: 400, headers: corsHeaders });
+        }
+
+        // Đảm bảo cấu trúc bảng dim_article_stock tồn tại
+        await env.DB.prepare(`
+          CREATE TABLE IF NOT EXISTS dim_article_stock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            site TEXT NOT NULL,
+            site_name TEXT,
+            nganh_hang TEXT,
+            nhom_hang TEXT,
+            material TEXT NOT NULL,
+            material_desc TEXT NOT NULL,
+            entry_unit TEXT,
+            price REAL DEFAULT 0,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(site, material)
+          )
+        `).run();
+
+        const insertStmt = env.DB.prepare(`
+          INSERT OR REPLACE INTO dim_article_stock (
+            site, site_name, nganh_hang, nhom_hang, material, material_desc, entry_unit, price, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        `);
+
+        const stmts = [];
+        for (const it of items) {
+          const site = it.site || '';
+          const mat = it.material || '';
+          if (!site || !mat) continue;
+          stmts.push(insertStmt.bind(
+            site,
+            it.site_name || '',
+            it.nganh_hang || '',
+            it.nhom_hang || '',
+            mat,
+            it.material_desc || '',
+            it.entry_unit || '',
+            Number(it.price) || 0
+          ));
+        }
+
+        if (stmts.length) {
+          const CHUNK = 100;
+          for (let i = 0; i < stmts.length; i += CHUNK) {
+            await env.DB.batch(stmts.slice(i, i + CHUNK));
+          }
+        }
+
+        invalidateMemoryCache('/api/fnb/stock');
+
+        return new Response(JSON.stringify({
+          success: true,
+          count: stmts.length,
+          message: `Đã lưu thành công ${stmts.length} mặt hàng vào dim_article_stock`
+        }), { headers: corsHeaders });
+      }
+
       if (pathname === '/api/admin/clean-demo-data') {
         await autoCleanDemoData(env);
         const { results: remainingUsers } = await env.DB.prepare(`SELECT id, email, full_name, role_code, status FROM app_users`).all();
@@ -2758,30 +2826,72 @@ export default {
 
 
 
-      // 3.5 GET /api/fnb/stock/items-for-site - Lấy danh mục & tồn sách cho 1 điểm bán
+      // 3.5 GET /api/fnb/stock/items-for-site - Lấy danh mục & tồn sách chuẩn xác theo từng điểm bán từ dim_article_stock
       if ((pathname === '/api/fnb/stock/items-for-site' || pathname === '/fnb/stock/items-for-site') && request.method === 'GET') {
         const siteCode = searchParams.get('site_code') || 'K001';
         const groupParam = searchParams.get('group') || 'all';
 
+        // 1. Ưu tiên truy vấn trực tiếp từ dim_article_stock (chỉ lấy đúng các mặt hàng của điểm bán đó)
         let query = `
-          SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
-                 COALESCE(b.book_qty, 0) as book_qty,
-                 COALESCE(b.last_count_qty, NULL) as last_count_qty,
-                 b.last_count_date,
-                 COALESCE(b.no_opening, 1) as no_opening,
-                 COALESCE(b.total_value, 0) as total_value
-          FROM fnb_stock_items i
-          LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
-          WHERE i.is_active = 1
+          SELECT 
+            d.id,
+            d.material as code,
+            d.material_desc as name,
+            COALESCE(d.nhom_hang, d.nganh_hang) as item_group,
+            d.nganh_hang,
+            d.nhom_hang,
+            d.entry_unit as unit,
+            COALESCE(d.price, 0) as unit_price,
+            0 as min_stock,
+            COALESCE(b.book_qty, 0) as book_qty,
+            COALESCE(b.last_count_qty, NULL) as last_count_qty,
+            b.last_count_date,
+            COALESCE(b.no_opening, 1) as no_opening,
+            COALESCE(b.total_value, 0) as total_value
+          FROM dim_article_stock d
+          LEFT JOIN fnb_stock_balances b ON d.material = b.item_code AND b.site_code = d.site
+          WHERE d.site = ?
         `;
         let binds = [siteCode];
         if (groupParam && groupParam !== 'all') {
-          query += ` AND i.item_group = ?`;
-          binds.push(groupParam);
+          query += ` AND (d.nhom_hang = ? OR d.nganh_hang = ? OR d.nhom_hang LIKE ?)`;
+          binds.push(groupParam, groupParam, `%${groupParam}%`);
         }
-        query += ` ORDER BY i.item_group, i.code`;
+        query += ` ORDER BY d.nhom_hang, d.material`;
 
-        const { results } = await env.DB.prepare(query).bind(...binds).all();
+        let results = [];
+        try {
+          const res = await env.DB.prepare(query).bind(...binds).all();
+          results = res.results || [];
+        } catch (e) {
+          console.warn('dim_article_stock not ready or empty:', e.message);
+        }
+
+        // 2. Fallback sang fnb_stock_items nếu site chưa có trong dim_article_stock
+        if (!results.length) {
+          let fbQuery = `
+            SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
+                   COALESCE(b.book_qty, 0) as book_qty,
+                   COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                   b.last_count_date,
+                   COALESCE(b.no_opening, 1) as no_opening,
+                   COALESCE(b.total_value, 0) as total_value
+            FROM fnb_stock_items i
+            LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
+            WHERE i.is_active = 1
+          `;
+          let fbBinds = [siteCode];
+          if (groupParam && groupParam !== 'all') {
+            fbQuery += ` AND i.item_group = ?`;
+            fbBinds.push(groupParam);
+          }
+          fbQuery += ` ORDER BY i.item_group, i.code`;
+          try {
+            const fbRes = await env.DB.prepare(fbQuery).bind(...fbBinds).all();
+            results = fbRes.results || [];
+          } catch (e) {}
+        }
+
         const fnbSiteStockData = {
           success: true,
           data: {
@@ -2810,8 +2920,12 @@ export default {
           let lines = [];
           if (countId) {
             const { results: l } = await env.DB.prepare(`
-              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              SELECT l.*, 
+                     COALESCE(d.material_desc, i.name, l.item_code) as item_name, 
+                     COALESCE(d.entry_unit, i.unit, '') as unit, 
+                     COALESCE(d.nhom_hang, d.nganh_hang, i.item_group, '') as item_group
               FROM fnb_stock_count_lines l
+              LEFT JOIN dim_article_stock d ON l.item_code = d.material
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.count_id = ?
             `).bind(countId).all();

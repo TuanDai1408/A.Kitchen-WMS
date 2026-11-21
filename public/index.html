@@ -1425,6 +1425,13 @@
                   <option value="MB">Miền Bắc (6 điểm)</option>
                 </select>
               </div>
+              <!-- Filter Điểm Bán -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
+                <select id="fnbStockFilterSite" onchange="onFnbStockFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-emerald-500">
+                  <option value="ALL">Tất cả 14 điểm</option>
+                </select>
+              </div>
 
               <!-- Filter Nhóm Hàng -->
               <div class="flex items-center gap-1.5">
@@ -4410,6 +4417,22 @@
         branchSel.value = code;
       }
 
+      // 2b. Sync F&B Site Selectors across Stock, Counts, Receipts, Waste
+      if (code && code !== 'ALL') {
+        const fnbSelectIds = ['fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
+        fnbSelectIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            for (let opt of el.options) {
+              if (opt.value.toUpperCase() === code.toUpperCase()) {
+                el.value = opt.value;
+                break;
+              }
+            }
+          }
+        });
+        if (typeof gFnbStockFilter !== 'undefined') gFnbStockFilter.site = code.toUpperCase();
+      }
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
         el.textContent = region;
@@ -9513,7 +9536,7 @@ window.renderFnbChainTable = function(items) {
 // ============================================================================
 let gFnbStockData = null;
 let gFnbStockFilter = {
-  region: 'ALL',
+  site: 'ALL',
   group: 'ALL',
   search: '',
   showValue: false
@@ -9524,6 +9547,9 @@ window.loadFnbStock = async function() {
   try {
     if (typeof showLoading === 'function') showLoading();
     const url = new URL('/api/fnb/stock', window.location.origin);
+    if (gFnbStockFilter.site && gFnbStockFilter.site !== 'ALL' && gFnbStockFilter.site !== 'all') {
+      url.searchParams.set('site_code', gFnbStockFilter.site);
+    }
     if (gFnbStockFilter.region && gFnbStockFilter.region !== 'ALL') {
       url.searchParams.set('regionId', gFnbStockFilter.region);
     }
@@ -9560,6 +9586,15 @@ window.renderFnbStock = function() {
     const codeMatch = (r.code || '').toLowerCase().includes(query);
     return nameMatch || codeMatch;
   });
+  // Filter rows by specific site if selected
+  const currentSiteFilter = gFnbStockFilter.site;
+  let displayRows = filteredRows;
+  if (currentSiteFilter && currentSiteFilter !== 'ALL' && currentSiteFilter !== 'all') {
+    displayRows = filteredRows.filter(r => {
+      const cell = r.cells && r.cells[currentSiteFilter];
+      return cell && (cell.book !== undefined || cell.noOpening !== undefined || cell.hasSiteRecord);
+    });
+  }
   
   // Calculate KPI metrics
   let totalChainValue = 0;
@@ -9583,7 +9618,7 @@ window.renderFnbStock = function() {
   const kpiNeg = document.getElementById('fnbStockKpiNegative');
   const kpiNoOp = document.getElementById('fnbStockKpiNoOpening');
   
-  if (kpiItems) kpiItems.textContent = filteredRows.length.toLocaleString('vi-VN');
+  if (kpiItems) kpiItems.textContent = displayRows.length.toLocaleString("vi-VN");
   if (kpiValue) kpiValue.textContent = Math.round(totalChainValue).toLocaleString('vi-VN') + ' đ';
   if (kpiNeg) kpiNeg.textContent = negativeCount.toLocaleString('vi-VN');
   if (kpiNoOp) kpiNoOp.textContent = noOpeningCount.toLocaleString('vi-VN');
@@ -9616,10 +9651,10 @@ window.renderFnbStock = function() {
   // 2. Render Desktop Table Body
   const tbody = document.getElementById('fnbStockTableBody');
   if (tbody) {
-    if (filteredRows.length === 0) {
+    if (displayRows.length === 0) {
       tbody.innerHTML = `<tr><td colspan="${sites.length + 3}" class="text-center py-12 text-gray-400">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</td></tr>`;
     } else {
-      tbody.innerHTML = filteredRows.map((r, idx) => {
+      tbody.innerHTML = displayRows.map((r, idx) => {
         const groupLabel = groupMap[r.group] || r.group;
         let rowHtml = `
           <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
@@ -9683,7 +9718,7 @@ window.renderFnbStock = function() {
   // 3. Render Native Mobile Card View
   const mob = document.getElementById('fnbStockMobileCards');
   if (mob) {
-    if (filteredRows.length === 0) {
+    if (displayRows.length === 0) {
       mob.innerHTML = `<div class="text-center py-10 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy mặt hàng nào phù hợp với bộ lọc.</div>`;
     } else {
       mob.innerHTML = filteredRows.map((r, idx) => {
@@ -9758,6 +9793,8 @@ window.renderFnbStock = function() {
 window.onFnbStockFilterChange = function() {
   const regEl = document.getElementById('fnbStockFilterRegion');
   const grpEl = document.getElementById('fnbStockFilterGroup');
+  const siteEl = document.getElementById('fnbStockFilterSite');
+  if (siteEl) gFnbStockFilter.site = siteEl.value;
   if (regEl) gFnbStockFilter.region = regEl.value;
   if (grpEl) gFnbStockFilter.group = grpEl.value;
   loadFnbStock();
@@ -9940,7 +9977,7 @@ let gFnbBlindCount = false;
 
 // --- 2. POPULATE SITE SELECTORS ONCE ---
 function initFnbSiteSelectors() {
-  const selectors = ['fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
+  const selectors = ['fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
   selectors.forEach(sid => {
     const el = document.getElementById(sid);
     if (!el || el.options.length > 2) return;
@@ -10407,12 +10444,14 @@ window.openCreateReceiptModal = async function() {
   const modal = document.getElementById('createReceiptModal');
   if (modal) {
     modal.classList.remove('hidden');
-    // Ensure all items are fetched
-    if (!gFnbAllItems.length) {
-      const res = await fetch('/api/fnb/stock/items-for-site?site_code=K001');
+    const curSite = document.getElementById('receiptModalSite')?.value || document.getElementById('fnbReceiptFilterSite')?.value || 'K001';
+    const siteSel = document.getElementById('receiptModalSite');
+    if (siteSel && curSite) siteSel.value = curSite;
+    try {
+      const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(curSite)}`);
       const json = await res.json();
       if (json.success) gFnbAllItems = json.data.items || [];
-    }
+    } catch (e) { console.error('fetch receipt items error:', e); }
     // Clear and add first line
     document.getElementById('receiptLinesContainer').innerHTML = '';
     gReceiptLineCounter = 0;
@@ -10420,6 +10459,26 @@ window.openCreateReceiptModal = async function() {
     recalcReceiptModalTotal();
     if (window.lucide) lucide.createIcons();
   }
+};
+
+window.onReceiptModalSiteChange = async function() {
+  const siteCode = document.getElementById('receiptModalSite')?.value || 'K001';
+  try {
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}`);
+    const json = await res.json();
+    if (json.success) {
+      gFnbAllItems = json.data.items || [];
+      document.querySelectorAll('#receiptLinesContainer select').forEach(sel => {
+        const curVal = sel.value;
+        let opts = '<option value="">-- Chọn mặt hàng nhập --</option>';
+        gFnbAllItems.forEach(it => {
+          opts += `<option value="${it.code}" data-price="${it.unit_price}" data-unit="${it.unit}" ${it.code === curVal ? "selected" : ""}>${it.code} - ${it.name} (${it.unit})</option>`;
+        });
+        sel.innerHTML = opts;
+      });
+      if (typeof recalcReceiptModalTotal === "function") recalcReceiptModalTotal();
+    }
+  } catch (e) { console.error("onReceiptModalSiteChange error:", e); }
 };
 
 window.closeCreateReceiptModal = function() {
@@ -10640,18 +10699,40 @@ window.openCreateWasteModal = async function() {
   initFnbSiteSelectors();
   const modal = document.getElementById('createWasteModal');
   if (modal) {
-    modal.classList.remove('hidden');
-    if (!gFnbAllItems.length) {
-      const res = await fetch('/api/fnb/stock/items-for-site?site_code=K001');
+    const curSite = document.getElementById('wasteModalSite')?.value || document.getElementById('fnbWasteFilterSite')?.value || 'K001';
+    const siteSel = document.getElementById('wasteModalSite');
+    if (siteSel && curSite) siteSel.value = curSite;
+    try {
+      const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(curSite)}`);
       const json = await res.json();
       if (json.success) gFnbAllItems = json.data.items || [];
-    }
+    } catch (e) { console.error('fetch waste items error:', e); }
     document.getElementById('wasteLinesContainer').innerHTML = '';
     gWasteLineCounter = 0;
     addWasteLineRow();
     recalcWasteModalTotal();
     if (window.lucide) lucide.createIcons();
   }
+};
+
+window.onWasteModalSiteChange = async function() {
+  const siteCode = document.getElementById('wasteModalSite')?.value || 'K001';
+  try {
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}`);
+    const json = await res.json();
+    if (json.success) {
+      gFnbAllItems = json.data.items || [];
+      document.querySelectorAll('#wasteLinesContainer select').forEach(sel => {
+        const curVal = sel.value;
+        let opts = '<option value="">-- Chọn mặt hàng hủy --</option>';
+        gFnbAllItems.forEach(it => {
+          opts += `<option value="${it.code}" data-price="${it.unit_price}" data-unit="${it.unit}" ${it.code === curVal ? "selected" : ""}>${it.code} - ${it.name} (${it.unit})</option>`;
+        });
+        sel.innerHTML = opts;
+      });
+      if (typeof recalcWasteModalTotal === "function") recalcWasteModalTotal();
+    }
+  } catch (e) { console.error("onWasteModalSiteChange error:", e); }
 };
 
 window.closeCreateWasteModal = function() {
