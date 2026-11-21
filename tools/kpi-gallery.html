@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.Kitchen WMS - KPI Component System Gallery</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v4 Build -->
+  <link rel="stylesheet" href="../public/assets/app.css">
+
+  <!-- ApexCharts & Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.3.0/dist/apexcharts.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 antialiased p-6 sm:p-10 space-y-12">
+
+  <!-- Header & Controls -->
+  <header class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex size-3 rounded-full bg-brand-600 animate-ping"></span>
+        <span class="inline-flex size-3 rounded-full bg-brand-600 -ml-5.5"></span>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">A.Kitchen WMS — KPI System Gallery</h1>
+      </div>
+      <p class="text-sm text-gray-500 mt-1">Hệ thống Thẻ KPI Thống Nhất Chuẩn TailAdmin (3 Biến Thể: Standard, Compact, Hero) & Font Inter</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="themeToggleBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 shadow-theme-xs hover:bg-gray-50 transition-colors">
+        <i data-lucide="moon" class="size-4 text-gray-600"></i>
+        <span>Chuyển chế độ Dark</span>
+      </button>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200">
+        TailAdmin Standard
+      </span>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- LIGHT MODE SHOWCASE                                                      -->
+  <!-- ========================================================================= -->
+  <section class="max-w-7xl mx-auto space-y-8 bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-theme-sm">
+    <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+      <div class="flex items-center gap-3">
+        <span class="p-2 rounded-xl bg-brand-50 text-brand-600">
+          <i data-lucide="sun" class="size-5"></i>
+        </span>
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Light Mode (Chế độ Sáng)</h2>
+          <p class="text-xs text-gray-500">Màu nền card trắng #FFFFFF, border gray-200, số màu trung tính gray-900</p>
+        </div>
+      </div>
+      <span class="text-xs font-medium text-gray-400">Theme: Light</span>
+    </div>
+
+    <!-- Variant A: Standard Cards -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Biến thể Chuẩn (Standard) — 4 cột / min-h 124px</h3>
+        <span class="text-xs text-gray-400">Dùng cho: wh-dashboard, fnb-pl, fnb-pos, portal-kiemke...</span>
+      </div>
+
+      <div class="kpi-grid">
+        <!-- 1. Normal + Positive Delta (Good) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Tổng Doanh Thu Ngày</span>
+            <div class="kpi-icon"><i data-lucide="dollar-sign" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">450,5</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+12,4%</span>
+                <span class="sr-only">tăng</span>
+              </span>
+              <span class="kpi-sub">so với hôm qua</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Normal + Negative Delta (Bad) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Tổng SKU Tồn Kho</span>
+            <div class="kpi-icon"><i data-lucide="package" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">1.250</span>
+              <span class="kpi-unit">Mã</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-8,1%</span>
+                <span class="sr-only">giảm</span>
+              </span>
+              <span class="kpi-sub">so với định mức</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Lower is Better (Food Cost: Delta Negative = Good!) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Food Cost Thực Tế</span>
+            <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">31,5%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good" title="Giảm chi phí nguyên liệu là tín hiệu tốt">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-2,4%</span>
+                <span class="sr-only">giảm chi phí tốt</span>
+              </span>
+              <span class="kpi-sub">thấp hơn kế hoạch</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Negative Currency (Loss) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Lợi Nhuận Ròng Tháng</span>
+            <div class="kpi-icon-error"><i data-lucide="trending-down" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">-14,5</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-104%</span>
+                <span class="sr-only">âm lợi nhuận</span>
+              </span>
+              <span class="kpi-sub">âm do biến động</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row of Standard: Large Number, Null, Progress, Skeleton -->
+      <div class="kpi-grid">
+        <!-- 5. Very Large Compact Number -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Doanh Thu Toàn Chuỗi</span>
+            <div class="kpi-icon-accent"><i data-lucide="bar-chart-3" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value" title="6.347.000.000 ₫" aria-label="6 tỷ 347 triệu đồng">6,35</span>
+              <span class="kpi-unit">tỷ ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-neutral">
+                <span class="size-1.5 rounded-full bg-gray-400"></span>
+                <span>0,0%</span>
+              </span>
+              <span class="kpi-sub" title="6.347.000.000 ₫">14 Điểm bán</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Null / Empty State -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Hao Hụt Kho Vận</span>
+            <div class="kpi-icon"><i data-lucide="shield-alert" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value" title="Chưa có dữ liệu tháng này">—</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-sub text-gray-400">Chưa phát sinh dữ liệu</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Progress Bar (< 100%) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Ngân Sách Đã Dùng</span>
+            <div class="kpi-icon"><i data-lucide="wallet" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline justify-between">
+              <div>
+                <span class="kpi-value">85,2</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <span class="text-xs font-semibold text-brand-600">85,2%</span>
+            </div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-bar" style="width: 85.2%;"></div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">Hạn mức 100 tr ₫ (còn 14,8 tr)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Progress Overflow (> 100% Error) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Vượt Ngân Sách Điểm Bán</span>
+            <div class="kpi-icon-error"><i data-lucide="alert-triangle" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline justify-between">
+              <div>
+                <span class="kpi-value">112,0</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <span class="text-xs font-semibold text-error-600">112,0%</span>
+            </div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-bar-error" style="width: 100%;"></div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+12,0%</span>
+              </span>
+              <span class="kpi-sub">Vượt trần ngân sách</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Third Row: Skeleton & Actionable Card -->
+      <div class="kpi-grid">
+        <!-- 9. Loading Skeleton State -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="h-4 w-28 kpi-skeleton"></div>
+            <div class="size-10 rounded-xl kpi-skeleton"></div>
+          </div>
+          <div class="kpi-body">
+            <div class="h-8 w-36 kpi-skeleton mt-2"></div>
+            <div class="flex items-center gap-2 mt-3">
+              <div class="h-4 w-14 rounded-full kpi-skeleton"></div>
+              <div class="h-3 w-20 kpi-skeleton"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Actionable Clickable Card (Role button) -->
+        <div class="kpi-card cursor-pointer focus-visible:ring-4 focus-visible:ring-brand-500/20" role="button" tabindex="0" title="Bấm để xem danh sách cận date">
+          <div class="kpi-header">
+            <span class="kpi-label font-semibold text-gray-700">SKU Cận Date Cần Xử Lý</span>
+            <div class="kpi-icon-warning"><i data-lucide="clock" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">18</span>
+              <span class="kpi-unit">SKU</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+4 SKU</span>
+              </span>
+              <span class="kpi-sub flex items-center gap-1 text-brand-600 font-medium">Xem chi tiết <i data-lucide="arrow-right" class="size-3"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant B: Compact Cards -->
+    <div class="space-y-3 pt-6 border-t border-gray-100">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Biến thể Gọn (Compact) — p-4 / min-h 104px</h3>
+        <span class="text-xs text-gray-400">Dùng cho: fnb-stock, wh-stock, fnb-counts, fnb-receipts, portal-order dải KPI...</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Doanh Thu Trong Ngày</span>
+            <div class="kpi-icon-compact"><i data-lucide="receipt" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">24,8</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+5,2%</span>
+              </span>
+              <span class="kpi-sub">342 đơn</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Phiếu Nhập Chờ Duyệt</span>
+            <div class="kpi-icon-compact"><i data-lucide="file-check" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">14</span>
+              <span class="kpi-unit">Phiếu</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-neutral">
+                <span>0 mới</span>
+              </span>
+              <span class="kpi-sub">Cần xử lý trong ca</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Tỷ Lệ Khớp Kiểm Kê</span>
+            <div class="kpi-icon-compact"><i data-lucide="check-circle" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">98,2%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+0,8%</span>
+              </span>
+              <span class="kpi-sub">Mục tiêu 95%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Giá Trị Tồn Kho</span>
+            <div class="kpi-icon-compact"><i data-lucide="archive" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">845,0</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-2,1%</span>
+              </span>
+              <span class="kpi-sub">so với đầu tuần</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant C: Hero Cards with Sparkline -->
+    <div class="space-y-3 pt-6 border-t border-gray-100">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Biến thể Hero (Chỉ số Quan Trọng Nhất) — span 2 cột / ApexCharts Sparkline</h3>
+        <span class="text-xs text-gray-400">Dùng cho: Doanh thu thuần P&L, Giá trị kho SAP, Tổng doanh thu chuỗi...</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Hero Card with Sparkline -->
+        <div class="kpi-card-hero">
+          <div class="kpi-header">
+            <div>
+              <span class="kpi-label">Doanh Thu Thuần Toàn Chuỗi (Tháng Hiện Tại)</span>
+              <p class="text-xs text-gray-400 mt-0.5">Tổng hợp 14 điểm bán A.Kitchen</p>
+            </div>
+            <div class="kpi-icon"><i data-lucide="trending-up" class="size-5"></i></div>
+          </div>
+          <div class="flex items-end justify-between gap-4 mt-4">
+            <div>
+              <div class="flex items-baseline">
+                <span class="kpi-value-hero">470,5</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>+8,4%</span>
+                </span>
+                <span class="kpi-sub">Đạt 102,3% kế hoạch tháng</span>
+              </div>
+            </div>
+            <!-- Sparkline Container -->
+            <div class="w-36 h-12 shrink-0">
+              <div id="lightHeroSparkline"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Normal Standard card next to hero -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Biên Lợi Nhuận Gộp</span>
+            <div class="kpi-icon"><i data-lucide="percent" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">68,5%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+1,2%</span>
+              </span>
+              <span class="kpi-sub">Vượt mức sàn</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Normal Standard card next to hero -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Điểm Hòa Vốn</span>
+            <div class="kpi-icon"><i data-lucide="target" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">312,0</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <span>Đã vượt mốc</span>
+              </span>
+              <span class="kpi-sub">Ngày 18 của tháng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================================================= -->
+  <!-- DARK MODE SHOWCASE                                                       -->
+  <!-- ========================================================================= -->
+  <section class="dark max-w-7xl mx-auto space-y-8 bg-gray-950 p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-theme-sm">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+      <div class="flex items-center gap-3">
+        <span class="p-2 rounded-xl bg-brand-500/15 text-brand-400">
+          <i data-lucide="moon" class="size-5"></i>
+        </span>
+        <div>
+          <h2 class="text-lg font-bold text-white">Dark Mode (Chế độ Tối)</h2>
+          <p class="text-xs text-gray-400">Màu nền card bán trong suốt rgba(255,255,255,0.03), border gray-800, số màu trắng #FFFFFF</p>
+        </div>
+      </div>
+      <span class="text-xs font-medium text-gray-500">Theme: Dark</span>
+    </div>
+
+    <!-- Variant A: Standard Cards (Dark) -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Biến thể Chuẩn (Standard) — 4 cột / Dark Surface</h3>
+        <span class="text-xs text-gray-500">Độ tương phản >= 4.5:1 đạt chuẩn WCAG AA</span>
+      </div>
+
+      <div class="kpi-grid">
+        <!-- 1. Normal + Positive Delta (Good) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Tổng Doanh Thu Ngày</span>
+            <div class="kpi-icon"><i data-lucide="dollar-sign" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">450,5</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+12,4%</span>
+                <span class="sr-only">tăng</span>
+              </span>
+              <span class="kpi-sub">so với hôm qua</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Normal + Negative Delta (Bad) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Tổng SKU Tồn Kho</span>
+            <div class="kpi-icon"><i data-lucide="package" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">1.250</span>
+              <span class="kpi-unit">Mã</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-8,1%</span>
+                <span class="sr-only">giảm</span>
+              </span>
+              <span class="kpi-sub">so với định mức</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Lower is Better (Food Cost: Delta Negative = Good!) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Food Cost Thực Tế</span>
+            <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">31,5%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good" title="Giảm chi phí nguyên liệu là tín hiệu tốt">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-2,4%</span>
+                <span class="sr-only">giảm chi phí tốt</span>
+              </span>
+              <span class="kpi-sub">thấp hơn kế hoạch</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Negative Currency (Loss) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Lợi Nhuận Ròng Tháng</span>
+            <div class="kpi-icon-error"><i data-lucide="trending-down" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">-14,5</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-104%</span>
+                <span class="sr-only">âm lợi nhuận</span>
+              </span>
+              <span class="kpi-sub">âm do biến động</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row of Standard: Large Number, Null, Progress, Skeleton -->
+      <div class="kpi-grid">
+        <!-- 5. Very Large Compact Number -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Doanh Thu Toàn Chuỗi</span>
+            <div class="kpi-icon-accent"><i data-lucide="bar-chart-3" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value" title="6.347.000.000 ₫" aria-label="6 tỷ 347 triệu đồng">6,35</span>
+              <span class="kpi-unit">tỷ ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-neutral">
+                <span class="size-1.5 rounded-full bg-gray-500"></span>
+                <span>0,0%</span>
+              </span>
+              <span class="kpi-sub" title="6.347.000.000 ₫">14 Điểm bán</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Null / Empty State -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Hao Hụt Kho Vận</span>
+            <div class="kpi-icon"><i data-lucide="shield-alert" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value" title="Chưa có dữ liệu tháng này">—</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-sub text-gray-500">Chưa phát sinh dữ liệu</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Progress Bar (< 100%) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Ngân Sách Đã Dùng</span>
+            <div class="kpi-icon"><i data-lucide="wallet" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline justify-between">
+              <div>
+                <span class="kpi-value">85,2</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <span class="text-xs font-semibold text-brand-400">85,2%</span>
+            </div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-bar" style="width: 85.2%;"></div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">Hạn mức 100 tr ₫ (còn 14,8 tr)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Progress Overflow (> 100% Error) -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Vượt Ngân Sách Điểm Bán</span>
+            <div class="kpi-icon-error"><i data-lucide="alert-triangle" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline justify-between">
+              <div>
+                <span class="kpi-value">112,0</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <span class="text-xs font-semibold text-error-400">112,0%</span>
+            </div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-bar-error" style="width: 100%;"></div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+12,0%</span>
+              </span>
+              <span class="kpi-sub">Vượt trần ngân sách</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Third Row: Skeleton & Actionable Card (Dark) -->
+      <div class="kpi-grid">
+        <!-- 9. Loading Skeleton State -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="h-4 w-28 kpi-skeleton"></div>
+            <div class="size-10 rounded-xl kpi-skeleton"></div>
+          </div>
+          <div class="kpi-body">
+            <div class="h-8 w-36 kpi-skeleton mt-2"></div>
+            <div class="flex items-center gap-2 mt-3">
+              <div class="h-4 w-14 rounded-full kpi-skeleton"></div>
+              <div class="h-3 w-20 kpi-skeleton"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Actionable Clickable Card -->
+        <div class="kpi-card cursor-pointer focus-visible:ring-4 focus-visible:ring-brand-500/20" role="button" tabindex="0" title="Bấm để xem danh sách cận date">
+          <div class="kpi-header">
+            <span class="kpi-label font-semibold text-gray-300">SKU Cận Date Cần Xử Lý</span>
+            <div class="kpi-icon-warning"><i data-lucide="clock" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">18</span>
+              <span class="kpi-unit">SKU</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+4 SKU</span>
+              </span>
+              <span class="kpi-sub flex items-center gap-1 text-brand-400 font-medium">Xem chi tiết <i data-lucide="arrow-right" class="size-3"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant B: Compact Cards (Dark) -->
+    <div class="space-y-3 pt-6 border-t border-gray-800">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Biến thể Gọn (Compact) — Dark Surface</h3>
+        <span class="text-xs text-gray-500">Tiết kiệm không gian cho dashboard dày dữ liệu</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Doanh Thu Trong Ngày</span>
+            <div class="kpi-icon-compact"><i data-lucide="receipt" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">24,8</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+5,2%</span>
+              </span>
+              <span class="kpi-sub">342 đơn</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Phiếu Nhập Chờ Duyệt</span>
+            <div class="kpi-icon-compact"><i data-lucide="file-check" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">14</span>
+              <span class="kpi-unit">Phiếu</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-neutral">
+                <span>0 mới</span>
+              </span>
+              <span class="kpi-sub">Cần xử lý trong ca</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Tỷ Lệ Khớp Kiểm Kê</span>
+            <div class="kpi-icon-compact"><i data-lucide="check-circle" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">98,2%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+0,8%</span>
+              </span>
+              <span class="kpi-sub">Mục tiêu 95%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card-compact">
+          <div class="kpi-header">
+            <span class="kpi-label-compact">Giá Trị Tồn Kho</span>
+            <div class="kpi-icon-compact"><i data-lucide="archive" class="size-4"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-compact">845,0</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-bad">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                <span>-2,1%</span>
+              </span>
+              <span class="kpi-sub">so với đầu tuần</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant C: Hero Cards with Sparkline (Dark) -->
+    <div class="space-y-3 pt-6 border-t border-gray-800">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Biến thể Hero (Chỉ số Quan Trọng Nhất) — Dark Surface</h3>
+        <span class="text-xs text-gray-500">Sparkline với stroke brand-400 & gradient area trong suốt</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Hero Card with Sparkline -->
+        <div class="kpi-card-hero">
+          <div class="kpi-header">
+            <div>
+              <span class="kpi-label">Doanh Thu Thuần Toàn Chuỗi (Tháng Hiện Tại)</span>
+              <p class="text-xs text-gray-500 mt-0.5">Tổng hợp 14 điểm bán A.Kitchen</p>
+            </div>
+            <div class="kpi-icon"><i data-lucide="trending-up" class="size-5"></i></div>
+          </div>
+          <div class="flex items-end justify-between gap-4 mt-4">
+            <div>
+              <div class="flex items-baseline">
+                <span class="kpi-value-hero">470,5</span>
+                <span class="kpi-unit">tr ₫</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>+8,4%</span>
+                </span>
+                <span class="kpi-sub">Đạt 102,3% kế hoạch tháng</span>
+              </div>
+            </div>
+            <!-- Sparkline Container -->
+            <div class="w-36 h-12 shrink-0">
+              <div id="darkHeroSparkline"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Normal Standard card next to hero -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Biên Lợi Nhuận Gộp</span>
+            <div class="kpi-icon"><i data-lucide="percent" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">68,5%</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>+1,2%</span>
+              </span>
+              <span class="kpi-sub">Vượt mức sàn</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Normal Standard card next to hero -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Điểm Hòa Vốn</span>
+            <div class="kpi-icon"><i data-lucide="target" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value">312,0</span>
+              <span class="kpi-unit">tr ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <span>Đã vượt mốc</span>
+              </span>
+              <span class="kpi-sub">Ngày 18 của tháng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sparkline Initializer Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Lucide icons
+      if (window.lucide) lucide.createIcons();
+
+      // Theme toggle for gallery testing
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          const isDark = document.documentElement.classList.toggle('dark');
+          btn.querySelector('span').textContent = isDark ? 'Chuyển chế độ Sáng' : 'Chuyển chế độ Dark';
+        });
+      }
+
+      // Sparkline Light Config
+      const lightSparkOptions = {
+        series: [{ data: [28, 35, 30, 42, 38, 55, 48, 62, 59, 72] }],
+        chart: {
+          type: 'area',
+          height: 48,
+          sparkline: { enabled: true },
+          fontFamily: 'Inter, sans-serif'
+        },
+        stroke: { curve: 'smooth', width: 2, colors: ['#19723C'] },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.35,
+            opacityTo: 0.05,
+            stops: [0, 95, 100],
+            colorStops: [
+              { offset: 0, color: '#19723C', opacity: 0.35 },
+              { offset: 100, color: '#19723C', opacity: 0 }
+            ]
+          }
+        },
+        tooltip: { enabled: false }
+      };
+
+      // Sparkline Dark Config
+      const darkSparkOptions = {
+        series: [{ data: [28, 35, 30, 42, 38, 55, 48, 62, 59, 72] }],
+        chart: {
+          type: 'area',
+          height: 48,
+          sparkline: { enabled: true },
+          fontFamily: 'Inter, sans-serif'
+        },
+        stroke: { curve: 'smooth', width: 2, colors: ['#599973'] },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.4,
+            opacityTo: 0.05,
+            stops: [0, 95, 100],
+            colorStops: [
+              { offset: 0, color: '#599973', opacity: 0.4 },
+              { offset: 100, color: '#599973', opacity: 0 }
+            ]
+          }
+        },
+        tooltip: { enabled: false }
+      };
+
+      if (document.getElementById('lightHeroSparkline')) {
+        new ApexCharts(document.getElementById('lightHeroSparkline'), lightSparkOptions).render();
+      }
+      if (document.getElementById('darkHeroSparkline')) {
+        new ApexCharts(document.getElementById('darkHeroSparkline'), darkSparkOptions).render();
+      }
+    });
+  </script>
+</body>
+</html>
