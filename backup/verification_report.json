@@ -1,0 +1,289 @@
+{
+  "status": "PASS",
+  "timestamp": "",
+  "schema": "wms",
+  "tables_checked": 36,
+  "mismatches": [],
+  "table_results": {
+    "access_requests": {
+      "table": "access_requests",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (8 rows)"
+      }
+    },
+    "admin_users": {
+      "table": "admin_users",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (4 rows)"
+      }
+    },
+    "app_roles": {
+      "table": "app_roles",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (5 rows)"
+      }
+    },
+    "app_users": {
+      "table": "app_users",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (5 rows)"
+      }
+    },
+    "branches": {
+      "table": "branches",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (14 rows)"
+      }
+    },
+    "chung_tu": {
+      "table": "chung_tu",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (21 rows)"
+      }
+    },
+    "chung_tu_file": {
+      "table": "chung_tu_file",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (26 rows)"
+      }
+    },
+    "daily_catering_reports": {
+      "table": "daily_catering_reports",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "dim_article_stock": {
+      "table": "dim_article_stock",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (3,494 rows)",
+        "sum_price": "OK (sum=500734590.0000)"
+      }
+    },
+    "dinh_muc": {
+      "table": "dinh_muc",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (588 rows)",
+        "sum_quota_qty": "OK (sum=58800.0000)"
+      }
+    },
+    "don_hang": {
+      "table": "don_hang",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (261 rows)",
+        "sum_order_qty": "OK (sum=5626.0000)",
+        "sum_accumulated_qty": "OK (sum=7553.0000)"
+      }
+    },
+    "fnb_monthly_summary": {
+      "table": "fnb_monthly_summary",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (37 rows)",
+        "sum_net_revenue": "OK (sum=14265702687.0000)",
+        "sum_gross_revenue": "OK (sum=15356591998.0000)",
+        "sum_discount": "OK (sum=1352870.4000)",
+        "sum_food_cost": "OK (sum=11132460137.6247)"
+      }
+    },
+    "fnb_stock_balances": {
+      "table": "fnb_stock_balances",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (392 rows)",
+        "sum_book_qty": "OK (sum=49435.4000)",
+        "sum_opening_qty": "OK (sum=42416.7000)",
+        "sum_receipt_qty": "OK (sum=61883.4000)",
+        "sum_sales_bom_qty": "OK (sum=54676.6000)",
+        "sum_waste_qty": "OK (sum=177.6000)",
+        "sum_total_value": "OK (sum=1680310050.0000)"
+      }
+    },
+    "fnb_stock_count_lines": {
+      "table": "fnb_stock_count_lines",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (6 rows)"
+      }
+    },
+    "fnb_stock_counts": {
+      "table": "fnb_stock_counts",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (3 rows)",
+        "sum_total_diff_val": "OK (sum=-250000.0000)",
+        "date_count_date": "OK [2026-11-15..2026-11-17]"
+      }
+    },
+    "fnb_stock_items": {
+      "table": "fnb_stock_items",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (28 rows)"
+      }
+    },
+    "fnb_stock_receipt_lines": {
+      "table": "fnb_stock_receipt_lines",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (6 rows)"
+      }
+    },
+    "fnb_stock_receipts": {
+      "table": "fnb_stock_receipts",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (4 rows)",
+        "sum_total_amount": "OK (sum=11900000.0000)",
+        "date_receipt_date": "OK [2026-11-16..2026-11-18]"
+      }
+    },
+    "fnb_stock_transactions": {
+      "table": "fnb_stock_transactions",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "fnb_stock_waste_lines": {
+      "table": "fnb_stock_waste_lines",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (3 rows)"
+      }
+    },
+    "fnb_stock_wastes": {
+      "table": "fnb_stock_wastes",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (3 rows)",
+        "sum_total_amount": "OK (sum=483000.0000)",
+        "date_waste_date": "OK [2026-11-15..2026-11-17]"
+      }
+    },
+    "inventory_batches": {
+      "table": "inventory_batches",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "items": {
+      "table": "items",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "kiemke_tonkho": {
+      "table": "kiemke_tonkho",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (163 rows)"
+      }
+    },
+    "nvl_items": {
+      "table": "nvl_items",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (785 rows)",
+        "sum_unit_price": "OK (sum=158517918.0000)"
+      }
+    },
+    "purchase_order_items": {
+      "table": "purchase_order_items",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "purchase_orders": {
+      "table": "purchase_orders",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "quy_trinh_don": {
+      "table": "quy_trinh_don",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (41 rows)"
+      }
+    },
+    "role_permissions": {
+      "table": "role_permissions",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (53 rows)"
+      }
+    },
+    "sites": {
+      "table": "sites",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (14 rows)",
+        "sum_budget_limit": "OK (sum=25000000.0000)"
+      }
+    },
+    "stock_audits": {
+      "table": "stock_audits",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "stock_transactions": {
+      "table": "stock_transactions",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "stock_transfers": {
+      "table": "stock_transfers",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    },
+    "transactions": {
+      "table": "transactions",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (37,329 rows)",
+        "sum_thanh_tien_truoc_thue": "OK (sum=14265702687.0000)",
+        "sum_tong_tien_billing": "OK (sum=15356591998.0000)",
+        "sum_gia_von": "OK (sum=11132460137.6247)",
+        "sum_ck_truoc_thue": "OK (sum=1352870.4000)",
+        "sum_so_luong": "OK (sum=334695.4110)",
+        "date_billing_date": "OK [2026-03-02..2026-11-19]"
+      }
+    },
+    "user_permissions": {
+      "table": "user_permissions",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (17 rows)"
+      }
+    },
+    "vouchers": {
+      "table": "vouchers",
+      "status": "PASS",
+      "checks": {
+        "row_count": "OK (0 rows)"
+      }
+    }
+  }
+}

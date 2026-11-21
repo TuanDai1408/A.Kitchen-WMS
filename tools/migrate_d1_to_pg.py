@@ -339,14 +339,22 @@ def migrate(sqlite_path: str, dsn: str, schema: str, tables: list = None,
                 if "id" in active_cols:
                     try:
                         seq_sql = f"""
-                            SELECT setval(
-                                pg_get_serial_sequence('{schema}.{table}', 'id'),
-                                COALESCE((SELECT MAX(id) FROM {schema}.{table}), 1)
-                            );
+                            DO $seq$
+                            DECLARE
+                                seq_name text;
+                            BEGIN
+                                seq_name := pg_get_serial_sequence('{schema}.{table}', 'id');
+                                IF seq_name IS NOT NULL THEN
+                                    EXECUTE format('SELECT setval(%L, COALESCE((SELECT MAX(id) FROM {schema}.{table}), 1))', seq_name);
+                                END IF;
+                            END;
+                            $seq$;
                         """
                         pg_cur.execute(seq_sql)
-                    except Exception:
-                        pass  # Table might use TEXT id (e.g. branches, items)
+                    except Exception as seq_err:
+                        print(f"    [WARN sequence] {table}: {seq_err}")
+
+                pg_conn.commit()
 
             # Refresh summary tables if transactions were migrated
             if "transactions" in target_tables:
