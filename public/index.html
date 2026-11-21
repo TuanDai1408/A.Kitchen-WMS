@@ -3609,8 +3609,8 @@
   <!-- ========================================================================
        NATIVE MOBILE & TABLET BOTTOM NAVIGATION BAR
        ======================================================================== -->
-  <nav id="mobileBottomNav" class="fixed bottom-0 inset-x-0 z-40 xl:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),8px)] pt-1.5 px-3 select-none">
-    <div class="flex items-center justify-around max-w-2xl mx-auto w-full">
+  <nav id="mobileBottomNav" class="fixed bottom-0 inset-x-0 z-40 xl:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[max(env(safe-area-inset-bottom),8px)] pt-1 px-2 select-none">
+    <div class="flex items-center justify-around max-w-lg mx-auto w-full">
       
       <!-- Tab 1: Nhóm 1 - Hiệu Quả & Doanh Thu -->
       <button onclick="switchTab('fnb-chain')" id="mobTab-fnb-chain" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-brand-500 font-bold cursor-pointer">
@@ -3628,12 +3628,12 @@
         <span class="text-[10px] mt-0.5 leading-tight font-medium">Kho Vận</span>
       </button>
 
-      <!-- Tab 3: Nhóm 4 - Center Elevated FAB - Tạo & Duyệt Chứng Từ -->
-      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:translate-y-px transition-transform px-2 group cursor-pointer">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center border-4 border-white dark:border-gray-900 transition-all group-hover:scale-105">
-          <i data-lucide="file-text" class="w-6 h-6 stroke-[2.2]"></i>
+      <!-- Tab 3: Nhóm 4 - Tạo & Duyệt Chứng Từ -->
+      <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
+        <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
         </div>
-        <span class="text-[9.5px] font-semibold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
+        <span class="text-[10px] mt-0.5 leading-tight font-medium">Chứng Từ</span>
       </button>
 
       <!-- Tab 4: Nhóm 4 - Báo Cáo Suất Ăn Ca -->
@@ -3696,12 +3696,12 @@
         <!-- Nhóm 1: Hiệu Quả & Doanh Thu (Finance) -->
         <div class="mobile-hub-category" data-cat="fnb-finance">
           <div class="flex items-center justify-between mb-2.5 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-rose-600 dark:text-rose-400">1. Hiệu Quả &amp; Doanh Thu</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">Finance</span>
+            <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">1. Hiệu Quả &amp; Doanh Thu</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Finance</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('fnb-chain')" data-tab="fnb-chain" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="trophy" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3710,7 +3710,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('fnb-pl')" data-tab="fnb-pl" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3719,7 +3719,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('fnb-pos')" data-tab="fnb-pos" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="zap" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3733,12 +3733,12 @@
         <!-- Nhóm 2: Vận Hành Kho Bếp (F&B) -->
         <div class="mobile-hub-category" data-cat="fnb-inventory">
           <div class="flex items-center justify-between mb-2.5 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400">2. Vận Hành Kho Bếp</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">F&amp;B</span>
+            <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">2. Vận Hành Kho Bếp</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">F&amp;B</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('wh-dashboard')" data-tab="wh-dashboard" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3747,7 +3747,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('fnb-counts')" data-tab="fnb-counts" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="clipboard-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3756,7 +3756,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('fnb-receipts')" data-tab="fnb-receipts" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="package-plus" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3765,7 +3765,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('fnb-waste')" data-tab="fnb-waste" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="trash-2" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3779,12 +3779,12 @@
         <!-- Nhóm 3: Kho Vận & WMS (WMS) -->
         <div class="mobile-hub-category" data-cat="wh-wms">
           <div class="flex items-center justify-between mb-2.5 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400">3. Kho Vận &amp; WMS</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">WMS</span>
+            <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">3. Kho Vận &amp; WMS</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">WMS</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('wh-stock')" data-tab="wh-stock" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3793,7 +3793,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('wh-reorder')" data-tab="wh-reorder" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="alert-triangle" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3802,7 +3802,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('wh-leadtime')" data-tab="wh-leadtime" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="truck" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3811,7 +3811,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('wh-posap')" data-tab="wh-posap" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="file-check-2" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3825,12 +3825,12 @@
         <!-- Nhóm 4: Cổng Thông Tin & Đặt Hàng (Portal) -->
         <div class="mobile-hub-category" data-cat="portal-ops">
           <div class="flex items-center justify-between mb-2.5 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-blue-600 dark:text-blue-400">4. Cổng Thông Tin &amp; Đặt Hàng</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">Portal</span>
+            <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">4. Cổng Thông Tin &amp; Đặt Hàng</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Portal</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('portal-voucher')" data-tab="portal-voucher" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="file-text" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3839,7 +3839,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('portal-search')" data-tab="portal-search" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="search" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3848,7 +3848,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('portal-order')" data-tab="portal-order" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="shopping-cart" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3857,7 +3857,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('portal-history')" data-tab="portal-history" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-gray-500/10 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="clock" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3866,7 +3866,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('portal-baocao')" data-tab="portal-baocao" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="clipboard-list" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3875,7 +3875,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('portal-kiemke')" data-tab="portal-kiemke" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="check-square" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3889,12 +3889,12 @@
         <!-- Nhóm 5: Hệ Thống & Danh Mục (Admin) -->
         <div class="mobile-hub-category" data-cat="sys-admin">
           <div class="flex items-center justify-between mb-2.5 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-purple-600 dark:text-purple-400">5. Hệ Thống &amp; Danh Mục</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">Admin</span>
+            <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">5. Hệ Thống &amp; Danh Mục</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Admin</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button onclick="switchFromHub('fnb-sites')" data-tab="fnb-sites" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="building-2" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3903,7 +3903,7 @@
               </div>
             </button>
             <button onclick="switchFromHub('user-matrix')" data-tab="user-matrix" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -3912,7 +3912,7 @@
               </div>
             </button>
             <button onclick="handleUserProfileClick(); closeMobileMenuHub();" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+              <div class="hub-icon-wrap w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="user-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
@@ -7606,10 +7606,19 @@ function openMobileMenuHub() {
   const curTabId = localStorage.getItem('orbit_active_tab') || 'fnb-chain';
   document.querySelectorAll('.hub-item').forEach(item => {
     const tabId = item.getAttribute('data-tab');
+    const icWrap = item.querySelector('.hub-icon-wrap');
     if (tabId === curTabId) {
-      item.classList.add('border-brand-500', 'bg-brand-50/70', 'dark:bg-brand-950/40');
+      item.classList.add('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-950/30');
+      if (icWrap) {
+        icWrap.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400');
+        icWrap.classList.add('bg-brand-500/10', 'text-brand-600', 'dark:text-brand-400');
+      }
     } else {
-      item.classList.remove('border-brand-500', 'bg-brand-50/70', 'dark:bg-brand-950/40');
+      item.classList.remove('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-950/30');
+      if (icWrap) {
+        icWrap.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400');
+        icWrap.classList.remove('bg-brand-500/10', 'text-brand-600', 'dark:text-brand-400');
+      }
     }
   });
   hub.classList.remove('hidden');
