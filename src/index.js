@@ -458,9 +458,16 @@ function invalidateMemoryCache(prefix) {
 }
 
 function createCachedResponse(data, ttlSeconds, corsHeaders, isNoCache, url, request, ctx, customKey) {
-  const memKey = customKey || (url ? (url.pathname + (url.search || '')) : null);
+  const cKey = url ? (url.pathname + (url.search || '')) : null;
+  const memKey = customKey || cKey;
   if (memKey && !isNoCache) {
     setMemoryCache(memKey, data, ttlSeconds);
+    if (cKey && cKey !== memKey) {
+      setMemoryCache(cKey, data, ttlSeconds);
+    }
+    if (url) {
+      setMemoryCache(url.toString(), data, ttlSeconds);
+    }
   }
   const headers = new Headers(corsHeaders);
   headers.set('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
@@ -571,6 +578,10 @@ export default {
       '/api/fnb/pos',
       '/api/fnb/stock',
       '/api/fnb/stock/items-for-site',
+      '/api/fnb/counts',
+      '/fnb/stock',
+      '/fnb/stock/items-for-site',
+      '/fnb/counts',
       '/api/branches',
       '/api/dashboard-summary',
       '/api/stock',
@@ -579,6 +590,7 @@ export default {
       '/api/po-sap',
       '/api/quota',
       '/api/orders',
+      '/api/order-detail',
       '/api/vouchers'
     ];
     const isCacheableReport = CACHEABLE_GET_ROUTES.includes(pathname) && request.method === 'GET';
@@ -973,7 +985,7 @@ export default {
         const now = new Date();
         const thangHienTai = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
-        return new Response(JSON.stringify({
+        const initResponseData = {
           success: true,
           data: {
             sites: sites.map(s => s.site_name),
@@ -990,7 +1002,8 @@ export default {
             thangHienTai,
             maxFileMB: 15
           }
-        }), { headers: corsHeaders });
+        };
+        return createCachedResponse(initResponseData, 300, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.2 GET /api/quota
@@ -1069,7 +1082,7 @@ export default {
           dinhMucSL: dmMap[item.item_code] || null
         }));
 
-        return new Response(JSON.stringify({
+        const quotaResponseData = {
           success: true,
           data: {
             site: siteRow ? siteRow.site_name : site,
@@ -1077,7 +1090,8 @@ export default {
             tienDaDat,
             items
           }
-        }), { headers: corsHeaders });
+        };
+        return createCachedResponse(quotaResponseData, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.3 POST /api/order
@@ -1131,6 +1145,10 @@ export default {
         stmts.push(insertQtStmt);
         await env.DB.batch(stmts);
 
+        invalidateMemoryCache('/api/orders');
+        invalidateMemoryCache('/api/quota');
+        invalidateMemoryCache('/api/dashboard-summary');
+
         return new Response(JSON.stringify({ success: true, data: { maDon, soDong: stmts.length - 1 } }), { headers: corsHeaders });
       }
 
@@ -1174,7 +1192,7 @@ export default {
         query += ` GROUP BY dh.order_code ORDER BY dh.order_date DESC`;
 
         const { results } = await env.DB.prepare(query).bind(...bindings).all();
-        return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+        return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.5 GET /api/order-detail
@@ -1206,7 +1224,7 @@ export default {
           FROM don_hang WHERE order_code = ? LIMIT 1
         `).bind(orderCode).first();
 
-        return new Response(JSON.stringify({ success: true, data: { info: summary, items, timeline } }), { headers: corsHeaders });
+        return createCachedResponse({ success: true, data: { info: summary, items, timeline } }, 120, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.6 GET /api/vouchers
@@ -1263,7 +1281,7 @@ export default {
           fileChinh: r.attachment_link
         }));
 
-        return new Response(JSON.stringify({ success: true, data }), { headers: corsHeaders });
+        return createCachedResponse({ success: true, data }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.7 POST /api/voucher
@@ -1286,6 +1304,7 @@ export default {
           await env.DB.batch(fileStmts);
         }
 
+        invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
       }
 
@@ -1323,6 +1342,7 @@ export default {
           }
           count++;
         }
+        invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, count, message: `Đã import thành công ${count} chứng từ` }), { headers: corsHeaders });
       }
 
@@ -2660,7 +2680,7 @@ export default {
           { id: 'MB', name: 'Miền Bắc' }
         ];
 
-        return new Response(JSON.stringify({
+        const fnbStockResponseData = {
           success: true,
           data: {
             regions,
@@ -2669,7 +2689,8 @@ export default {
             showValue: true,
             rows
           }
-        }), { headers: corsHeaders });
+        };
+        return createCachedResponse(fnbStockResponseData, 180, corsHeaders, isNoCache, url, request, ctx);
       }
 
 
@@ -2698,13 +2719,14 @@ export default {
         query += ` ORDER BY i.item_group, i.code`;
 
         const { results } = await env.DB.prepare(query).bind(...binds).all();
-        return new Response(JSON.stringify({
+        const fnbSiteStockData = {
           success: true,
           data: {
             site_code: siteCode,
             items: results
           }
-        }), { headers: corsHeaders });
+        };
+        return createCachedResponse(fnbSiteStockData, 180, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 3.6 KIỂM KÊ: GET & POST /api/fnb/counts
@@ -2733,13 +2755,14 @@ export default {
             lines = l;
           }
 
-          return new Response(JSON.stringify({
+          const fnbCountsData = {
             success: true,
             data: {
               counts,
               lines
             }
-          }), { headers: corsHeaders });
+          };
+          return createCachedResponse(fnbCountsData, 60, corsHeaders, isNoCache, url, request, ctx);
         }
 
         if (request.method === 'POST') {
