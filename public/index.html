@@ -1728,36 +1728,49 @@
 
         <!-- Controls & Filter Bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+          <select id="fnbCountSiteSelect" class="hidden"><option value="K001">K001</option></select>
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Site Selector Pill (Synchronized with global site selection) -->
+              <div onclick="openSiteSelectorModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs cursor-pointer hover:border-brand-500/60 transition-all group shrink-0" title="Bấm để đổi điểm bán & cơ sở">
+                <i data-lucide="map-pin" class="size-3.5 text-brand-500 shrink-0"></i>
+                <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Cơ sở:</span>
+                <span id="fnbCountCurrentSiteBadge" class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate max-w-[200px]">K001 - MN Bếp Ăn Đại Học Hùng Vương</span>
+                <span class="text-brand-500 group-hover:underline font-bold text-[10px] shrink-0 ml-1">Đổi ↗</span>
+              </div>
+
+              <!-- Filter Ngành hàng -->
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
-                <select id="fnbCountSiteSelect" onchange="onFnbCountSiteChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-blue-500">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ngành hàng:</span>
+                <select id="fnbCountNganhHangFilter" onchange="onFnbCountNganhHangChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500 max-w-[170px] truncate">
+                  <option value="">Tất cả ngành hàng</option>
                 </select>
               </div>
 
+              <!-- Filter Nhóm hàng -->
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Ngày kiểm:</span>
-                <input type="date" id="fnbCountDatePicker" onchange="onFnbCountDateChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-blue-500">
-              </div>
-
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Chế độ:</span>
-                <select id="fnbCountTypeSelect" onchange="onFnbCountTypeChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-blue-500">
-                  <option value="DAILY">Kiểm ngày (Nhóm A trọng yếu)</option>
-                  <option value="PERIODIC">Kiểm toàn bộ (28 mặt hàng)</option>
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Nhóm hàng:</span>
+                <select id="fnbCountNhomHangFilter" onchange="onFnbCountFilterChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500 max-w-[190px] truncate">
+                  <option value="">Tất cả nhóm hàng</option>
                 </select>
               </div>
 
-              <label class="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700" title="Ẩn cột tồn sổ sách khi đang đếm">
-                <input type="checkbox" id="fnbCountBlindToggle" onchange="toggleBlindCount(this.checked)" class="rounded text-blue-600 focus:ring-0">
+              <!-- Ngày kiểm -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ngày kiểm:</span>
+                <input type="date" id="fnbCountDatePicker" onchange="onFnbCountDateChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              </div>
+
+              <!-- Kiểm mù Toggle -->
+              <label class="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0" title="Ẩn cột tồn sổ sách khi đang đếm">
+                <input type="checkbox" id="fnbCountBlindToggle" onchange="toggleBlindCount(this.checked)" class="rounded text-brand-600 focus:ring-0">
                 <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Kiểm mù (Ẩn tồn sách)</span>
               </label>
             </div>
 
             <div class="relative w-full lg:w-64">
               <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm món / mã kiểm..." class="w-full pl-9 pr-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500">
+              <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm tên, mã, ngành hàng..." class="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
             </div>
           </div>
         </div>
@@ -5058,7 +5071,7 @@
         fnbSelectIds.forEach(id => {
           const el = document.getElementById(id);
           if (el) {
-            for (let opt of el.options) {
+            if (el.options) if (el.options) if (el.options) if (el.options) if (el.options) for (let opt of el.options) {
               if (opt.value.toUpperCase() === code.toUpperCase()) {
                 el.value = opt.value;
                 break;
@@ -5102,6 +5115,8 @@
         if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
         if (typeof loadStockFEFO === 'function') loadStockFEFO();
         if (typeof loadReorderROP === 'function') loadReorderROP();
+        if (typeof loadFnbCounts === 'function') loadFnbCounts();
+        if (typeof loadAudit === 'function') loadAudit();
       } catch (e) {
         console.warn('Reload notice:', e);
       }
@@ -10839,28 +10854,52 @@ function initFnbSiteSelectors() {
 }
 
 // --- 3. KIỂM KÊ HẰNG NGÀY (DAILY COUNTS) ---
-window.loadFnbCounts = async function() {
-  initFnbSiteSelectors();
-  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
-  const countType = document.getElementById('fnbCountTypeSelect')?.value || 'DAILY';
+function getActiveFnbCountSite() {
+  const localSaved = localStorage.getItem('orbit_user_site');
+  const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+  const hiddenSite = document.getElementById('fnbCountSiteSelect')?.value;
+
+  let siteCode = localSaved || globalSel || appBranch || hiddenSite || 'K001';
+  if (siteCode === 'ALL' || siteCode === 'all') siteCode = 'K001';
+  return siteCode.toUpperCase();
+}
+
+async function loadFnbCounts() {
+  window.loadFnbCounts = loadFnbCounts;
+  const siteCode = getActiveFnbCountSite();
+  const hiddenSel = document.getElementById('fnbCountSiteSelect');
+  if (hiddenSel) hiddenSel.value = siteCode;
+
+  // Sync site badge in UI
+  const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []);
+  const siteObj = sites.find(s => s.code.toUpperCase() === siteCode.toUpperCase());
+  const siteName = siteObj ? (siteObj.ten || siteObj.name) : siteCode;
+  const badgeEl = document.getElementById('fnbCountCurrentSiteBadge');
+  if (badgeEl) badgeEl.textContent = siteName;
+
+  // Sync default date
+  const dp = document.getElementById('fnbCountDatePicker');
+  if (dp && !dp.value) dp.value = new Date().toISOString().slice(0, 10);
 
   try {
-    if (typeof showLoading === 'function') showLoading();
-    // 1. Fetch items with current book balance for this site
-    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${siteCode}`);
+    if (typeof showLoading === 'function') showLoading('Tải danh mục kiểm kê của ' + siteCode + '...');
+    // 1. Fetch items with current book balance specifically for this site from dim_article_stock
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}&no-cache=1`);
     const json = await res.json();
     if (json.success && json.data) {
       gFnbAllItems = json.data.items || [];
-      // Filter for Daily (Category NVL, BTP, HANG_BAN) vs Periodic (All)
-      if (countType === 'DAILY') {
-        gCurrentCountItems = gFnbAllItems.filter(i => ['NVL', 'BTP'].includes(i.item_group));
-      } else {
-        gCurrentCountItems = [...gFnbAllItems];
-      }
+      // Populate cascading Ngành hàng & Nhóm hàng filters based on items of this site
+      populateFnbCountFilters();
+      // Render counts table with initial items of this site
+      renderFnbCountsTable();
+    } else {
+      gFnbAllItems = [];
+      populateFnbCountFilters();
       renderFnbCountsTable();
     }
 
-    // 2. Load recent counts history
+    // 2. Load recent counts history for this site
     loadFnbCountsHistory(siteCode);
   } catch (err) {
     console.error('loadFnbCounts error:', err);
@@ -10870,15 +10909,124 @@ window.loadFnbCounts = async function() {
   }
 };
 
+function populateFnbCountFilters() {
+  const nganhSel = document.getElementById('fnbCountNganhHangFilter');
+  const nhomSel = document.getElementById('fnbCountNhomHangFilter');
+  if (!nganhSel || !nhomSel) return;
+
+  const nganhMap = new Map();
+  (gFnbAllItems || []).forEach(i => {
+    const ng = (i.nganh_hang || 'Chưa phân loại').trim();
+    const nh = (i.nhom_hang || i.item_group || 'Chưa phân loại').trim();
+    if (!nganhMap.has(ng)) nganhMap.set(ng, new Set());
+    nganhMap.get(ng).add(nh);
+  });
+
+  window.gFnbNganhMap = nganhMap;
+
+  let nganhOpts = '<option value="">Tất cả ngành hàng</option>';
+  Array.from(nganhMap.keys()).sort().forEach(ng => {
+    nganhOpts += `<option value="${escapeHtml(ng)}">${escapeHtml(ng)}</option>`;
+  });
+  nganhSel.innerHTML = nganhOpts;
+  nganhSel.value = '';
+
+  populateFnbCountNhomHangDropdown('');
+}
+
+function populateFnbCountNhomHangDropdown(selectedNganh) {
+  const nhomSel = document.getElementById('fnbCountNhomHangFilter');
+  if (!nhomSel) return;
+
+  const nhomSet = new Set();
+  if (window.gFnbNganhMap) {
+    if (selectedNganh && window.gFnbNganhMap.has(selectedNganh)) {
+      window.gFnbNganhMap.get(selectedNganh).forEach(nh => nhomSet.add(nh));
+    } else {
+      window.gFnbNganhMap.forEach(set => set.forEach(nh => nhomSet.add(nh)));
+    }
+  }
+
+  let nhomOpts = '<option value="">Tất cả nhóm hàng</option>';
+  Array.from(nhomSet).sort().forEach(nh => {
+    nhomOpts += `<option value="${escapeHtml(nh)}">${escapeHtml(nh)}</option>`;
+  });
+  nhomSel.innerHTML = nhomOpts;
+  nhomSel.value = '';
+}
+
+window.onFnbCountNganhHangChange = function() {
+  const selectedNganh = document.getElementById('fnbCountNganhHangFilter')?.value || '';
+  populateFnbCountNhomHangDropdown(selectedNganh);
+  renderFnbCountsTable();
+};
+
+window.onFnbCountFilterChange = function() {
+  renderFnbCountsTable();
+};
+
+window.onFnbCountSearch = function(val) {
+  renderFnbCountsTable();
+};
+
+window.onFnbCountDateChange = function() {
+  renderFnbCountsTable();
+};
+
+window.onFnbCountSiteChange = function() {
+  loadFnbCounts();
+};
+
+window.toggleBlindCount = function(checked) {
+  gFnbBlindCount = checked;
+  renderFnbCountsTable();
+};
+
+window.onCountInputChange = function(code, val) {
+  const item = (gCurrentCountItems || []).find(i => i.code === code);
+  if (item) {
+    item.userCount = val === '' ? 0 : Number(val);
+    renderFnbCountsTable();
+  }
+};
+
+window.onCountNoteChange = function(code, val) {
+  const item = (gCurrentCountItems || []).find(i => i.code === code);
+  if (item) item.userNote = val;
+};
+
 window.renderFnbCountsTable = function() {
   const tbody = document.getElementById('fnbCountsTableBody');
   const mob = document.getElementById('fnbCountsMobileCards');
+  const selectedNganh = (document.getElementById('fnbCountNganhHangFilter')?.value || '').trim().toLowerCase();
+  const selectedNhom = (document.getElementById('fnbCountNhomHangFilter')?.value || '').trim().toLowerCase();
   const query = (document.getElementById('fnbCountSearchInput')?.value || '').trim().toLowerCase();
 
-  const filtered = gCurrentCountItems.filter(i => {
-    if (!query) return true;
-    return (i.name || '').toLowerCase().includes(query) || (i.code || '').toLowerCase().includes(query);
+  const filtered = (gFnbAllItems || []).filter(i => {
+    // 1. Filter by nganh_hang
+    if (selectedNganh) {
+      const ng = (i.nganh_hang || '').trim().toLowerCase();
+      if (ng !== selectedNganh) return false;
+    }
+    // 2. Filter by nhom_hang
+    if (selectedNhom) {
+      const nh = (i.nhom_hang || i.item_group || '').trim().toLowerCase();
+      if (nh !== selectedNhom) return false;
+    }
+    // 3. Filter by search query
+    if (query) {
+      const name = (i.name || '').toLowerCase();
+      const code = (i.code || '').toLowerCase();
+      const ng = (i.nganh_hang || '').toLowerCase();
+      const nh = (i.nhom_hang || '').toLowerCase();
+      if (!name.includes(query) && !code.includes(query) && !ng.includes(query) && !nh.includes(query)) {
+        return false;
+      }
+    }
+    return true;
   });
+
+  gCurrentCountItems = filtered;
 
   // Calculate metrics
   let matchedCount = 0;
@@ -10886,30 +11034,36 @@ window.renderFnbCountsTable = function() {
   let totalDiffVal = 0;
 
   filtered.forEach(i => {
-    const book = i.book_qty || 0;
-    const count = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null ? i.last_count_qty : book);
+    const book = Number(i.book_qty) || 0;
+    const rawCount = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null && i.last_count_qty !== undefined ? i.last_count_qty : book);
+    const count = Number(rawCount) || 0;
     const diff = count - book;
-    const diffVal = diff * (i.unit_price || 0);
+    const diffVal = diff * (Number(i.unit_price) || 0);
     if (Math.abs(diff) < 0.001) matchedCount++;
     else diffCount++;
     totalDiffVal += diffVal;
   });
 
-  document.getElementById('fnbCountMetricTotal').textContent = filtered.length;
-  document.getElementById('fnbCountMetricMatched').textContent = matchedCount;
-  document.getElementById('fnbCountMetricDiff').textContent = diffCount;
-  document.getElementById('fnbCountMetricDiffVal').textContent = (totalDiffVal > 0 ? '+' : '') + Math.round(totalDiffVal).toLocaleString('vi-VN') + ' đ';
+  const totalEl = document.getElementById('fnbCountMetricTotal');
+  if (totalEl) totalEl.textContent = filtered.length;
+  const matchEl = document.getElementById('fnbCountMetricMatched');
+  if (matchEl) matchEl.textContent = matchedCount;
+  const diffEl = document.getElementById('fnbCountMetricDiff');
+  if (diffEl) diffEl.textContent = diffCount;
+  const diffValEl = document.getElementById('fnbCountMetricDiffVal');
+  if (diffValEl) diffValEl.textContent = (totalDiffVal > 0 ? '+' : '') + Math.round(totalDiffVal).toLocaleString('vi-VN') + ' đ';
 
   // Desktop Table
   if (tbody) {
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không có mặt hàng nào phù hợp.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</td></tr>`;
     } else {
       tbody.innerHTML = filtered.map((item, idx) => {
-        const book = item.book_qty || 0;
-        const count = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null ? item.last_count_qty : book);
+        const book = Number(item.book_qty) || 0;
+        const rawCount = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null && item.last_count_qty !== undefined ? item.last_count_qty : book);
+        const count = Number(rawCount) || 0;
         const diff = count - book;
-        const diffVal = diff * (item.unit_price || 0);
+        const diffVal = diff * (Number(item.unit_price) || 0);
 
         let diffBadge = `<span class="text-gray-400 tabular-nums">0</span>`;
         if (diff > 0) diffBadge = `<span class="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">+${diff.toFixed(1)}</span>`;
@@ -10921,27 +11075,30 @@ window.renderFnbCountsTable = function() {
 
         const bookDisplay = gFnbBlindCount ? '<span class="text-gray-300 dark:text-gray-700 italic tabular-nums text-[11px] select-none">••••</span>' : `<span class="font-bold tabular-nums ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${book.toFixed(1)}</span>`;
 
+        const nhomBadge = item.nhom_hang || item.item_group || '';
+
         return `
           <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
             <td class="py-3 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
             <td class="py-3 px-4">
-              <div class="font-bold text-gray-900 dark:text-white">${item.name}</div>
+              <div class="font-bold text-gray-900 dark:text-white">${escapeHtml(item.name)}</div>
               <div class="text-[10.5px] tabular-nums text-gray-400 flex items-center gap-1.5 mt-0.5">
-                <span>${item.code}</span>
+                <span class="font-mono">${escapeHtml(item.code)}</span>
+                ${nhomBadge ? `<span>•</span><span class="text-gray-500 dark:text-gray-400">${escapeHtml(nhomBadge)}</span>` : ''}
                 <span>•</span>
                 <span>Giá: ${Number(item.unit_price).toLocaleString('vi-VN')} đ</span>
               </div>
             </td>
-            <td class="py-3 px-3 text-center font-semibold text-gray-600 dark:text-gray-300">${item.unit}</td>
+            <td class="py-3 px-3 text-center font-semibold text-gray-600 dark:text-gray-300">${escapeHtml(item.unit || '')}</td>
             <td class="py-3 px-3 text-right fnb-count-book-col">${bookDisplay}</td>
             <td class="py-2.5 px-3 bg-blue-50/30 dark:bg-blue-950/10">
-              <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
+              <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${escapeHtml(item.code)}', this.value)"
                      class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-white/3 font-semibold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
             </td>
             <td class="py-3 px-3 text-right select-all">${diffBadge}</td>
             <td class="py-3 px-3 text-right select-all">${diffValText}</td>
             <td class="py-2.5 px-4">
-              <input type="text" placeholder="Lý do chênh lệch (nếu có)..." value="${item.userNote || ''}" oninput="onCountNoteChange('${item.code}', this.value)"
+              <input type="text" placeholder="Lý do chênh lệch (nếu có)..." value="${escapeHtml(item.userNote || '')}" oninput="onCountNoteChange('${escapeHtml(item.code)}', this.value)"
                      class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-[11px] outline-none focus:border-blue-500">
             </td>
           </tr>
@@ -10953,45 +11110,45 @@ window.renderFnbCountsTable = function() {
   // Mobile Card View
   if (mob) {
     if (filtered.length === 0) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp.</div>`;
+      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc.</div>`;
     } else {
       mob.innerHTML = filtered.map((item, idx) => {
-        const book = item.book_qty || 0;
-        const count = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null ? item.last_count_qty : book);
+        const book = Number(item.book_qty) || 0;
+        const rawCount = (item.userCount !== undefined) ? item.userCount : (item.last_count_qty !== null && item.last_count_qty !== undefined ? item.last_count_qty : book);
+        const count = Number(rawCount) || 0;
         const diff = count - book;
-        const diffVal = diff * (item.unit_price || 0);
+        const diffVal = diff * (Number(item.unit_price) || 0);
 
         return `
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${item.item_group}</span>
-                <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1">${item.name}</h4>
-                <div class="text-[10px] text-gray-400 tabular-nums">${item.code} • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${item.unit}</div>
+                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${escapeHtml(item.nhom_hang || item.item_group || 'Chưa phân loại')}</span>
+                <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1">${escapeHtml(item.name)}</h4>
+                <div class="text-[10px] text-gray-400 tabular-nums"><span class="font-mono">${escapeHtml(item.code)}</span> • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${escapeHtml(item.unit || '')}</div>
               </div>
               <div class="text-right">
                 <span class="text-[10px] text-gray-400">Tồn sách:</span>
-                <div class="font-bold tabular-nums text-xs ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${gFnbBlindCount ? '••••' : book.toFixed(1)} ${item.unit}</div>
+                <div class="font-bold tabular-nums text-xs ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${gFnbBlindCount ? '••••' : book.toFixed(1)} ${escapeHtml(item.unit || '')}</div>
               </div>
             </div>
 
-            <div class="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-              <div class="flex-1">
-                <label class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-0.5">SL Đếm Thực Tế (${item.unit})</label>
-                <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${item.code}', this.value)"
-                       class="w-full text-center py-2 px-3 rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 font-semibold tabular-nums text-base text-gray-900 dark:text-white outline-none">
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+              <div>
+                <span class="text-[10px] text-gray-400 block mb-0.5">SL Thực tế:</span>
+                <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${escapeHtml(item.code)}', this.value)"
+                       class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/20 font-bold tabular-nums text-gray-900 dark:text-white outline-none">
               </div>
-              <div class="w-32 text-right">
-                <span class="text-[10px] text-gray-400">Lệch:</span>
-                <div class="font-semibold tabular-nums text-sm ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-gray-400')}">
-                  ${diff > 0 ? '+' : ''}${diff.toFixed(1)} ${item.unit}
+              <div class="text-right">
+                <span class="text-[10px] text-gray-400 block mb-0.5">Chênh lệch:</span>
+                <div class="font-bold text-xs pt-1.5 tabular-nums ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-gray-400')}">
+                  ${diff > 0 ? '+' : ''}${diff.toFixed(1)} (${(diffVal > 0 ? '+' : '') + Math.round(diffVal).toLocaleString('vi-VN')} đ)
                 </div>
-                <div class="text-[9.5px] tabular-nums text-gray-400">${Math.round(diffVal).toLocaleString('vi-VN')} đ</div>
               </div>
             </div>
 
-            <input type="text" placeholder="Ghi chú lý do chênh lệch..." value="${item.userNote || ''}" oninput="onCountNoteChange('${item.code}', this.value)"
-                   class="w-full py-1.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs outline-none">
+            <input type="text" placeholder="Ghi chú lý do..." value="${escapeHtml(item.userNote || '')}" oninput="onCountNoteChange('${escapeHtml(item.code)}', this.value)"
+                   class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-[11px] outline-none">
           </div>
         `;
       }).join('');
@@ -11001,47 +11158,13 @@ window.renderFnbCountsTable = function() {
   if (window.lucide) lucide.createIcons();
 };
 
-window.onCountInputChange = function(code, val) {
-  const item = gCurrentCountItems.find(i => i.code === code);
-  if (item) {
-    item.userCount = val === '' ? 0 : Number(val);
-    renderFnbCountsTable();
-  }
-};
-
-window.onCountNoteChange = function(code, val) {
-  const item = gCurrentCountItems.find(i => i.code === code);
-  if (item) item.userNote = val;
-};
-
-window.onFnbCountSiteChange = function() {
-  loadFnbCounts();
-};
-
-window.onFnbCountDateChange = function() {
-  loadFnbCounts();
-};
-
-window.onFnbCountTypeChange = function() {
-  loadFnbCounts();
-};
-
-window.onFnbCountSearch = function() {
-  renderFnbCountsTable();
-};
-
-window.toggleBlindCount = function(checked) {
-  gFnbBlindCount = checked;
-  renderFnbCountsTable();
-};
-
-// Lưu kết quả kiểm kê vào D1
+// Lưu kết quả kiểm kê vào D1 / PostgreSQL
 window.saveFnbCountAudit = async function() {
-  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
+  const siteCode = getActiveFnbCountSite();
   const countDate = document.getElementById('fnbCountDatePicker')?.value || new Date().toISOString().slice(0, 10);
-  const countType = document.getElementById('fnbCountTypeSelect')?.value || 'DAILY';
+  const countType = 'DAILY';
 
-  if (!gCurrentCountItems.length) {
+  if (!gCurrentCountItems || !gCurrentCountItems.length) {
     if (typeof showToast === 'function') showToast('Không có mặt hàng nào để lưu kiểm kê!');
     return;
   }
@@ -11050,14 +11173,17 @@ window.saveFnbCountAudit = async function() {
     const book = i.book_qty || 0;
     const count = (i.userCount !== undefined) ? i.userCount : (i.last_count_qty !== null ? i.last_count_qty : book);
     const diff = count - book;
-    const unitPrice = i.unit_price || 0;
+    const diffVal = diff * (i.unit_price || 0);
     return {
       item_code: i.code,
+      item_name: i.name,
+      item_group: i.item_group || i.nhom_hang || 'NVL',
+      unit: i.unit,
+      unit_price: i.unit_price || 0,
       book_qty: book,
-      count_qty: count,
+      actual_qty: count,
       diff_qty: diff,
-      unit_price: unitPrice,
-      diff_val: diff * unitPrice,
+      diff_value: diffVal,
       note: i.userNote || ''
     };
   });
@@ -11066,16 +11192,12 @@ window.saveFnbCountAudit = async function() {
     site_code: siteCode,
     count_date: countDate,
     count_type: countType,
-    notes: `Kiểm kê ${countType === 'DAILY' ? 'hằng ngày' : 'định kỳ'} điểm ${siteCode}`,
-    created_by: App?.user?.fullName || 'Bếp trưởng',
+    notes: `Kiểm kê hằng ngày điểm ${siteCode}`,
     lines
   };
 
-  const btn = document.getElementById('btnSaveFnbCount');
-  if (btn) btn.disabled = true;
-
   try {
-    if (typeof showLoading === 'function') showLoading();
+    if (typeof showLoading === 'function') showLoading('Đang lưu phiếu kiểm kê...');
     const res = await fetch('/api/fnb/counts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -11090,31 +11212,30 @@ window.saveFnbCountAudit = async function() {
     console.error('saveFnbCountAudit error:', err);
     if (typeof showToast === 'function') showToast('Lỗi lưu kiểm kê: ' + err.message);
   } finally {
-    if (btn) btn.disabled = false;
     if (typeof hideLoading === 'function') hideLoading();
   }
 };
 
 window.loadFnbCountsHistory = async function(siteCode) {
   try {
-    const res = await fetch(`/api/fnb/counts?site_code=${siteCode}`);
+    const res = await fetch(`/api/fnb/counts?site_code=${encodeURIComponent(siteCode)}`);
     const json = await res.json();
     const tbody = document.getElementById('fnbCountsHistoryBody');
     if (tbody && json.success) {
       const counts = json.data.counts || [];
       if (!counts.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-400">Chưa có phiếu kiểm kê nào cho điểm này.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-400">Chưa có phiếu kiểm kê nào cho điểm ${escapeHtml(siteCode)}.</td></tr>`;
       } else {
         tbody.innerHTML = counts.map(c => `
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-            <td class="py-2.5 px-3 tabular-nums font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${c.count_code}</td>
-            <td class="py-2.5 px-3 font-semibold">${c.site_code}</td>
-            <td class="py-2.5 px-3 tabular-nums">${c.count_date}</td>
+            <td class="py-2.5 px-3 tabular-nums font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${escapeHtml(c.count_code)}</td>
+            <td class="py-2.5 px-3 font-semibold">${escapeHtml(c.site_code)}</td>
+            <td class="py-2.5 px-3 tabular-nums">${escapeHtml(c.count_date)}</td>
             <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
             <td class="py-2.5 px-3 text-right tabular-nums">${c.total_items}</td>
             <td class="py-2.5 px-3 text-right tabular-nums ${c.diff_items > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${c.diff_items}</td>
-            <td class="py-2.5 px-3 text-right tabular-nums font-bold ${c.total_diff_val < 0 ? 'text-rose-600' : (c.total_diff_val > 0 ? 'text-emerald-600' : 'text-gray-400')}">${c.total_diff_val > 0 ? '+' : ''}${Math.round(c.total_diff_val).toLocaleString('vi-VN')} đ</td>
-            <td class="py-2.5 px-3 text-gray-500">${c.created_by || '--'}</td>
+            <td class="py-2.5 px-3 text-right tabular-nums font-bold ${c.diff_value > 0 ? 'text-rose-600' : (c.diff_value < 0 ? 'text-rose-600' : 'text-emerald-600')}">${Math.round(c.diff_value).toLocaleString('vi-VN')} đ</td>
+            <td class="py-2.5 px-3 text-gray-400">${escapeHtml(c.notes || '—')}</td>
           </tr>
         `).join('');
       }
@@ -11124,16 +11245,15 @@ window.loadFnbCountsHistory = async function(siteCode) {
   }
 };
 
-// Xuất biểu mẫu kiểm kê Excel (Aptos)
 window.exportCountSheetExcel = function() {
-  if (!gCurrentCountItems.length) {
+  if (!gCurrentCountItems || !gCurrentCountItems.length) {
     if (typeof showToast === 'function') showToast('Không có dữ liệu mặt hàng để xuất phiếu kiểm!');
     return;
   }
-  const siteCode = document.getElementById('fnbCountSiteSelect')?.value || 'K001';
+  const siteCode = getActiveFnbCountSite();
   const countDate = document.getElementById('fnbCountDatePicker')?.value || new Date().toISOString().slice(0, 10);
 
-  const headers = ['STT', 'Mã Hàng', 'Tên Hàng', 'Nhóm Hàng', 'ĐVT', 'Đơn Giá (đ)', 'Tồn Sổ Sách', 'Số Đếm Thực Tế', 'Chênh Lệch', 'Ghi Chú'];
+  const headers = ['STT', 'Mã Hàng', 'Tên Hàng', 'Ngành Hàng', 'Nhóm Hàng', 'ĐVT', 'Đơn Giá (đ)', 'Tồn Sổ Sách', 'Số Đếm Thực Tế', 'Chênh Lệch', 'Ghi Chú'];
   const rows = [headers];
 
   gCurrentCountItems.forEach((i, idx) => {
@@ -11144,7 +11264,8 @@ window.exportCountSheetExcel = function() {
       idx + 1,
       i.code,
       i.name,
-      i.item_group,
+      i.nganh_hang || '',
+      i.nhom_hang || i.item_group || '',
       i.unit,
       i.unit_price || 0,
       book,
@@ -11155,639 +11276,26 @@ window.exportCountSheetExcel = function() {
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  const range = XLSX.utils.decode_range(ws['!ref']);
 
-  for (let R = range.s.r; R <= range.e.r; ++R) {
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-      if (!ws[cellRef]) continue;
-      const isHeader = (R === 0);
-      if (isHeader) {
-        ws[cellRef].s = {
-          font: { name: 'Aptos', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
-          fill: { fgColor: { rgb: '1F4E79' } },
-          alignment: { horizontal: 'center', vertical: 'center' }
-        };
-      } else {
-        let alignH = 'left';
-        if (C === 0 || C === 1 || C === 4) alignH = 'center';
-        else if (C >= 5 && C <= 8) alignH = 'right';
-        ws[cellRef].s = {
-          font: { name: 'Aptos', sz: 11 },
-          alignment: { horizontal: alignH, vertical: 'center' }
-        };
-      }
-    }
-  }
-
-  ws['!autofilter'] = { ref: ws['!ref'] };
-  ws['!freeze'] = { xSplit: 3, ySplit: 1, topLeftCell: 'D2', activePane: 'bottomRight', state: 'frozen' };
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 15 },
+    { wch: 32 },
+    { wch: 20 },
+    { wch: 22 },
+    { wch: 8 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 25 }
+  ];
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, `Phieu_Kiem_${siteCode}`);
-  XLSX.writeFile(wb, `Phieu_Kiem_Ke_${siteCode}_${countDate.replace(/-/g, '')}.xlsx`);
-  if (typeof showToast === 'function') showToast('Đã xuất phiếu kiểm kê Excel chuẩn Aptos!');
-};
+  XLSX.utils.book_append_sheet(wb, ws, 'PhieuKiemKe');
+  XLSX.writeFile(wb, `Phieu_Kiem_Ke_${siteCode}_${countDate}.xlsx`);
 
-// --- 4. NHẬP HÀNG (GOODS RECEIPTS) ---
-let gReceiptLineCounter = 0;
-
-window.loadFnbReceipts = async function() {
-  initFnbSiteSelectors();
-  const siteCode = document.getElementById('fnbReceiptFilterSite')?.value || 'all';
-
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch(`/api/fnb/receipts?site_code=${siteCode}`);
-    const json = await res.json();
-    if (json.success) {
-      const receipts = json.data.receipts || [];
-      renderFnbReceiptsTable(receipts);
-    }
-  } catch (err) {
-    console.error('loadFnbReceipts error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi tải phiếu nhập: ' + err.message);
-  } finally {
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-window.renderFnbReceiptsTable = function(receipts) {
-  const tbody = document.getElementById('fnbReceiptsTableBody');
-  const mob = document.getElementById('fnbReceiptsMobileCards');
-  const summaryEl = document.getElementById('fnbReceiptsSummary');
-
-  let totalSum = 0;
-  receipts.forEach(r => totalSum += (r.total_amount || 0));
-
-  if (summaryEl) {
-    summaryEl.innerHTML = `Tổng số: <b>${receipts.length}</b> phiếu • Tổng giá trị: <b class="text-indigo-600 dark:text-indigo-400">${Math.round(totalSum).toLocaleString('vi-VN')} đ</b>`;
-  }
-
-  // Desktop Table
-  if (tbody) {
-    if (!receipts.length) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Chưa có phiếu nhập hàng nào.</td></tr>`;
-    } else {
-      tbody.innerHTML = receipts.map(r => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="py-3 px-4 tabular-nums font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer" onclick="viewReceiptDetail(${r.id})">${r.receipt_code}</td>
-          <td class="py-3 px-3 font-semibold text-gray-900 dark:text-white">${r.site_code}</td>
-          <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300">${r.receipt_date}</td>
-          <td class="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">${r.supplier}</td>
-          <td class="py-3 px-3 tabular-nums text-gray-500">${r.invoice_no || '--'}</td>
-          <td class="py-3 px-4 text-right tabular-nums font-semibold text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-3 text-gray-500">${r.created_by || '--'}</td>
-          <td class="py-3 px-3 text-center">
-            <button onclick="viewReceiptDetail(${r.id})" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-[11px] transition-all">
-              Chi tiết
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-  }
-
-  // Mobile Cards
-  if (mob) {
-    if (!receipts.length) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có phiếu nhập hàng nào.</div>`;
-    } else {
-      mob.innerHTML = receipts.map(r => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-start justify-between">
-            <div>
-              <span class="text-xs tabular-nums font-bold text-indigo-600 dark:text-indigo-400">${r.receipt_code}</span>
-              <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-0.5">${r.supplier}</h4>
-              <div class="text-[10px] text-gray-400 tabular-nums">Điểm: ${r.site_code} • Ngày: ${r.receipt_date}</div>
-            </div>
-            <div class="text-right">
-              <span class="text-[10px] text-gray-400">Tổng tiền:</span>
-              <div class="font-semibold tabular-nums text-sm text-indigo-600 dark:text-indigo-400">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px]">
-            <span class="text-gray-400">HĐ/PO: ${r.invoice_no || 'N/A'}</span>
-            <button onclick="viewReceiptDetail(${r.id})" class="px-3 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 font-bold text-xs">Xem Chi Tiết</button>
-          </div>
-        </div>
-      `).join('');
-    }
-  }
-
-  if (window.lucide) lucide.createIcons();
-};
-
-window.openCreateReceiptModal = async function() {
-  initFnbSiteSelectors();
-  const modal = document.getElementById('createReceiptModal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    const curSite = document.getElementById('receiptModalSite')?.value || document.getElementById('fnbReceiptFilterSite')?.value || 'K001';
-    const siteSel = document.getElementById('receiptModalSite');
-    if (siteSel && curSite) siteSel.value = curSite;
-    try {
-      const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(curSite)}`);
-      const json = await res.json();
-      if (json.success) gFnbAllItems = json.data.items || [];
-    } catch (e) { console.error('fetch receipt items error:', e); }
-    // Clear and add first line
-    document.getElementById('receiptLinesContainer').innerHTML = '';
-    gReceiptLineCounter = 0;
-    addReceiptLineRow();
-    recalcReceiptModalTotal();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-window.onReceiptModalSiteChange = async function() {
-  const siteCode = document.getElementById('receiptModalSite')?.value || 'K001';
-  try {
-    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}`);
-    const json = await res.json();
-    if (json.success) {
-      gFnbAllItems = json.data.items || [];
-      document.querySelectorAll('#receiptLinesContainer select').forEach(sel => {
-        const curVal = sel.value;
-        let opts = '<option value="">-- Chọn mặt hàng nhập --</option>';
-        gFnbAllItems.forEach(it => {
-          opts += `<option value="${it.code}" data-price="${it.unit_price}" data-unit="${it.unit}" ${it.code === curVal ? "selected" : ""}>${it.code} - ${it.name} (${it.unit})</option>`;
-        });
-        sel.innerHTML = opts;
-      });
-      if (typeof recalcReceiptModalTotal === "function") recalcReceiptModalTotal();
-    }
-  } catch (e) { console.error("onReceiptModalSiteChange error:", e); }
-};
-
-window.closeCreateReceiptModal = function() {
-  document.getElementById('createReceiptModal')?.classList.add('hidden');
-};
-
-window.addReceiptLineRow = function() {
-  const container = document.getElementById('receiptLinesContainer');
-  if (!container) return;
-  gReceiptLineCounter++;
-  const rowId = `rcLine_${gReceiptLineCounter}`;
-
-  let itemOptions = '<option value="">-- Chọn mặt hàng nhập --</option>';
-  gFnbAllItems.forEach(i => {
-    itemOptions += `<option value="${i.code}" data-price="${i.unit_price}" data-unit="${i.unit}">${i.code} - ${i.name} (${i.unit})</option>`;
-  });
-
-  const rowHtml = `
-    <div id="${rowId}" class="p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
-      <div class="flex-1 w-full sm:w-auto">
-        <select onchange="onReceiptLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs rc-item-code outline-none">
-          ${itemOptions}
-        </select>
-      </div>
-      <div class="w-24">
-        <input type="number" step="0.1" placeholder="SL" oninput="recalcReceiptModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums rc-qty outline-none" value="1">
-      </div>
-      <div class="w-28">
-        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcReceiptModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums rc-price outline-none" value="0">
-      </div>
-      <div class="w-28 text-right tabular-nums font-bold text-indigo-600 dark:text-indigo-400 rc-line-total">
-        0 đ
-      </div>
-      <button onclick="document.getElementById('${rowId}').remove(); recalcReceiptModalTotal()" class="p-1 text-gray-400 hover:text-rose-500">
-        <i data-lucide="trash" class="w-4 h-4"></i>
-      </button>
-    </div>
-  `;
-  container.insertAdjacentHTML('beforeend', rowHtml);
-  if (window.lucide) lucide.createIcons();
-};
-
-window.onReceiptLineItemChange = function(rowId, selectEl) {
-  const row = document.getElementById(rowId);
-  if (!row) return;
-  const opt = selectEl.selectedOptions[0];
-  const price = opt?.dataset?.price || 0;
-  const priceInput = row.querySelector('.rc-price');
-  if (priceInput) priceInput.value = price;
-  recalcReceiptModalTotal();
-};
-
-window.recalcReceiptModalTotal = function() {
-  let grandTotal = 0;
-  document.querySelectorAll('#receiptLinesContainer > div').forEach(row => {
-    const qty = Number(row.querySelector('.rc-qty')?.value) || 0;
-    const price = Number(row.querySelector('.rc-price')?.value) || 0;
-    const total = qty * price;
-    grandTotal += total;
-    const totalEl = row.querySelector('.rc-line-total');
-    if (totalEl) totalEl.textContent = Math.round(total).toLocaleString('vi-VN') + ' đ';
-  });
-  const grandEl = document.getElementById('receiptModalTotalAmount');
-  if (grandEl) grandEl.textContent = Math.round(grandTotal).toLocaleString('vi-VN') + ' đ';
-};
-
-window.submitCreateReceipt = async function() {
-  const siteCode = document.getElementById('receiptModalSite')?.value;
-  const receiptDate = document.getElementById('receiptModalDate')?.value;
-  const supplier = document.getElementById('receiptModalSupplier')?.value;
-  const invoiceNo = document.getElementById('receiptModalInvoice')?.value;
-  const notes = document.getElementById('receiptModalNotes')?.value;
-
-  const lines = [];
-  document.querySelectorAll('#receiptLinesContainer > div').forEach(row => {
-    const itemCode = row.querySelector('.rc-item-code')?.value;
-    const qty = Number(row.querySelector('.rc-qty')?.value) || 0;
-    const unitPrice = Number(row.querySelector('.rc-price')?.value) || 0;
-    if (itemCode && qty > 0) {
-      lines.push({ item_code: itemCode, qty, unit_price: unitPrice });
-    }
-  });
-
-  if (!siteCode || !supplier || !lines.length) {
-    if (typeof showToast === 'function') showToast('Vui lòng chọn ít nhất 1 mặt hàng có số lượng > 0!');
-    return;
-  }
-
-  const payload = {
-    site_code: siteCode,
-    receipt_date: receiptDate,
-    supplier,
-    invoice_no: invoiceNo,
-    notes,
-    created_by: App?.user?.fullName || 'Bếp trưởng',
-    lines
-  };
-
-  const btn = document.getElementById('btnSubmitReceipt');
-  if (btn) btn.disabled = true;
-
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch('/api/fnb/receipts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Lỗi khi nhập kho');
-
-    if (typeof showToast === 'function') showToast(`Đã nhập hàng thành công: ${json.data.receipt_code}!`);
-    closeCreateReceiptModal();
-    loadFnbReceipts();
-  } catch (err) {
-    console.error('submitCreateReceipt error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi nhập hàng: ' + err.message);
-  } finally {
-    if (btn) btn.disabled = false;
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-// --- 5. HỦY HÀNG & HAO HỤT (WASTE & DISPOSAL) ---
-let gWasteLineCounter = 0;
-
-window.loadFnbWaste = async function() {
-  initFnbSiteSelectors();
-  const siteCode = document.getElementById('fnbWasteFilterSite')?.value || 'all';
-
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch(`/api/fnb/wastes?site_code=${siteCode}`);
-    const json = await res.json();
-    if (json.success) {
-      const wastes = json.data.wastes || [];
-      renderFnbWasteTable(wastes);
-    }
-  } catch (err) {
-    console.error('loadFnbWaste error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi tải biên bản hủy: ' + err.message);
-  } finally {
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-window.renderFnbWasteTable = function(wastes) {
-  const tbody = document.getElementById('fnbWasteTableBody');
-  const mob = document.getElementById('fnbWasteMobileCards');
-  const summaryEl = document.getElementById('fnbWasteSummary');
-
-  let totalSum = 0;
-  wastes.forEach(w => totalSum += (w.total_amount || 0));
-
-  if (summaryEl) {
-    summaryEl.innerHTML = `Tổng số: <b>${wastes.length}</b> biên bản • Tổng giá trị hủy: <b class="text-rose-600 dark:text-rose-400">${Math.round(totalSum).toLocaleString('vi-VN')} đ</b>`;
-  }
-
-  // Desktop Table
-  if (tbody) {
-    if (!wastes.length) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Chưa có biên bản hủy hàng nào.</td></tr>`;
-    } else {
-      tbody.innerHTML = wastes.map(w => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="py-3 px-4 tabular-nums font-bold text-rose-600 dark:text-rose-400 cursor-pointer" onclick="viewWasteDetail(${w.id})">${w.waste_code}</td>
-          <td class="py-3 px-3 font-semibold text-gray-900 dark:text-white">${w.site_code}</td>
-          <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300">${w.waste_date}</td>
-          <td class="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">${w.reason}</span>
-          </td>
-          <td class="py-3 px-3 font-medium text-gray-700 dark:text-gray-300">${w.confirmed_by}</td>
-          <td class="py-3 px-4 text-right tabular-nums font-semibold text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</td>
-          <td class="py-3 px-4 text-gray-500 truncate max-w-[150px]">${w.notes || '--'}</td>
-          <td class="py-3 px-3 text-center">
-            <button onclick="viewWasteDetail(${w.id})" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[11px] transition-all">
-              Chi tiết
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-  }
-
-  // Mobile Cards
-  if (mob) {
-    if (!wastes.length) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có biên bản hủy hàng nào.</div>`;
-    } else {
-      mob.innerHTML = wastes.map(w => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-start justify-between">
-            <div>
-              <span class="text-xs tabular-nums font-bold text-rose-600 dark:text-rose-400">${w.waste_code}</span>
-              <div class="mt-1">
-                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300">${w.reason}</span>
-              </div>
-              <div class="text-[10px] text-gray-400 tabular-nums mt-1">Điểm: ${w.site_code} • Ngày: ${w.waste_date}</div>
-            </div>
-            <div class="text-right">
-              <span class="text-[10px] text-gray-400">Giá trị hủy:</span>
-              <div class="font-semibold tabular-nums text-sm text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} đ</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px]">
-            <span class="text-gray-400">Xác nhận: ${w.confirmed_by}</span>
-            <button onclick="viewWasteDetail(${w.id})" class="px-3 py-1 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 font-bold text-xs">Xem Chi Tiết</button>
-          </div>
-        </div>
-      `).join('');
-    }
-  }
-
-  if (window.lucide) lucide.createIcons();
-};
-
-window.openCreateWasteModal = async function() {
-  initFnbSiteSelectors();
-  const modal = document.getElementById('createWasteModal');
-  if (modal) {
-    const curSite = document.getElementById('wasteModalSite')?.value || document.getElementById('fnbWasteFilterSite')?.value || 'K001';
-    const siteSel = document.getElementById('wasteModalSite');
-    if (siteSel && curSite) siteSel.value = curSite;
-    try {
-      const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(curSite)}`);
-      const json = await res.json();
-      if (json.success) gFnbAllItems = json.data.items || [];
-    } catch (e) { console.error('fetch waste items error:', e); }
-    document.getElementById('wasteLinesContainer').innerHTML = '';
-    gWasteLineCounter = 0;
-    addWasteLineRow();
-    recalcWasteModalTotal();
-    if (window.lucide) lucide.createIcons();
-  }
-};
-
-window.onWasteModalSiteChange = async function() {
-  const siteCode = document.getElementById('wasteModalSite')?.value || 'K001';
-  try {
-    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}`);
-    const json = await res.json();
-    if (json.success) {
-      gFnbAllItems = json.data.items || [];
-      document.querySelectorAll('#wasteLinesContainer select').forEach(sel => {
-        const curVal = sel.value;
-        let opts = '<option value="">-- Chọn mặt hàng hủy --</option>';
-        gFnbAllItems.forEach(it => {
-          opts += `<option value="${it.code}" data-price="${it.unit_price}" data-unit="${it.unit}" ${it.code === curVal ? "selected" : ""}>${it.code} - ${it.name} (${it.unit})</option>`;
-        });
-        sel.innerHTML = opts;
-      });
-      if (typeof recalcWasteModalTotal === "function") recalcWasteModalTotal();
-    }
-  } catch (e) { console.error("onWasteModalSiteChange error:", e); }
-};
-
-window.closeCreateWasteModal = function() {
-  document.getElementById('createWasteModal')?.classList.add('hidden');
-};
-
-window.addWasteLineRow = function() {
-  const container = document.getElementById('wasteLinesContainer');
-  if (!container) return;
-  gWasteLineCounter++;
-  const rowId = `wsLine_${gWasteLineCounter}`;
-
-  let itemOptions = '<option value="">-- Chọn mặt hàng cần hủy --</option>';
-  gFnbAllItems.forEach(i => {
-    itemOptions += `<option value="${i.code}" data-price="${i.unit_price}" data-unit="${i.unit}">${i.code} - ${i.name} (${i.unit})</option>`;
-  });
-
-  const rowHtml = `
-    <div id="${rowId}" class="p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
-      <div class="flex-1 w-full sm:w-auto">
-        <select onchange="onWasteLineItemChange('${rowId}', this)" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs ws-item-code outline-none">
-          ${itemOptions}
-        </select>
-      </div>
-      <div class="w-24">
-        <input type="number" step="0.1" placeholder="SL Hủy" oninput="recalcWasteModalTotal()" class="w-full text-center px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums ws-qty outline-none" value="1">
-      </div>
-      <div class="w-28">
-        <input type="number" step="100" placeholder="Đơn giá" oninput="recalcWasteModalTotal()" class="w-full text-right px-2 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold tabular-nums ws-price outline-none" value="0">
-      </div>
-      <div class="w-28 text-right tabular-nums font-bold text-rose-600 dark:text-rose-400 ws-line-total">
-        0 đ
-      </div>
-      <button onclick="document.getElementById('${rowId}').remove(); recalcWasteModalTotal()" class="p-1 text-gray-400 hover:text-rose-500">
-        <i data-lucide="trash" class="w-4 h-4"></i>
-      </button>
-    </div>
-  `;
-  container.insertAdjacentHTML('beforeend', rowHtml);
-  if (window.lucide) lucide.createIcons();
-};
-
-window.onWasteLineItemChange = function(rowId, selectEl) {
-  const row = document.getElementById(rowId);
-  if (!row) return;
-  const opt = selectEl.selectedOptions[0];
-  const price = opt?.dataset?.price || 0;
-  const priceInput = row.querySelector('.ws-price');
-  if (priceInput) priceInput.value = price;
-  recalcWasteModalTotal();
-};
-
-window.recalcWasteModalTotal = function() {
-  let grandTotal = 0;
-  document.querySelectorAll('#wasteLinesContainer > div').forEach(row => {
-    const qty = Number(row.querySelector('.ws-qty')?.value) || 0;
-    const price = Number(row.querySelector('.ws-price')?.value) || 0;
-    const total = qty * price;
-    grandTotal += total;
-    const totalEl = row.querySelector('.ws-line-total');
-    if (totalEl) totalEl.textContent = Math.round(total).toLocaleString('vi-VN') + ' đ';
-  });
-  const grandEl = document.getElementById('wasteModalTotalAmount');
-  if (grandEl) grandEl.textContent = Math.round(grandTotal).toLocaleString('vi-VN') + ' đ';
-};
-
-window.submitCreateWaste = async function() {
-  const siteCode = document.getElementById('wasteModalSite')?.value;
-  const wasteDate = document.getElementById('wasteModalDate')?.value;
-  const reason = document.getElementById('wasteModalReason')?.value;
-  const confirmedBy = document.getElementById('wasteModalConfirmedBy')?.value;
-  const notes = document.getElementById('wasteModalNotes')?.value;
-
-  const lines = [];
-  document.querySelectorAll('#wasteLinesContainer > div').forEach(row => {
-    const itemCode = row.querySelector('.ws-item-code')?.value;
-    const qty = Number(row.querySelector('.ws-qty')?.value) || 0;
-    const unitPrice = Number(row.querySelector('.ws-price')?.value) || 0;
-    if (itemCode && qty > 0) {
-      lines.push({ item_code: itemCode, qty, unit_price: unitPrice, reason_detail: reason });
-    }
-  });
-
-  if (!siteCode || !lines.length) {
-    if (typeof showToast === 'function') showToast('Vui lòng chọn ít nhất 1 mặt hàng có số lượng hủy > 0!');
-    return;
-  }
-
-  const payload = {
-    site_code: siteCode,
-    waste_date: wasteDate,
-    reason,
-    confirmed_by: confirmedBy,
-    notes,
-    created_by: App?.user?.fullName || 'Bếp trưởng',
-    lines
-  };
-
-  const btn = document.getElementById('btnSubmitWaste');
-  if (btn) btn.disabled = true;
-
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch('/api/fnb/wastes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Lỗi khi ghi biên bản hủy');
-
-    if (typeof showToast === 'function') showToast(`Đã ghi biên bản hủy thành công: ${json.data.waste_code}!`);
-    closeCreateWasteModal();
-    loadFnbWaste();
-  } catch (err) {
-    console.error('submitCreateWaste error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi ghi biên bản hủy: ' + err.message);
-  } finally {
-    if (btn) btn.disabled = false;
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-// --- 6. VIEW DETAILS MODAL ---
-window.viewReceiptDetail = async function(receiptId) {
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch(`/api/fnb/receipts?id=${receiptId}`);
-    const json = await res.json();
-    if (!json.success) throw new Error('Không tải được phiếu');
-
-    const lines = json.data.lines || [];
-    const modal = document.getElementById('invDetailModal');
-    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Phiếu Nhập #${receiptId}`;
-    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng nhập kho`;
-
-    let html = `
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
-            <tr>
-              <th class="py-2 px-3">Mặt Hàng</th>
-              <th class="py-2 px-3 text-center">ĐVT</th>
-              <th class="py-2 px-3 text-right">SL Nhập</th>
-              <th class="py-2 px-3 text-right">Đơn Giá</th>
-              <th class="py-2 px-3 text-right">Thành Tiền</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-800/60 tabular-nums">
-            ${lines.map(l => `
-              <tr>
-                <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">${l.item_name || l.item_code}</td>
-                <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
-                <td class="py-2 px-3 text-right font-bold text-indigo-600">${l.qty}</td>
-                <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 text-right font-semibold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-    document.getElementById('invDetailModalBody').innerHTML = html;
-    modal.classList.remove('hidden');
-  } catch (e) {
-    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
-  } finally {
-    if (typeof hideLoading === 'function') hideLoading();
-  }
-};
-
-window.viewWasteDetail = async function(wasteId) {
-  try {
-    if (typeof showLoading === 'function') showLoading();
-    const res = await fetch(`/api/fnb/wastes?id=${wasteId}`);
-    const json = await res.json();
-    if (!json.success) throw new Error('Không tải được biên bản');
-
-    const lines = json.data.lines || [];
-    const modal = document.getElementById('invDetailModal');
-    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Biên Bản Hủy #${wasteId}`;
-    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng hao hụt / hủy`;
-
-    let html = `
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
-            <tr>
-              <th class="py-2 px-3">Mặt Hàng</th>
-              <th class="py-2 px-3 text-center">ĐVT</th>
-              <th class="py-2 px-3 text-right">SL Hủy</th>
-              <th class="py-2 px-3 text-right">Đơn Giá</th>
-              <th class="py-2 px-3 text-right">Thành Tiền</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-800/60 tabular-nums">
-            ${lines.map(l => `
-              <tr>
-                <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">${l.item_name || l.item_code}</td>
-                <td class="py-2 px-3 text-center">${l.unit || '--'}</td>
-                <td class="py-2 px-3 text-right font-bold text-rose-600">${l.qty}</td>
-                <td class="py-2 px-3 text-right">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 text-right font-semibold">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-    document.getElementById('invDetailModalBody').innerHTML = html;
-    modal.classList.remove('hidden');
-  } catch (e) {
-    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
-  } finally {
-    if (typeof hideLoading === 'function') hideLoading();
-  }
+  if (typeof showToast === 'function') showToast('Đã xuất phiếu kiểm kê Excel!');
 };
 
 window.viewCountDetail = async function(countId) {
