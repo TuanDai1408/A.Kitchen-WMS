@@ -1753,9 +1753,16 @@ export default {
       }
 
       
-      // Sync monthly summary from transactions table (Chuyển 37,329 dòng transactions thành ~28 dòng summary)
+      // Sync monthly summary from transactions table (Hỗ trợ sync riêng 1 tháng ?month=YYYY-MM chỉ mất 14 writes)
       if (pathname === '/api/admin/sync-monthly-summary') {
-        await env.DB.prepare(`
+        const monthParam = searchParams.get('month') || '';
+        let targetMonth = monthParam ? normalizeMonth(monthParam) : '';
+        if (targetMonth && targetMonth.includes('/')) {
+          const parts = targetMonth.split('/');
+          if (parts.length === 2) targetMonth = `${parts[1]}-${parts[0].padStart(2, '0')}`;
+        }
+
+        let syncSql = `
           INSERT OR REPLACE INTO fnb_monthly_summary (
             month_period, site_code, site_name, region,
             total_bills, active_days, net_revenue, gross_revenue,
@@ -1777,13 +1784,35 @@ export default {
             COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
           FROM transactions
           WHERE billing_date IS NOT NULL AND billing_date != ''
-          GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
-        `).run();
+        `;
+
+        let binds = [];
+        if (targetMonth) {
+          syncSql += ` AND billing_date >= ? AND billing_date <= ?`;
+          binds.push(`${targetMonth}-01`, `${targetMonth}-31`);
+        }
+        syncSql += ` GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang`;
+
+        const stmt = env.DB.prepare(syncSql);
+        await (binds.length ? stmt.bind(...binds) : stmt).run();
+
+        // Xóa sạch bộ nhớ đệm RAM Cache và Edge Cache
         invalidateMemoryCache('/api/fnb');
-        const { results: summaries } = await env.DB.prepare('SELECT month_period, site_code, net_revenue FROM fnb_monthly_summary').all();
+
+        let querySummaries = 'SELECT month_period, site_code, net_revenue FROM fnb_monthly_summary';
+        let queryBinds = [];
+        if (targetMonth) {
+          querySummaries += ' WHERE month_period = ?';
+          queryBinds.push(targetMonth);
+        }
+        const { results: summaries } = await env.DB.prepare(querySummaries).bind(...queryBinds).all();
+
         return new Response(JSON.stringify({
           success: true,
-          message: 'Đã tổng hợp số liệu fnb_monthly_summary thành công!',
+          message: targetMonth 
+            ? `Đã tổng hợp số liệu tháng ${targetMonth} thành công!` 
+            : 'Đã tổng hợp toàn bộ số liệu fnb_monthly_summary thành công!',
+          month: targetMonth || 'all',
           count: summaries ? summaries.length : 0,
           summaries: summaries || []
         }), { headers: corsHeaders });
@@ -2404,6 +2433,40 @@ export default {
             GROUP BY ma_cua_hang, ten_cua_hang, vung_mien
           `).bind(effStart, effEnd).all();
           transSums = rawSums || [];
+
+          // Tự động lưu ngầm vào fnb_monthly_summary để các lượt truy cập sau không bao giờ bị scan lại bảng transactions
+          if (rawSums && rawSums.length > 0 && ctx && typeof ctx.waitUntil === 'function') {
+            ctx.waitUntil((async () => {
+              try {
+                await env.DB.prepare(`
+                  INSERT OR REPLACE INTO fnb_monthly_summary (
+                    month_period, site_code, site_name, region,
+                    total_bills, active_days, net_revenue, gross_revenue,
+                    discount, food_cost, dine_in_rev, takeaway_rev, catering_rev
+                  )
+                  SELECT 
+                    SUBSTR(billing_date, 1, 7) as month_period,
+                    ma_cua_hang as site_code,
+                    COALESCE(ten_cua_hang, ma_cua_hang) as site_name,
+                    COALESCE(vung_mien, 'Miền Nam') as region,
+                    COUNT(DISTINCT so_hoa_don) as total_bills,
+                    COUNT(DISTINCT billing_date) as active_days,
+                    COALESCE(SUM(thanh_tien_truoc_thue), 0) as net_revenue,
+                    COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
+                    COALESCE(SUM(ck_truoc_thue), 0) as discount,
+                    COALESCE(SUM(gia_von), 0) as food_cost,
+                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
+                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
+                    COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
+                  FROM transactions
+                  WHERE billing_date >= ? AND billing_date <= ?
+                  GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
+                `).bind(effStart, effEnd).run();
+              } catch (e) {
+                console.warn('Auto-heal fnb_monthly_summary error:', e.message);
+              }
+            })());
+          }
         }
 
         const siteRevMap = {};

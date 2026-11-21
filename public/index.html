@@ -483,8 +483,12 @@
           <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs text-gray-600 dark:text-gray-300 font-medium shadow-xs">
               <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-600"></i>
-              Kỳ báo cáo: <strong class="text-gray-900 dark:text-white font-semibold">Tháng 11/2026</strong>
+              Kỳ báo cáo: <strong id="fnbChainPeriodLabel" class="text-gray-900 dark:text-white font-semibold">Tháng 11/2026</strong>
             </span>
+            <button id="btnSyncFnbSummary" onclick="triggerSyncFnbMonthlySummary()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-brand-200 dark:border-brand-800/80 bg-brand-50/80 hover:bg-brand-100 dark:bg-brand-950/40 dark:hover:bg-brand-900/60 text-xs text-brand-700 dark:text-brand-300 font-medium shadow-xs active:translate-y-px transition-all cursor-pointer" title="Cập nhật số liệu mới nhất của tháng này vào bảng tổng hợp (chỉ tốn 14 writes)">
+              <i id="syncFnbIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400"></i>
+              <span id="syncFnbLabel">Đồng bộ số liệu</span>
+            </button>
           </div>
         </div>
 
@@ -6564,6 +6568,47 @@ let gChainRankings = [];
 let gCurrentFilterRegion = 'ALL';
 
 // 1. Load F&B Chain Rankings
+// Sync F&B Monthly Summary Trigger (Chỉ sync riêng tháng đang chọn, siêu tiết kiệm quota)
+async function triggerSyncFnbMonthlySummary() {
+  const btn = document.getElementById("btnSyncFnbSummary");
+  const icon = document.getElementById("syncFnbIcon");
+  const label = document.getElementById("syncFnbLabel");
+  const month = document.getElementById("globalMonthPicker")?.value || "2026-11";
+
+  try {
+    if (btn) btn.disabled = true;
+    if (icon) icon.classList.add("animate-spin");
+    if (label) label.textContent = "Đang đồng bộ...";
+
+    const resp = await fetch(`/api/admin/sync-monthly-summary?month=${encodeURIComponent(month)}`);
+    const res = await resp.json();
+
+    if (res.success) {
+      if (typeof showToast === "function") {
+        showToast(`Đã đồng bộ số liệu tháng ${month} thành công (${res.count || 14} điểm bán)!`, "success");
+      }
+      // Tải lại giao diện với số liệu mới
+      await loadFnbChain();
+    } else {
+      if (typeof showToast === "function") {
+        showToast("Lỗi đồng bộ: " + (res.error || "Không thành công"), "error");
+      }
+    }
+  } catch (err) {
+    console.error("triggerSyncFnbMonthlySummary error:", err);
+    if (typeof showToast === "function") {
+      showToast("Lỗi kết nối khi đồng bộ: " + err.message, "error");
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+    if (icon) icon.classList.remove("animate-spin");
+    if (label) label.textContent = "Đồng bộ số liệu";
+    if (window.lucide && typeof lucide.createIcons === "function") {
+      lucide.createIcons();
+    }
+  }
+}
+
 async function loadFnbChain() {
   try {
     showLoading();
