@@ -3439,6 +3439,76 @@ export default {
         }
       }
 
+      // 3.65 DANH SÁCH ĐƠN ĐẶT HÀNG PO/PR TỪ SAP (CHO NHẬP HÀNG ĐIỂM BÁN)
+      if (pathname === '/api/fnb/po-list' || pathname === '/fnb/po-list') {
+        const siteCode = searchParams.get('site_code');
+        const search = searchParams.get('search') || '';
+        const status = searchParams.get('status') || '';
+        
+        let q = `
+          SELECT 
+            po_number,
+            site,
+            MAX(doc_date) as doc_date,
+            supplier_code,
+            COALESCE(NULLIF(supplier_name, ''), 'Bếp Trung Tâm Siba') as supplier_name,
+            COUNT(*) as item_count,
+            SUM(order_qty) as total_qty,
+            SUM(order_qty * net_price) as total_amount,
+            status
+          FROM wms.sap_po_items
+          WHERE 1=1
+        `;
+        const params = [];
+        if (siteCode && siteCode !== 'all') {
+          q += ` AND site = ?`;
+          params.push(siteCode.toUpperCase());
+        }
+        if (status) {
+          q += ` AND status = ?`;
+          params.push(status);
+        }
+        if (search) {
+          q += ` AND (po_number LIKE ? OR supplier_name LIKE ? OR supplier_code LIKE ?)`;
+          const s = `%${search}%`;
+          params.push(s, s, s);
+        }
+        q += ` GROUP BY po_number, site, supplier_code, supplier_name, status
+               ORDER BY MAX(doc_date) DESC, po_number DESC
+               LIMIT 100`;
+        const { rows } = await db.query(env, q, params);
+        return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/fnb/po-details' || pathname === '/fnb/po-details') {
+        const poNumber = searchParams.get('po_number');
+        if (!poNumber) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu số đơn đặt hàng po_number' }), { headers: corsHeaders, status: 400 });
+        }
+        const q = `
+          SELECT 
+            site,
+            po_number,
+            po_item,
+            doc_date,
+            supplier_code,
+            COALESCE(NULLIF(supplier_name, ''), 'Bếp Trung Tâm Siba') as supplier_name,
+            article as item_code,
+            article_desc as item_name,
+            merch_category,
+            order_qty,
+            order_unit as unit,
+            net_price as unit_price,
+            received_qty,
+            status
+          FROM wms.sap_po_items
+          WHERE po_number = ?
+          ORDER BY CAST(po_item AS INTEGER) ASC, po_item ASC
+        `;
+        const { rows } = await db.query(env, q, [poNumber]);
+        return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
+      }
+
       // 3.7 NHẬP HÀNG: GET & POST /api/fnb/receipts
       if ((pathname === '/api/fnb/receipts' || pathname === '/fnb/receipts')) {
         if (request.method === 'GET') {
@@ -3509,18 +3579,32 @@ export default {
                   VALUES (?, ?, ?, ?, ?, ?)
                 `, [receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '']);
 
+                // Upsert vào fnb_stock_balances để luôn đảm bảo có tồn kho tại điểm bán sau khi nhập
                 await tx.exec(`
-                  UPDATE fnb_stock_balances
-                  SET receipt_qty = receipt_qty + ?,
-                      book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
-                      total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
-                  WHERE item_code = ? AND site_code = ?
-                `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
+                  INSERT INTO fnb_stock_balances (item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, total_value, updated_at)
+                  VALUES (?, ?, 'Miền Nam', 0, ?, 0, 0, ?, ?, NOW())
+                  ON CONFLICT (item_code, site_code) DO UPDATE SET
+                    receipt_qty = fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty,
+                    book_qty = fnb_stock_balances.opening_qty + (fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty) - fnb_stock_balances.sales_bom_qty - fnb_stock_balances.waste_qty,
+                    total_value = (fnb_stock_balances.opening_qty + (fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty) - fnb_stock_balances.sales_bom_qty - fnb_stock_balances.waste_qty) * ?,
+                    updated_at = NOW()
+                `, [item.item_code, site_code, qty, qty, lineAmount, unitPrice]);
 
                 await tx.exec(`
-                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                  VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
-                `, [receiptCode, validReceiptDate, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by]);
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'NHAP_KHO', ?, ?, ?, ?, ?, ?, ?)
+                `, [receiptCode, item.item_code, site_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ/PO: ${invoice_no || 'N/A'})`, created_by]);
+
+                // Nếu có số PO, cập nhật trạng thái đã nhận hàng
+                if (invoice_no) {
+                  await tx.exec(`
+                    UPDATE wms.sap_po_items
+                    SET received_qty = received_qty + ?,
+                        status = CASE WHEN (received_qty + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
+                        updated_at = NOW()
+                    WHERE po_number = ? AND article = ?
+                  `, [qty, qty, invoice_no, item.item_code]);
+                }
               }
             });
 
