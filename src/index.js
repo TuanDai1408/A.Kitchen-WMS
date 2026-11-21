@@ -1750,9 +1750,9 @@ export default {
             COALESCE(SUM(tong_tien_billing), 0) as gross_revenue,
             COALESCE(SUM(ck_truoc_thue), 0) as discount,
             COALESCE(SUM(gia_von), 0) as food_cost,
-            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
-            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
-            COALESCE(SUM(CASE WHEN LOWER(loai_don_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
+            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%tại chỗ%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as dine_in_rev,
+            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%mang đi%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as takeaway_rev,
+            COALESCE(SUM(CASE WHEN LOWER(ten_kenh_ban_hang) LIKE '%suất ăn%' THEN thanh_tien_truoc_thue ELSE 0 END), 0) as catering_rev
           FROM transactions
           WHERE billing_date IS NOT NULL AND billing_date != ''
           GROUP BY SUBSTR(billing_date, 1, 7), ma_cua_hang
