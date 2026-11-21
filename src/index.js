@@ -3158,18 +3158,57 @@ export default {
         sitesQuery += ` ORDER BY site_code`;
         const { rows: sites } = await db.query(env, sitesQuery, sitesBinds);
 
-        // 2. Lấy danh mục mặt hàng F&B
+        // 2. Lấy danh mục mặt hàng F&B (kết hợp fnb_stock_items + số dư tồn fnb_stock_balances + dim_article_stock)
         const isPostgres = db.isPg(env);
-        let itemsQuery = isPostgres
-          ? `SELECT * FROM fnb_stock_items WHERE is_active = true`
-          : `SELECT * FROM fnb_stock_items WHERE is_active = 1`;
-        let itemsBinds = [];
-        if (groupParam && groupParam !== 'all') {
-          itemsQuery += ` AND item_group = ?`;
-          itemsBinds.push(groupParam);
+        let itemsList = [];
+        if (isPostgres) {
+          try {
+            const combinedQuery = `
+              SELECT 
+                COALESCE(i.id, 900000 + (ROW_NUMBER() OVER (ORDER BY b.item_code))) as id,
+                b.item_code as code,
+                COALESCE(i.name, d.material_desc, p.article_desc, b.item_code) as name,
+                COALESCE(i.item_group, d.nhom_hang, p.merch_category, 'HANG_HOA') as item_group,
+                COALESCE(i.unit, d.entry_unit, p.order_unit, 'Phần') as unit,
+                COALESCE(i.unit_price, d.price, p.net_price, 0) as unit_price,
+                COALESCE(i.min_stock, 0) as min_stock
+              FROM (
+                SELECT DISTINCT item_code FROM fnb_stock_balances
+                UNION
+                SELECT code as item_code FROM fnb_stock_items WHERE is_active = true
+              ) b
+              LEFT JOIN fnb_stock_items i ON b.item_code = i.code
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price 
+                FROM dim_article_stock
+                GROUP BY material
+              ) d ON b.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+                FROM sap_po_items
+                GROUP BY article
+              ) p ON b.item_code = p.article
+              ORDER BY item_group, code
+            `;
+            const res = await db.query(env, combinedQuery);
+            itemsList = res.rows || [];
+          } catch (e) {
+            console.warn('Fallback fnb_stock_items query:', e.message);
+            const res = await db.query(env, `SELECT * FROM fnb_stock_items WHERE is_active = true ORDER BY item_group, code`);
+            itemsList = res.rows || [];
+          }
+        } else {
+          try {
+            const res = await db.query(env, `SELECT * FROM fnb_stock_items WHERE is_active = 1 ORDER BY item_group, code`);
+            itemsList = res.rows || [];
+          } catch (e) {
+            console.warn('SQLite items error:', e.message);
+          }
         }
-        itemsQuery += ` ORDER BY item_group, code`;
-        const { rows: itemsList } = await db.query(env, itemsQuery, itemsBinds);
+
+        if (groupParam && groupParam !== 'all') {
+          itemsList = itemsList.filter(item => item.item_group === groupParam || (item.item_group && item.item_group.includes(groupParam)));
+        }
 
         // 3. Lấy toàn bộ số dư tồn kho
         const { rows: balances } = await db.query(env, `
@@ -3177,20 +3216,21 @@ export default {
           FROM fnb_stock_balances
         `);
 
-        // Tạo map (item_code -> site_code -> cell)
+        // Tạo map (item_code -> site_code -> cell) với parse Number an toàn tuyệt đối
         const cellMap = {};
         for (const b of (balances || [])) {
           if (!cellMap[b.item_code]) cellMap[b.item_code] = {};
           cellMap[b.item_code][b.site_code] = {
-            book: b.book_qty,
-            lastCount: b.last_count_qty,
-            lastDate: b.last_count_date,
+            book: Number(b.book_qty) || 0,
+            lastCount: (b.last_count_qty !== null && b.last_count_qty !== undefined && b.last_count_qty !== '') ? Number(b.last_count_qty) : null,
+            lastDate: b.last_count_date || null,
             noOpening: b.no_opening === 1 || b.no_opening === true,
-            value: b.total_value,
-            opening: b.opening_qty,
-            receipt: b.receipt_qty,
-            salesBom: b.sales_bom_qty,
-            waste: b.waste_qty
+            value: Number(b.total_value) || 0,
+            opening: Number(b.opening_qty) || 0,
+            receipt: Number(b.receipt_qty) || 0,
+            salesBom: Number(b.sales_bom_qty) || 0,
+            waste: Number(b.waste_qty) || 0,
+            hasSiteRecord: true
           };
         }
 
@@ -3203,7 +3243,8 @@ export default {
               lastCount: null,
               lastDate: null,
               noOpening: true,
-              value: 0
+              value: 0,
+              hasSiteRecord: false
             };
           }
           return {
@@ -3212,8 +3253,8 @@ export default {
             name: item.name,
             group: item.item_group,
             unit: item.unit,
-            price: item.unit_price,
-            minStock: item.min_stock,
+            price: Number(item.unit_price) || 0,
+            minStock: Number(item.min_stock) || 0,
             cells
           };
         });

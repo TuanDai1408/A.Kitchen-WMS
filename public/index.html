@@ -5331,11 +5331,11 @@
           const d = json.data;
           updateTailadminDashboard(d);
 
-          document.getElementById('dashCritCount').textContent = d.critical_exp_count || 0;
-          document.getElementById('dashRopCount').textContent = d.rop_reorder_count || 0;
-          document.getElementById('dashLeadTime').textContent = (d.avg_lead_time || 24.5) + 'h';
-          document.getElementById('dashTotalQty').textContent = fmtNum(d.total_qty || 0);
-          document.getElementById('dashTotalSkus').textContent = `${d.total_skus || 0} SKU đang quản lý`;
+          const elCrit = document.getElementById('dashCritCount'); if (elCrit) elCrit.textContent = d.critical_exp_count || 0;
+          const elRop = document.getElementById('dashRopCount'); if (elRop) elRop.textContent = d.rop_reorder_count || 0;
+          const elLead = document.getElementById('dashLeadTime'); if (elLead) elLead.textContent = (d.avg_lead_time || 24.5) + 'h';
+          const elQty = document.getElementById('dashTotalQty'); if (elQty) elQty.textContent = fmtNum(d.total_qty || 0);
+          const elSkus = document.getElementById('dashTotalSkus'); if (elSkus) elSkus.textContent = `${d.total_skus || 0} SKU đang quản lý`;
 
           // Badges in nav
           const bcEl = document.getElementById('badgeCritNav'); if (bcEl) bcEl.textContent = d.critical_exp_count || 0;
@@ -10498,6 +10498,7 @@ window.loadFnbStock = async function() {
     if (gFnbStockFilter.group && gFnbStockFilter.group !== 'ALL') {
       url.searchParams.set('group', gFnbStockFilter.group);
     }
+    url.searchParams.set('refresh', 'true');
     const res = await fetch(url.toString());
     const json = await res.json();
     if (!json.success || !json.data) {
@@ -10534,7 +10535,7 @@ window.renderFnbStock = function() {
   if (currentSiteFilter && currentSiteFilter !== 'ALL' && currentSiteFilter !== 'all') {
     displayRows = filteredRows.filter(r => {
       const cell = r.cells && r.cells[currentSiteFilter];
-      return cell && (cell.book !== undefined || cell.noOpening !== undefined || cell.hasSiteRecord);
+      return cell && (cell.hasSiteRecord || (cell.book !== undefined && Number(cell.book) !== 0) || (cell.lastCount !== null && cell.lastCount !== undefined));
     });
   }
   
@@ -10545,10 +10546,12 @@ window.renderFnbStock = function() {
   
   filteredRows.forEach(r => {
     sites.forEach(s => {
-      const cell = r.cells[s.id];
+      const cell = r.cells && r.cells[s.id];
       if (cell) {
-        if (cell.value) totalChainValue += cell.value;
-        if (cell.book < 0) negativeCount++;
+        const val = Number(cell.value) || 0;
+        const bk = Number(cell.book) || 0;
+        totalChainValue += val;
+        if (bk < 0) negativeCount++;
         if (cell.noOpening) noOpeningCount++;
       }
     });
@@ -10616,16 +10619,20 @@ window.renderFnbStock = function() {
         `;
         
         sites.forEach(s => {
-          const cell = r.cells[s.id] || { book: 0, lastCount: null, noOpening: true, value: 0 };
-          const isNegative = cell.book < 0;
+          const cell = (r.cells && r.cells[s.id]) || { book: 0, lastCount: null, noOpening: true, value: 0 };
+          const numBook = Number(cell.book) || 0;
+          const isNegative = numBook < 0;
           const bookClass = isNegative
             ? 'text-rose-600 dark:text-rose-400 font-semibold'
-            : (cell.book > 0 ? 'text-gray-900 dark:text-white font-bold' : 'text-gray-400 dark:text-gray-600 font-medium');
+            : (numBook > 0 ? 'text-gray-900 dark:text-white font-bold' : 'text-gray-400 dark:text-gray-600 font-medium');
           
           let lastCountHtml = '';
-          if (cell.lastCount !== null && cell.lastCount !== undefined) {
-            const countFormatted = Number.isInteger(cell.lastCount) ? cell.lastCount.toLocaleString('vi-VN') : cell.lastCount.toFixed(1);
-            lastCountHtml = ` <span class="text-gray-400 dark:text-gray-500 font-normal text-[10.5px]" title="Đếm gần nhất (${cell.lastDate || 'N/A'}): ${countFormatted}">(${countFormatted})</span>`;
+          if (cell.lastCount !== null && cell.lastCount !== undefined && cell.lastCount !== '') {
+            const numCount = Number(cell.lastCount);
+            if (!isNaN(numCount)) {
+              const countFormatted = Number.isInteger(numCount) ? numCount.toLocaleString('vi-VN') : numCount.toFixed(1);
+              lastCountHtml = ` <span class="text-gray-400 dark:text-gray-500 font-normal text-[10.5px]" title="Đếm gần nhất (${cell.lastDate || 'N/A'}): ${countFormatted}">(${countFormatted})</span>`;
+            }
           }
           
           let alertBadge = '';
@@ -10634,11 +10641,12 @@ window.renderFnbStock = function() {
           }
           
           let valHtml = '';
-          if (gFnbStockFilter.showValue && cell.value) {
-            valHtml = `<div class="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums mt-0.5">${Math.round(cell.value).toLocaleString('vi-VN')} đ</div>`;
+          const numVal = Number(cell.value) || 0;
+          if (gFnbStockFilter.showValue && numVal) {
+            valHtml = `<div class="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums mt-0.5">${Math.round(numVal).toLocaleString('vi-VN')} đ</div>`;
           }
           
-          const bookFormatted = Number.isInteger(cell.book) ? cell.book.toLocaleString('vi-VN') : cell.book.toFixed(1);
+          const bookFormatted = Number.isInteger(numBook) ? numBook.toLocaleString('vi-VN') : numBook.toFixed(1);
           
           rowHtml += `
             <td class="py-3 px-3 text-right tabular-nums text-xs select-all">
@@ -10667,14 +10675,18 @@ window.renderFnbStock = function() {
         const groupLabel = groupMap[r.group] || r.group;
         
         const siteCards = sites.map(s => {
-          const cell = r.cells[s.id] || { book: 0, lastCount: null, noOpening: true, value: 0 };
-          const isNeg = cell.book < 0;
-          const isZero = cell.book === 0;
-          const bookFormatted = Number.isInteger(cell.book) ? cell.book.toLocaleString('vi-VN') : cell.book.toFixed(1);
+          const cell = (r.cells && r.cells[s.id]) || { book: 0, lastCount: null, noOpening: true, value: 0 };
+          const numBook = Number(cell.book) || 0;
+          const isNeg = numBook < 0;
+          const isZero = numBook === 0;
+          const bookFormatted = Number.isInteger(numBook) ? numBook.toLocaleString('vi-VN') : numBook.toFixed(1);
           let countText = '';
-          if (cell.lastCount !== null && cell.lastCount !== undefined) {
-            const countFormatted = Number.isInteger(cell.lastCount) ? cell.lastCount.toLocaleString('vi-VN') : cell.lastCount.toFixed(1);
-            countText = `(${countFormatted})`;
+          if (cell.lastCount !== null && cell.lastCount !== undefined && cell.lastCount !== '') {
+            const numCount = Number(cell.lastCount);
+            if (!isNaN(numCount)) {
+              const countFormatted = Number.isInteger(numCount) ? numCount.toLocaleString('vi-VN') : numCount.toFixed(1);
+              countText = `(${countFormatted})`;
+            }
           }
           return {
             site: s,
