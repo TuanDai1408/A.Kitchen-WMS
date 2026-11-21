@@ -11007,7 +11007,17 @@ window.renderFnbCountsTable = function() {
   // Desktop Table
   if (tbody) {
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</td></tr>`;
+      if (!gFnbAllItems || gFnbAllItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div class="flex flex-col items-center justify-center gap-2">
+            <i data-lucide="package-search" class="w-8 h-8 text-gray-400"></i>
+            <p class="font-semibold text-sm text-gray-700 dark:text-gray-200">Chưa có mặt hàng nào được nhập kho tại điểm bán này.</p>
+            <p class="text-xs text-gray-400">Vui lòng nhập hàng tại tab <a href="javascript:void(0)" onclick="switchTab('fnb-receipts')" class="text-brand-500 underline font-medium hover:text-brand-600">Nhập Hàng Điểm Bán</a> trước khi thực hiện kiểm kê.</p>
+          </div>
+        </td></tr>`;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</td></tr>`;
+      }
     } else {
       tbody.innerHTML = filtered.map((item, idx) => {
         const book = Number(item.book_qty) || 0;
@@ -11061,7 +11071,15 @@ window.renderFnbCountsTable = function() {
   // Mobile Card View
   if (mob) {
     if (filtered.length === 0) {
-      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc.</div>`;
+      if (!gFnbAllItems || gFnbAllItems.length === 0) {
+        mob.innerHTML = `<div class="text-center py-8 px-4 text-gray-500 dark:text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center gap-2">
+          <i data-lucide="package-search" class="w-8 h-8 text-gray-400"></i>
+          <p class="font-semibold text-xs text-gray-700 dark:text-gray-200">Chưa có mặt hàng nào được nhập kho tại điểm bán này.</p>
+          <p class="text-[11px] text-gray-400">Vui lòng nhập hàng tại tab <a href="javascript:void(0)" onclick="switchTab('fnb-receipts')" class="text-brand-500 underline font-medium">Nhập Hàng</a> trước khi kiểm kê.</p>
+        </div>`;
+      } else {
+        mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc.</div>`;
+      }
     } else {
       mob.innerHTML = filtered.map((item, idx) => {
         const book = Number(item.book_qty) || 0;

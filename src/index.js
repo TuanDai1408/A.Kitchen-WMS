@@ -3316,71 +3316,91 @@ export default {
 
 
 
-      // 3.5 GET /api/fnb/stock/items-for-site - Lấy danh mục & tồn sách chuẩn xác theo từng điểm bán từ dim_article_stock
+      // 3.5 GET /api/fnb/stock/items-for-site - Chỉ lấy các mặt hàng đã nhập kho trước đó theo từng điểm bán
       if ((pathname === '/api/fnb/stock/items-for-site' || pathname === '/fnb/stock/items-for-site') && request.method === 'GET') {
         const siteCode = searchParams.get('site_code') || 'K001';
         const groupParam = searchParams.get('group') || 'all';
 
-        // 1. Ưu tiên truy vấn trực tiếp từ dim_article_stock (chỉ lấy đúng các mặt hàng của điểm bán đó)
-        let query = `
-          SELECT 
-            d.id,
-            d.material as code,
-            d.material_desc as name,
-            COALESCE(d.nhom_hang, d.nganh_hang) as item_group,
-            d.nganh_hang,
-            d.nhom_hang,
-            d.entry_unit as unit,
-            COALESCE(d.price, 0) as unit_price,
-            0 as min_stock,
-            COALESCE(b.book_qty, 0) as book_qty,
-            COALESCE(b.last_count_qty, NULL) as last_count_qty,
-            b.last_count_date,
-            COALESCE(b.no_opening, ${db.isPg(env) ? 'true' : '1'}) as no_opening,
-            COALESCE(b.total_value, 0) as total_value
-          FROM dim_article_stock d
-          LEFT JOIN fnb_stock_balances b ON d.material = b.item_code AND b.site_code = d.site
-          WHERE d.site = ?
-        `;
-        let binds = [siteCode];
+        let query = {
+          pg: `
+            SELECT 
+              COALESCE(b.id, 0) as id,
+              sub.item_code as code,
+              COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+              COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+              COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+              COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+              COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+              COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+              0 as min_stock,
+              COALESCE(b.book_qty, 0) as book_qty,
+              COALESCE(b.last_count_qty, NULL) as last_count_qty,
+              b.last_count_date,
+              COALESCE(b.no_opening, false) as no_opening,
+              COALESCE(b.total_value, 0) as total_value
+            FROM (
+              SELECT DISTINCT l.item_code
+              FROM fnb_stock_receipt_lines l
+              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+              WHERE UPPER(r.site_code) = UPPER(?)
+              UNION
+              SELECT DISTINCT b2.item_code
+              FROM fnb_stock_balances b2
+              WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+            ) sub
+            LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
+            LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
+            LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+            LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+          `,
+          d1: `
+            SELECT 
+              COALESCE(b.id, 0) as id,
+              sub.item_code as code,
+              COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+              COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+              COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+              COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+              COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+              COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+              0 as min_stock,
+              COALESCE(b.book_qty, 0) as book_qty,
+              COALESCE(b.last_count_qty, NULL) as last_count_qty,
+              b.last_count_date,
+              COALESCE(b.no_opening, 0) as no_opening,
+              COALESCE(b.total_value, 0) as total_value
+            FROM (
+              SELECT DISTINCT l.item_code
+              FROM fnb_stock_receipt_lines l
+              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+              WHERE UPPER(r.site_code) = UPPER(?)
+              UNION
+              SELECT DISTINCT b2.item_code
+              FROM fnb_stock_balances b2
+              WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+            ) sub
+            LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
+            LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
+            LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+            LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+          `
+        };
+
+        let binds = [siteCode, siteCode, siteCode, siteCode];
         if (groupParam && groupParam !== 'all') {
-          query += ` AND (d.nhom_hang = ? OR d.nganh_hang = ? OR d.nhom_hang LIKE ?)`;
+          query.pg += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
+          query.d1 += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
           binds.push(groupParam, groupParam, `%${groupParam}%`);
         }
-        query += ` ORDER BY d.nhom_hang, d.material`;
+        query.pg += ` ORDER BY nhom_hang, sub.item_code`;
+        query.d1 += ` ORDER BY nhom_hang, sub.item_code`;
 
         let results = [];
         try {
           const res = await db.query(env, query, binds);
           results = res.rows || [];
         } catch (e) {
-          console.warn('dim_article_stock not ready or empty:', e.message);
-        }
-
-        // 2. Fallback sang fnb_stock_items nếu site chưa có trong dim_article_stock
-        if (!results.length) {
-          const isPostgres = db.isPg(env);
-          let fbQuery = `
-            SELECT i.id, i.code, i.name, i.item_group, i.unit, i.unit_price, i.min_stock,
-                   COALESCE(b.book_qty, 0) as book_qty,
-                   COALESCE(b.last_count_qty, NULL) as last_count_qty,
-                   b.last_count_date,
-                   COALESCE(b.no_opening, ${isPostgres ? 'true' : '1'}) as no_opening,
-                   COALESCE(b.total_value, 0) as total_value
-            FROM fnb_stock_items i
-            LEFT JOIN fnb_stock_balances b ON i.code = b.item_code AND b.site_code = ?
-            WHERE i.is_active = ${isPostgres ? 'true' : '1'}
-          `;
-          let fbBinds = [siteCode];
-          if (groupParam && groupParam !== 'all') {
-            fbQuery += ` AND i.item_group = ?`;
-            fbBinds.push(groupParam);
-          }
-          fbQuery += ` ORDER BY i.item_group, i.code`;
-          try {
-            const fbRes = await db.query(env, fbQuery, fbBinds);
-            results = fbRes.rows || [];
-          } catch (e) {}
+          console.warn('items-for-site query error:', e.message);
         }
 
         const fnbSiteStockData = {
