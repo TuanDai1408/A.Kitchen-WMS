@@ -457,7 +457,8 @@ function invalidateMemoryCache(prefix) {
   }
 }
 
-function createCachedResponse(data, ttlSeconds, corsHeaders, isNoCache, url, request, ctx, memKey) {
+function createCachedResponse(data, ttlSeconds, corsHeaders, isNoCache, url, request, ctx, customKey) {
+  const memKey = customKey || (url ? (url.pathname + (url.search || '')) : null);
   if (memKey && !isNoCache) {
     setMemoryCache(memKey, data, ttlSeconds);
   }
@@ -465,7 +466,7 @@ function createCachedResponse(data, ttlSeconds, corsHeaders, isNoCache, url, req
   headers.set('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
   headers.set('X-D1-Cache', 'MISS');
   const resp = new Response(JSON.stringify(data), { headers });
-  if (!isNoCache && ctx && typeof ctx.waitUntil === 'function') {
+  if (!isNoCache && ctx && typeof ctx.waitUntil === 'function' && url && request) {
     try {
       ctx.waitUntil(caches.default.put(new Request(url.toString(), request), resp.clone()));
     } catch (e) {}
@@ -583,9 +584,10 @@ export default {
     const isCacheableReport = CACHEABLE_GET_ROUTES.includes(pathname) && request.method === 'GET';
     const isNoCache = searchParams.get('refresh') === 'true' || searchParams.get('nocache') === '1';
 
+    const canonicalKey = url.pathname + (url.search || '');
     if (isCacheableReport && !isNoCache) {
       // 0a. Ultra-fast RAM Cache (<0.5ms, 0 D1 rows read)
-      const memCached = getMemoryCache(url.toString());
+      const memCached = getMemoryCache(canonicalKey) || getMemoryCache(url.toString());
       if (memCached) {
         const resp = new Response(JSON.stringify(memCached), { headers: corsHeaders });
         resp.headers.set('X-D1-Cache', 'RAM-HIT');
