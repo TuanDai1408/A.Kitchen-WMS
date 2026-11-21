@@ -3316,77 +3316,130 @@ export default {
 
 
 
-      // 3.5 GET /api/fnb/stock/items-for-site - Chỉ lấy các mặt hàng đã nhập kho trước đó theo từng điểm bán
+      // 3.5 GET /api/fnb/stock/items-for-site - Lấy các mặt hàng theo từng điểm bán (hỗ trợ in_stock_only=1 cho hủy hàng)
       if ((pathname === '/api/fnb/stock/items-for-site' || pathname === '/fnb/stock/items-for-site') && request.method === 'GET') {
         const siteCode = searchParams.get('site_code') || 'K001';
         const groupParam = searchParams.get('group') || 'all';
+        const inStockOnly = searchParams.get('in_stock_only') === '1' || searchParams.get('in_stock_only') === 'true';
 
-        let query = {
-          pg: `
-            SELECT 
-              COALESCE(b.id, 0) as id,
-              sub.item_code as code,
-              COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
-              COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
-              COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
-              COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
-              COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
-              COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
-              0 as min_stock,
-              COALESCE(b.book_qty, 0) as book_qty,
-              COALESCE(b.last_count_qty, NULL) as last_count_qty,
-              b.last_count_date,
-              COALESCE(b.no_opening, false) as no_opening,
-              COALESCE(b.total_value, 0) as total_value
-            FROM (
-              SELECT DISTINCT l.item_code
-              FROM fnb_stock_receipt_lines l
-              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
-              WHERE UPPER(r.site_code) = UPPER(?)
-              UNION
-              SELECT DISTINCT b2.item_code
-              FROM fnb_stock_balances b2
-              WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
-            ) sub
-            LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
-            LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
-            LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
-            LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
-          `,
-          d1: `
-            SELECT 
-              COALESCE(b.id, 0) as id,
-              sub.item_code as code,
-              COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
-              COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
-              COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
-              COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
-              COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
-              COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
-              0 as min_stock,
-              COALESCE(b.book_qty, 0) as book_qty,
-              COALESCE(b.last_count_qty, NULL) as last_count_qty,
-              b.last_count_date,
-              COALESCE(b.no_opening, 0) as no_opening,
-              COALESCE(b.total_value, 0) as total_value
-            FROM (
-              SELECT DISTINCT l.item_code
-              FROM fnb_stock_receipt_lines l
-              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
-              WHERE UPPER(r.site_code) = UPPER(?)
-              UNION
-              SELECT DISTINCT b2.item_code
-              FROM fnb_stock_balances b2
-              WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
-            ) sub
-            LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
-            LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
-            LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
-            LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
-          `
-        };
+        let query = {};
+        let binds = [];
 
-        let binds = [siteCode, siteCode, siteCode, siteCode];
+        if (inStockOnly) {
+          query = {
+            pg: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                b.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, false) as no_opening,
+                ROUND((COALESCE(b.book_qty, 0) * COALESCE(d.price, p.net_price, i.unit_price, 0))::numeric, 0) as total_value
+              FROM fnb_stock_balances b
+              LEFT JOIN dim_article_stock d ON b.item_code = d.material AND UPPER(d.site) = UPPER(b.site_code)
+              LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON b.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON b.item_code = i.code
+              WHERE UPPER(b.site_code) = UPPER(?) AND b.book_qty > 0
+            `,
+            d1: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                b.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, 0) as no_opening,
+                ROUND(COALESCE(b.book_qty, 0) * COALESCE(d.price, p.net_price, i.unit_price, 0)) as total_value
+              FROM fnb_stock_balances b
+              LEFT JOIN dim_article_stock d ON b.item_code = d.material AND UPPER(d.site) = UPPER(b.site_code)
+              LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON b.item_code = i.code
+              WHERE UPPER(b.site_code) = UPPER(?) AND b.book_qty > 0
+            `
+          };
+          binds = [siteCode];
+        } else {
+          query = {
+            pg: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                sub.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, false) as no_opening,
+                COALESCE(b.total_value, 0) as total_value
+              FROM (
+                SELECT DISTINCT l.item_code
+                FROM fnb_stock_receipt_lines l
+                JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+                WHERE UPPER(r.site_code) = UPPER(?)
+                UNION
+                SELECT DISTINCT b2.item_code
+                FROM fnb_stock_balances b2
+                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+              ) sub
+              LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
+              LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+              LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+            `,
+            d1: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                sub.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, 0) as no_opening,
+                COALESCE(b.total_value, 0) as total_value
+              FROM (
+                SELECT DISTINCT l.item_code
+                FROM fnb_stock_receipt_lines l
+                JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+                WHERE UPPER(r.site_code) = UPPER(?)
+                UNION
+                SELECT DISTINCT b2.item_code
+                FROM fnb_stock_balances b2
+                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+              ) sub
+              LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
+              LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+              LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+            `
+          };
+          binds = [siteCode, siteCode, siteCode, siteCode];
+        }
         if (groupParam && groupParam !== 'all') {
           query.pg += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
           query.d1 += ` WHERE (COALESCE(d.nhom_hang, p.merch_category, i.item_group) = ? OR COALESCE(d.nganh_hang, p.merch_category) = ? OR COALESCE(d.nhom_hang, p.merch_category, i.item_group) LIKE ?)`;
@@ -3508,9 +3561,9 @@ export default {
 
                 if (Math.abs(diffQty) > 0.001) {
                   await tx.exec(`
-                    INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                    VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
-                  `, [countCode, validCountDate, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by]);
+                    INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                    VALUES (?, 'KIEM_KE', ?, ?, ?, ?, ?, ?, ?)
+                  `, [countCode, item.item_code, site_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by]);
                 }
               }
             });
@@ -3729,8 +3782,13 @@ export default {
           let lines = [];
           if (wasteId) {
             const { rows: l } = await db.query(env, `
-              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              SELECT l.*, 
+                     COALESCE(d.material_desc, p.article_desc, i.name, l.item_code) as item_name, 
+                     COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit, 
+                     COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group
               FROM fnb_stock_waste_lines l
+              LEFT JOIN dim_article_stock d ON l.item_code = d.material
+              LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON l.item_code = p.article
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.waste_id = ?
             `, [wasteId]);
@@ -3784,16 +3842,17 @@ export default {
 
                 await tx.exec(`
                   UPDATE fnb_stock_balances
-                  SET waste_qty = waste_qty + ?,
-                      book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
-                      total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
-                  WHERE item_code = ? AND site_code = ?
+                  SET waste_qty = COALESCE(waste_qty, 0) + ?,
+                      book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                      total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
                 `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
 
                 await tx.exec(`
-                  INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
-                  VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
-                `, [wasteCode, validWasteDate, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by]);
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'HUY_HANG', ?, ?, ?, ?, ?, ?, ?)
+                `, [wasteCode, item.item_code, site_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${item.reason_detail || reason} (Xác nhận: ${confirmed_by})`, created_by]);
               }
             });
 

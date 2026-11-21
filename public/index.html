@@ -2201,67 +2201,235 @@
            ===================================================================== -->
       <section id="fnb-waste" class="tab-panel space-y-5">
         
-        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('wh-dashboard')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng Quan Kho Vận</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none">
+          <button onclick="switchTab('wh-dashboard')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng Quan Kho Vận</span></button>
+          <button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button>
+          <button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng &amp; Hao Hụt</span></button>
+        </div>
 
         <!-- TailAdmin Breadcrumb Header -->
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90 ">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90">
               Biên Bản Hủy Hàng &amp; Hao Hụt
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ghi nhận hàng hỏng, quá hạn, dập nát, cháy rách hoặc nấu dư cuối ngày. Tự động giảm số lượng tồn kho và ghi nhận chi phí hao hụt.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Chỉ hiển thị các mặt hàng đang có tồn kho (&gt; 0) tại điểm bán để ghi nhận hư hỏng, quá hạn, dập nát và tự động trừ tồn kho thực tế.</p>
           </div>
           <div class="flex items-center gap-2.5 flex-wrap">
-            <button onclick="openCreateWasteModal()" class="inline-flex items-center gap-2 rounded-[10px] bg-brand-500 hover:bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all">
+            <button onclick="openCreateWasteModal()" class="inline-flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-theme-xs transition-all">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
               <span>+ Ghi Biên Bản Hủy Hàng</span>
             </button>
-            <button onclick="loadFnbWaste()" class="inline-flex size-10 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 shadow-theme-xs transition-all" title="Làm mới">
+            <button onclick="loadFnbWaste()" class="inline-flex size-10 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 shadow-theme-xs transition-all" title="Làm mới">
               <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
 
+        <!-- TailAdmin KPI Metric Cards -->
+        <div class="kpi-grid">
+          <!-- Card 1: Tổng Mã Tồn > 0 -->
+          <div class="kpi-card">
+            <div class="flex items-start justify-between gap-2">
+              <span class="kpi-label">Mặt Hàng Tồn &gt; 0</span>
+              <div class="kpi-icon bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <i data-lucide="package" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline">
+              <span id="kpiWasteInStockCount" class="kpi-value">—</span>
+              <span class="kpi-unit">Mã</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span class="kpi-sub">Khả dụng tại điểm bán</span>
+              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
+                Tồn khả dụng
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 2: Tổng Giá Trị Tồn Khả Dụng -->
+          <div class="kpi-card">
+            <div class="flex items-start justify-between gap-2">
+              <span class="kpi-label">Giá Trị Tồn Khả Dụng</span>
+              <div class="kpi-icon bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline">
+              <span id="kpiWasteInStockVal" class="kpi-value">—</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span class="kpi-sub">Theo giá vốn thực tế</span>
+              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
+                Giá vốn
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 3: Mặt Hàng Đã Chọn Hủy -->
+          <div class="kpi-card">
+            <div class="flex items-start justify-between gap-2">
+              <span class="kpi-label">Mặt Hàng Chọn Hủy</span>
+              <div class="kpi-icon bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline">
+              <span id="kpiWasteSelectedCount" class="kpi-value text-amber-600 dark:text-amber-400">0</span>
+              <span class="kpi-unit">Mã</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span class="kpi-sub">Đang nhập số lượng hủy</span>
+              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+                Chờ xác nhận
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 4: Tổng Tiền Hủy Dự Kiến -->
+          <div class="kpi-card">
+            <div class="flex items-start justify-between gap-2">
+              <span class="kpi-label">Tổng Tiền Hủy Dự Kiến</span>
+              <div class="kpi-icon bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline">
+              <span id="kpiWasteTotalEstAmount" class="kpi-value text-rose-600 dark:text-rose-400">0 ₫</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span class="kpi-sub">Tự động trừ tồn khi xác nhận</span>
+              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400">
+                Hao hụt
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-View Navigation: Hàng Tồn > 0 vs Lịch Sử Biên Bản Hủy -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs select-none">
+            <button type="button" id="subtab-fnb-waste-stock" onclick="switchFnbWasteSubView('stock')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700">
+              <i data-lucide="package-check" class="w-4 h-4 text-emerald-500"></i>
+              <span>Mặt Hàng Tồn Kho (Tồn &gt; 0)</span>
+              <span id="fnbWasteBadgeInStockCount" class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 font-mono font-bold">0</span>
+            </button>
+            <button type="button" id="subtab-fnb-waste-history" onclick="switchFnbWasteSubView('history')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+              <i data-lucide="history" class="w-4 h-4 text-gray-400"></i>
+              <span>Lịch Sử Biên Bản Hủy</span>
+              <span id="fnbWasteBadgeHistoryCount" class="px-2 py-0.5 rounded-full text-[11px] bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 font-mono font-bold">0</span>
+            </button>
+          </div>
+
+          <!-- Quick Action: Submit Selected Waste -->
+          <button type="button" id="btnSubmitDirectWaste" onclick="submitDirectWaste()" disabled class="inline-flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-xs font-bold text-white shadow-theme-xs transition-all">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <span id="btnSubmitDirectWasteText">Xác Nhận Tạo Biên Bản Hủy (0)</span>
+          </button>
+        </div>
+
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col md:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto">
             <div class="flex items-center gap-1.5">
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
-              <select id="fnbWasteFilterSite" onchange="loadFnbWaste()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500">
-                <option value="all">Tất cả 14 điểm</option>
+              <select id="fnbWasteFilterSite" onchange="onFnbWasteSiteChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500">
+                <option value="K001">K001 - Cửa hàng Ba Đình</option>
               </select>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Ngành:</span>
+              <select id="fnbWasteNganhHangFilter" onchange="onFnbWasteNganhHangChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 max-w-[170px] truncate">
+                <option value="">Tất cả ngành hàng</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nhóm:</span>
+              <select id="fnbWasteNhomHangFilter" onchange="onFnbWasteFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 max-w-[180px] truncate">
+                <option value="">Tất cả nhóm hàng</option>
+              </select>
+            </div>
+            <div class="relative min-w-[200px] flex-1 sm:flex-initial">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="fnbWasteSearchInput" oninput="onFnbWasteSearch(this.value)" placeholder="Tìm mã, tên mặt hàng..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:border-rose-500">
             </div>
             <button onclick="loadFnbWaste()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5 transition-all">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
             </button>
           </div>
-          <div id="fnbWasteSummary" class="text-xs text-gray-500 tabular-nums">
+          <div id="fnbWasteSummary" class="text-xs text-gray-500 tabular-nums self-end md:self-center">
             Đang tải dữ liệu...
           </div>
         </div>
 
-        <!-- Waste Table (Desktop) -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
-          <table class="w-full border-collapse text-left text-xs">
-            <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
-              <tr>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Mã Biên Bản</th>
-                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Điểm Bán</th>
-                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Ngày Hủy</th>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Lý Do Hủy</th>
-                <th class="py-3 px-3 font-bold uppercase tracking-wider text-[11px]">Người Xác Nhận</th>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px] text-right">Giá Trị Hủy (VNĐ)</th>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Ghi Chú</th>
-                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-24">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody id="fnbWasteTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
-            </tbody>
-          </table>
+        <!-- SUB-VIEW 1: MẶT HÀNG TỒN KHO (TỒN > 0) -->
+        <div id="fnbWasteSubViewStock" class="space-y-4">
+          <!-- Desktop Table -->
+          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 select-none">
+                <tr>
+                  <th class="py-3 px-3 text-center font-bold text-[11px] w-12">STT</th>
+                  <th class="py-3 px-3 font-bold text-[11px] w-28">Mã Hàng</th>
+                  <th class="py-3 px-4 font-bold text-[11px]">Tên Mặt Hàng</th>
+                  <th class="py-3 px-2 text-center font-bold text-[11px] w-16">ĐVT</th>
+                  <th class="py-3 px-3 text-right font-bold text-[11px] w-24">Đơn Giá</th>
+                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28 text-emerald-600 dark:text-emerald-400">Tồn Sách (&gt;0)</th>
+                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28">Giá Trị Tồn</th>
+                  <th class="py-3 px-3 text-center font-bold text-[11px] w-32 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/20">SL Cần Hủy *</th>
+                  <th class="py-3 px-3 font-bold text-[11px] w-44">Lý Do Hủy</th>
+                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28 text-rose-600 dark:text-rose-400">Tiền Hủy</th>
+                  <th class="py-3 px-3 font-bold text-[11px] w-36">Ghi Chú</th>
+                </tr>
+              </thead>
+              <tbody id="fnbWasteStockTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div id="fnbWasteStockEmptyState" class="hidden p-12 text-center bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-3">
+            <div class="inline-flex size-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400">
+              <i data-lucide="package-search" class="size-7"></i>
+            </div>
+            <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200">Không có mặt hàng nào có tồn kho &gt; 0</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              Điểm bán này hiện chưa có mặt hàng nào có số lượng tồn khả dụng lớn hơn 0 hoặc không khớp bộ lọc đã chọn.
+            </p>
+          </div>
+
+          <!-- Mobile Cards -->
+          <div id="fnbWasteStockMobileCards" class="block lg:hidden space-y-3">
+          </div>
         </div>
 
-        <!-- Waste Mobile Card View -->
-        <div id="fnbWasteMobileCards" class="block lg:hidden space-y-3 mt-4">
+        <!-- SUB-VIEW 2: LỊCH SỬ BIÊN BẢN HỦY -->
+        <div id="fnbWasteSubViewHistory" class="hidden space-y-4">
+          <!-- Desktop Table -->
+          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+                <tr>
+                  <th class="py-3 px-4 font-bold text-[11px]">Mã Biên Bản</th>
+                  <th class="py-3 px-3 font-bold text-[11px]">Điểm Bán</th>
+                  <th class="py-3 px-3 font-bold text-[11px]">Ngày Hủy</th>
+                  <th class="py-3 px-4 font-bold text-[11px]">Lý Do Hủy</th>
+                  <th class="py-3 px-3 font-bold text-[11px]">Người Xác Nhận</th>
+                  <th class="py-3 px-4 font-bold text-[11px] text-right">Giá Trị Hủy (VNĐ)</th>
+                  <th class="py-3 px-4 font-bold text-[11px]">Ghi Chú</th>
+                  <th class="py-3 px-3 text-center font-bold text-[11px] w-24">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="fnbWasteTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards -->
+          <div id="fnbWasteMobileCards" class="block lg:hidden space-y-3">
+          </div>
         </div>
 
       </section>
@@ -11900,6 +12068,846 @@ window.closeInvDetailModal = function() {
 
 
 
+
+
+
+// ============================================================================
+// 5. HỦY HÀNG & HAO HỤT (FNB STOCK WASTES) ENGINE - TỒN > 0
+// ============================================================================
+
+function getActiveFnbWasteSite() {
+  const filterSel = document.getElementById('fnbWasteFilterSite')?.value;
+  if (filterSel && filterSel !== 'all' && filterSel !== 'ALL') return filterSel.toUpperCase();
+  const localSaved = localStorage.getItem('orbit_user_site');
+  const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+
+  let siteCode = localSaved || globalSel || appBranch || 'K001';
+  if (siteCode === 'ALL' || siteCode === 'all') siteCode = 'K001';
+  return siteCode.toUpperCase();
+}
+
+window.populateFnbWasteSiteDropdown = function() {
+  const sel = document.getElementById('fnbWasteFilterSite');
+  if (!sel) return;
+  const currentVal = sel.value || getActiveFnbWasteSite();
+  const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []).filter(s => s.code !== 'ALL');
+  if (sites && sites.length) {
+    let opts = '';
+    sites.forEach(s => {
+      opts += `<option value="${s.code}" ${s.code.toUpperCase() === currentVal.toUpperCase() ? 'selected' : ''}>${s.name}</option>`;
+    });
+    sel.innerHTML = opts;
+    if (currentVal && Array.from(sel.options).some(o => o.value === currentVal)) {
+      sel.value = currentVal;
+    }
+  }
+};
+
+window.switchFnbWasteSubView = function(view) {
+  const btnStock = document.getElementById('subtab-fnb-waste-stock');
+  const btnHistory = document.getElementById('subtab-fnb-waste-history');
+  const secStock = document.getElementById('fnbWasteSubViewStock');
+  const secHistory = document.getElementById('fnbWasteSubViewHistory');
+
+  if (view === 'history') {
+    if (btnStock) {
+      btnStock.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200';
+    }
+    if (btnHistory) {
+      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700';
+    }
+    if (secStock) secStock.classList.add('hidden');
+    if (secHistory) secHistory.classList.remove('hidden');
+  } else {
+    if (btnStock) {
+      btnStock.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700';
+    }
+    if (btnHistory) {
+      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200';
+    }
+    if (secStock) secStock.classList.remove('hidden');
+    if (secHistory) secHistory.classList.add('hidden');
+  }
+  if (window.lucide) lucide.createIcons();
+};
+
+window.loadFnbWaste = async function() {
+  populateFnbWasteSiteDropdown();
+  const siteCode = getActiveFnbWasteSite();
+  const filterSel = document.getElementById('fnbWasteFilterSite');
+  if (filterSel && filterSel.value !== siteCode) {
+    filterSel.value = siteCode;
+  }
+
+  const sumEl = document.getElementById('fnbWasteSummary');
+  if (sumEl) sumEl.textContent = 'Đang tải hàng tồn của ' + siteCode + '...';
+
+  try {
+    // 1. Fetch positive stock items (in_stock_only=1)
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}&in_stock_only=1&no-cache=1`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      window.gFnbWasteStockItems = (json.data.items || []).map(i => ({
+        ...i,
+        wasteQty: 0,
+        wasteReason: 'Hàng hỏng / ôi thiu không đạt chuẩn',
+        wasteNote: ''
+      }));
+    } else {
+      window.gFnbWasteStockItems = [];
+    }
+
+    populateFnbWasteFilters();
+    renderFnbWasteStockTable();
+
+    // 2. Load waste slips history
+    loadFnbWasteHistory(siteCode);
+
+  } catch (err) {
+    console.error('loadFnbWaste error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi tải dữ liệu hủy hàng: ' + err.message);
+  }
+};
+
+function populateFnbWasteFilters() {
+  const nganhSel = document.getElementById('fnbWasteNganhHangFilter');
+  const nhomSel = document.getElementById('fnbWasteNhomHangFilter');
+  if (!nganhSel || !nhomSel) return;
+
+  const nganhMap = new Map();
+  (window.gFnbWasteStockItems || []).forEach(i => {
+    const ng = (i.nganh_hang || 'Chưa phân loại').trim();
+    const nh = (i.nhom_hang || i.item_group || 'Chưa phân loại').trim();
+    if (!nganhMap.has(ng)) nganhMap.set(ng, new Set());
+    nganhMap.get(ng).add(nh);
+  });
+  window.gFnbWasteNganhMap = nganhMap;
+
+  let nganhOpts = '<option value="">Tất cả ngành hàng</option>';
+  Array.from(nganhMap.keys()).sort().forEach(ng => {
+    nganhOpts += `<option value="${escapeHtml(ng)}">${escapeHtml(ng)}</option>`;
+  });
+  nganhSel.innerHTML = nganhOpts;
+  nganhSel.value = '';
+
+  populateFnbWasteNhomHangDropdown('');
+}
+
+function populateFnbWasteNhomHangDropdown(selectedNganh) {
+  const nhomSel = document.getElementById('fnbWasteNhomHangFilter');
+  if (!nhomSel) return;
+
+  const nhomSet = new Set();
+  if (window.gFnbWasteNganhMap) {
+    if (selectedNganh && window.gFnbWasteNganhMap.has(selectedNganh)) {
+      window.gFnbWasteNganhMap.get(selectedNganh).forEach(nh => nhomSet.add(nh));
+    } else {
+      window.gFnbWasteNganhMap.forEach(set => set.forEach(nh => nhomSet.add(nh)));
+    }
+  }
+
+  let nhomOpts = '<option value="">Tất cả nhóm hàng</option>';
+  Array.from(nhomSet).sort().forEach(nh => {
+    nhomOpts += `<option value="${escapeHtml(nh)}">${escapeHtml(nh)}</option>`;
+  });
+  nhomSel.innerHTML = nhomOpts;
+  nhomSel.value = '';
+}
+
+window.onFnbWasteNganhHangChange = function() {
+  const selectedNganh = document.getElementById('fnbWasteNganhHangFilter')?.value || '';
+  populateFnbWasteNhomHangDropdown(selectedNganh);
+  renderFnbWasteStockTable();
+};
+
+window.onFnbWasteFilterChange = function() {
+  renderFnbWasteStockTable();
+};
+
+window.onFnbWasteSearch = function(val) {
+  renderFnbWasteStockTable();
+};
+
+window.onFnbWasteSiteChange = function() {
+  loadFnbWaste();
+};
+
+window.renderFnbWasteStockTable = function() {
+  const tbody = document.getElementById('fnbWasteStockTableBody');
+  const mob = document.getElementById('fnbWasteStockMobileCards');
+  const emptyState = document.getElementById('fnbWasteStockEmptyState');
+  const sumEl = document.getElementById('fnbWasteSummary');
+  const bInStock = document.getElementById('fnbWasteBadgeInStockCount');
+
+  const selectedNganh = (document.getElementById('fnbWasteNganhHangFilter')?.value || '').trim().toLowerCase();
+  const selectedNhom = (document.getElementById('fnbWasteNhomHangFilter')?.value || '').trim().toLowerCase();
+  const query = (document.getElementById('fnbWasteSearchInput')?.value || '').trim().toLowerCase();
+
+  const allItems = window.gFnbWasteStockItems || [];
+
+  // Update total in stock KPI
+  const kpiCount = document.getElementById('kpiWasteInStockCount');
+  const kpiVal = document.getElementById('kpiWasteInStockVal');
+  if (kpiCount) kpiCount.textContent = allItems.length;
+
+  let totalStockVal = 0;
+  allItems.forEach(i => {
+    totalStockVal += Number(i.total_value) || (Number(i.book_qty) * Number(i.unit_price) || 0);
+  });
+  if (kpiVal) {
+    if (typeof fmtCompactVND === 'function') {
+      const c = fmtCompactVND(totalStockVal);
+      kpiVal.innerHTML = `${c.v}<span class="kpi-unit">${c.u}</span>`;
+    } else {
+      kpiVal.textContent = Math.round(totalStockVal).toLocaleString('vi-VN') + ' ₫';
+    }
+  }
+
+  if (bInStock) bInStock.textContent = allItems.length;
+
+  // Filter items for display
+  const filtered = allItems.filter(i => {
+    if (selectedNganh) {
+      const ng = (i.nganh_hang || '').trim().toLowerCase();
+      if (ng !== selectedNganh) return false;
+    }
+    if (selectedNhom) {
+      const nh = (i.nhom_hang || i.item_group || '').trim().toLowerCase();
+      if (nh !== selectedNhom) return false;
+    }
+    if (query) {
+      const name = (i.name || '').toLowerCase();
+      const code = (i.code || '').toLowerCase();
+      if (!name.includes(query) && !code.includes(query)) return false;
+    }
+    return true;
+  });
+
+  if (sumEl) {
+    sumEl.textContent = `Hiển thị ${filtered.length} / ${allItems.length} mặt hàng có tồn > 0`;
+  }
+
+  updateWasteKPIs();
+
+  if (!filtered.length) {
+    if (tbody) tbody.innerHTML = '';
+    if (mob) mob.innerHTML = '';
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  }
+
+  if (emptyState) emptyState.classList.add('hidden');
+
+  const reasonOptions = [
+    'Hàng hỏng / ôi thiu không đạt chuẩn',
+    'Quá hạn sử dụng (HSD)',
+    'Rách vỡ bao bì / đổ vỡ khi vận chuyển',
+    'Dập nát hư hỏng sau sơ chế',
+    'Nấu thử món mới & mẫu lưu kiểm thực',
+    'Nấu dư cuối ngày không bảo quản được',
+    'Hao hụt định mức khác'
+  ];
+
+  if (tbody) {
+    tbody.innerHTML = filtered.map((item, idx) => {
+      const bQty = Number(item.book_qty) || 0;
+      const uPrice = Number(item.unit_price) || 0;
+      const stockVal = Number(item.total_value) || (bQty * uPrice);
+      const wQty = item.wasteQty || 0;
+      const lineAmt = wQty * uPrice;
+
+      return `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-3 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
+          <td class="py-3 px-3 font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(item.code)}</td>
+          <td class="py-3 px-4">
+            <div class="font-semibold text-gray-900 dark:text-white text-xs">${escapeHtml(item.name || item.code)}</div>
+            <div class="text-[10.5px] text-gray-400 flex items-center gap-1.5 mt-0.5">
+              <span>${escapeHtml(item.nganh_hang || item.item_group || 'Chưa phân loại')}</span>
+              ${item.nhom_hang && item.nhom_hang !== item.nganh_hang ? `<span>•</span><span>${escapeHtml(item.nhom_hang)}</span>` : ''}
+            </div>
+          </td>
+          <td class="py-3 px-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-300">
+            ${escapeHtml(item.unit || 'Phần')}
+          </td>
+          <td class="py-3 px-3 text-right tabular-nums text-xs text-gray-600 dark:text-gray-300">
+            ${Math.round(uPrice).toLocaleString('vi-VN')} ₫
+          </td>
+          <td class="py-3 px-3 text-right tabular-nums text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
+            ${bQty.toFixed(1)}
+          </td>
+          <td class="py-3 px-3 text-right tabular-nums text-xs text-gray-600 dark:text-gray-300">
+            ${Math.round(stockVal).toLocaleString('vi-VN')} ₫
+          </td>
+          <td class="py-3 px-3 text-center bg-rose-50/30 dark:bg-rose-950/20">
+            <input type="number" step="0.01" min="0" max="${bQty}" value="${wQty > 0 ? wQty : ''}" placeholder="0"
+                   oninput="onWasteLineQtyChange('${escapeHtml(item.code)}', this.value)"
+                   class="w-24 text-center py-1.5 px-2 rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-gray-800 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500">
+          </td>
+          <td class="py-3 px-3">
+            <select onchange="onWasteLineReasonChange('${escapeHtml(item.code)}', this.value)" class="w-full py-1.5 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs outline-none focus:border-rose-500">
+              ${reasonOptions.map(r => `<option value="${escapeHtml(r)}" ${item.wasteReason === r ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
+            </select>
+          </td>
+          <td id="wasteLineTotal_${escapeHtml(item.code)}" class="py-3 px-3 text-right tabular-nums text-xs font-bold text-rose-600 dark:text-rose-400">
+            ${lineAmt > 0 ? Math.round(lineAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}
+          </td>
+          <td class="py-3 px-3">
+            <input type="text" placeholder="Ghi chú..." value="${escapeHtml(item.wasteNote || '')}"
+                   oninput="onWasteLineNoteChange('${escapeHtml(item.code)}', this.value)"
+                   class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-xs outline-none focus:border-rose-500">
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  if (mob) {
+    mob.innerHTML = filtered.map((item, idx) => {
+      const bQty = Number(item.book_qty) || 0;
+      const uPrice = Number(item.unit_price) || 0;
+      const wQty = item.wasteQty || 0;
+      const lineAmt = wQty * uPrice;
+
+      return `
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(item.code)}</span>
+              <h4 class="font-semibold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(item.name || item.code)}</h4>
+              <div class="text-[11px] text-gray-400">${escapeHtml(item.nganh_hang || item.item_group || '')}</div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">Tồn: ${bQty.toFixed(1)} ${escapeHtml(item.unit || '')}</span>
+              <div class="text-[11px] text-gray-400 tabular-nums">${Math.round(uPrice).toLocaleString('vi-VN')} ₫ / ${escapeHtml(item.unit || '')}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+            <div>
+              <label class="block text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">SL Cần Hủy (Tối đa ${bQty.toFixed(1)})</label>
+              <input type="number" step="0.01" min="0" max="${bQty}" value="${wQty > 0 ? wQty : ''}" placeholder="0"
+                     oninput="onWasteLineQtyChange('${escapeHtml(item.code)}', this.value)"
+                     class="w-full text-center py-1.5 px-2 rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-gray-800 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500 text-xs">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-gray-500 mb-1">Thành Tiền Hủy</label>
+              <div id="mobWasteLineTotal_${escapeHtml(item.code)}" class="py-1.5 px-2 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-bold text-rose-600 dark:text-rose-400 tabular-nums text-right">
+                ${lineAmt > 0 ? Math.round(lineAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-gray-500 mb-1">Lý Do Hủy</label>
+            <select onchange="onWasteLineReasonChange('${escapeHtml(item.code)}', this.value)" class="w-full py-1.5 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs outline-none focus:border-rose-500">
+              ${reasonOptions.map(r => `<option value="${escapeHtml(r)}" ${item.wasteReason === r ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onWasteLineQtyChange = function(code, val) {
+  const item = (window.gFnbWasteStockItems || []).find(i => i.code === code);
+  if (!item) return;
+
+  const num = parseFloat(val);
+  const maxQty = Number(item.book_qty) || 0;
+  if (isNaN(num) || num < 0) {
+    item.wasteQty = 0;
+  } else if (num > maxQty) {
+    item.wasteQty = maxQty;
+    if (typeof showToast === 'function') showToast(`Số lượng hủy không được vượt quá tồn sách (${maxQty})`);
+  } else {
+    item.wasteQty = num;
+  }
+
+  const lineAmt = item.wasteQty * (Number(item.unit_price) || 0);
+
+  const td = document.getElementById(`wasteLineTotal_${code}`);
+  if (td) td.textContent = lineAmt > 0 ? Math.round(lineAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+
+  const mobTd = document.getElementById(`mobWasteLineTotal_${code}`);
+  if (mobTd) mobTd.textContent = lineAmt > 0 ? Math.round(lineAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+
+  updateWasteKPIs();
+};
+
+window.onWasteLineReasonChange = function(code, val) {
+  const item = (window.gFnbWasteStockItems || []).find(i => i.code === code);
+  if (item) item.wasteReason = val;
+};
+
+window.onWasteLineNoteChange = function(code, val) {
+  const item = (window.gFnbWasteStockItems || []).find(i => i.code === code);
+  if (item) item.wasteNote = val;
+};
+
+function updateWasteKPIs() {
+  const items = window.gFnbWasteStockItems || [];
+  let selectedCount = 0;
+  let totalEstAmt = 0;
+
+  items.forEach(i => {
+    if (i.wasteQty > 0) {
+      selectedCount++;
+      totalEstAmt += (i.wasteQty * (Number(i.unit_price) || 0));
+    }
+  });
+
+  const kpiSel = document.getElementById('kpiWasteSelectedCount');
+  if (kpiSel) kpiSel.textContent = selectedCount;
+
+  const kpiEst = document.getElementById('kpiWasteTotalEstAmount');
+  if (kpiEst) {
+    if (totalEstAmt > 0 && typeof fmtCompactVND === 'function') {
+      const c = fmtCompactVND(totalEstAmt);
+      kpiEst.innerHTML = `${c.v}<span class="kpi-unit">${c.u}</span>`;
+    } else {
+      kpiEst.textContent = totalEstAmt > 0 ? Math.round(totalEstAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+    }
+  }
+
+  const btnSubmit = document.getElementById('btnSubmitDirectWaste');
+  const btnSubmitText = document.getElementById('btnSubmitDirectWasteText');
+  if (btnSubmit) {
+    btnSubmit.disabled = (selectedCount === 0);
+  }
+  if (btnSubmitText) {
+    btnSubmitText.textContent = `Xác Nhận Tạo Biên Bản Hủy (${selectedCount})`;
+  }
+}
+
+window.submitDirectWaste = async function() {
+  const allItems = window.gFnbWasteStockItems || [];
+  const validLines = allItems.filter(i => (i.wasteQty || 0) > 0);
+
+  if (!validLines.length) {
+    if (typeof showToast === 'function') showToast('Vui lòng nhập số lượng hủy > 0 cho ít nhất một mặt hàng!');
+    return;
+  }
+
+  const siteCode = getActiveFnbWasteSite();
+  const today = new Date().toISOString().slice(0, 10);
+  const createdBy = (window.gCurrentUser && window.gCurrentUser.name) || 'Bếp Trưởng / Quản Lý';
+
+  let totalAmount = 0;
+  validLines.forEach(l => {
+    totalAmount += (l.wasteQty * (Number(l.unit_price) || 0));
+  });
+
+  const payload = {
+    site_code: siteCode,
+    waste_date: today,
+    reason: validLines.length === 1 ? validLines[0].wasteReason : 'Hàng hỏng / hao hụt định kỳ điểm bán',
+    confirmed_by: createdBy,
+    notes: `Biên bản hủy hàng gồm ${validLines.length} mặt hàng tồn kho`,
+    created_by: createdBy,
+    lines: validLines.map(l => ({
+      item_code: l.code,
+      qty: l.wasteQty,
+      unit_price: Number(l.unit_price) || 0,
+      reason_detail: l.wasteReason || 'Hàng hỏng / ôi thiu không đạt chuẩn',
+      note: l.wasteNote || ''
+    }))
+  };
+
+  const btn = document.getElementById('btnSubmitDirectWaste');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang tạo biên bản hủy...`;
+  }
+
+  try {
+    if (typeof showLoading === 'function') showLoading('Đang lưu biên bản hủy và cập nhật số dư tồn...');
+    const res = await fetch('/api/fnb/wastes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi khi tạo biên bản hủy hàng');
+
+    if (typeof showToast === 'function') {
+      showToast(`Tạo thành công biên bản hủy ${json.data.waste_code}! Tồn kho điểm ${siteCode} đã được giảm tự động.`);
+    }
+
+    // Refresh waste data and switch to history view to review
+    await loadFnbWaste();
+    switchFnbWasteSubView('history');
+
+    // Trigger stock matrix reload in background
+    if (typeof loadFnbStock === 'function') loadFnbStock();
+    if (typeof loadFnbCounts === 'function') loadFnbCounts();
+
+  } catch (err) {
+    console.error('submitDirectWaste error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi ghi biên bản hủy: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> <span id="btnSubmitDirectWasteText">Xác Nhận Tạo Biên Bản Hủy (0)</span>`;
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.loadFnbWasteHistory = async function(siteCodeArg) {
+  const siteCode = siteCodeArg || getActiveFnbWasteSite();
+  const tbody = document.getElementById('fnbWasteTableBody');
+  const mob = document.getElementById('fnbWasteMobileCards');
+  const bHist = document.getElementById('fnbWasteBadgeHistoryCount');
+
+  try {
+    const res = await fetch(`/api/fnb/wastes?site_code=${encodeURIComponent(siteCode)}&no-cache=1`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      const wastes = json.data.wastes || [];
+      if (bHist) bHist.textContent = wastes.length;
+
+      if (tbody) {
+        if (!wastes.length) {
+          tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Chưa có biên bản hủy hàng nào cho điểm bán ${escapeHtml(siteCode)}.</td></tr>`;
+        } else {
+          tbody.innerHTML = wastes.map(w => `
+            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+              <td class="py-3 px-4 font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(w.waste_code)}</td>
+              <td class="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(w.site_code)}</td>
+              <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(String(w.waste_date || '').slice(0, 10))}</td>
+              <td class="py-3 px-4 font-medium text-gray-900 dark:text-white text-xs">${escapeHtml(w.reason || 'Hàng hỏng')}</td>
+              <td class="py-3 px-3 text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(w.confirmed_by || 'Bếp trưởng')}</td>
+              <td class="py-3 px-4 text-right tabular-nums text-xs font-bold text-rose-600 dark:text-rose-400">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} ₫</td>
+              <td class="py-3 px-4 text-gray-500 text-xs">${escapeHtml(w.notes || '—')}</td>
+              <td class="py-3 px-3 text-center">
+                <button type="button" onclick="viewWasteDetail(${w.id})" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Xem chi tiết">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      if (mob) {
+        if (!wastes.length) {
+          mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có biên bản hủy hàng nào.</div>`;
+        } else {
+          mob.innerHTML = wastes.map(w => `
+            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(w.waste_code)}</span>
+                  <h4 class="font-semibold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(w.reason || 'Hàng hỏng')}</h4>
+                  <div class="text-[11px] text-gray-400 tabular-nums">Ngày: ${escapeHtml(String(w.waste_date || '').slice(0, 10))} • Điểm: ${escapeHtml(w.site_code)}</div>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-xs text-rose-600 dark:text-rose-400 tabular-nums block">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} ₫</span>
+                  <span class="text-[10px] text-gray-400">${escapeHtml(w.confirmed_by || 'Bếp trưởng')}</span>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+  } catch (err) {
+    console.error('loadFnbWasteHistory error:', err);
+  }
+};
+
+window.viewWasteDetail = async function(wasteId) {
+  try {
+    if (typeof showLoading === 'function') showLoading('Đang tải chi tiết biên bản...');
+    const res = await fetch(`/api/fnb/wastes?id=${wasteId}`);
+    const json = await res.json();
+    if (!json.success) throw new Error('Không tải được biên bản hủy');
+
+    const lines = json.data.lines || [];
+    const modal = document.getElementById('invDetailModal');
+    document.getElementById('invDetailModalTitle').textContent = `Chi Tiết Biên Bản Hủy #${wasteId}`;
+    document.getElementById('invDetailModalSub').textContent = `${lines.length} mặt hàng bị hủy`;
+
+    let html = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
+            <tr>
+              <th class="py-2 px-3">Mặt Hàng</th>
+              <th class="py-2 px-2 text-center">ĐVT</th>
+              <th class="py-2 px-3 text-right">SL Hủy</th>
+              <th class="py-2 px-3 text-right">Đơn Giá</th>
+              <th class="py-2 px-3 text-right">Thành Tiền</th>
+              <th class="py-2 px-3">Lý Do Chi Tiết</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800/60 tabular-nums">
+            ${lines.map(l => `
+              <tr>
+                <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">
+                  <div>${escapeHtml(l.item_name || l.item_code)}</div>
+                  <div class="text-[10px] text-gray-400 font-mono">${escapeHtml(l.item_code)}</div>
+                </td>
+                <td class="py-2 px-2 text-center text-gray-500">${escapeHtml(l.unit || '')}</td>
+                <td class="py-2 px-3 text-right font-bold text-rose-600">${Number(l.qty).toFixed(1)}</td>
+                <td class="py-2 px-3 text-right text-gray-500">${Number(l.unit_price).toLocaleString('vi-VN')} ₫</td>
+                <td class="py-2 px-3 text-right font-bold text-gray-900 dark:text-white">${Math.round(l.amount).toLocaleString('vi-VN')} ₫</td>
+                <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${escapeHtml(l.reason_detail || '--')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    document.getElementById('invDetailModalBody').innerHTML = html;
+    if (modal) modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi xem chi tiết: ' + e.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+window.openCreateWasteModal = async function() {
+  const modal = document.getElementById('createWasteModal');
+  const siteCode = getActiveFnbWasteSite();
+  const siteSel = document.getElementById('wasteModalSite');
+  const dateInput = document.getElementById('wasteModalDate');
+
+  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+
+  if (siteSel) {
+    let opts = '';
+    (typeof gFnbSitesList !== 'undefined' ? gFnbSitesList : []).forEach(s => {
+      opts += `<option value="${s.code}" ${s.code === siteCode ? 'selected' : ''}>${s.code} - ${s.name}</option>`;
+    });
+    siteSel.innerHTML = opts;
+    siteSel.value = siteCode;
+  }
+
+  // Load items with in_stock_only=1 for this site
+  await loadWasteModalItems(siteCode);
+
+  // Clear and add 1 default row
+  const container = document.getElementById('wasteLinesContainer');
+  if (container) container.innerHTML = '';
+  addWasteLineRow();
+
+  if (modal) modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeCreateWasteModal = function() {
+  const modal = document.getElementById('createWasteModal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.onWasteModalSiteChange = async function() {
+  const siteCode = document.getElementById('wasteModalSite')?.value || 'K001';
+  await loadWasteModalItems(siteCode);
+  const container = document.getElementById('wasteLinesContainer');
+  if (container) container.innerHTML = '';
+  addWasteLineRow();
+};
+
+async function loadWasteModalItems(siteCode) {
+  try {
+    const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}&in_stock_only=1&no-cache=1`);
+    const json = await res.json();
+    window.gWasteModalInStockItems = (json.success && json.data) ? (json.data.items || []) : [];
+  } catch (e) {
+    window.gWasteModalInStockItems = [];
+  }
+}
+
+window.addWasteLineRow = function() {
+  const container = document.getElementById('wasteLinesContainer');
+  if (!container) return;
+
+  const items = window.gWasteModalInStockItems || [];
+  const rowId = 'wasteRow_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+  let itemOptions = '<option value="">-- Chọn mặt hàng có tồn kho --</option>';
+  items.forEach(i => {
+    itemOptions += `<option value="${escapeHtml(i.code)}" data-price="${i.unit_price}" data-unit="${escapeHtml(i.unit || '')}" data-stock="${i.book_qty}">[${escapeHtml(i.code)}] ${escapeHtml(i.name)} (Tồn: ${Number(i.book_qty).toFixed(1)} ${escapeHtml(i.unit || '')})</option>`;
+  });
+
+  const rowHtml = `
+    <div id="${rowId}" class="p-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 space-y-2">
+      <div class="flex items-center justify-between gap-2">
+        <select onchange="onWasteModalItemSelect('${rowId}', this)" class="w-full py-1.5 px-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-semibold outline-none focus:border-rose-500">
+          ${itemOptions}
+        </select>
+        <button type="button" onclick="document.getElementById('${rowId}')?.remove(); recalculateWasteModalTotal();" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 transition-colors">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div>
+          <label class="block text-[10px] text-gray-500 mb-0.5">SL Hủy</label>
+          <input type="number" step="0.01" min="0" placeholder="0" oninput="onWasteModalLineQtyInput('${rowId}', this.value)" class="waste-modal-qty w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold tabular-nums text-center outline-none focus:border-rose-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-gray-500 mb-0.5">Đơn Giá</label>
+          <div class="waste-modal-price py-1 px-2 text-xs tabular-nums text-gray-600 dark:text-gray-300">0 ₫</div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-gray-500 mb-0.5">Thành Tiền</label>
+          <div class="waste-modal-amt py-1 px-2 text-xs font-bold tabular-nums text-rose-600 text-right">0 ₫</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.insertAdjacentHTML('beforeend', rowHtml);
+  if (window.lucide) lucide.createIcons();
+};
+
+window.onWasteModalItemSelect = function(rowId, sel) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const opt = sel.options[sel.selectedIndex];
+  const price = Number(opt?.getAttribute('data-price')) || 0;
+  const stock = Number(opt?.getAttribute('data-stock')) || 0;
+
+  const priceEl = row.querySelector('.waste-modal-price');
+  if (priceEl) priceEl.textContent = Math.round(price).toLocaleString('vi-VN') + ' ₫';
+
+  const qtyInput = row.querySelector('.waste-modal-qty');
+  if (qtyInput) {
+    qtyInput.max = stock;
+    qtyInput.placeholder = `Tối đa ${stock.toFixed(1)}`;
+  }
+
+  onWasteModalLineQtyInput(rowId, qtyInput ? qtyInput.value : 0);
+};
+
+window.onWasteModalLineQtyInput = function(rowId, val) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const sel = row.querySelector('select');
+  const opt = sel?.options[sel.selectedIndex];
+  const price = Number(opt?.getAttribute('data-price')) || 0;
+  const qty = parseFloat(val) || 0;
+  const amt = qty * price;
+
+  const amtEl = row.querySelector('.waste-modal-amt');
+  if (amtEl) amtEl.textContent = amt > 0 ? Math.round(amt).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+
+  recalculateWasteModalTotal();
+};
+
+function recalculateWasteModalTotal() {
+  const container = document.getElementById('wasteLinesContainer');
+  if (!container) return;
+  let total = 0;
+  container.querySelectorAll('.p-3').forEach(row => {
+    const sel = row.querySelector('select');
+    const opt = sel?.options[sel.selectedIndex];
+    const price = Number(opt?.getAttribute('data-price')) || 0;
+    const qtyInput = row.querySelector('.waste-modal-qty');
+    const qty = parseFloat(qtyInput?.value) || 0;
+    total += (qty * price);
+  });
+  const totalEl = document.getElementById('wasteModalTotalAmount');
+  if (totalEl) totalEl.textContent = total > 0 ? Math.round(total).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+}
+
+window.submitCreateWaste = async function() {
+  const container = document.getElementById('wasteLinesContainer');
+  if (!container) return;
+
+  const lines = [];
+  container.querySelectorAll('.p-3').forEach(row => {
+    const sel = row.querySelector('select');
+    const itemCode = sel?.value;
+    const opt = sel?.options[sel.selectedIndex];
+    const price = Number(opt?.getAttribute('data-price')) || 0;
+    const qtyInput = row.querySelector('.waste-modal-qty');
+    const qty = parseFloat(qtyInput?.value) || 0;
+
+    if (itemCode && qty > 0) {
+      lines.push({
+        item_code: itemCode,
+        qty: qty,
+        unit_price: price,
+        reason_detail: document.getElementById('wasteModalReason')?.value || 'Hàng hỏng / rách',
+        note: ''
+      });
+    }
+  });
+
+  if (!lines.length) {
+    if (typeof showToast === 'function') showToast('Vui lòng chọn mặt hàng và nhập số lượng hủy > 0!');
+    return;
+  }
+
+  const siteCode = document.getElementById('wasteModalSite')?.value || getActiveFnbWasteSite();
+  const wasteDate = document.getElementById('wasteModalDate')?.value || new Date().toISOString().slice(0, 10);
+  const reason = document.getElementById('wasteModalReason')?.value || 'Hàng hỏng / rách';
+  const confirmedBy = document.getElementById('wasteModalConfirmedBy')?.value || 'Bếp trưởng';
+  const notes = document.getElementById('wasteModalNotes')?.value || '';
+  const createdBy = (window.gCurrentUser && window.gCurrentUser.name) || 'Bếp trưởng';
+
+  const payload = {
+    site_code: siteCode,
+    waste_date: wasteDate,
+    reason: reason,
+    confirmed_by: confirmedBy,
+    notes: notes,
+    created_by: createdBy,
+    lines: lines
+  };
+
+  const btn = document.getElementById('btnSubmitWaste');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang xác nhận...`;
+  }
+
+  try {
+    if (typeof showLoading === 'function') showLoading('Đang tạo biên bản hủy...');
+    const res = await fetch('/api/fnb/wastes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Lỗi khi tạo biên bản');
+
+    if (typeof showToast === 'function') {
+      showToast(`Tạo thành công biên bản hủy ${json.data.waste_code}!`);
+    }
+
+    closeCreateWasteModal();
+    await loadFnbWaste();
+    switchFnbWasteSubView('history');
+
+    if (typeof loadFnbStock === 'function') loadFnbStock();
+    if (typeof loadFnbCounts === 'function') loadFnbCounts();
+
+  } catch (err) {
+    console.error('submitCreateWaste error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Hủy Hàng`;
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+};
 
 // ============================================================================
 // ORBIT SIBA FOOD: GOOGLE AUTH & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT ENGINE
