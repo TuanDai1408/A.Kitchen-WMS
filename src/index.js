@@ -1212,9 +1212,9 @@ export default {
         const siteCode = extractSiteCode(site);
         const normMonth = normalizeMonth(thang);
 
-        let siteRow = await env.DB.prepare(`
+        let siteRow = await db.queryOne(env, `
           SELECT * FROM sites WHERE site_name = ? OR site_code = ? OR name = ? LIMIT 1
-        `).bind(site, siteCode, site).first();
+        `, [site, siteCode, site]);
 
         const nganSach = siteRow ? (siteRow.budget_limit || 0) : 0;
         const region = siteRow ? siteRow.region : '';
@@ -1234,13 +1234,11 @@ export default {
             )
           GROUP BY dh.item_code
         `;
-        const { results: daDatRows } = await env.DB.prepare(daDatQuery)
-          .bind(site, `%${siteCode}%`, thang, `%${normMonth}%`, `%${thang}%`)
-          .all();
+        const { rows: daDatRows } = await db.query(env, daDatQuery, [site, `%${siteCode}%`, thang, `%${normMonth}%`, `%${thang}%`]);
 
         const daDatMap = {};
         let tienDaDat = 0;
-        for (const r of daDatRows) {
+        for (const r of (daDatRows || [])) {
           daDatMap[r.item_code] = r.total_sl || 0;
           tienDaDat += r.total_tien || 0;
         }
@@ -1255,22 +1253,22 @@ export default {
           nvlQuery += ` ORDER BY name`;
         }
 
-        let { results: nvlList } = await env.DB.prepare(nvlQuery).bind(...nvlBindings).all();
+        let { rows: nvlList } = await db.query(env, nvlQuery, nvlBindings);
         if (!nvlList || nvlList.length === 0) {
-          const fallback = await env.DB.prepare(`SELECT * FROM nvl_items ORDER BY name`).all();
-          nvlList = fallback.results;
+          const fallback = await db.query(env, `SELECT * FROM nvl_items ORDER BY name`);
+          nvlList = fallback.rows || [];
         }
 
-        const { results: dmList } = await env.DB.prepare(`
+        const { rows: dmList } = await db.query(env, `
           SELECT item_code, quota_qty FROM dinh_muc 
           WHERE (site_name = ? OR site_name LIKE ?) AND (month_period = ? OR month_period = ?)
-        `).bind(site, `%${siteCode}%`, thang, normMonth).all();
+        `, [site, `%${siteCode}%`, thang, normMonth]);
         const dmMap = {};
-        for (const dm of dmList) {
+        for (const dm of (dmList || [])) {
           dmMap[dm.item_code] = dm.quota_qty || 0;
         }
 
-        const items = nvlList.map(item => ({
+        const items = (nvlList || []).map(item => ({
           maHang: item.item_code,
           tenSP: item.name,
           dvt: item.unit,
@@ -1308,47 +1306,43 @@ export default {
         const maDon = generateCode('DH', site);
         const nowStr = formatDate(new Date());
 
-        const insertDhStmt = env.DB.prepare(`
-          INSERT INTO don_hang (
-            order_code, order_date, site_name, ordered_by, applied_month,
-            item_code, item_name, unit, order_qty, accumulated_qty,
-            over_quota_note, status
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        const stmts = [];
-        for (const it of items) {
-          const qty = Number(it.soLuong) || 0;
-          if (qty <= 0) continue;
-          const luyKe = (Number(it.daDat) || 0) + qty;
-          stmts.push(insertDhStmt.bind(
-            maDon, nowStr, site, nguoiDat || 'Người dùng', thang,
-            it.maHang, it.tenSP, it.dvt, qty, luyKe,
-            it.ghiChu || ghiChu || '', 'Mới tạo'
-          ));
-        }
-
-        if (stmts.length === 0) {
+        const validItems = items.filter(it => (Number(it.soLuong) || 0) > 0);
+        if (validItems.length === 0) {
           return new Response(JSON.stringify({ success: false, error: 'Số lượng đặt phải lớn hơn 0.' }), {
             status: 400,
             headers: corsHeaders
           });
         }
 
-        const insertQtStmt = env.DB.prepare(`
-          INSERT INTO quy_trinh_don (
-            order_code, step, step_name, status, action_time, actor, note
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(maDon, 1, 'Gửi đơn hàng', 'Hoàn tất', nowStr, nguoiDat || 'Người dùng', 'Tạo đơn hàng thành công qua Portal');
+        await db.withTransaction(env, async (tx) => {
+          for (const it of validItems) {
+            const qty = Number(it.soLuong) || 0;
+            const luyKe = (Number(it.daDat) || 0) + qty;
+            await tx.exec(`
+              INSERT INTO don_hang (
+                order_code, order_date, site_name, ordered_by, applied_month,
+                item_code, item_name, unit, order_qty, accumulated_qty,
+                over_quota_note, status
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+              maDon, nowStr, site, nguoiDat || 'Người dùng', thang,
+              it.maHang, it.tenSP, it.dvt, qty, luyKe,
+              it.ghiChu || ghiChu || '', 'Mới tạo'
+            ]);
+          }
 
-        stmts.push(insertQtStmt);
-        await env.DB.batch(stmts);
+          await tx.exec(`
+            INSERT INTO quy_trinh_don (
+              order_code, step, step_name, status, action_time, actor, note
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          `, [maDon, 1, 'Gửi đơn hàng', 'Hoàn tất', nowStr, nguoiDat || 'Người dùng', 'Tạo đơn hàng thành công qua Portal']);
+        });
 
         invalidateMemoryCache('/api/orders');
         invalidateMemoryCache('/api/quota');
         invalidateMemoryCache('/api/dashboard-summary');
 
-        return new Response(JSON.stringify({ success: true, data: { maDon, soDong: stmts.length - 1 } }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, data: { maDon, soDong: validItems.length } }), { headers: corsHeaders });
       }
 
       // 2.4 GET /api/orders
@@ -1388,16 +1382,16 @@ export default {
         if (conditions.length) {
           query += ' WHERE ' + conditions.join(' AND ');
         }
-        query += ` GROUP BY dh.order_code ORDER BY dh.order_date DESC`;
+        query += ` GROUP BY dh.order_code, dh.order_date, dh.site_name, dh.ordered_by, dh.applied_month, dh.status ORDER BY dh.order_date DESC`;
 
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
-        return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx);
+        const { rows: results } = await db.query(env, query, bindings);
+        return createCachedResponse({ success: true, data: results || [] }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.5 GET /api/order-detail
       if (pathname === '/api/order-detail' && request.method === 'GET') {
         const orderCode = searchParams.get('orderCode') || '';
-        const { results: items } = await env.DB.prepare(`
+        const { rows: items } = await db.query(env, `
           SELECT 
             dh.item_code as maHang,
             dh.item_name as tenSP,
@@ -1411,19 +1405,19 @@ export default {
           LEFT JOIN nvl_items nvl ON dh.item_code = nvl.item_code
           WHERE dh.order_code = ?
           ORDER BY dh.id
-        `).bind(orderCode).all();
+        `, [orderCode]);
 
-        const { results: timeline } = await env.DB.prepare(`
+        const { rows: timeline } = await db.query(env, `
           SELECT step as buoc, step_name as tenBuoc, status as trangThai, action_time as thoiGian, actor as nguoiXuLy, note as ghiChu
           FROM quy_trinh_don WHERE order_code = ? ORDER BY step ASC, action_time ASC
-        `).bind(orderCode).all();
+        `, [orderCode]);
 
-        const summary = await env.DB.prepare(`
+        const summary = await db.queryOne(env, `
           SELECT order_code, order_date, site_name, ordered_by, applied_month, status
           FROM don_hang WHERE order_code = ? LIMIT 1
-        `).bind(orderCode).first();
+        `, [orderCode]);
 
-        return createCachedResponse({ success: true, data: { info: summary, items, timeline } }, 120, corsHeaders, isNoCache, url, request, ctx);
+        return createCachedResponse({ success: true, data: { info: summary, items: items || [], timeline: timeline || [] } }, 120, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.6 GET /api/vouchers
@@ -1458,14 +1452,14 @@ export default {
         if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
         query += ` ORDER BY created_at DESC`;
 
-        const { results } = await env.DB.prepare(query).bind(...bindings).all();
-        const { results: fileCounts } = await env.DB.prepare(`
+        const { rows: results } = await db.query(env, query, bindings);
+        const { rows: fileCounts } = await db.query(env, `
           SELECT voucher_code, COUNT(id) as cnt FROM chung_tu_file GROUP BY voucher_code
-        `).all();
+        `);
         const fileMap = {};
-        for (const f of fileCounts) fileMap[f.voucher_code] = f.cnt;
+        for (const f of (fileCounts || [])) fileMap[f.voucher_code] = f.cnt;
 
-        const data = results.map(r => ({
+        const data = (results || []).map(r => ({
           maCT: r.voucher_code,
           site: r.site_name,
           loaiHoaDon: r.invoice_type,
@@ -1490,18 +1484,21 @@ export default {
         const maCT = generateCode('CT', site);
         const nowStr = formatDate(new Date());
 
-        await env.DB.prepare(`
-          INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr, nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '', nowStr, nguoiNhap || 'Thủ kho').run();
+        await db.withTransaction(env, async (tx) => {
+          await tx.exec(`
+            INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `, [maCT, site, loaiHoaDon, ngayXuat || nowStr, ngayNhan || nowStr, nguoiGiao || '', nguoiNhan || '', nhaCungCap || '', ghiChu || '', nowStr, nguoiNhap || 'Thủ kho']);
 
-        if (files && files.length) {
-          const fileStmts = files.map(f => env.DB.prepare(`
-            INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
-            VALUES (?, ?, ?, ?, ?)
-          `).bind(maCT, f.name || 'Tài liệu', f.url || '', f.type || 'IMAGE', nowStr));
-          await env.DB.batch(fileStmts);
-        }
+          if (files && files.length) {
+            for (const f of files) {
+              await tx.exec(`
+                INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+                VALUES (?, ?, ?, ?, ?)
+              `, [maCT, f.name || 'Tài liệu', f.url || '', f.type || 'IMAGE', nowStr]);
+            }
+          }
+        });
 
         invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
@@ -1516,31 +1513,35 @@ export default {
         }
         const nowStr = formatDate(new Date());
         let count = 0;
-        for (const item of items) {
-          const site = item.site || item.site_name || '';
-          if (!site) continue;
-          const maCT = generateCode('CT', site);
-          await env.DB.prepare(`
-            INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(
-            maCT, site, item.loaiHoaDon || 'Hóa đơn GTGT',
-            item.ngayXuat || nowStr, item.ngayNhan || nowStr,
-            item.nguoiGiao || '', item.nguoiNhan || '',
-            item.nhaCungCap || '', item.ghiChu || '',
-            nowStr, item.nguoiNhap || 'Import Excel'
-          ).run();
+        await db.withTransaction(env, async (tx) => {
+          for (const item of items) {
+            const site = item.site || item.site_name || '';
+            if (!site) continue;
+            const maCT = generateCode('CT', site);
+            await tx.exec(`
+              INSERT INTO chung_tu (voucher_code, site_name, invoice_type, invoice_date, receive_date, deliverer_name, receiver_name, supplier_name, note, created_at, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+              maCT, site, item.loaiHoaDon || 'Hóa đơn GTGT',
+              item.ngayXuat || nowStr, item.ngayNhan || nowStr,
+              item.nguoiGiao || '', item.nguoiNhan || '',
+              item.nhaCungCap || '', item.ghiChu || '',
+              nowStr, item.nguoiNhap || 'Import Excel'
+            ]);
 
-          if (item.linkAnh && String(item.linkAnh).trim()) {
-            const links = String(item.linkAnh).split(',').map(s => s.trim()).filter(Boolean);
-            const fileStmts = links.map((lnk, idx) => env.DB.prepare(`
-              INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
-              VALUES (?, ?, ?, ?, ?)
-            `).bind(maCT, `Ảnh đính kèm ${idx + 1}`, lnk, 'DRIVE_LINK', nowStr));
-            if (fileStmts.length) await env.DB.batch(fileStmts);
+            if (item.linkAnh && String(item.linkAnh).trim()) {
+              const links = String(item.linkAnh).split(',').map(s => s.trim()).filter(Boolean);
+              for (let idx = 0; idx < links.length; idx++) {
+                await tx.exec(`
+                  INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+                  VALUES (?, ?, ?, ?, ?)
+                `, [maCT, `Ảnh đính kèm ${idx + 1}`, links[idx], 'DRIVE_LINK', nowStr]);
+              }
+            }
+            count++;
           }
-          count++;
-        }
+        });
+
         invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, count, message: `Đã import thành công ${count} chứng từ` }), { headers: corsHeaders });
       }
@@ -1548,12 +1549,12 @@ export default {
       // 2.8 GET /api/voucher-detail
       if (pathname === '/api/voucher-detail' && request.method === 'GET') {
         const maCT = searchParams.get('maCT');
-        const voucher = await env.DB.prepare(`SELECT * FROM chung_tu WHERE voucher_code = ?`).bind(maCT).first();
+        const voucher = await db.queryOne(env, `SELECT * FROM chung_tu WHERE voucher_code = ?`, [maCT]);
         if (!voucher) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ' }), { status: 404, headers: corsHeaders });
 
-        const { results: files } = await env.DB.prepare(`
+        const { rows: files } = await db.query(env, `
           SELECT file_name, file_link, file_type, upload_date FROM chung_tu_file WHERE voucher_code = ?
-        `).bind(maCT).all();
+        `, [maCT]);
 
         const allFiles = [...(files || [])];
         if (voucher.attachment_link && !allFiles.some(f => f.file_link === voucher.attachment_link)) {
