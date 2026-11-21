@@ -240,8 +240,8 @@
             <li>
               <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
-                  <i data-lucide="receipt" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
-                  <span class="truncate">Nhập Chứng Từ (Full)</span>
+                  <i data-lucide="file-text" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tạo & Duyệt Chứng Từ</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -259,7 +259,7 @@
               <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="shopping-cart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
-                  <span class="truncate">Đặt Hàng CCDC / Vật Tư</span>
+                  <span class="truncate">Đặt Hàng Vật Tư Bếp</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -267,7 +267,7 @@
             <li>
               <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
-                  <i data-lucide="history" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <i data-lucide="clock" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Lịch Sử Đặt Hàng</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
@@ -3612,44 +3612,44 @@
   <nav id="mobileBottomNav" class="fixed bottom-0 inset-x-0 z-40 xl:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-[max(env(safe-area-inset-bottom),8px)] pt-1.5 px-3 select-none">
     <div class="flex items-center justify-around max-w-2xl mx-auto w-full">
       
-      <!-- Tab 1: P&L Chuỗi -->
+      <!-- Tab 1: Nhóm 1 - Hiệu Quả & Doanh Thu -->
       <button onclick="switchTab('fnb-chain')" id="mobTab-fnb-chain" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-brand-500 font-bold cursor-pointer">
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="trophy" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight">Chuỗi F&amp;B</span>
+        <span class="text-[10px] mt-0.5 leading-tight font-medium">Chuỗi F&amp;B</span>
       </button>
 
-      <!-- Tab 2: Kho FEFO -->
-      <button onclick="switchTab('wh-stock')" id="mobTab-wh-stock" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
+      <!-- Tab 2: Nhóm 2 & 3 - Vận Hành & Kho Vận -->
+      <button onclick="switchTab('wh-dashboard')" id="mobTab-wh-dashboard" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
-          <i data-lucide="package" class="w-5 h-5"></i>
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight">Kho FEFO</span>
+        <span class="text-[10px] mt-0.5 leading-tight font-medium">Kho Vận</span>
       </button>
 
-      <!-- Tab 3: Center Elevated FAB - Nhập Chứng Từ -->
+      <!-- Tab 3: Nhóm 4 - Center Elevated FAB - Tạo & Duyệt Chứng Từ -->
       <button onclick="switchTab('portal-voucher')" id="mobTab-portal-voucher" class="mob-nav-btn -mt-6 flex flex-col items-center justify-center py-1 active:translate-y-px transition-transform px-2 group cursor-pointer">
         <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center border-4 border-white dark:border-gray-900 transition-all group-hover:scale-105">
-          <i data-lucide="receipt" class="w-6 h-6 stroke-[2.2]"></i>
+          <i data-lucide="file-text" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
         <span class="text-[9.5px] font-semibold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
       </button>
 
-      <!-- Tab 4: Suất Ăn Ca Bếp -->
+      <!-- Tab 4: Nhóm 4 - Báo Cáo Suất Ăn Ca -->
       <button onclick="switchTab('portal-baocao')" id="mobTab-portal-baocao" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="clipboard-list" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight">Suất Ăn</span>
+        <span class="text-[10px] mt-0.5 leading-tight font-medium">Suất Ăn</span>
       </button>
 
-      <!-- Tab 5: Menu 9 Chấm / Launcher Hub -->
+      <!-- Tab 5: Menu 9 Chấm / Launcher Hub (Đầy đủ 5 nhóm nghiệp vụ) -->
       <button onclick="openMobileMenuHub()" id="mobTab-hub" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 active:translate-y-px transition-all text-gray-400 dark:text-gray-500 font-medium cursor-pointer">
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="layout-grid" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight">Tất Cả</span>
+        <span class="text-[10px] mt-0.5 leading-tight font-medium">Tất Cả</span>
       </button>
 
     </div>
@@ -3693,230 +3693,231 @@
       <!-- Scrollable App Categories Grid -->
       <div id="mobileHubScrollArea" class="p-4 overflow-y-auto space-y-5 custom-scrollbar text-xs">
         
-        <!-- Category 1: P&L & Chuỗi Căn Tin -->
-        <div>
-          <div class="flex items-center justify-between mb-2 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-brand-500">1. P&amp;L &amp; Chuỗi Căng Tin</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">A.Kitchen</span>
+        <!-- Nhóm 1: Hiệu Quả & Doanh Thu (Finance) -->
+        <div class="mobile-hub-category" data-cat="fnb-finance">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-rose-600 dark:text-rose-400">1. Hiệu Quả &amp; Doanh Thu</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">Finance</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button onclick="switchFromHub('wh-dashboard')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Tổng Quan Kho</div>
-                <div class="text-[10px] text-gray-500 truncate">Điều hành & Tồn kho</div>
-              </div>
-            </button>
-            <button onclick="switchFromHub('fnb-counts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Kiểm Kê Ngày</div>
-                <div class="text-[10px] text-gray-500 truncate">Nhóm A & Thừa/thiếu</div>
-              </div>
-            </button>
-            <button onclick="switchFromHub('fnb-receipts')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
-                <i data-lucide="package-plus" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Nhập Hàng</div>
-                <div class="text-[10px] text-gray-500 truncate">Phiếu nhập kho điểm</div>
-              </div>
-            </button>
-            <button onclick="switchFromHub('fnb-waste')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
-                <i data-lucide="trash-2" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Hủy Hàng</div>
-                <div class="text-[10px] text-gray-500 truncate">Hao hụt & Hỏng thiu</div>
-              </div>
-            </button>
-            
-            <button data-role="admin-only" onclick="switchFromHub('fnb-chain')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('fnb-chain')" data-tab="fnb-chain" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center shrink-0">
                 <i data-lucide="trophy" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Toàn Chuỗi</div>
-                <div class="text-[10px] text-gray-500 truncate">14 Điểm bán</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Toàn Chuỗi &amp; Xếp Hạng</div>
+                <div class="text-[10px] text-gray-500 truncate">14 Điểm bán toàn chuỗi</div>
               </div>
             </button>
-            <button data-role="admin-only" onclick="switchFromHub('fnb-pl')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('fnb-pl')" data-tab="fnb-pl" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">P&amp;L Điểm Bán</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Báo Cáo P&amp;L Điểm Bán</div>
                 <div class="text-[10px] text-gray-500 truncate">Prime Cost, EBITDA</div>
               </div>
             </button>
-            <button data-role="admin-only" onclick="switchFromHub('fnb-pos')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('fnb-pos')" data-tab="fnb-pos" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="zap" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Doanh Thu POS</div>
-                <div class="text-[10px] text-gray-500 truncate">Khung giờ vàng</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Doanh Thu POS &amp; Bán Lẻ</div>
+                <div class="text-[10px] text-gray-500 truncate">Hóa đơn &amp; Giờ cao điểm</div>
               </div>
             </button>
           </div>
         </div>
 
-        <!-- Category 2: Kho Gia Vị & Vận Hành Bếp -->
-        <div>
-          <div class="flex items-center justify-between mb-2 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-gray-500">2. Kho Vận &amp; Bếp Ăn (WMS)</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">WMS</span>
+        <!-- Nhóm 2: Vận Hành Kho Bếp (F&B) -->
+        <div class="mobile-hub-category" data-cat="fnb-inventory">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400">2. Vận Hành Kho Bếp</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">F&amp;B</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button onclick="switchFromHub('wh-dashboard')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-gray-500/10 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0">
+            <button onclick="switchFromHub('wh-dashboard')" data-tab="wh-dashboard" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Tổng Quan Kho</div>
-                <div class="text-[10px] text-gray-500 truncate">KPIs kho vận</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Tổng Quan Kho Vận</div>
+                <div class="text-[10px] text-gray-500 truncate">Điều hành &amp; Tồn kho</div>
               </div>
             </button>
-            <button onclick="switchFromHub('wh-stock')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+            <button onclick="switchFromHub('fnb-counts')" data-tab="fnb-counts" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Hạn Dùng &amp; FEFO</div>
-                <div class="text-[10px] text-gray-500 truncate">Lô cận date</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Kiểm Kê Hằng Ngày</div>
+                <div class="text-[10px] text-gray-500 truncate">Kiểm đếm thực tế điểm</div>
               </div>
             </button>
-            <button onclick="switchFromHub('wh-reorder')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            <button onclick="switchFromHub('fnb-receipts')" data-tab="fnb-receipts" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <i data-lucide="package-plus" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Cảnh Báo ROP</div>
-                <div class="text-[10px] text-gray-500 truncate">Điểm đặt hàng</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Nhập Hàng Điểm Bán</div>
+                <div class="text-[10px] text-gray-500 truncate">Đơn PO &amp; Phiếu nhập</div>
               </div>
             </button>
-            <button onclick="switchFromHub('wh-leadtime')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
-                <i data-lucide="truck" class="w-5 h-5"></i>
+            <button onclick="switchFromHub('fnb-waste')" data-tab="fnb-waste" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Lead Time NCC</div>
-                <div class="text-[10px] text-gray-500 truncate">Độ trễ giao</div>
-              </div>
-            </button>
-            <button onclick="switchFromHub('wh-posap')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
-                <i data-lucide="file-check-2" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Đơn PO SAP</div>
-                <div class="text-[10px] text-gray-500 truncate">Phân tích PPV</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Hủy Hàng &amp; Hao Hụt</div>
+                <div class="text-[10px] text-gray-500 truncate">Mã tồn &gt; 0 &amp; Giảm tồn</div>
               </div>
             </button>
           </div>
         </div>
 
-        <!-- Category 3: Vật Tư & Nghiệp Vụ Bếp -->
-        <div>
-          <div class="flex items-center justify-between mb-2 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-gray-500">3. Vật Tư &amp; Chứng Từ Ca Bếp</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-brand-600 dark:bg-rose-950 dark:text-rose-300">Ca Bếp</span>
+        <!-- Nhóm 3: Kho Vận & WMS (WMS) -->
+        <div class="mobile-hub-category" data-cat="wh-wms">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400">3. Kho Vận &amp; WMS</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">WMS</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button onclick="switchFromHub('portal-voucher')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <i data-lucide="receipt" class="w-5 h-5"></i>
+            <button onclick="switchFromHub('wh-stock')" data-tab="wh-stock" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-semibold text-brand-500 dark:text-brand-400 truncate">Nhập Chứng Từ</div>
-                <div class="text-[10px] text-gray-500 truncate">Full Screen</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Hạn Dùng &amp; Xuất FEFO</div>
+                <div class="text-[10px] text-gray-500 truncate">Date &amp; Lô xuất kho tổng</div>
               </div>
             </button>
-            <button onclick="switchFromHub('portal-search')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-gray-500/10 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0">
+            <button onclick="switchFromHub('wh-reorder')" data-tab="wh-reorder" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-gray-900 dark:text-white truncate">Cảnh Báo Tồn ROP</div>
+                <div class="text-[10px] text-gray-500 truncate">Ngưỡng đặt hàng an toàn</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-leadtime')" data-tab="wh-leadtime" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center shrink-0">
+                <i data-lucide="truck" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-gray-900 dark:text-white truncate">Lead Time &amp; NCC</div>
+                <div class="text-[10px] text-gray-500 truncate">Độ trễ giao hàng NCC</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('wh-posap')" data-tab="wh-posap" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0">
+                <i data-lucide="file-check-2" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-gray-900 dark:text-white truncate">Đơn Hàng PO SAP</div>
+                <div class="text-[10px] text-gray-500 truncate">Đồng bộ SAP ERP</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Nhóm 4: Cổng Thông Tin & Đặt Hàng (Portal) -->
+        <div class="mobile-hub-category" data-cat="portal-ops">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-blue-600 dark:text-blue-400">4. Cổng Thông Tin &amp; Đặt Hàng</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">Portal</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button onclick="switchFromHub('portal-voucher')" data-tab="portal-voucher" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 flex items-center justify-center shrink-0">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-gray-900 dark:text-white truncate">Tạo &amp; Duyệt Chứng Từ</div>
+                <div class="text-[10px] text-gray-500 truncate">Hóa đơn &amp; thanh toán</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('portal-search')" data-tab="portal-search" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
                 <i data-lucide="search" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Tra Cứu Từ</div>
-                <div class="text-[10px] text-gray-500 truncate">Xem ảnh &amp; duyệt</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Tra Cứu Chứng Từ</div>
+                <div class="text-[10px] text-gray-500 truncate">Tìm kiếm nâng cao</div>
               </div>
             </button>
-            <button onclick="switchFromHub('portal-order')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+            <button onclick="switchFromHub('portal-order')" data-tab="portal-order" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="shopping-cart" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Đặt Hàng CCDC</div>
-                <div class="text-[10px] text-gray-500 truncate">Theo ngân sách</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Đặt Hàng Vật Tư Bếp</div>
+                <div class="text-[10px] text-gray-500 truncate">Đặt hàng kho tổng</div>
               </div>
             </button>
-            <button onclick="switchFromHub('portal-history')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('portal-history')" data-tab="portal-history" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-gray-500/10 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0">
-                <i data-lucide="history" class="w-5 h-5"></i>
+                <i data-lucide="clock" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Lịch Sử Đơn</div>
-                <div class="text-[10px] text-gray-500 truncate">Tiến độ giao</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Lịch Sử Đặt Hàng</div>
+                <div class="text-[10px] text-gray-500 truncate">Tiến độ giao nhận</div>
               </div>
             </button>
-            <button onclick="switchFromHub('portal-baocao')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('portal-baocao')" data-tab="portal-baocao" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
                 <i data-lucide="clipboard-list" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Báo Cáo Suất Ăn</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Báo Cáo Suất Ăn Ca</div>
                 <div class="text-[10px] text-gray-500 truncate">8 nhóm nghiệp vụ</div>
               </div>
             </button>
-            <button onclick="switchFromHub('portal-kiemke')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('portal-kiemke')" data-tab="portal-kiemke" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
                 <i data-lucide="check-square" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Kiểm Kê Kỳ</div>
-                <div class="text-[10px] text-gray-500 truncate">So khớp tồn</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Kiểm Kê Tồn Kho Kỳ</div>
+                <div class="text-[10px] text-gray-500 truncate">So khớp số dư tồn</div>
               </div>
             </button>
           </div>
         </div>
 
-        <!-- Category 4: Hệ Thống & Quản Trị -->
-        <div>
-          <div class="flex items-center justify-between mb-2 px-1">
-            <span class="font-bold text-[11px] uppercase tracking-wider text-gray-500">4. Hệ Thống &amp; Danh Mục</span>
+        <!-- Nhóm 5: Hệ Thống & Danh Mục (Admin) -->
+        <div class="mobile-hub-category" data-cat="sys-admin">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <span class="font-bold text-[11px] uppercase tracking-wider text-purple-600 dark:text-purple-400">5. Hệ Thống &amp; Danh Mục</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">Admin</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button onclick="switchFromHub('fnb-sites')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('fnb-sites')" data-tab="fnb-sites" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
                 <i data-lucide="building-2" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">14 Điểm Bán SAP</div>
-                <div class="text-[10px] text-gray-500 truncate">Danh mục chuẩn</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Danh Mục 14 Điểm Bán</div>
+                <div class="text-[10px] text-gray-500 truncate">14 Điểm bán SAP ERP</div>
               </div>
             </button>
-            <button onclick="switchFromHub('user-matrix')" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="switchFromHub('user-matrix')" data-tab="user-matrix" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Phân Quyền Matrix</div>
-                <div class="text-[10px] text-gray-500 truncate">Quản lý User &amp; Quyền</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Phân Quyền User Matrix</div>
+                <div class="text-[10px] text-gray-500 truncate">Ma trận quyền người dùng</div>
               </div>
             </button>
-            <button onclick="openAuthModal('login'); closeMobileMenuHub();" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
+            <button onclick="handleUserProfileClick(); closeMobileMenuHub();" class="hub-item flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500">
               <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                <i data-lucide="user-check" class="w-5 h-5"></i>
               </div>
               <div class="min-w-0">
-                <div class="font-bold text-gray-900 dark:text-white truncate">Đăng Nhập Admin</div>
-                <div class="text-[10px] text-gray-500 truncate">Phân quyền bảo mật</div>
+                <div class="font-bold text-gray-900 dark:text-white truncate">Tài Khoản &amp; Vai Trò</div>
+                <div class="text-[10px] text-gray-500 truncate">Thông tin &amp; Chuyển đổi</div>
               </div>
             </button>
           </div>
@@ -7567,31 +7568,50 @@ function toggleTheme() {
 // ============================================================================
 
 const TAB_META = {
+  // Nhóm 1: Hiệu Quả & Doanh Thu -> mobTab: 'fnb-chain'
   'fnb-chain': { title: 'Toàn Chuỗi & Xếp Hạng', mobTab: 'fnb-chain' },
   'fnb-pl': { title: 'Báo Cáo P&L Điểm Bán', mobTab: 'fnb-chain' },
   'fnb-pos': { title: 'Doanh Thu POS & Bán Lẻ', mobTab: 'fnb-chain' },
-  'fnb-stock': { title: 'Tồn Kho Chuỗi F&B', mobTab: 'fnb-chain' },
-  'fnb-counts': { title: 'Kiểm Kê Hằng Ngày', mobTab: 'fnb-chain' },
-  'fnb-receipts': { title: 'Nhập Hàng Điểm Bán', mobTab: 'fnb-chain' },
-  'fnb-waste': { title: 'Hủy Hàng & Hao Hụt', mobTab: 'fnb-chain' },
-  'fnb-sites': { title: 'Danh Mục 14 Điểm Bán', mobTab: 'hub' },
-  'user-matrix': { title: 'Phân Quyền User Matrix', mobTab: 'hub' },
-  'wh-dashboard': { title: 'Tổng Quan Kho Vận', mobTab: 'fnb-chain' },
-  'wh-stock': { title: 'Hạn Dùng & FEFO', mobTab: 'wh-stock' },
-  'wh-reorder': { title: 'Cảnh Báo Tồn ROP', mobTab: 'wh-stock' },
-  'wh-leadtime': { title: 'Lead Time Nhà Cung Cấp', mobTab: 'wh-stock' },
-  'wh-posap': { title: 'Đơn Hàng PO SAP', mobTab: 'wh-stock' },
+
+  // Nhóm 2: Vận Hành Kho Bếp -> mobTab: 'wh-dashboard'
+  'wh-dashboard': { title: 'Tổng Quan Kho Vận', mobTab: 'wh-dashboard' },
+  'fnb-counts': { title: 'Kiểm Kê Hằng Ngày', mobTab: 'wh-dashboard' },
+  'fnb-receipts': { title: 'Nhập Hàng Điểm Bán', mobTab: 'wh-dashboard' },
+  'fnb-waste': { title: 'Hủy Hàng & Hao Hụt', mobTab: 'wh-dashboard' },
+
+  // Nhóm 3: Kho Vận & WMS -> mobTab: 'wh-dashboard'
+  'wh-stock': { title: 'Hạn Dùng & Xuất FEFO', mobTab: 'wh-dashboard' },
+  'wh-reorder': { title: 'Cảnh Báo Tồn ROP', mobTab: 'wh-dashboard' },
+  'wh-leadtime': { title: 'Lead Time & NCC', mobTab: 'wh-dashboard' },
+  'wh-posap': { title: 'Đơn Hàng PO SAP', mobTab: 'wh-dashboard' },
+
+  // Nhóm 4: Cổng Thông Tin & Đặt Hàng -> mobTab: 'portal-voucher' hoặc 'portal-baocao'
   'portal-voucher': { title: 'Tạo & Duyệt Chứng Từ', mobTab: 'portal-voucher' },
   'portal-search': { title: 'Tra Cứu Chứng Từ', mobTab: 'portal-voucher' },
-  'portal-order': { title: 'Đặt Hàng Vật Tư Bếp', mobTab: 'hub' },
-  'portal-history': { title: 'Lịch Sử Đặt Hàng', mobTab: 'hub' },
+  'portal-order': { title: 'Đặt Hàng Vật Tư Bếp', mobTab: 'portal-voucher' },
+  'portal-history': { title: 'Lịch Sử Đặt Hàng', mobTab: 'portal-voucher' },
   'portal-baocao': { title: 'Báo Cáo Suất Ăn Ca', mobTab: 'portal-baocao' },
-  'portal-kiemke': { title: 'Kiểm Kê Tồn Kho Kỳ', mobTab: 'hub' }
+  'portal-kiemke': { title: 'Kiểm Kê Tồn Kho Kỳ', mobTab: 'portal-voucher' },
+
+  // Nhóm 5: Hệ Thống & Danh Mục -> mobTab: 'hub'
+  'fnb-sites': { title: 'Danh Mục 14 Điểm Bán', mobTab: 'hub' },
+  'user-matrix': { title: 'Phân Quyền User Matrix', mobTab: 'hub' }
 };
 
 function openMobileMenuHub() {
   const hub = document.getElementById('mobileMenuHub');
   if (!hub) return;
+
+  // Highlight currently active tab in Hub
+  const curTabId = localStorage.getItem('orbit_active_tab') || 'fnb-chain';
+  document.querySelectorAll('.hub-item').forEach(item => {
+    const tabId = item.getAttribute('data-tab');
+    if (tabId === curTabId) {
+      item.classList.add('border-brand-500', 'bg-brand-50/70', 'dark:bg-brand-950/40');
+    } else {
+      item.classList.remove('border-brand-500', 'bg-brand-50/70', 'dark:bg-brand-950/40');
+    }
+  });
   hub.classList.remove('hidden');
   hub.classList.add('flex');
   requestAnimationFrame(() => {
@@ -7646,6 +7666,18 @@ function filterMobileHubFeatures(val) {
     } else {
       el.style.display = 'none';
       el.classList.add('hidden');
+    }
+  });
+
+  // Ẩn nhóm danh mục nếu không còn mục con nào khớp tìm kiếm
+  document.querySelectorAll('#mobileMenuHub .mobile-hub-category').forEach(cat => {
+    const visible = cat.querySelectorAll('.hub-item:not(.hidden)');
+    if (visible.length === 0) {
+      cat.style.display = 'none';
+      cat.classList.add('hidden');
+    } else {
+      cat.style.display = '';
+      cat.classList.remove('hidden');
     }
   });
 }
@@ -13006,25 +13038,34 @@ window.getAppSitesList = function() {
 const SITES_LIST = window.getAppSitesList();
 
 const FEATURE_TITLES = {
-  'fnb-chain': { name: 'Toàn Chuỗi & P&L 14 Điểm Bán', role: 'ADMIN', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm' },
-  'fnb-pl': { name: 'Báo Cáo Lợi Nhuận P&L Chi Tiết', role: 'KE_TOAN', desc: 'Báo cáo lãi lỗ, kiểm soát định mức chi phí vận hành' },
-  'fnb-pos': { name: 'Doanh Thu POS Thời Gian Thực', role: 'KE_TOAN', desc: 'Tra cứu hóa đơn POS, dòng tiền và phân tích giờ cao điểm' },
-  'fnb-stock': { name: 'Tồn Kho Điểm Bán', role: 'NHAN_VIEN', desc: 'Xem tồn kho thực tế tại các điểm bán' },
-  'fnb-counts': { name: 'Kiểm Kê Điểm Bán', role: 'BEP_TRUONG', desc: 'Kiểm kê định kỳ ca sáng/tối và đối soát nguyên vật liệu' },
-  'fnb-receipts': { name: 'Quản Lý Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Tạo phiếu nhập từ NCC ngoài, tăng tồn kho' },
-  'fnb-waste': { name: 'Biên Bản Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, giảm tồn kho và chi phí hao hụt' },
-  'fnb-sites': { name: 'Danh Mục 14 Điểm Bán & Mã SAP', role: 'KHO_TRUONG', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống' },
-  'wh-dashboard': { name: 'Kho Tổng WMS', role: 'KHO_TRUONG', desc: 'Trung tâm điều hành và cân đối kho gia vị tổng' },
-  'wh-stock': { name: 'Tồn Kho & FEFO Kho Tổng', role: 'KHO_TRUONG', desc: 'Kiểm soát hạn dùng, lô date và giá trị tồn kho tổng' },
-  'wh-reorder': { name: 'Cảnh Báo Điểm Đặt Hàng (ROP)', role: 'KHO_TRUONG', desc: 'Tính toán tồn an toàn và cảnh báo thiếu hàng tự động' },
-  'wh-leadtime': { name: 'Lead Time Nhà Cung Cấp', role: 'KHO_TRUONG', desc: 'Đánh giá độ trễ giao hàng của từng nhà cung cấp' },
-  'wh-posap': { name: 'Đơn Hàng SAP PO', role: 'KHO_TRUONG', desc: 'Đồng bộ đơn mua nguyên vật liệu từ SAP ERP' },
-  'portal-voucher': { name: 'Chứng Từ Thu Chi & Hóa Đơn', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
-  'portal-search': { name: 'Tra Cứu Báo Cáo Chuyên Sâu', role: 'KE_TOAN', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều' },
-  'portal-order': { name: 'Đặt Hàng Kho Tổng', role: 'NHAN_VIEN', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán' },
-  'portal-history': { name: 'Lịch Sử Nhập Xuất Kho Tổng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
-  'portal-baocao': { name: 'Báo Cáo Suất Ăn & Vận Hành', role: 'NHAN_VIEN', desc: 'Báo cáo suất ăn và chi phí phát sinh' },
-  'portal-kiemke': { name: 'Kiểm Kê Kho Tổng', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' }
+  // Nhóm 1: Hiệu Quả & Doanh Thu
+  'fnb-chain': { name: 'Toàn Chuỗi & Xếp Hạng', role: 'ADMIN', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm' },
+  'fnb-pl': { name: 'Báo Cáo P&L Điểm Bán', role: 'KE_TOAN', desc: 'Báo cáo lãi lỗ, kiểm soát định mức chi phí vận hành' },
+  'fnb-pos': { name: 'Doanh Thu POS & Bán Lẻ', role: 'KE_TOAN', desc: 'Tra cứu hóa đơn POS, dòng tiền và phân tích giờ cao điểm' },
+
+  // Nhóm 2: Vận Hành Kho Bếp
+  'wh-dashboard': { name: 'Tổng Quan Kho Vận', role: 'KHO_TRUONG', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi' },
+  'fnb-counts': { name: 'Kiểm Kê Hằng Ngày', role: 'BEP_TRUONG', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu' },
+  'fnb-receipts': { name: 'Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC' },
+  'fnb-waste': { name: 'Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế' },
+
+  // Nhóm 3: Kho Vận & WMS
+  'wh-stock': { name: 'Hạn Dùng & Xuất FEFO', role: 'KHO_TRUONG', desc: 'Kiểm soát hạn dùng, lô date và giá trị tồn kho tổng' },
+  'wh-reorder': { name: 'Cảnh Báo Tồn ROP', role: 'KHO_TRUONG', desc: 'Tính toán tồn an toàn và cảnh báo thiếu hàng tự động' },
+  'wh-leadtime': { name: 'Lead Time & NCC', role: 'KHO_TRUONG', desc: 'Đánh giá độ trễ giao hàng của từng nhà cung cấp' },
+  'wh-posap': { name: 'Đơn Hàng PO SAP', role: 'KHO_TRUONG', desc: 'Đồng bộ đơn mua nguyên vật liệu từ SAP ERP' },
+
+  // Nhóm 4: Cổng Thông Tin & Đặt Hàng
+  'portal-voucher': { name: 'Tạo & Duyệt Chứng Từ', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
+  'portal-search': { name: 'Tra Cứu Chứng Từ', role: 'KE_TOAN', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều' },
+  'portal-order': { name: 'Đặt Hàng Vật Tư Bếp', role: 'NHAN_VIEN', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán' },
+  'portal-history': { name: 'Lịch Sử Đặt Hàng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
+  'portal-baocao': { name: 'Báo Cáo Suất Ăn Ca', role: 'NHAN_VIEN', desc: 'Báo cáo suất ăn và chi phí phát sinh' },
+  'portal-kiemke': { name: 'Kiểm Kê Tồn Kho Kỳ', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' },
+
+  // Nhóm 5: Hệ Thống & Danh Mục
+  'fnb-sites': { name: 'Danh Mục 14 Điểm Bán', role: 'KHO_TRUONG', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống' },
+  'user-matrix': { name: 'Phân Quyền User Matrix', role: 'ADMIN', desc: 'Ma trận phân quyền người dùng và kiểm soát truy cập' }
 };
 
 // ============================================================================
@@ -13553,7 +13594,7 @@ function applyUserSessionToUI() {
   });
 
   // Ẩn nhóm mobile hub nếu tất cả item con bị ẩn
-  document.querySelectorAll('#mobileMenuHub .space-y-4 > div').forEach(group => {
+  document.querySelectorAll('#mobileMenuHub .mobile-hub-category').forEach(group => {
     const visibleHubItems = group.querySelectorAll('.hub-item:not(.hidden)');
     if (visibleHubItems.length === 0) {
       group.classList.add('hidden');
@@ -13597,14 +13638,14 @@ function applyUserSessionToUI() {
     }
   }
 
-  const mobWhStock = document.getElementById('mobTab-wh-stock');
-  if (mobWhStock) {
-    if (canAccessTab('wh-stock')) {
-      mobWhStock.classList.remove('hidden');
-      mobWhStock.style.display = '';
+  const mobWh = document.getElementById('mobTab-wh-dashboard');
+  if (mobWh) {
+    if (canAccessTab('wh-dashboard') || canAccessTab('fnb-counts') || canAccessTab('wh-stock')) {
+      mobWh.classList.remove('hidden');
+      mobWh.style.display = '';
     } else {
-      mobWhStock.classList.add('hidden');
-      mobWhStock.style.display = 'none';
+      mobWh.classList.add('hidden');
+      mobWh.style.display = 'none';
     }
   }
 
