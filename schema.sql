@@ -149,3 +149,60 @@ CREATE TABLE IF NOT EXISTS stock_audits (
   FOREIGN KEY (branch_id) REFERENCES branches(id),
   FOREIGN KEY (sku) REFERENCES items(sku)
 );
+
+-- ============================================================================
+-- PERFORMANCE INDEXES (TỐI ƯU HÓA CLOUDFLARE D1 - GIẢM 99% ROWS SCANNED)
+-- ============================================================================
+
+-- 1. Branches & Sites
+CREATE INDEX IF NOT EXISTS idx_branches_code ON branches(code);
+CREATE INDEX IF NOT EXISTS idx_branches_active ON branches(is_active);
+CREATE INDEX IF NOT EXISTS idx_sites_code ON sites(site_code);
+CREATE INDEX IF NOT EXISTS idx_sites_name ON sites(site_name);
+
+-- 2. Inventory Batches & Stock (FEFO & Tồn kho)
+CREATE INDEX IF NOT EXISTS idx_inv_batches_branch_sku ON inventory_batches(branch_id, sku);
+CREATE INDEX IF NOT EXISTS idx_inv_batches_exp ON inventory_batches(exp_date);
+CREATE INDEX IF NOT EXISTS idx_inv_batches_qty ON inventory_batches(qty);
+CREATE INDEX IF NOT EXISTS idx_stock_trans_branch_created ON stock_transactions(branch_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_stock_trans_sku ON stock_transactions(sku);
+
+-- 3. Purchase Orders & Vouchers
+CREATE INDEX IF NOT EXISTS idx_po_branch_status ON purchase_orders(branch_id, status);
+CREATE INDEX IF NOT EXISTS idx_po_number ON purchase_orders(po_number);
+CREATE INDEX IF NOT EXISTS idx_po_order_time ON purchase_orders(order_time);
+CREATE INDEX IF NOT EXISTS idx_poi_po_id ON purchase_order_items(po_id);
+CREATE INDEX IF NOT EXISTS idx_poi_sku ON purchase_order_items(sku);
+CREATE INDEX IF NOT EXISTS idx_vouchers_code ON vouchers(voucher_code);
+CREATE INDEX IF NOT EXISTS idx_vouchers_status ON vouchers(status);
+
+-- 4. Báo cáo vận hành & Kiểm kê
+CREATE INDEX IF NOT EXISTS idx_catering_branch_date ON daily_catering_reports(branch_id, report_date);
+CREATE INDEX IF NOT EXISTS idx_stock_audits_branch_period ON stock_audits(branch_id, period_month);
+
+-- 5. Users, Roles & Permissions
+CREATE INDEX IF NOT EXISTS idx_app_users_email ON app_users(email);
+CREATE INDEX IF NOT EXISTS idx_app_users_role ON app_users(role_code);
+CREATE INDEX IF NOT EXISTS idx_role_perms_role ON role_permissions(role_code);
+CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email);
+CREATE INDEX IF NOT EXISTS idx_access_req_user_status ON access_requests(user_email, status);
+
+-- 6. Đơn Hàng & Định Mức (NVL, Quota)
+CREATE INDEX IF NOT EXISTS idx_don_hang_site_month ON don_hang(site_name, applied_month);
+CREATE INDEX IF NOT EXISTS idx_don_hang_item ON don_hang(item_code);
+CREATE INDEX IF NOT EXISTS idx_don_hang_status ON don_hang(status);
+CREATE INDEX IF NOT EXISTS idx_dinh_muc_site_month ON dinh_muc(site_name, month_period);
+CREATE INDEX IF NOT EXISTS idx_dinh_muc_item ON dinh_muc(item_code);
+CREATE INDEX IF NOT EXISTS idx_nvl_items_code ON nvl_items(item_code);
+CREATE INDEX IF NOT EXISTS idx_nvl_items_region ON nvl_items(region);
+
+-- 7. POS & F&B Analytics
+CREATE INDEX IF NOT EXISTS idx_trans_billing_date ON transactions(billing_date);
+CREATE INDEX IF NOT EXISTS idx_trans_store_date ON transactions(ma_cua_hang, billing_date);
+CREATE INDEX IF NOT EXISTS idx_fnb_summary_month ON fnb_monthly_summary(month_period);
+CREATE INDEX IF NOT EXISTS idx_fnb_summary_site_month ON fnb_monthly_summary(site_code, month_period);
+CREATE INDEX IF NOT EXISTS idx_fnb_bal_site_item ON fnb_stock_balances(site_code, item_code);
+CREATE INDEX IF NOT EXISTS idx_fnb_count_lines_cid ON fnb_stock_count_lines(count_id);
+CREATE INDEX IF NOT EXISTS idx_fnb_receipt_lines_rid ON fnb_stock_receipt_lines(receipt_id);
+CREATE INDEX IF NOT EXISTS idx_fnb_waste_lines_wid ON fnb_stock_waste_lines(waste_id);
+

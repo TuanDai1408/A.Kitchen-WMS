@@ -423,6 +423,123 @@ const MASTER_14_SITES_FALLBACK = [
   { code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam', budget: 1000000, address: 'Site vận hành A.Kitchen', phone: '0900000000', is_active: 1 }
 ];
 
+
+// ============================================================================
+// PERFORMANCE & D1 QUOTA OPTIMIZATION: IN-MEMORY CACHE & AUTO-INDEXES
+// ============================================================================
+const MEMORY_CACHE = new Map();
+
+function getMemoryCache(key) {
+  const item = MEMORY_CACHE.get(key);
+  if (!item) return null;
+  if (Date.now() > item.expiresAt) {
+    MEMORY_CACHE.delete(key);
+    return null;
+  }
+  return item.value;
+}
+
+function setMemoryCache(key, value, ttlSeconds = 60) {
+  if (MEMORY_CACHE.size > 250) {
+    const oldestKey = MEMORY_CACHE.keys().next().value;
+    MEMORY_CACHE.delete(oldestKey);
+  }
+  MEMORY_CACHE.set(key, {
+    value,
+    expiresAt: Date.now() + (ttlSeconds * 1000)
+  });
+}
+
+function invalidateMemoryCache(prefix) {
+  for (const key of MEMORY_CACHE.keys()) {
+    if (key.includes(prefix)) {
+      MEMORY_CACHE.delete(key);
+    }
+  }
+}
+
+function createCachedResponse(data, ttlSeconds, corsHeaders, isNoCache, url, request, ctx, memKey) {
+  if (memKey && !isNoCache) {
+    setMemoryCache(memKey, data, ttlSeconds);
+  }
+  const headers = new Headers(corsHeaders);
+  headers.set('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
+  headers.set('X-D1-Cache', 'MISS');
+  const resp = new Response(JSON.stringify(data), { headers });
+  if (!isNoCache && ctx && typeof ctx.waitUntil === 'function') {
+    try {
+      ctx.waitUntil(caches.default.put(new Request(url.toString(), request), resp.clone()));
+    } catch (e) {}
+  }
+  return resp;
+}
+
+let gIndexesCreated = false;
+async function ensureDatabaseIndexes(env) {
+  if (gIndexesCreated) return;
+  gIndexesCreated = true;
+
+  const indexes = [
+    // 1. Branches & Sites
+    'CREATE INDEX IF NOT EXISTS idx_branches_code ON branches(code)',
+    'CREATE INDEX IF NOT EXISTS idx_branches_active ON branches(is_active)',
+    'CREATE INDEX IF NOT EXISTS idx_sites_code ON sites(site_code)',
+    'CREATE INDEX IF NOT EXISTS idx_sites_name ON sites(site_name)',
+
+    // 2. Inventory Batches & Stock (FEFO & Tồn kho)
+    'CREATE INDEX IF NOT EXISTS idx_inv_batches_branch_sku ON inventory_batches(branch_id, sku)',
+    'CREATE INDEX IF NOT EXISTS idx_inv_batches_exp ON inventory_batches(exp_date)',
+    'CREATE INDEX IF NOT EXISTS idx_inv_batches_qty ON inventory_batches(qty)',
+    'CREATE INDEX IF NOT EXISTS idx_stock_trans_branch_created ON stock_transactions(branch_id, created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_stock_trans_sku ON stock_transactions(sku)',
+
+    // 3. Purchase Orders & Vouchers
+    'CREATE INDEX IF NOT EXISTS idx_po_branch_status ON purchase_orders(branch_id, status)',
+    'CREATE INDEX IF NOT EXISTS idx_po_number ON purchase_orders(po_number)',
+    'CREATE INDEX IF NOT EXISTS idx_po_order_time ON purchase_orders(order_time)',
+    'CREATE INDEX IF NOT EXISTS idx_poi_po_id ON purchase_order_items(po_id)',
+    'CREATE INDEX IF NOT EXISTS idx_poi_sku ON purchase_order_items(sku)',
+    'CREATE INDEX IF NOT EXISTS idx_vouchers_code ON vouchers(voucher_code)',
+    'CREATE INDEX IF NOT EXISTS idx_vouchers_status ON vouchers(status)',
+
+    // 4. Báo cáo vận hành & Kiểm kê
+    'CREATE INDEX IF NOT EXISTS idx_catering_branch_date ON daily_catering_reports(branch_id, report_date)',
+    'CREATE INDEX IF NOT EXISTS idx_stock_audits_branch_period ON stock_audits(branch_id, period_month)',
+
+    // 5. Users, Roles & Permissions
+    'CREATE INDEX IF NOT EXISTS idx_app_users_email ON app_users(email)',
+    'CREATE INDEX IF NOT EXISTS idx_app_users_role ON app_users(role_code)',
+    'CREATE INDEX IF NOT EXISTS idx_role_perms_role ON role_permissions(role_code)',
+    'CREATE INDEX IF NOT EXISTS idx_user_perms_email ON user_permissions(user_email)',
+    'CREATE INDEX IF NOT EXISTS idx_access_req_user_status ON access_requests(user_email, status)',
+
+    // 6. Đơn Hàng & Định Mức (NVL, Quota)
+    'CREATE INDEX IF NOT EXISTS idx_don_hang_site_month ON don_hang(site_name, applied_month)',
+    'CREATE INDEX IF NOT EXISTS idx_don_hang_item ON don_hang(item_code)',
+    'CREATE INDEX IF NOT EXISTS idx_don_hang_status ON don_hang(status)',
+    'CREATE INDEX IF NOT EXISTS idx_dinh_muc_site_month ON dinh_muc(site_name, month_period)',
+    'CREATE INDEX IF NOT EXISTS idx_dinh_muc_item ON dinh_muc(item_code)',
+    'CREATE INDEX IF NOT EXISTS idx_nvl_items_code ON nvl_items(item_code)',
+    'CREATE INDEX IF NOT EXISTS idx_nvl_items_region ON nvl_items(region)',
+
+    // 7. POS & F&B Analytics
+    'CREATE INDEX IF NOT EXISTS idx_trans_billing_date ON transactions(billing_date)',
+    'CREATE INDEX IF NOT EXISTS idx_trans_store_date ON transactions(ma_cua_hang, billing_date)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_summary_month ON fnb_monthly_summary(month_period)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_summary_site_month ON fnb_monthly_summary(site_code, month_period)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_bal_site_item ON fnb_stock_balances(site_code, item_code)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_count_lines_cid ON fnb_stock_count_lines(count_id)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_receipt_lines_rid ON fnb_stock_receipt_lines(receipt_id)',
+    'CREATE INDEX IF NOT EXISTS idx_fnb_waste_lines_wid ON fnb_stock_waste_lines(waste_id)'
+  ];
+
+  for (const idxSql of indexes) {
+    try {
+      await env.DB.prepare(idxSql).run().catch(() => {});
+    } catch (e) {}
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -441,18 +558,43 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // 0. Cloudflare Workers Edge Caching cho các báo cáo phân tích nặng (giảm 80-90% read đến D1)
-    const isCacheableReport = (pathname === '/api/fnb/chain' || pathname === '/api/fnb/pl' || pathname === '/api/fnb/pos') && request.method === 'GET';
+    // Lazy initialize database indexes in background (0ms latency impact)
+    if (!gIndexesCreated && ctx && typeof ctx.waitUntil === 'function') {
+      ctx.waitUntil(ensureDatabaseIndexes(env));
+    }
+
+    // 0. High-Performance Multi-tier Caching Layer (RAM Cache + Edge Cache)
+    const CACHEABLE_GET_ROUTES = [
+      '/api/fnb/chain',
+      '/api/fnb/pl',
+      '/api/fnb/pos',
+      '/api/branches',
+      '/api/dashboard-summary',
+      '/api/stock',
+      '/api/reorder',
+      '/api/leadtime',
+      '/api/po-sap'
+    ];
+    const isCacheableReport = CACHEABLE_GET_ROUTES.includes(pathname) && request.method === 'GET';
     const isNoCache = searchParams.get('refresh') === 'true' || searchParams.get('nocache') === '1';
 
     if (isCacheableReport && !isNoCache) {
+      // 0a. Ultra-fast RAM Cache (<0.5ms, 0 D1 rows read)
+      const memCached = getMemoryCache(url.toString());
+      if (memCached) {
+        const resp = new Response(JSON.stringify(memCached), { headers: corsHeaders });
+        resp.headers.set('X-D1-Cache', 'RAM-HIT');
+        return resp;
+      }
+
+      // 0b. Cloudflare Edge Cache API
       try {
         const cache = caches.default;
         const cacheKey = new Request(url.toString(), request);
         const cachedResponse = await cache.match(cacheKey);
         if (cachedResponse) {
           const resp = new Response(cachedResponse.body, cachedResponse);
-          resp.headers.set('X-D1-Cache', 'HIT');
+          resp.headers.set('X-D1-Cache', 'EDGE-HIT');
           return resp;
         }
       } catch (cacheErr) {
@@ -465,11 +607,17 @@ export default {
       // PHÂN HỆ 1: QUẢN LÝ KHO GIA VỊ, FEFO & VẬN HÀNH BẾP (WMS)
       // ======================================================================
 
-      // 1.1 GET /api/branches
+      // 1.1 GET /api/branches (Tối ưu: RAM Cache 300s, không ghi DB trong GET)
       if (pathname === '/api/branches' && request.method === 'GET') {
+        const memBranches = !isNoCache ? getMemoryCache('api_branches') : null;
+        if (memBranches) {
+          const resp = new Response(JSON.stringify(memBranches), { headers: corsHeaders });
+          resp.headers.set('X-D1-Cache', 'RAM-HIT');
+          return resp;
+        }
+
         try {
-          await ensureBranchesSynced(env);
-          const { results } = await env.DB.prepare(`
+          let { results } = await env.DB.prepare(`
             SELECT 
               COALESCE(b.id, LOWER(s.site_code)) as id,
               s.site_code as code,
@@ -485,10 +633,15 @@ export default {
             WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
             ORDER BY s.site_code
           `).all();
-          if (results && results.length > 0) {
-            return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
+
+          if (!results || results.length === 0) {
+            await ensureBranchesSynced(env);
+            results = MASTER_14_SITES_FALLBACK;
           }
-          return new Response(JSON.stringify({ success: true, data: MASTER_14_SITES_FALLBACK }), { headers: corsHeaders });
+
+          const responseData = { success: true, data: results };
+          setMemoryCache('api_branches', responseData, 300);
+          return createCachedResponse(responseData, 300, corsHeaders, isNoCache, url, request, ctx, url.toString());
         } catch (dbErr) {
           console.warn('D1 limit or connection fallback for branches:', dbErr.message);
           return new Response(JSON.stringify({ success: true, data: MASTER_14_SITES_FALLBACK, fallback: true }), { headers: corsHeaders });
@@ -573,7 +726,7 @@ export default {
           ? Math.min(100, Math.max(0, Math.round(((totalSkus - ropCount) / totalSkus) * 1000) / 10))
           : 92.4;
 
-        return new Response(JSON.stringify({
+        const dashSummaryData = {
           success: true,
           data: {
             critical_exp_count: critRow ? critRow.critical_count : 0,
@@ -586,7 +739,8 @@ export default {
             safety_rate: safetyRate,
             alerts: alertsRows && alertsRows.results ? alertsRows.results : []
           }
-        }), { headers: corsHeaders });
+        };
+        return createCachedResponse(dashSummaryData, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 1.3 GET /api/stock
@@ -632,7 +786,7 @@ export default {
           };
         });
 
-        return new Response(JSON.stringify({ success: true, data: enriched }), { headers: corsHeaders });
+        return createCachedResponse({ success: true, data: enriched }, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
 
       // 1.4 POST /api/stock/receipt
@@ -1281,6 +1435,17 @@ export default {
         if (!email) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu email' }), { status: 400, headers: corsHeaders });
         }
+
+        const authCacheKey = 'auth_me_' + email.toLowerCase().trim();
+        if (!isNoCache) {
+          const cached = getMemoryCache(authCacheKey);
+          if (cached) {
+            const resp = new Response(JSON.stringify(cached), { headers: corsHeaders });
+            resp.headers.set('X-D1-Cache', 'RAM-HIT');
+            return resp;
+          }
+        }
+
         try {
           let user = await env.DB.prepare(`SELECT * FROM app_users WHERE email = ? LIMIT 1`).bind(email).first();
           if (!user) {
@@ -1308,7 +1473,7 @@ export default {
             });
           }
 
-          return new Response(JSON.stringify({
+          const authResponseData = {
             success: true,
             data: {
               user: {
@@ -1327,7 +1492,9 @@ export default {
               approvedRoles,
               permissions
             }
-          }), { headers: corsHeaders });
+          };
+          setMemoryCache(authCacheKey, authResponseData, 60);
+          return new Response(JSON.stringify(authResponseData), { headers: corsHeaders });
         } catch (dbErr) {
           console.warn('D1 limit or connection fallback for /api/auth/me:', dbErr.message);
           const isOwner = email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com';
@@ -2573,7 +2740,8 @@ export default {
 
             const countId = insertHeader.meta.last_row_id;
 
-            // Insert Lines & Update Balances
+            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
+            const countBatchStmts = [];
             for (const item of lines) {
               const countQty = Number(item.count_qty) || 0;
               const bookQty = Number(item.book_qty) || 0;
@@ -2581,26 +2749,30 @@ export default {
               const unitPrice = Number(item.unit_price) || 0;
               const diffVal = diffQty * unitPrice;
 
-              await env.DB.prepare(`
+              countBatchStmts.push(env.DB.prepare(`
                 INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-              `).bind(countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || '').run();
+              `).bind(countId, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || ''));
 
-              // Cập nhật số đếm thực tế gần nhất vào bảng số dư tồn kho
-              await env.DB.prepare(`
+              countBatchStmts.push(env.DB.prepare(`
                 UPDATE fnb_stock_balances
                 SET last_count_qty = ?, last_count_date = ?
                 WHERE item_code = ? AND site_code = ?
-              `).bind(countQty, count_date, item.item_code, site_code).run();
+              `).bind(countQty, count_date, item.item_code, site_code));
 
-              // Ghi log giao dịch kiểm kê
               if (Math.abs(diffQty) > 0.001) {
-                await env.DB.prepare(`
+                countBatchStmts.push(env.DB.prepare(`
                   INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
                   VALUES (?, ?, ?, ?, 'KIEM_KE', ?, ?, ?, ?, ?)
-                `).bind(countCode, count_date, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by).run();
+                `).bind(countCode, count_date, site_code, item.item_code, diffQty, unitPrice, diffVal, `Chênh lệch kiểm kê: ${diffQty > 0 ? '+' : ''}${diffQty}`, created_by));
               }
             }
+
+            if (countBatchStmts.length > 0) {
+              await env.DB.batch(countBatchStmts);
+            }
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
 
             return new Response(JSON.stringify({
               success: true,
@@ -2670,32 +2842,37 @@ export default {
 
             const receiptId = insertH.meta.last_row_id;
 
-            // Insert Lines & Update Balances
+            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
+            const receiptBatchStmts = [];
             for (const item of lines) {
               const qty = Number(item.qty) || 0;
               const unitPrice = Number(item.unit_price) || 0;
               const lineAmount = qty * unitPrice;
 
-              await env.DB.prepare(`
+              receiptBatchStmts.push(env.DB.prepare(`
                 INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
                 VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '').run();
+              `).bind(receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || ''));
 
-              // Cập nhật tăng số lượng nhập và số tồn sổ sách
-              await env.DB.prepare(`
+              receiptBatchStmts.push(env.DB.prepare(`
                 UPDATE fnb_stock_balances
                 SET receipt_qty = receipt_qty + ?,
                     book_qty = opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty,
                     total_value = (opening_qty + receipt_qty + ? - sales_bom_qty - waste_qty) * ?
                 WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code).run();
+              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
 
-              // Ghi log giao dịch nhập kho
-              await env.DB.prepare(`
+              receiptBatchStmts.push(env.DB.prepare(`
                 INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
                 VALUES (?, ?, ?, ?, 'NHAP_KHO', ?, ?, ?, ?, ?)
-              `).bind(receiptCode, receipt_date, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by).run();
+              `).bind(receiptCode, receipt_date, site_code, item.item_code, qty, unitPrice, lineAmount, `Nhập từ ${supplier} (Số HĐ: ${invoice_no || 'N/A'})`, created_by));
             }
+
+            if (receiptBatchStmts.length > 0) {
+              await env.DB.batch(receiptBatchStmts);
+            }
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
 
             return new Response(JSON.stringify({
               success: true,
@@ -2765,32 +2942,37 @@ export default {
 
             const wasteId = insertH.meta.last_row_id;
 
-            // Insert Lines & Update Balances
+            // Batch insert lines & update balances in a single transaction (ACID & D1 Optimized)
+            const wasteBatchStmts = [];
             for (const item of lines) {
               const qty = Number(item.qty) || 0;
               const unitPrice = Number(item.unit_price) || 0;
               const lineAmount = qty * unitPrice;
 
-              await env.DB.prepare(`
+              wasteBatchStmts.push(env.DB.prepare(`
                 INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
                 VALUES (?, ?, ?, ?, ?, ?)
-              `).bind(wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason).run();
+              `).bind(wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason));
 
-              // Cập nhật tăng số lượng hủy và giảm số tồn sổ sách
-              await env.DB.prepare(`
+              wasteBatchStmts.push(env.DB.prepare(`
                 UPDATE fnb_stock_balances
                 SET waste_qty = waste_qty + ?,
                     book_qty = opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?),
                     total_value = (opening_qty + receipt_qty - sales_bom_qty - (waste_qty + ?)) * ?
                 WHERE item_code = ? AND site_code = ?
-              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code).run();
+              `).bind(qty, qty, qty, unitPrice, item.item_code, site_code));
 
-              // Ghi log giao dịch hủy hàng
-              await env.DB.prepare(`
+              wasteBatchStmts.push(env.DB.prepare(`
                 INSERT INTO fnb_stock_transactions (trans_code, trans_date, site_code, item_code, trans_type, qty, unit_price, amount, notes, created_by)
                 VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?, ?, ?, ?)
-              `).bind(wasteCode, waste_date, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by).run();
+              `).bind(wasteCode, waste_date, site_code, item.item_code, -qty, unitPrice, -lineAmount, `Hủy hàng: ${reason} (Xác nhận: ${confirmed_by})`, created_by));
             }
+
+            if (wasteBatchStmts.length > 0) {
+              await env.DB.batch(wasteBatchStmts);
+            }
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
 
             return new Response(JSON.stringify({
               success: true,

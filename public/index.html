@@ -11378,14 +11378,17 @@ window.syncCurrentUserPermissions = async function() {
   }
 };
 
-// Đồng bộ định kỳ mỗi 15 giây và mỗi khi user focus lại cửa sổ trình duyệt
+// Đồng bộ định kỳ mỗi 5 phút (300 giây) và khi user focus lại cửa sổ trình duyệt (giới hạn tối đa 1 lần/phút để tránh vượt quota Cloudflare D1)
+let lastFocusSyncTime = Date.now();
 setInterval(() => {
   if (!document.hidden && window.gCurrentUser && window.gCurrentUser.email) {
     window.syncCurrentUserPermissions();
   }
-}, 15000);
+}, 300000);
 window.addEventListener('focus', () => {
-  if (window.gCurrentUser && window.gCurrentUser.email) {
+  const now = Date.now();
+  if (now - lastFocusSyncTime > 60000 && window.gCurrentUser && window.gCurrentUser.email) {
+    lastFocusSyncTime = now;
     window.syncCurrentUserPermissions();
   }
 });
