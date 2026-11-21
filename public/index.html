@@ -7672,12 +7672,21 @@ function updateMobileNavState(tabId) {
   }
 
   // Update bottom navigation bar
-  const activeMobGroup = TAB_META[tabId]?.mobTab || 'hub';
   document.querySelectorAll('.mob-nav-btn').forEach(btn => {
     btn.classList.remove('active', 'text-brand-500', 'dark:text-brand-400', 'font-bold');
     btn.classList.add('text-gray-400', 'dark:text-gray-500', 'font-medium');
   });
 
+  // 1. Direct match: Check if a visible bottom button is explicitly bound to this tab
+  const directBtn = document.querySelector(`.mob-nav-btn[onclick*="'${tabId}'"]`);
+  if (directBtn && window.getComputedStyle(directBtn).display !== 'none' && !directBtn.classList.contains('hidden')) {
+    directBtn.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
+    directBtn.classList.add('active', 'text-brand-500', 'dark:text-brand-400', 'font-bold');
+    return;
+  }
+
+  // 2. Group match via TAB_META fallback
+  const activeMobGroup = TAB_META[tabId]?.mobTab || 'hub';
   const activeBtn = document.getElementById(`mobTab-${activeMobGroup}`);
   if (activeBtn) {
     activeBtn.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
@@ -13025,51 +13034,97 @@ function applyUserSessionToUI() {
     }
   });
 
-  // 4. ĐỒNG BỘ THANH ĐIỀU HƯỚNG DƯỚI ĐÁY MOBILE (#mobileTabBar)
+  // 4. ĐỒNG BỘ THANH ĐIỀU HƯỚNG DƯỚI ĐÁY MOBILE (#mobileBottomNav)
   const mobChain = document.getElementById('mobTab-fnb-chain');
+  const mobWh = document.getElementById('mobTab-wh-dashboard');
+  const mobVoucher = document.getElementById('mobTab-portal-voucher');
+  const mobBaocao = document.getElementById('mobTab-portal-baocao');
+
+  // Đăng ký các tab cố định của các button khác để tránh trùng lặp tuyệt đối
+  const assignedTabs = new Set(['wh-dashboard']);
+  if (canAccessTab('portal-voucher')) assignedTabs.add('portal-voucher');
+  if (canAccessTab('portal-baocao')) assignedTabs.add('portal-baocao');
+
   if (mobChain) {
+    let targetTab = null;
+    let targetTitle = 'Chuỗi F&B';
+    let targetIcon = 'trophy';
+
     if (canAccessTab('fnb-chain')) {
-      mobChain.classList.remove('hidden');
-      mobChain.style.display = '';
-      mobChain.setAttribute('onclick', "switchTab('fnb-chain')");
-      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Chuỗi F&B';
-    } else if (canAccessTab('wh-dashboard')) {
-      mobChain.classList.remove('hidden');
-      mobChain.style.display = '';
-      mobChain.setAttribute('onclick', "switchTab('wh-dashboard')");
-      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Kho Vận';
-    } else if (canAccessTab('wh-dashboard')) {
-      mobChain.classList.remove('hidden');
-      mobChain.style.display = '';
-      mobChain.setAttribute('onclick', "switchTab('wh-dashboard')");
-      const span = mobChain.querySelector('span'); if (span) span.textContent = 'Kho Tổng';
+      targetTab = 'fnb-chain';
+      targetTitle = 'Chuỗi F&B';
+      targetIcon = 'trophy';
+    } else if (canAccessTab('fnb-pl')) {
+      targetTab = 'fnb-pl';
+      targetTitle = 'Báo Cáo P&L';
+      targetIcon = 'pie-chart';
+    } else if (canAccessTab('fnb-pos')) {
+      targetTab = 'fnb-pos';
+      targetTitle = 'Doanh Thu POS';
+      targetIcon = 'zap';
+    } else if (canAccessTab('fnb-counts')) {
+      targetTab = 'fnb-counts';
+      targetTitle = 'Kiểm Kê';
+      targetIcon = 'clipboard-check';
+    } else if (canAccessTab('fnb-receipts')) {
+      targetTab = 'fnb-receipts';
+      targetTitle = 'Nhập Hàng';
+      targetIcon = 'package-plus';
+    } else if (canAccessTab('wh-stock')) {
+      targetTab = 'wh-stock';
+      targetTitle = 'Hạn Dùng';
+      targetIcon = 'calendar-clock';
+    } else if (canAccessTab('portal-search')) {
+      targetTab = 'portal-search';
+      targetTitle = 'Tra Cứu';
+      targetIcon = 'search';
+    } else if (canAccessTab('portal-order')) {
+      targetTab = 'portal-order';
+      targetTitle = 'Đặt Hàng';
+      targetIcon = 'shopping-cart';
     } else {
+      // Tìm tab đầu tiên được phép trên sidebar mà chưa được gán trên bottom bar
       const firstAllowed = document.querySelector('#sidebar .nav-btn:not(.hidden)');
       if (firstAllowed) {
         const tId = firstAllowed.getAttribute('data-tab');
-        mobChain.classList.remove('hidden');
-        mobChain.style.display = '';
-        mobChain.setAttribute('onclick', `switchTab('${tId}')`);
-        const span = mobChain.querySelector('span'); if (span) { const tId = firstAllowed.getAttribute('data-tab'); span.textContent = (typeof TAB_META !== 'undefined' && TAB_META[tId]) ? TAB_META[tId].title : firstAllowed.textContent.trim(); }
-      } else {
-        mobChain.classList.add('hidden');
-        mobChain.style.display = 'none';
+        if (tId && !assignedTabs.has(tId)) {
+          targetTab = tId;
+          targetTitle = (typeof TAB_META !== 'undefined' && TAB_META[tId]) ? TAB_META[tId].title : firstAllowed.textContent.trim();
+          targetIcon = 'layers';
+        }
       }
+    }
+
+    if (targetTab && !assignedTabs.has(targetTab)) {
+      mobChain.classList.remove('hidden');
+      mobChain.style.display = '';
+      mobChain.setAttribute('onclick', `switchTab('${targetTab}')`);
+      const span = mobChain.querySelector('span');
+      if (span) span.textContent = targetTitle;
+      const icWrap = mobChain.querySelector('.mob-ic-wrap');
+      if (icWrap) {
+        icWrap.innerHTML = `<i data-lucide="${targetIcon}" class="w-5 h-5"></i>`;
+      }
+    } else {
+      // Nếu không có tab nào hợp lệ hoặc bị trùng lặp với nút Kho Vận -> Ẩn Button 1 để không trùng lặp
+      mobChain.classList.add('hidden');
+      mobChain.style.display = 'none';
     }
   }
 
-  const mobWh = document.getElementById('mobTab-wh-dashboard');
   if (mobWh) {
-    if (canAccessTab('wh-dashboard') || canAccessTab('fnb-counts') || canAccessTab('wh-stock')) {
+    if (canAccessTab('wh-dashboard') || canAccessTab('wh-stock') || canAccessTab('wh-reorder')) {
       mobWh.classList.remove('hidden');
       mobWh.style.display = '';
+      mobWh.setAttribute('onclick', "switchTab('wh-dashboard')");
+      const span = mobWh.querySelector('span');
+      if (span) span.textContent = 'Kho Vận';
     } else {
       mobWh.classList.add('hidden');
       mobWh.style.display = 'none';
     }
   }
 
-  const mobVoucher = document.getElementById('mobTab-portal-voucher');
   if (mobVoucher) {
     if (canAccessTab('portal-voucher')) {
       mobVoucher.classList.remove('hidden');
@@ -13080,7 +13135,6 @@ function applyUserSessionToUI() {
     }
   }
 
-  const mobBaocao = document.getElementById('mobTab-portal-baocao');
   if (mobBaocao) {
     if (canAccessTab('portal-baocao')) {
       mobBaocao.classList.remove('hidden');
@@ -13090,6 +13144,8 @@ function applyUserSessionToUI() {
       mobBaocao.style.display = 'none';
     }
   }
+
+  if (window.lucide) lucide.createIcons();
 
   // 5. ĐỒNG BỘ CÁC NÚT SUB-TAB CON TRONG TRANG
   document.querySelectorAll('button[onclick*="switchTab"]').forEach(subBtn => {
