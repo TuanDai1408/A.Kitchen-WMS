@@ -139,72 +139,72 @@ async function ensureRolePermissions(env) {
 async function autoCleanDemoData(env) {
   try {
     // 1. Xóa các tài khoản demo fake trong app_users
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM app_users 
       WHERE email LIKE '%@sibafood.vn' 
          OR email = 'admin@sibafood.vn' 
          OR email LIKE '%test%'
-    `).run();
+    `).catch(() => {});
 
     // 2. Xóa phân quyền và yêu cầu cấp quyền của user demo
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM user_permissions 
       WHERE user_email LIKE '%@sibafood.vn' 
          OR user_email LIKE '%test%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM access_requests 
       WHERE user_email LIKE '%@sibafood.vn' 
          OR user_email LIKE '%test%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
     // 3. Xóa dữ liệu seed demo mock ban đầu
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM purchase_orders 
       WHERE id LIKE 'po_%' OR po_number LIKE 'PO #%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM purchase_order_items 
       WHERE po_id LIKE 'po_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM vouchers 
       WHERE id LIKE 'vc_%' OR voucher_code LIKE 'CT-202611-%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM inventory_batches 
       WHERE id LIKE 'bat_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM stock_audits 
       WHERE id LIKE 'sa_%'
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM branches 
       WHERE id IN ('b_q1', 'b_q7', 'b_td')
-    `).run().catch(() => {});
+    `).catch(() => {});
 
     await ensureBranchesSynced(env);
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM items 
       WHERE sku IN ('GV-BBQ-01', 'GV-SWCH-02', 'GV-MUSH-09', 'GV-PEP-01', 'GV-SUG-05', 'GV-OYST-04', 'GV-OYST-08', 'GV-FSH-01', 'VT-GLV-01', 'VT-WRP-02', 'CC-KNF-04')
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM daily_catering_reports
-    `).run().catch(() => {});
+    `).catch(() => {});
 
-    await env.DB.prepare(`
+    await db.exec(env, `
       DELETE FROM don_hang 
       WHERE ordered_by LIKE '%test%' OR ordered_by LIKE '%demo%' OR ordered_by LIKE '%sibafood.vn%'
-    `).run().catch(() => {});
+    `).catch(() => {});
   } catch (err) {
     console.error('autoCleanDemoData error:', err);
   }
@@ -214,18 +214,46 @@ async function autoCleanDemoData(env) {
 async function ensureBranchesSynced(env) {
   try {
     // 1. Đồng bộ các điểm bán từ master sites sang branches nếu còn thiếu
-    await env.DB.prepare(`
-      INSERT OR IGNORE INTO branches (id, code, name, address, phone, is_active)
-      SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, 1 as is_active
-      FROM sites
-      WHERE site_code NOT IN (SELECT code FROM branches)
-    `).run().catch(() => {});
+    await db.exec(env, {
+      d1: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, 1 as is_active
+        FROM sites
+        WHERE site_code NOT IN (SELECT code FROM branches)
+        ON CONFLICT (id) DO NOTHING
+      `,
+      pg: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        SELECT LOWER(site_code) as id, site_code as code, COALESCE(site_name, name) as name, 'Hệ thống căn tin Tân Long Group' as address, '0903.000.xxx' as phone, true as is_active
+        FROM sites
+        WHERE site_code NOT IN (SELECT code FROM branches)
+        ON CONFLICT (id) DO NOTHING
+      `
+    }).catch(() => {});
 
     // 2. Đảm bảo K505 luôn có mặt và active trong branches
-    await env.DB.prepare(`
-      INSERT OR REPLACE INTO branches (id, code, name, address, phone, is_active)
-      VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', 1)
-    `).run().catch(() => {});
+    await db.exec(env, {
+      d1: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', 1)
+        ON CONFLICT (id) DO UPDATE SET
+          code = excluded.code,
+          name = excluded.name,
+          address = excluded.address,
+          phone = excluded.phone,
+          is_active = excluded.is_active
+      `,
+      pg: `
+        INSERT INTO branches (id, code, name, address, phone, is_active)
+        VALUES ('k505', 'K505', 'K505 - MB A.Kitchen - Hub Đa Phúc', 'Hệ thống căn tin Tân Long Group - Hub Đa Phúc', '0903.000.505', true)
+        ON CONFLICT (id) DO UPDATE SET
+          code = excluded.code,
+          name = excluded.name,
+          address = excluded.address,
+          phone = excluded.phone,
+          is_active = excluded.is_active
+      `
+    }).catch(() => {});
   } catch (err) {
     console.error('ensureBranchesSynced notice:', err);
   }
@@ -646,22 +674,40 @@ export default {
         }
 
         try {
-          let { results } = await env.DB.prepare(`
-            SELECT 
-              COALESCE(b.id, LOWER(s.site_code)) as id,
-              s.site_code as code,
-              COALESCE(b.name, s.site_name, s.name) as name,
-              s.region,
-              COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
-              COALESCE(b.phone, '0903.000.xxx') as phone,
-              COALESCE(s.budget_limit, 10000000) as budget,
-              COALESCE(b.is_active, 1) as is_active,
-              s.site_type
-            FROM sites s
-            LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
-            WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
-            ORDER BY s.site_code
-          `).all();
+          let { rows: results } = await db.query(env, {
+            d1: `
+              SELECT 
+                COALESCE(b.id, LOWER(s.site_code)) as id,
+                s.site_code as code,
+                COALESCE(b.name, s.site_name, s.name) as name,
+                s.region,
+                COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+                COALESCE(b.phone, '0903.000.xxx') as phone,
+                COALESCE(s.budget_limit, 10000000) as budget,
+                COALESCE(b.is_active, 1) as is_active,
+                s.site_type
+              FROM sites s
+              LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+              WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, 1) = 1
+              ORDER BY s.site_code
+            `,
+            pg: `
+              SELECT 
+                COALESCE(b.id, LOWER(s.site_code)) as id,
+                s.site_code as code,
+                COALESCE(b.name, s.site_name, s.name) as name,
+                s.region,
+                COALESCE(b.address, 'Hệ thống căn tin Tân Long Group') as address,
+                COALESCE(b.phone, '0903.000.xxx') as phone,
+                COALESCE(s.budget_limit, 10000000) as budget,
+                CASE WHEN COALESCE(b.is_active, true) = true THEN 1 ELSE 0 END as is_active,
+                s.site_type
+              FROM sites s
+              LEFT JOIN branches b ON LOWER(b.code) = LOWER(s.site_code)
+              WHERE s.site_name IS NOT NULL AND s.site_name != '' AND COALESCE(b.is_active, true) = true
+              ORDER BY s.site_code
+            `
+          });
 
           if (!results || results.length === 0) {
             await ensureBranchesSynced(env);
@@ -963,13 +1009,13 @@ export default {
       if (pathname === '/api/init' && request.method === 'GET') {
         let sites = [];
         try {
-          const res = await env.DB.prepare(`
+          const res = await db.query(env, `
             SELECT DISTINCT site_code, name, site_name, budget_limit, region, site_type, month_period
             FROM sites
             WHERE site_name IS NOT NULL AND site_name != ''
             ORDER BY site_code
-          `).all();
-          sites = res.results || [];
+          `);
+          sites = res.rows || [];
         } catch (e) {
           console.warn('D1 limit or connection fallback for sites in /api/init:', e.message);
           sites = MASTER_14_SITES_FALLBACK.map(s => ({
