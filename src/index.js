@@ -1403,14 +1403,25 @@ export default {
         }
         query += ` GROUP BY dh.order_code, dh.order_date, dh.site_name, dh.ordered_by, dh.applied_month, dh.status ORDER BY dh.order_date DESC`;
 
-        const { rows: results } = await db.query(env, query, bindings);
-        return createCachedResponse({ success: true, data: results || [] }, 60, corsHeaders, isNoCache, url, request, ctx);
+        const { rows: rawResults } = await db.query(env, query, bindings);
+        const results = (rawResults || []).map(r => ({
+          maDon: r.maDon ?? r.madon,
+          ngayDat: r.ngayDat ?? r.ngaydat,
+          site: r.site,
+          nguoiDat: r.nguoiDat ?? r.nguoidat,
+          thang: r.thang,
+          trangThai: r.trangThai ?? r.trangthai,
+          soDong: Number(r.soDong ?? r.sodong ?? 0),
+          tongSL: Number(r.tongSL ?? r.tongsl ?? 0),
+          tongTien: Number(r.tongTien ?? r.tongtien ?? 0)
+        }));
+        return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.5 GET /api/order-detail
       if (pathname === '/api/order-detail' && request.method === 'GET') {
         const orderCode = searchParams.get('orderCode') || '';
-        const { rows: items } = await db.query(env, `
+        const { rows: rawItems } = await db.query(env, `
           SELECT 
             dh.item_code as maHang,
             dh.item_name as tenSP,
@@ -1426,17 +1437,37 @@ export default {
           ORDER BY dh.id
         `, [orderCode]);
 
-        const { rows: timeline } = await db.query(env, `
+        const items = (rawItems || []).map(i => ({
+          maHang: i.maHang ?? i.mahang,
+          tenSP: i.tenSP ?? i.tensp,
+          dvt: i.dvt,
+          soLuong: Number(i.soLuong ?? i.soluong ?? 0),
+          luyKe: Number(i.luyKe ?? i.luyke ?? 0),
+          ghiChu: i.ghiChu ?? i.ghichu ?? '',
+          donGia: Number(i.donGia ?? i.dongia ?? 0),
+          thanhTien: Number(i.thanhTien ?? i.thanhtien ?? 0)
+        }));
+
+        const { rows: rawTimeline } = await db.query(env, `
           SELECT step as buoc, step_name as tenBuoc, status as trangThai, action_time as thoiGian, actor as nguoiXuLy, note as ghiChu
           FROM quy_trinh_don WHERE order_code = ? ORDER BY step ASC, action_time ASC
         `, [orderCode]);
+
+        const timeline = (rawTimeline || []).map(t => ({
+          buoc: t.buoc,
+          tenBuoc: t.tenBuoc ?? t.tenbuoc,
+          trangThai: t.trangThai ?? t.trangthai,
+          thoiGian: t.thoiGian ?? t.thoigian,
+          nguoiXuLy: t.nguoiXuLy ?? t.nguoixuly,
+          ghiChu: t.ghiChu ?? t.ghichu
+        }));
 
         const summary = await db.queryOne(env, `
           SELECT order_code, order_date, site_name, ordered_by, applied_month, status
           FROM don_hang WHERE order_code = ? LIMIT 1
         `, [orderCode]);
 
-        return createCachedResponse({ success: true, data: { info: summary, items: items || [], timeline: timeline || [] } }, 120, corsHeaders, isNoCache, url, request, ctx);
+        return createCachedResponse({ success: true, data: { info: summary, items: items, timeline: timeline } }, 120, corsHeaders, isNoCache, url, request, ctx);
       }
 
       // 2.6 GET /api/vouchers
