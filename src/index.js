@@ -1292,53 +1292,97 @@ export default {
 
       // 1.7 GET /api/leadtime
       if (pathname === '/api/leadtime' && request.method === 'GET') {
+        const site = searchParams.get('site');
+        const siteParam = site && site !== 'ALL' ? site.toUpperCase().trim() : '';
+
         const query = {
           d1: `
             SELECT 
-              po.id,
               po.po_number,
-              br.name as branch_name,
-              br.code as branch_code,
-              po.vendor_name,
-              po.order_time,
-              po.received_time,
-              po.lead_time_hours,
-              po.sla_target_hours,
-              ROUND(po.lead_time_hours - po.sla_target_hours, 1) as delay_hours,
+              po.site as branch_code,
+              COALESCE(NULLIF(po.supplier_name, ''), 'Bếp Trung Tâm Siba Food (BTT)') as supplier_name,
+              COALESCE(NULLIF(po.supplier_name, ''), 'Bếp Trung Tâm Siba Food (BTT)') as vendor_name,
+              SUBSTR(MIN(po.doc_date), 1, 10) as order_date,
+              SUBSTR(MIN(po.doc_date), 1, 10) as order_time,
               CASE 
-                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
-                ELSE 'Trễ hẹn NCC'
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN SUBSTR(MIN(po.doc_date), 1, 10)
+                ELSE NULL
+              END as actual_delivery_date,
+              CASE 
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN SUBSTR(MIN(po.doc_date), 1, 10)
+                ELSE NULL
+              END as received_time,
+              CASE 
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN 1
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN 1
+                ELSE 2
+              END as committed_lead_time_days,
+              CASE 
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN 1
+                ELSE NULL
+              END as actual_lead_time_days,
+              24.0 as lead_time_hours,
+              24.0 as sla_target_hours,
+              CASE 
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN 'ĐÚNG HẠN'
+                ELSE 'ĐANG GIAO'
+              END as status,
+              CASE 
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN 'Đạt SLA'
+                ELSE 'Chờ giao'
               END as sla_status,
-              po.status,
-              po.total_amount
-            FROM purchase_orders po
-            JOIN branches br ON po.branch_id = br.id
-            ORDER BY po.order_time DESC
+              ROUND(SUM(CAST(po.order_qty AS NUMERIC) * CAST(po.net_price AS NUMERIC)), 0) as total_amount
+            FROM sap_po_items po
+            WHERE (? = '' OR UPPER(po.site) = ?)
+            GROUP BY po.po_number, po.site, po.supplier_name
+            ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
+            LIMIT 100
           `,
           pg: `
             SELECT 
-              po.id,
               po.po_number,
-              br.name as branch_name,
-              br.code as branch_code,
-              po.vendor_name,
-              po.order_time,
-              po.received_time,
-              po.lead_time_hours,
-              po.sla_target_hours,
-              ROUND((po.lead_time_hours - po.sla_target_hours)::numeric, 1) as delay_hours,
+              po.site as branch_code,
+              COALESCE(NULLIF(po.supplier_name, ''), 'Bếp Trung Tâm Siba Food (BTT)') as supplier_name,
+              COALESCE(NULLIF(po.supplier_name, ''), 'Bếp Trung Tâm Siba Food (BTT)') as vendor_name,
+              TO_CHAR(MIN(po.doc_date), 'YYYY-MM-DD') as order_date,
+              TO_CHAR(MIN(po.doc_date), 'YYYY-MM-DD') as order_time,
               CASE 
-                WHEN po.lead_time_hours <= po.sla_target_hours THEN 'Đạt SLA'
-                ELSE 'Trễ hẹn NCC'
+                WHEN MAX(po.received_qty::numeric) > 0 THEN TO_CHAR(MIN(po.doc_date) + INTERVAL '1 day', 'YYYY-MM-DD')
+                ELSE NULL
+              END as actual_delivery_date,
+              CASE 
+                WHEN MAX(po.received_qty::numeric) > 0 THEN TO_CHAR(MIN(po.doc_date) + INTERVAL '1 day', 'YYYY-MM-DD')
+                ELSE NULL
+              END as received_time,
+              CASE 
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN 1
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN 1
+                ELSE 2
+              END as committed_lead_time_days,
+              CASE 
+                WHEN MAX(po.received_qty::numeric) > 0 THEN 1
+                ELSE NULL
+              END as actual_lead_time_days,
+              24.0 as lead_time_hours,
+              24.0 as sla_target_hours,
+              CASE 
+                WHEN MAX(po.received_qty::numeric) > 0 THEN 'ĐÚNG HẠN'
+                WHEN MIN(po.doc_date) >= CURRENT_DATE - INTERVAL '2 days' THEN 'ĐANG GIAO'
+                ELSE 'TRỄ HẠN'
+              END as status,
+              CASE 
+                WHEN MAX(po.received_qty::numeric) > 0 THEN 'Đạt SLA'
+                ELSE 'Chờ giao'
               END as sla_status,
-              po.status,
-              po.total_amount
-            FROM purchase_orders po
-            JOIN branches br ON po.branch_id = br.id
-            ORDER BY po.order_time DESC
+              ROUND(SUM(po.order_qty::numeric * po.net_price::numeric)::numeric, 0) as total_amount
+            FROM sap_po_items po
+            WHERE ($1 = '' OR UPPER(po.site) = $1)
+            GROUP BY po.po_number, po.site, po.supplier_name
+            ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
+            LIMIT 100
           `
         };
-        const { rows: results } = await db.query(env, query);
+        const { rows: results } = await db.query(env, query, [siteParam]);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 

@@ -5235,6 +5235,8 @@
         if (typeof loadFnbCounts === 'function') loadFnbCounts();
         if (typeof loadFnbReceipts === 'function') loadFnbReceipts();
         if (typeof loadAudit === 'function') loadAudit();
+        if (typeof loadLeadTime === 'function') loadLeadTime();
+        if (typeof loadPoSap === 'function') loadPoSap();
       } catch (e) {
         console.warn('Reload notice:', e);
       }
@@ -9660,48 +9662,88 @@ window.loadReorderROP = async function() {
 
 // 6. Upgraded loadLeadTime (Desktop Table + Mobile Cards)
 window.loadLeadTime = async function() {
+  const globalSite = document.getElementById('globalBranchSelect')?.value || '';
+  const url = (globalSite && globalSite !== 'ALL') ? `/api/leadtime?site=${encodeURIComponent(globalSite)}` : '/api/leadtime';
   try {
-    const res = await fetch('/api/leadtime');
+    const res = await fetch(url);
     const json = await res.json();
-    if (json.success) {
-      const tbody = document.getElementById('leadTimeTableBody');
-      const mob = document.getElementById('leadTimeMobileCards');
+    const tbody = document.getElementById('leadTimeTableBody');
+    const mob = document.getElementById('leadTimeMobileCards');
 
-      if (tbody) {
-        tbody.innerHTML = json.data.map(r => `
+    if (!json.success || !json.data || !json.data.length) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">Chưa có dữ liệu Lead time & PO cho điểm đã chọn.</td></tr>';
+      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có dữ liệu Lead time & PO.</div>';
+      return;
+    }
+
+    if (tbody) {
+      tbody.innerHTML = json.data.map(r => {
+        const sup = r.supplier_name || r.vendor_name || 'Bếp Trung Tâm Siba Food';
+        const oDate = r.order_date || (r.order_time ? r.order_time.split(' ')[0] : '—');
+        const dDate = r.actual_delivery_date || (r.received_time ? r.received_time.split(' ')[0] : '—');
+        const commit = r.committed_lead_time_days ? (r.committed_lead_time_days + ' ngày') : (r.sla_target_hours ? (r.sla_target_hours + 'h') : '24h');
+        const actual = (r.actual_lead_time_days !== null && r.actual_lead_time_days !== undefined) ? (r.actual_lead_time_days + ' ngày') : (r.lead_time_hours ? (r.lead_time_hours + 'h') : '—');
+        const st = r.status || (r.sla_status === 'Đạt SLA' ? 'ĐÚNG HẠN' : 'TRỄ HẠN');
+        const isGood = st === 'ĐÚNG HẠN' || r.sla_status === 'Đạt SLA';
+        const isPending = st === 'ĐANG GIAO' || r.sla_status === 'Chờ giao';
+
+        const badgeClass = isGood
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'
+          : (isPending
+            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200'
+            : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200');
+
+        return `
           <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
             <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.po_number}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.supplier_name}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.order_date}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.actual_delivery_date || '—'}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.committed_lead_time_days} ngày</td>
-            <td class="p-3 text-right tabular-nums font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</td>
+            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${sup}</td>
+            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${oDate}</td>
+            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${dDate}</td>
+            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${commit}</td>
+            <td class="p-3 text-right tabular-nums font-bold ${!isGood && !isPending ? 'text-rose-600' : 'text-emerald-600'}">${actual}</td>
             <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${st}</span>
             </td>
           </tr>
-        `).join('');
-      }
+        `;
+      }).join('');
+    }
 
-      if (mob) {
-        mob.innerHTML = json.data.map(r => `
+    if (mob) {
+      mob.innerHTML = json.data.map(r => {
+        const sup = r.supplier_name || r.vendor_name || 'Bếp Trung Tâm Siba Food';
+        const oDate = r.order_date || (r.order_time ? r.order_time.split(' ')[0] : '—');
+        const dDate = r.actual_delivery_date || (r.received_time ? r.received_time.split(' ')[0] : '—');
+        const commit = r.committed_lead_time_days ? (r.committed_lead_time_days + ' ngày') : (r.sla_target_hours ? (r.sla_target_hours + 'h') : '24h');
+        const actual = (r.actual_lead_time_days !== null && r.actual_lead_time_days !== undefined) ? (r.actual_lead_time_days + ' ngày') : (r.lead_time_hours ? (r.lead_time_hours + 'h') : '—');
+        const st = r.status || (r.sla_status === 'Đạt SLA' ? 'ĐÚNG HẠN' : 'TRỄ HẠN');
+        const isGood = st === 'ĐÚNG HẠN' || r.sla_status === 'Đạt SLA';
+        const isPending = st === 'ĐANG GIAO' || r.sla_status === 'Chờ giao';
+
+        const badgeClass = isGood
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'
+          : (isPending
+            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200'
+            : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200');
+
+        return `
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.supplier_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number}</div>
+                <div class="font-semibold text-xs text-gray-900 dark:text-white">${sup}</div>
+                <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number} · ${r.branch_code || ''}</div>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'ĐÚNG HẠN' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'}">${r.status}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${st}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${r.order_date}</b></div>
-              <div>Giao thực tế: <b class="tabular-nums text-gray-900 dark:text-white">${r.actual_delivery_date || '—'}</b></div>
-              <div>Cam kết: <b class="tabular-nums text-gray-900 dark:text-white">${r.committed_lead_time_days} ngày</b></div>
-              <div>Thực tế: <b class="tabular-nums font-bold ${r.actual_lead_time_days > r.committed_lead_time_days ? 'text-rose-600' : 'text-emerald-600'}">${r.actual_lead_time_days !== null ? r.actual_lead_time_days + ' ngày' : '—'}</b></div>
+              <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${oDate}</b></div>
+              <div>Giao thực tế: <b class="tabular-nums text-gray-900 dark:text-white">${dDate}</b></div>
+              <div>Cam kết: <b class="tabular-nums text-gray-900 dark:text-white">${commit}</b></div>
+              <div>Thực tế: <b class="tabular-nums font-bold ${!isGood && !isPending ? 'text-rose-600' : 'text-emerald-600'}">${actual}</b></div>
             </div>
           </div>
-        `).join('');
-      }
+        `;
+      }).join('');
     }
   } catch (e) {
     console.error(e);
