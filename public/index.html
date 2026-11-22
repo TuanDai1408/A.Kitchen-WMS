@@ -2194,253 +2194,226 @@
           </div>
         </div>
       </section>
-<section id="fnb-waste" class="tab-panel space-y-5">
-        
-        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none">
-          <button onclick="switchTab('wh-dashboard')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng Quan Kho Vận</span></button>
-          <button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button>
-          <button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button>
-          <button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng &amp; Hao Hụt</span></button>
+<section id="fnb-waste" class="tab-panel space-y-4">
+        <!-- Sub-nav bar -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
+          <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
-        <!-- TailAdmin Breadcrumb Header -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <!-- Page Header -->
+        <div class="page-header">
           <div>
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Biên Bản Hủy Hàng &amp; Hao Hụt
-            </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Chỉ hiển thị các mặt hàng đang có tồn kho (&gt; 0) tại điểm bán để ghi nhận hư hỏng, quá hạn, dập nát và tự động trừ tồn kho thực tế.</p>
+            <h1 class="page-title">Biên bản hủy hàng &amp; hao hụt</h1>
+            <p class="page-subtitle">Ghi nhận hư hỏng, quá hạn, dập nát cho các mặt hàng tồn kho (&gt; 0) và tự động trừ tồn kho thực tế</p>
           </div>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <button onclick="openCreateWasteModal()" class="inline-flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-theme-xs transition-all">
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="openCreateWasteModal()" class="btn btn-primary">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              <span>+ Ghi Biên Bản Hủy Hàng</span>
+              <span>+ Ghi biên bản hủy hàng</span>
             </button>
-            <button onclick="loadFnbWaste()" class="inline-flex size-10 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 shadow-theme-xs transition-all" title="Làm mới">
+            <button onclick="loadFnbWaste()" class="btn btn-secondary btn-icon" title="Làm mới">
               <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
 
-        <!-- TailAdmin KPI Metric Cards -->
+        <!-- KPI Grid -->
         <div class="kpi-grid">
-          <!-- Card 1: Tổng Mã Tồn > 0 -->
           <div class="kpi-card">
-            <div class="flex items-start justify-between gap-2">
-              <span class="kpi-label">Mặt Hàng Tồn &gt; 0</span>
-              <div class="kpi-icon bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-                <i data-lucide="package" class="w-5 h-5"></i>
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Mặt hàng tồn &gt; 0</span>
+                <p class="kpi-sub mt-0.5">Khả dụng tại điểm bán</p>
               </div>
+              <div class="kpi-icon text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20"><i data-lucide="package" class="size-5"></i></div>
             </div>
-            <div class="mt-3 flex items-baseline">
-              <span id="kpiWasteInStockCount" class="kpi-value">—</span>
-              <span class="kpi-unit">Mã</span>
-            </div>
-            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span class="kpi-sub">Khả dụng tại điểm bán</span>
-              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
-                Tồn khả dụng
-              </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span id="kpiWasteInStockCount" class="kpi-value num">—</span>
+                <span class="kpi-unit">Mã</span>
+              </div>
             </div>
           </div>
 
-          <!-- Card 2: Tổng Giá Trị Tồn Khả Dụng -->
           <div class="kpi-card">
-            <div class="flex items-start justify-between gap-2">
-              <span class="kpi-label">Giá Trị Tồn Khả Dụng</span>
-              <div class="kpi-icon bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-                <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Giá trị tồn khả dụng</span>
+                <p class="kpi-sub mt-0.5">Theo giá vốn thực tế</p>
               </div>
+              <div class="kpi-icon text-brand-600 bg-brand-50 dark:bg-brand-950/20"><i data-lucide="badge-dollar-sign" class="size-5"></i></div>
             </div>
-            <div class="mt-3 flex items-baseline">
-              <span id="kpiWasteInStockVal" class="kpi-value">—</span>
-            </div>
-            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span class="kpi-sub">Theo giá vốn thực tế</span>
-              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
-                Giá vốn
-              </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span id="kpiWasteInStockVal" class="kpi-value num">—</span>
+              </div>
             </div>
           </div>
 
-          <!-- Card 3: Mặt Hàng Đã Chọn Hủy -->
           <div class="kpi-card">
-            <div class="flex items-start justify-between gap-2">
-              <span class="kpi-label">Mặt Hàng Chọn Hủy</span>
-              <div class="kpi-icon bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
-                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Mặt hàng chọn hủy</span>
+                <p class="kpi-sub mt-0.5">Đang nhập số lượng</p>
               </div>
+              <div class="kpi-icon text-amber-600 bg-amber-50 dark:bg-amber-950/20"><i data-lucide="alert-triangle" class="size-5"></i></div>
             </div>
-            <div class="mt-3 flex items-baseline">
-              <span id="kpiWasteSelectedCount" class="kpi-value text-amber-600 dark:text-amber-400">0</span>
-              <span class="kpi-unit">Mã</span>
-            </div>
-            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span class="kpi-sub">Đang nhập số lượng hủy</span>
-              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
-                Chờ xác nhận
-              </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span id="kpiWasteSelectedCount" class="kpi-value num text-amber-600 dark:text-amber-400">0</span>
+                <span class="kpi-unit">Mã</span>
+              </div>
             </div>
           </div>
 
-          <!-- Card 4: Tổng Tiền Hủy Dự Kiến -->
           <div class="kpi-card">
-            <div class="flex items-start justify-between gap-2">
-              <span class="kpi-label">Tổng Tiền Hủy Dự Kiến</span>
-              <div class="kpi-icon bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
-                <i data-lucide="trash-2" class="w-5 h-5"></i>
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tiền hủy dự kiến</span>
+                <p class="kpi-sub mt-0.5">Trừ tồn khi xác nhận</p>
               </div>
+              <div class="kpi-icon text-rose-600 bg-rose-50 dark:bg-rose-950/20"><i data-lucide="trash-2" class="size-5"></i></div>
             </div>
-            <div class="mt-3 flex items-baseline">
-              <span id="kpiWasteTotalEstAmount" class="kpi-value text-rose-600 dark:text-rose-400">0 ₫</span>
-            </div>
-            <div class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span class="kpi-sub">Tự động trừ tồn khi xác nhận</span>
-              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400">
-                Hao hụt
-              </span>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span id="kpiWasteTotalEstAmount" class="kpi-value num text-rose-600 dark:text-rose-400">0 ₫</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Sub-View Navigation: Hàng Tồn > 0 vs Lịch Sử Biên Bản Hủy -->
         <div class="flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center gap-2 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs select-none">
-            <button type="button" id="subtab-fnb-waste-stock" onclick="switchFnbWasteSubView('stock')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700">
-              <i data-lucide="package-check" class="w-4 h-4 text-emerald-500"></i>
-              <span>Mặt Hàng Tồn Kho (Tồn &gt; 0)</span>
-              <span id="fnbWasteBadgeInStockCount" class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 font-mono font-bold">0</span>
+          <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+            <button type="button" id="subtab-fnb-waste-stock" onclick="switchFnbWasteSubView('stock')" class="btn btn-primary btn-sm">
+              <i data-lucide="package-check" class="w-4 h-4"></i>
+              <span>Mặt hàng tồn kho (Tồn &gt; 0)</span>
+              <span id="fnbWasteBadgeInStockCount" class="badge badge-neutral px-2 py-0.5 num">0</span>
             </button>
-            <button type="button" id="subtab-fnb-waste-history" onclick="switchFnbWasteSubView('history')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
-              <i data-lucide="history" class="w-4 h-4 text-gray-400"></i>
-              <span>Lịch Sử Biên Bản Hủy</span>
-              <span id="fnbWasteBadgeHistoryCount" class="px-2 py-0.5 rounded-full text-[11px] bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 font-mono font-bold">0</span>
+            <button type="button" id="subtab-fnb-waste-history" onclick="switchFnbWasteSubView('history')" class="btn btn-secondary btn-sm">
+              <i data-lucide="history" class="w-4 h-4"></i>
+              <span>Lịch sử biên bản hủy</span>
+              <span id="fnbWasteBadgeHistoryCount" class="badge badge-neutral px-2 py-0.5 num">0</span>
             </button>
           </div>
 
-          <!-- Quick Action: Submit Selected Waste -->
-          <button type="button" id="btnSubmitDirectWaste" onclick="submitDirectWaste()" disabled class="inline-flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-xs font-bold text-white shadow-theme-xs transition-all">
+          <button type="button" id="btnSubmitDirectWaste" onclick="submitDirectWaste()" disabled class="btn btn-primary btn-sm">
             <i data-lucide="trash-2" class="w-4 h-4"></i>
-            <span id="btnSubmitDirectWasteText">Xác Nhận Tạo Biên Bản Hủy (0)</span>
+            <span id="btnSubmitDirectWasteText">Xác nhận tạo biên bản hủy (0)</span>
           </button>
         </div>
 
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col md:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto">
-            <select id="fnbWasteFilterSite" class="hidden"><option value="K001">K001</option></select>
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Lý do hủy:</span>
-              <select id="fnbWasteReasonFilter" onchange="onFnbWasteFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500 max-w-[185px]">
-                <option value="">Tất cả lý do hủy</option>
-                <option value="EXP">⏰ Quá hạn sử dụng (EXP)</option>
-                <option value="DAMAGE">Rách / vỡ / hỏng bao bì</option>
-                <option value="QUALITY">Cảm quan / biến chất</option>
-                <option value="COOK">Khét / cháy / lỗi chế biến</option>
-                <option value="OTHER">Khác / hao hụt rã đông</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Ngành:</span>
-              <select id="fnbWasteNganhHangFilter" onchange="onFnbWasteNganhHangChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 max-w-[170px] truncate">
-                <option value="">Tất cả ngành hàng</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nhóm:</span>
-              <select id="fnbWasteNhomHangFilter" onchange="onFnbWasteFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 max-w-[180px] truncate">
-                <option value="">Tất cả nhóm hàng</option>
-              </select>
-            </div>
-            <div class="relative min-w-[200px] flex-1 sm:flex-initial">
-              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="fnbWasteSearchInput" oninput="onFnbWasteSearch(this.value)" placeholder="Tìm mã, tên mặt hàng..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:border-rose-500">
-            </div>
-            <button onclick="loadFnbWaste()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5 transition-all">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
-            </button>
+        <div class="filter-bar">
+          <select id="fnbWasteFilterSite" class="hidden"><option value="K001">K001</option></select>
+          <div class="field w-48">
+            <select id="fnbWasteReasonFilter" onchange="onFnbWasteFilterChange()" class="select">
+              <option value="">Tất cả lý do hủy</option>
+              <option value="EXP">Quá hạn sử dụng (EXP)</option>
+              <option value="DAMAGE">Rách / vỡ / hỏng bao bì</option>
+              <option value="QUALITY">Cảm quan / biến chất</option>
+              <option value="COOK">Khét / cháy / lỗi chế biến</option>
+              <option value="OTHER">Khác / hao hụt rã đông</option>
+            </select>
           </div>
-          <div id="fnbWasteSummary" class="text-xs text-gray-500 tabular-nums self-end md:self-center">
-            Đang tải dữ liệu...
+
+          <div class="field w-44">
+            <select id="fnbWasteNganhHangFilter" onchange="onFnbWasteNganhHangChange()" class="select">
+              <option value="">Tất cả ngành hàng</option>
+            </select>
           </div>
+
+          <div class="field w-44">
+            <select id="fnbWasteNhomHangFilter" onchange="onFnbWasteFilterChange()" class="select">
+              <option value="">Tất cả nhóm hàng</option>
+            </select>
+          </div>
+
+          <div class="relative flex-1 min-w-[200px]">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            <input type="text" id="fnbWasteSearchInput" oninput="onFnbWasteSearch(this.value)" placeholder="Tìm mã, tên mặt hàng..." class="input pl-9 w-full">
+          </div>
+
+          <button onclick="loadFnbWaste()" class="btn btn-secondary">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Làm mới
+          </button>
         </div>
 
         <!-- SUB-VIEW 1: MẶT HÀNG TỒN KHO (TỒN > 0) -->
         <div id="fnbWasteSubViewStock" class="space-y-4">
-          <!-- Desktop Table -->
-          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
-            <table class="w-full border-collapse text-left text-xs">
-              <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 select-none">
-                <tr>
-                  <th class="py-3 px-3 text-center font-bold text-[11px] w-12">STT</th>
-                  <th class="py-3 px-3 font-bold text-[11px] w-28">Mã Hàng</th>
-                  <th class="py-3 px-4 font-bold text-[11px]">Tên Mặt Hàng</th>
-                  <th class="py-3 px-2 text-center font-bold text-[11px] w-16">ĐVT</th>
-                  <th class="py-3 px-3 text-right font-bold text-[11px] w-24">Đơn Giá</th>
-                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28 text-emerald-600 dark:text-emerald-400">Tồn Sách (&gt;0)</th>
-                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28">Giá Trị Tồn</th>
-                  <th class="py-3 px-3 text-center font-bold text-[11px] w-32 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/20">SL Cần Hủy *</th>
-                  <th class="py-3 px-3 font-bold text-[11px] w-44">Lý Do Hủy</th>
-                  <th class="py-3 px-3 text-right font-bold text-[11px] w-28 text-rose-600 dark:text-rose-400">Tiền Hủy</th>
-                  <th class="py-3 px-3 font-bold text-[11px] w-36">Ghi Chú</th>
-                </tr>
-              </thead>
-              <tbody id="fnbWasteStockTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Empty State -->
-          <div id="fnbWasteStockEmptyState" class="hidden p-12 text-center bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-3">
-            <div class="inline-flex size-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400">
-              <i data-lucide="package-search" class="size-7"></i>
+          <div class="table-card p-5">
+            <div id="fnbWasteSummary" class="text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800 num">
+              Đang tải dữ liệu...
             </div>
-            <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200">Không có mặt hàng nào có tồn kho &gt; 0</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-              Điểm bán này hiện chưa có mặt hàng nào có số lượng tồn khả dụng lớn hơn 0 hoặc không khớp bộ lọc đã chọn.
-            </p>
-          </div>
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="text-center w-12">STT</th>
+                    <th class="col-code">Mã hàng</th>
+                    <th class="min-w-[180px]">Tên mặt hàng</th>
+                    <th class="text-center w-16">ĐVT</th>
+                    <th class="col-num text-right w-24">Đơn giá</th>
+                    <th class="col-num text-right w-28 text-emerald-600 dark:text-emerald-400">Tồn sách (&gt;0)</th>
+                    <th class="col-num text-right w-28">Giá trị tồn</th>
+                    <th class="text-center w-32 text-rose-600 dark:text-rose-400">SL cần hủy *</th>
+                    <th class="w-44">Lý do hủy</th>
+                    <th class="col-num text-right w-28 text-rose-600 dark:text-rose-400">Tiền hủy</th>
+                    <th class="w-36">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody id="fnbWasteStockTableBody">
+                </tbody>
+              </table>
+            </div>
 
-          <!-- Mobile Cards -->
-          <div id="fnbWasteStockMobileCards" class="block lg:hidden space-y-3">
+            <!-- Empty State -->
+            <div id="fnbWasteStockEmptyState" class="hidden p-12 text-center rounded-xl border border-gray-200 dark:border-gray-800 space-y-3">
+              <div class="inline-flex size-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400">
+                <i data-lucide="package-search" class="size-7"></i>
+              </div>
+              <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Không có mặt hàng nào có tồn kho &gt; 0</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                Điểm bán này hiện chưa có mặt hàng nào có số lượng tồn khả dụng lớn hơn 0 hoặc không khớp bộ lọc đã chọn.
+              </p>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div id="fnbWasteStockMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
           </div>
         </div>
 
         <!-- SUB-VIEW 2: LỊCH SỬ BIÊN BẢN HỦY -->
         <div id="fnbWasteSubViewHistory" class="hidden space-y-4">
-          <!-- Desktop Table -->
-          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
-            <table class="w-full border-collapse text-left text-xs">
-              <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
-                <tr>
-                  <th class="py-3 px-4 font-bold text-[11px]">Mã Biên Bản</th>
-                  <th class="py-3 px-3 font-bold text-[11px]">Điểm Bán</th>
-                  <th class="py-3 px-3 font-bold text-[11px]">Ngày Hủy</th>
-                  <th class="py-3 px-4 font-bold text-[11px]">Lý Do Hủy</th>
-                  <th class="py-3 px-3 font-bold text-[11px]">Người Xác Nhận</th>
-                  <th class="py-3 px-4 font-bold text-[11px] text-right">Giá Trị Hủy (VNĐ)</th>
-                  <th class="py-3 px-4 font-bold text-[11px]">Ghi Chú</th>
-                  <th class="py-3 px-3 text-center font-bold text-[11px] w-24">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody id="fnbWasteTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
-              </tbody>
-            </table>
-          </div>
+          <div class="table-card p-5">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="col-code">Mã biên bản</th>
+                    <th>Điểm bán</th>
+                    <th class="col-date">Ngày hủy</th>
+                    <th>Lý do hủy</th>
+                    <th>Người xác nhận</th>
+                    <th class="col-num text-right">Giá trị hủy (VNĐ)</th>
+                    <th>Ghi chú</th>
+                    <th class="col-actions text-center w-24">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="fnbWasteTableBody">
+                </tbody>
+              </table>
+            </div>
 
-          <!-- Mobile Cards -->
-          <div id="fnbWasteMobileCards" class="block lg:hidden space-y-3">
+            <!-- Mobile Cards -->
+            <div id="fnbWasteMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
           </div>
         </div>
-
       </section>
-
-
-
-      
-
-
-      <section id="wh-stock" class="tab-panel space-y-4">
+<section id="wh-stock" class="tab-panel space-y-4">
         <!-- Page Header -->
         <div class="page-header">
           <div>
