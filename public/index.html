@@ -1854,234 +1854,202 @@
       <!-- =====================================================================
            SECTION: KIỂM KÊ HẰNG NGÀY & ĐỊNH KỲ (/fnb/counts)
            ===================================================================== -->
-      <section id="fnb-counts" class="tab-panel space-y-5">
-        
-        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none"><button onclick="switchTab('wh-dashboard')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng Quan Kho Vận</span></button><button onclick="switchTab('fnb-counts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700"><i data-lucide="clipboard-check" class="w-4 h-4 text-blue-500"></i><span>Kiểm Kê Hằng Ngày</span></button><button onclick="switchTab('fnb-receipts')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập Hàng</span></button><button onclick="switchTab('fnb-waste')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy Hàng & Hao Hụt</span></button></div>
+      <section id="fnb-counts" class="tab-panel space-y-4">
+        <!-- Sub-nav bar -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
+          <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
+        </div>
 
-        <!-- TailAdmin Breadcrumb Header -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <!-- Page Header -->
+        <div class="page-header">
           <div>
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90 ">
-              Kiểm Kê Tồn Kho Hằng Ngày
-            </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Kiểm ngày nhóm trọng yếu (thịt, rau, gia vị), đối chiếu số liệu tồn sổ sách và hao hụt ca.</p>
+            <h1 class="page-title">Kiểm kê tồn kho hằng ngày</h1>
+            <p class="page-subtitle">Kiểm ngày nhóm trọng yếu (thịt, rau, gia vị), đối chiếu số liệu tồn sổ sách và hao hụt ca</p>
           </div>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <button onclick="exportCountSheetExcel()" class="inline-flex items-center gap-2 rounded-[10px] border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-theme-xs transition-all">
-              <i data-lucide="printer" class="w-4 h-4 text-brand-500"></i>
-              <span>Xuất Mẫu Kiểm Excel</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="exportCountSheetExcel()" class="btn btn-secondary">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>Xuất mẫu Excel</span>
             </button>
-            <button onclick="saveFnbCountAudit()" id="btnSaveFnbCount" class="inline-flex items-center gap-2 rounded-[10px] bg-brand-500 hover:bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition-all">
+            <button onclick="saveFnbCountAudit()" id="btnSaveFnbCount" class="btn btn-primary">
               <i data-lucide="check-circle" class="w-4 h-4"></i>
-              <span>Lưu Kiểm Kê Điểm</span>
+              <span>Lưu kiểm kê</span>
             </button>
           </div>
         </div>
 
-        <!-- Controls & Filter Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+        <!-- Filter Bar -->
+        <div class="filter-bar">
           <select id="fnbCountSiteSelect" class="hidden"><option value="K001">K001</option></select>
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-2.5">
-              <!-- Filter Trạng thái kiểm kê & chênh lệch tồn -->
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Chênh lệch:</span>
-                <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-                  <option value="all">Tất cả mặt hàng</option>
-                  <option value="diff">Lệch tồn (Thừa / Thiếu)</option>
-                  <option value="matched">Khớp 100% sổ sách</option>
-                  <option value="counted">Đã kiểm đếm</option>
-                  <option value="uncounted">⏳ Chưa kiểm đếm</option>
-                </select>
-              </div>
+          <div class="field flex-1 min-w-[170px]">
+            <label class="field-label">Chênh lệch</label>
+            <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="select">
+              <option value="all">Tất cả mặt hàng</option>
+              <option value="diff">Lệch tồn (Thừa / Thiếu)</option>
+              <option value="matched">Khớp 100% sổ sách</option>
+              <option value="counted">Đã kiểm đếm</option>
+              <option value="uncounted">Chưa kiểm đếm</option>
+            </select>
+          </div>
 
-              <!-- Filter Ngành hàng -->
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ngành hàng:</span>
-                <select id="fnbCountNganhHangFilter" onchange="onFnbCountNganhHangChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500 max-w-[170px] truncate">
-                  <option value="">Tất cả ngành hàng</option>
-                </select>
-              </div>
+          <div class="field flex-1 min-w-[170px]">
+            <label class="field-label">Ngành hàng</label>
+            <select id="fnbCountNganhHangFilter" onchange="onFnbCountNganhHangChange()" class="select">
+              <option value="">Tất cả ngành hàng</option>
+            </select>
+          </div>
 
-              <!-- Filter Nhóm hàng -->
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Nhóm hàng:</span>
-                <select id="fnbCountNhomHangFilter" onchange="onFnbCountFilterChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500 max-w-[190px] truncate">
-                  <option value="">Tất cả nhóm hàng</option>
-                </select>
-              </div>
+          <div class="field flex-1 min-w-[170px]">
+            <label class="field-label">Nhóm hàng</label>
+            <select id="fnbCountNhomHangFilter" onchange="onFnbCountFilterChange()" class="select">
+              <option value="">Tất cả nhóm hàng</option>
+            </select>
+          </div>
 
-              <!-- Ngày kiểm -->
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ngày kiểm:</span>
-                <input type="date" id="fnbCountDatePicker" onchange="onFnbCountDateChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-              </div>
+          <div class="field flex-1 min-w-[160px]">
+            <label class="field-label">Ngày kiểm</label>
+            <input type="date" id="fnbCountDatePicker" onchange="onFnbCountDateChange()" class="input">
+          </div>
 
-              <!-- Kiểm mù Toggle -->
-              <label class="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0" title="Ẩn cột tồn sổ sách khi đang đếm">
-                <input type="checkbox" id="fnbCountBlindToggle" onchange="toggleBlindCount(this.checked)" class="rounded text-brand-600 focus:ring-0">
-                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Kiểm mù (Ẩn tồn sách)</span>
-              </label>
-            </div>
-
-            <div class="relative w-full lg:w-64">
+          <div class="field flex-1 min-w-[200px]">
+            <label class="field-label">Tìm kiếm</label>
+            <div class="relative">
               <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm tên, mã, ngành hàng..." class="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              <input type="text" id="fnbCountSearchInput" oninput="onFnbCountSearch(this.value)" placeholder="Tìm tên, mã, ngành..." class="input pl-9 w-full">
             </div>
+          </div>
+
+          <div class="flex items-center self-end pb-1.5">
+            <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300" title="Ẩn cột tồn sổ sách khi đang đếm">
+              <input type="checkbox" id="fnbCountBlindToggle" onchange="toggleBlindCount(this.checked)" class="rounded border-gray-300 text-brand-600 focus:ring-brand-500">
+              <span>Kiểm mù</span>
+            </label>
           </div>
         </div>
 
-        <!-- TailAdmin Unified KPI Grid: F&B Count Metrics (Compact Variant) -->
-        <div class="kpi-grid mb-6">
-          <div class="kpi-card-compact">
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
             <div class="kpi-header">
               <div>
-                <span class="kpi-label-compact">Mặt Hàng Kiểm</span>
+                <span class="kpi-label">Mặt hàng kiểm</span>
                 <p class="kpi-sub mt-0.5">Tổng số danh mục</p>
               </div>
-              <div class="kpi-icon-compact"><i data-lucide="clipboard-list" class="size-4"></i></div>
+              <div class="kpi-icon"><i data-lucide="clipboard-list" class="size-5"></i></div>
             </div>
             <div class="kpi-body">
               <div class="flex items-baseline">
-                <span class="kpi-value-compact" id="fnbCountMetricTotal">—</span>
+                <span class="kpi-value num" id="fnbCountMetricTotal">—</span>
                 <span class="kpi-unit">Mã</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral">
-                  <span>Kiểm đếm</span>
-                </span>
-                <span class="kpi-sub">Theo ca/ngày</span>
               </div>
             </div>
           </div>
 
-          <div class="kpi-card-compact">
+          <div class="kpi-card">
             <div class="kpi-header">
               <div>
-                <span class="kpi-label-compact">Khớp Sổ Sách</span>
+                <span class="kpi-label">Khớp sổ sách</span>
                 <p class="kpi-sub mt-0.5">Không chênh lệch</p>
               </div>
-              <div class="kpi-icon-compact !bg-success-50 !text-success-600 dark:!bg-success-500/15 dark:!text-success-500"><i data-lucide="check-circle" class="size-4"></i></div>
+              <div class="kpi-icon text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20"><i data-lucide="check-circle" class="size-5"></i></div>
             </div>
             <div class="kpi-body">
               <div class="flex items-baseline">
-                <span class="kpi-value-compact" id="fnbCountMetricMatched">—</span>
+                <span class="kpi-value num text-emerald-600 dark:text-emerald-400" id="fnbCountMetricMatched">—</span>
                 <span class="kpi-unit">Mã</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-good">
-                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
-                  <span>Khớp chuẩn</span>
-                </span>
-                <span class="kpi-sub">Trùng khớp</span>
               </div>
             </div>
           </div>
 
-          <div class="kpi-card-compact">
+          <div class="kpi-card">
             <div class="kpi-header">
               <div>
-                <span class="kpi-label-compact font-medium text-rose-700 dark:text-rose-400">Lệch Thừa / Thiếu</span>
+                <span class="kpi-label">Lệch thừa / thiếu</span>
                 <p class="kpi-sub mt-0.5">Chênh lệch số lượng</p>
               </div>
-              <div class="kpi-icon-compact !bg-error-50 !text-error-600 dark:!bg-error-500/15 dark:!text-error-500"><i data-lucide="alert-triangle" class="size-4"></i></div>
+              <div class="kpi-icon text-rose-600 bg-rose-50 dark:bg-rose-950/20"><i data-lucide="alert-triangle" class="size-5"></i></div>
             </div>
             <div class="kpi-body">
               <div class="flex items-baseline">
-                <span class="kpi-value-compact" id="fnbCountMetricDiff">—</span>
+                <span class="kpi-value num text-rose-600 dark:text-rose-400" id="fnbCountMetricDiff">—</span>
                 <span class="kpi-unit">Mã</span>
               </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-bad">
-                  <span>Có sai lệch</span>
-                </span>
-                <span class="kpi-sub">Cần giải trình</span>
-              </div>
             </div>
           </div>
 
-          <div class="kpi-card-compact">
+          <div class="kpi-card">
             <div class="kpi-header">
               <div>
-                <span class="kpi-label-compact font-medium text-gray-700 dark:text-gray-300">Tổng Tiền Lệch</span>
-                <p class="kpi-sub mt-0.5">Giá trị chênh lệch</p>
+                <span class="kpi-label">Tổng tiền lệch</span>
+                <p class="kpi-sub mt-0.5">Quy đổi giá vốn</p>
               </div>
-              <div class="kpi-icon-compact"><i data-lucide="circle-dollar-sign" class="size-4"></i></div>
+              <div class="kpi-icon"><i data-lucide="circle-dollar-sign" class="size-5"></i></div>
             </div>
             <div class="kpi-body">
               <div class="flex items-baseline">
-                <span class="kpi-value-compact" id="fnbCountMetricDiffVal" title="—">—</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral">
-                  <span>Giá trị</span>
-                </span>
-                <span class="kpi-sub">Quy đổi giá vốn</span>
+                <span class="kpi-value num" id="fnbCountMetricDiffVal" title="—">—</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Desktop Counting Table -->
-        <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
-          <table class="w-full border-collapse text-left text-xs">
-            <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
-              <tr>
-                <th class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px]">STT</th>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px] min-w-[200px]">Mặt Hàng F&amp;B</th>
-                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-16">ĐVT</th>
-                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-28 fnb-count-book-col">Tồn Sách</th>
-                <th class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] w-36 bg-blue-50/50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">SL Đếm Thực Tế</th>
-                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-28">Chênh Lệch</th>
-                <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] w-32">Tiền Lệch</th>
-                <th class="py-3 px-4 font-bold uppercase tracking-wider text-[11px]">Ghi Chú Lý Do</th>
-              </tr>
-            </thead>
-            <tbody id="fnbCountsTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
-            </tbody>
-          </table>
-        </div>
+        <!-- Counting Table -->
+        <div class="table-card p-5">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="text-center w-12">STT</th>
+                  <th class="min-w-[200px]">Mặt hàng F&amp;B</th>
+                  <th class="text-center w-16">ĐVT</th>
+                  <th class="col-num text-right w-28 fnb-count-book-col">Tồn sách</th>
+                  <th class="text-center w-36">SL đếm thực tế</th>
+                  <th class="col-num text-right w-28">Chênh lệch</th>
+                  <th class="col-num text-right w-32">Tiền lệch</th>
+                  <th>Ghi chú lý do</th>
+                </tr>
+              </thead>
+              <tbody id="fnbCountsTableBody">
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Mobile Card View -->
-        <div id="fnbCountsMobileCards" class="block lg:hidden space-y-3 mt-4">
+          <!-- Mobile Card View -->
+          <div id="fnbCountsMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
 
         <!-- Recent Audit History -->
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3 mt-6">
-          <div class="flex items-center justify-between">
+        <div class="table-card p-5 space-y-3 mt-4">
+          <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
             <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> Lịch Sử Các Đợt Kiểm Kê Gần Đây
+              <i data-lucide="history" class="w-4 h-4 text-brand-600"></i> Lịch sử các đợt kiểm kê gần đây
             </h3>
-            <span class="text-xs text-gray-400">Lưu tự động trên Cloudflare D1</span>
+            <span class="text-xs text-gray-400">Lưu tự động trên hệ thống</span>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 border-b border-gray-200 dark:border-gray-800">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="py-2.5 px-3">Mã Phiếu</th>
-                  <th class="py-2.5 px-3">Điểm Bán</th>
-                  <th class="py-2.5 px-3">Ngày Kiểm</th>
-                  <th class="py-2.5 px-3">Loại Phiếu</th>
-                  <th class="py-2.5 px-3 text-right">Tổng Món</th>
-                  <th class="py-2.5 px-3 text-right">Số Lệch</th>
-                  <th class="py-2.5 px-3 text-right">Giá Trị Lệch</th>
-                  <th class="py-2.5 px-3">Người Kiểm</th>
+                  <th class="col-code">Mã phiếu</th>
+                  <th>Điểm bán</th>
+                  <th class="col-date">Ngày kiểm</th>
+                  <th>Loại phiếu</th>
+                  <th class="col-num text-right">Tổng món</th>
+                  <th class="col-num text-right">Số lệch</th>
+                  <th class="col-num text-right">Giá trị lệch</th>
+                  <th>Người kiểm</th>
                 </tr>
               </thead>
-              <tbody id="fnbCountsHistoryBody" class="divide-y divide-gray-100 dark:divide-gray-800/60">
+              <tbody id="fnbCountsHistoryBody">
               </tbody>
             </table>
           </div>
         </div>
-
       </section>
-
-
-
-      <!-- =====================================================================
-           SECTION: NHẬP HÀNG ĐIỂM BÁN (/fnb/receipts)
-           ===================================================================== -->
-      <section id="fnb-receipts" class="tab-panel space-y-5">
+<section id="fnb-receipts" class="tab-panel space-y-5">
         
         <!-- Tab Navigation Bar -->
         <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 w-fit max-w-full overflow-x-auto shadow-xs mb-4 select-none">
