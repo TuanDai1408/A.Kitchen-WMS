@@ -425,11 +425,14 @@
           <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
         </div>
 
-        <!-- Global Month Picker -->
-        <div class="hidden md:flex h-9 sm:h-10 lg:h-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 px-2 sm:px-3 items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0">
-          <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0 pointer-events-none"></i>
-          <span id="currentDateDisplay" class="hidden 2xl:inline text-xs font-medium text-gray-500 dark:text-gray-400"></span>
-          <input type="month" id="globalMonthPicker" value="2026-11" onchange="onGlobalMonthChange(this.value)" class="bg-transparent tabular-nums font-medium text-gray-800 dark:text-gray-200 outline-none text-xs border-none cursor-pointer">
+        <!-- Global Month Picker (Hiển thị nhãn Tiếng Việt "Tháng MM/YYYY") -->
+        <div class="hidden md:flex items-center relative shrink-0">
+          <button type="button" onclick="const p = document.getElementById('globalMonthPicker'); if (p.showPicker) p.showPicker(); else p.click();" class="h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium flex items-center gap-2 shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
+            <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0"></i>
+            <span id="currentDateDisplay" class="hidden 2xl:inline text-xs text-gray-500 dark:text-gray-400"></span>
+            <span id="globalMonthDisplay" class="text-sm font-medium text-gray-800 dark:text-gray-200">Tháng 11/2026</span>
+          </button>
+          <input type="month" id="globalMonthPicker" value="2026-11" onchange="if (typeof updateGlobalMonthLabel === 'function') updateGlobalMonthLabel(this.value); onGlobalMonthChange(this.value);" class="sr-only">
         </div>
 
         <!-- Admin Pending Requests Button (Visible for Admin) -->
@@ -660,11 +663,11 @@
             <div class="flex items-center gap-1.5">
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0 hidden sm:inline">Trọng tâm:</span>
               <select id="plFocusFilter" onchange="filterPlBreakdown(this.value)" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs outline-none focus:border-brand-500">
-                <option value="ALL">📊 Toàn bộ cấu trúc P&amp;L</option>
-                <option value="COGS">🥩 Chi phí Giá vốn (Food Cost)</option>
-                <option value="LABOR">👨‍🍳 Chi phí Nhân công (Labor)</option>
-                <option value="OPEX">🏢 Chi phí Vận hành &amp; Mặt bằng</option>
-                <option value="EBITDA">📈 Lợi nhuận gộp &amp; EBITDA</option>
+                <option value="ALL">Toàn bộ cấu trúc P&amp;L</option>
+                <option value="COGS">Chi phí Giá vốn (Food Cost)</option>
+                <option value="LABOR">Chi phí Nhân công (Labor)</option>
+                <option value="OPEX">Chi phí Vận hành &amp; Mặt bằng</option>
+                <option value="EBITDA">Lợi nhuận gộp &amp; EBITDA</option>
               </select>
             </div>
             <button onclick="exportFnbPLExcel()" class="px-3 py-1.5 rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-all">
@@ -1564,9 +1567,9 @@
               <span id="dashBranchTitle" class="hidden"></span>
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:inline">Trọng tâm:</span>
               <select id="whDashScopeFilter" onchange="if(typeof onWhDashScopeChange==='function')onWhDashScopeChange(this.value)" class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 dark:text-gray-200 outline-none focus:border-brand-500">
-                <option value="ALL">📦 Toàn bộ danh mục kho</option>
-                <option value="NEAR_EXP">⚠️ Lô cận date (≤ 7 ngày)</option>
-                <option value="MIN_STOCK">📉 Chạm ngưỡng an toàn (ROP)</option>
+                <option value="ALL">Toàn bộ danh mục kho</option>
+                <option value="NEAR_EXP">Lô cận date (≤ 7 ngày)</option>
+                <option value="MIN_STOCK">Chạm ngưỡng an toàn (ROP)</option>
                 <option value="SLOW_MOVING">⏳ Tồn chậm luân chuyển (> 20 ngày)</option>
               </select>
             </div>
@@ -1886,9 +1889,9 @@
                 <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Chênh lệch:</span>
                 <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
                   <option value="all">Tất cả mặt hàng</option>
-                  <option value="diff">⚠️ Lệch tồn (Thừa / Thiếu)</option>
-                  <option value="matched">🎯 Khớp 100% sổ sách</option>
-                  <option value="counted">✅ Đã kiểm đếm</option>
+                  <option value="diff">Lệch tồn (Thừa / Thiếu)</option>
+                  <option value="matched">Khớp 100% sổ sách</option>
+                  <option value="counted">Đã kiểm đếm</option>
                   <option value="uncounted">⏳ Chưa kiểm đếm</option>
                 </select>
               </div>
@@ -2110,10 +2113,10 @@
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nguồn giao:</span>
               <select id="fnbPoSupplierFilter" onchange="renderFnbPoTable(document.getElementById('fnbPoSearchInput')?.value || '')" class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 shadow-theme-xs outline-none focus:border-brand-500">
                 <option value="">Tất cả nguồn hàng</option>
-                <option value="SIBA">🍲 Bếp Trung Tâm Siba</option>
-                <option value="BAF">🥩 BaF Meat / MeatDeli</option>
-                <option value="SPICE">🧂 Gia vị &amp; Hàng khô</option>
-                <option value="VEG">🥦 Rau củ Đà Lạt</option>
+                <option value="SIBA">Bếp Trung Tâm Siba</option>
+                <option value="BAF">BaF Meat / MeatDeli</option>
+                <option value="SPICE">Gia vị &amp; Hàng khô</option>
+                <option value="VEG">Rau củ Đà Lạt</option>
               </select>
             </div>
             <button onclick="openManualReceiptModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-2 shadow-theme-xs transition-all active:translate-y-px" title="Tạo phiếu nhập hàng thủ công cho các mặt hàng chưa có PO/PR">
@@ -2382,10 +2385,10 @@
               <select id="fnbWasteReasonFilter" onchange="onFnbWasteFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500 max-w-[185px]">
                 <option value="">Tất cả lý do hủy</option>
                 <option value="EXP">⏰ Quá hạn sử dụng (EXP)</option>
-                <option value="DAMAGE">📦 Rách / vỡ / hỏng bao bì</option>
-                <option value="QUALITY">⚠️ Cảm quan / biến chất</option>
-                <option value="COOK">🔥 Khét / cháy / lỗi chế biến</option>
-                <option value="OTHER">📋 Khác / hao hụt rã đông</option>
+                <option value="DAMAGE">Rách / vỡ / hỏng bao bì</option>
+                <option value="QUALITY">Cảm quan / biến chất</option>
+                <option value="COOK">Khét / cháy / lỗi chế biến</option>
+                <option value="OTHER">Khác / hao hụt rã đông</option>
               </select>
             </div>
             <div class="flex items-center gap-1.5">
@@ -2666,10 +2669,10 @@
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">ĐÁNH GIÁ SLA</label>
             <select id="leadTimeSlaFilter" onchange="filterLeadTimeSla(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
-              <option value="ALL">📋 Tất cả đơn PO</option>
-              <option value="ON_TIME">✅ Đúng hạn SLA</option>
-              <option value="DELIVERING">🚚 Đang giao hàng</option>
-              <option value="LATE">⚠️ Trễ hẹn NCC</option>
+              <option value="ALL">Tất cả đơn PO</option>
+              <option value="ON_TIME">Đúng hạn SLA</option>
+              <option value="DELIVERING">Đang giao hàng</option>
+              <option value="LATE">Trễ hẹn NCC</option>
             </select>
           </div>
           <button onclick="loadLeadTime()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl flex items-center gap-1.5 shadow-theme-xs cursor-pointer transition-all">
@@ -2740,7 +2743,7 @@
             <div>
               <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Điểm bán / Điểm kho</label>
               <select id="whInvSiteSelect" onchange="loadWhInventory()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-                <option value="ALL">🏢 Toàn Hệ Thống (Tất cả điểm)</option>
+                <option value="ALL">Toàn Hệ Thống (Tất cả điểm)</option>
               </select>
             </div>
             <!-- Tìm kiếm -->
@@ -2763,10 +2766,10 @@
               <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Trạng thái tồn kho</label>
               <select id="whInvStatusSelect" onchange="filterWhInventoryTable()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
                 <option value="ALL">Tất cả mặt hàng</option>
-                <option value="HAS_RECEIPT">📦 Đã nhập trong kỳ (&gt; 0)</option>
-                <option value="IN_STOCK">✅ Còn tồn kho (&gt; 0)</option>
-                <option value="HAS_BATCH">🏷️ Có quản lý lô hàng</option>
-                <option value="NEGATIVE">⚠️ Âm kho / Cần kiểm tra</option>
+                <option value="HAS_RECEIPT">Đã nhập trong kỳ (&gt; 0)</option>
+                <option value="IN_STOCK">Còn tồn kho (&gt; 0)</option>
+                <option value="HAS_BATCH">Có quản lý lô hàng</option>
+                <option value="NEGATIVE">Âm kho / Cần kiểm tra</option>
               </select>
             </div>
           </div>
@@ -2866,11 +2869,11 @@
           <div class="flex items-center gap-1.5">
             <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nghiệp vụ:</span>
             <select id="ctVoucherTypeFilter" onchange="if(typeof onCtTypeFilterChange==='function')onCtTypeFilterChange(this.value)" class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-              <option value="ALL">📋 Tất cả nghiệp vụ chứng từ</option>
-              <option value="NHAP_NCC">📥 Nhập mua Nhà Cung Cấp</option>
-              <option value="NHAP_BTT">🍲 Nhập từ Bếp Trung Tâm</option>
-              <option value="XUAT_TRA">📤 Xuất trả Nhà Cung Cấp</option>
-              <option value="DIEU_CHUYEN">🔄 Điều chuyển nội bộ</option>
+              <option value="ALL">Tất cả nghiệp vụ chứng từ</option>
+              <option value="NHAP_NCC">Nhập mua Nhà Cung Cấp</option>
+              <option value="NHAP_BTT">Nhập từ Bếp Trung Tâm</option>
+              <option value="XUAT_TRA">Xuất trả Nhà Cung Cấp</option>
+              <option value="DIEU_CHUYEN">Điều chuyển nội bộ</option>
             </select>
           </div>
           <button onclick="resetChungTuForm()" class="px-4 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
@@ -2970,33 +2973,36 @@
         </div>
       </section>
 <section id="portal-search" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="filter-bar">
           <select id="scVung" class="hidden"></select>
           <select id="scSite" class="hidden"></select>
-          <div class="flex-1 min-w-[160px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TRẠNG THÁI ĐỐI SOÁT</label>
-            <select id="scAuditFilter" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-medium outline-none focus:border-brand-500">
+          <div class="field">
+            <label for="scAuditFilter" class="field-label">Trạng thái đối soát</label>
+            <select id="scAuditFilter" onchange="searchVouchers()" class="select">
               <option value="">Tất cả trạng thái</option>
-              <option value="HAS_IMG">📷 Đã đính kèm ảnh Drive</option>
-              <option value="NO_IMG">⚠️ Chưa có ảnh hóa đơn</option>
-              <option value="VERIFIED">✅ Đã kiểm tra khớp số</option>
+              <option value="HAS_IMG">Đã đính kèm ảnh Drive</option>
+              <option value="NO_IMG">Chưa có ảnh hóa đơn</option>
+              <option value="VERIFIED">Đã kiểm tra khớp số</option>
             </select>
           </div>
-          <div class="flex-1 min-w-[160px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">LOẠI HÓA ĐƠN</label>
-            <select id="scLoai" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"></select>
+          <div class="field">
+            <label for="scLoai" class="field-label">Loại hóa đơn</label>
+            <select id="scLoai" onchange="searchVouchers()" class="select"></select>
           </div>
-          <div class="flex-1 min-w-[130px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TỪ NGÀY</label>
-            <input type="date" id="scTu" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+          <div class="field">
+            <label for="scTu" class="field-label">Từ ngày</label>
+            <input type="date" id="scTu" onchange="searchVouchers()" class="input">
           </div>
-          <div class="flex-1 min-w-[130px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">ĐẾN NGÀY</label>
-            <input type="date" id="scDen" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+          <div class="field">
+            <label for="scDen" class="field-label">Đến ngày</label>
+            <input type="date" id="scDen" onchange="searchVouchers()" class="input">
           </div>
-          <button onclick="exportVouchersExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Xuất Excel
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="exportVouchersExcel()" class="btn btn-secondary w-full sm:w-auto" title="Xuất danh sách chứng từ ra file Excel">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              <span>Xuất Excel</span>
+            </button>
+          </div>
         </div>
 
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
@@ -3033,10 +3039,10 @@
           <div class="w-full sm:flex-1 sm:min-w-[170px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">NGUỒN CUNG ỨNG</label>
             <select id="orderSupplyChannel" onchange="filterItems()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-medium outline-none focus:border-brand-500">
-              <option value="ALL">📦 Tất cả nguồn cung ứng</option>
-              <option value="BTT">🍲 Bếp Trung Tâm Siba</option>
-              <option value="NCC">🚚 NCC giao trực tiếp điểm</option>
-              <option value="URGENT">⚡ Đặt hàng khẩn cấp</option>
+              <option value="ALL">Tất cả nguồn cung ứng</option>
+              <option value="BTT">Bếp Trung Tâm Siba</option>
+              <option value="NCC">NCC giao trực tiếp điểm</option>
+              <option value="URGENT">Đặt hàng khẩn cấp</option>
             </select>
           </div>
           <div class="w-full sm:flex-1 sm:min-w-[140px]">
@@ -3196,11 +3202,11 @@
               <label class="font-bold text-gray-700 dark:text-gray-200">TRẠNG THÁI ĐƠN</label>
             </div>
             <select id="hsOrderStatusFilter" onchange="filterHsOrders(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-medium outline-none focus:border-brand-500">
-              <option value="ALL">📋 Tất cả trạng thái</option>
-              <option value="APPROVED">✅ Đã phê duyệt đơn</option>
+              <option value="ALL">Tất cả trạng thái</option>
+              <option value="APPROVED">Đã phê duyệt đơn</option>
               <option value="PENDING">⏳ Chờ duyệt định mức</option>
-              <option value="DELIVERED">🚚 Đã nhận hàng tại kho</option>
-              <option value="REJECTED">❌ Đã hủy đơn</option>
+              <option value="DELIVERED">Đã nhận hàng tại kho</option>
+              <option value="REJECTED">Đã hủy đơn</option>
             </select>
           </div>
           <div class="flex-1 min-w-[140px]">
@@ -3249,10 +3255,10 @@
           <div class="flex-1 min-w-[170px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">CA BÁO CÁO</label>
             <select id="bcShiftSelect" name="Ca báo cáo" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
-              <option value="CA_SANG">🌅 Ca Sáng (06:00 - 14:00)</option>
-              <option value="CA_CHIEU">☀️ Ca Chiều (14:00 - 22:00)</option>
-              <option value="CA_TOI">🌙 Ca Tối / Giao Ca Đêm</option>
-              <option value="CA_HC">🏢 Hành Chính / Trọn Ngày</option>
+              <option value="CA_SANG">Ca Sáng (06:00 - 14:00)</option>
+              <option value="CA_CHIEU">Ca Chiều (14:00 - 22:00)</option>
+              <option value="CA_TOI">Ca Tối / Giao Ca Đêm</option>
+              <option value="CA_HC">Hành Chính / Trọn Ngày</option>
             </select>
           </div>
           <button onclick="resetBaoCao()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
@@ -3537,9 +3543,9 @@
           <div class="flex-1 min-w-[170px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TRỌNG TÂM KIỂM KÊ</label>
             <select id="kkDiscrepancyFilter" onchange="onKkDiscrepancyFilterChange(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
-              <option value="ALL">📋 Toàn bộ danh mục kiểm kê</option>
-              <option value="DIFF">⚠️ Có chênh lệch (Thừa / Thiếu)</option>
-              <option value="COUNTED">✅ Đã kiểm xong (Có số thực tế)</option>
+              <option value="ALL">Toàn bộ danh mục kiểm kê</option>
+              <option value="DIFF">Có chênh lệch (Thừa / Thiếu)</option>
+              <option value="COUNTED">Đã kiểm xong (Có số thực tế)</option>
               <option value="UNCOUNTED">⏳ Chưa nhập số lượng kiểm</option>
             </select>
           </div>
@@ -4325,11 +4331,11 @@
             <div>
               <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Hình thức nhập *</label>
               <select id="manualReceiptType" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-semibold text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-                <option value="NHAP_MUA_TRUC_TIEP">🛒 Mua trực tiếp (Chợ / Siêu thị / NCC lẻ)</option>
-                <option value="NHAP_DIEU_CHUYEN">🔄 Điều chuyển nội bộ (Bếp khác chuyển sang)</option>
-                <option value="NHAP_BO_SUNG">📦 Nhập bổ sung ngoài PO / Giao bù</option>
-                <option value="NHAP_DAU_KY">📋 Nhập tồn đầu kỳ / Kiểm kê phát hiện thừa</option>
-                <option value="NHAP_KHAC">🏷️ Nhập khác / Hàng tài trợ</option>
+                <option value="NHAP_MUA_TRUC_TIEP">Mua trực tiếp (Chợ / Siêu thị / NCC lẻ)</option>
+                <option value="NHAP_DIEU_CHUYEN">Điều chuyển nội bộ (Bếp khác chuyển sang)</option>
+                <option value="NHAP_BO_SUNG">Nhập bổ sung ngoài PO / Giao bù</option>
+                <option value="NHAP_DAU_KY">Nhập tồn đầu kỳ / Kiểm kê phát hiện thừa</option>
+                <option value="NHAP_KHAC">Nhập khác / Hàng tài trợ</option>
               </select>
             </div>
             <div>
@@ -4378,10 +4384,10 @@
               <div class="flex items-center gap-1.5">
                 <select id="manualItemCategorySelect" onchange="filterManualCatalogList()" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[11px] font-medium text-gray-700 dark:text-gray-300 outline-none">
                   <option value="">Tất cả ngành hàng</option>
-                  <option value="113">🥩 Thực phẩm sơ chế / chế biến</option>
-                  <option value="HANG_BAN">🥤 Hàng bán / Giải khát</option>
-                  <option value="VTTH">🍴 Vật tư tiêu hao</option>
-                  <option value="GIA_VI">🧂 Gia vị & Hàng khô</option>
+                  <option value="113">Thực phẩm sơ chế / chế biến</option>
+                  <option value="HANG_BAN">Hàng bán / Giải khát</option>
+                  <option value="VTTH">Vật tư tiêu hao</option>
+                  <option value="GIA_VI">Gia vị & Hàng khô</option>
                 </select>
               </div>
             </div>
@@ -10322,7 +10328,7 @@ window.loadWhInventory = async function() {
   const siteSelect = document.getElementById('whInvSiteSelect');
   if (siteSelect && (!siteSelect.options || siteSelect.options.length <= 1)) {
     const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
-    siteSelect.innerHTML = '<option value="ALL">🏢 Toàn Hệ Thống (Tất cả điểm)</option>' +
+    siteSelect.innerHTML = '<option value="ALL">Toàn Hệ Thống (Tất cả điểm)</option>' +
       sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
     
     const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'K001');
