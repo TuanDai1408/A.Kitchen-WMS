@@ -2478,6 +2478,21 @@
             </button>
           </div>
         </div>
+        <!-- Sub-view navigation tabs: Cân đối tồn kho vs Đơn hàng PO/PR đã nhập -->
+        <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
+          <button id="whInvTabBtnBalance" onclick="switchWhInvSubView('balance')" class="btn btn-primary h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-2">
+            <i data-lucide="boxes" class="w-4 h-4"></i>
+            <span>Cân đối tồn kho vật tư</span>
+          </button>
+          <button id="whInvTabBtnReceipts" onclick="switchWhInvSubView('receipts')" class="btn btn-secondary h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-2">
+            <i data-lucide="package-check" class="w-4 h-4"></i>
+            <span>Danh sách đơn hàng PO / PR đã nhập kho</span>
+            <span id="whInvBadgeReceiptsCount" class="badge badge-brand text-[11px] px-1.5 py-0.2">0</span>
+          </button>
+        </div>
+
+        <!-- VIEW 1: Cân đối tồn kho vật tư -->
+        <div id="whInvBalanceView" class="space-y-4">
 
         <!-- Filter Bar -->
         <div class="filter-bar">
@@ -2627,6 +2642,92 @@
           <!-- Native Mobile Card View -->
           <div id="whInventoryMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
+      </div>
+      <!-- End VIEW 1 -->
+
+        <!-- VIEW 2: Danh sách đơn hàng PO / PR đã nhập kho -->
+        <div id="whInvReceiptsView" class="space-y-4 hidden">
+          <!-- Filter & Action Bar for Received Orders -->
+          <div class="filter-bar">
+            <div class="field flex-1 min-w-[200px]">
+              <label class="field-label">Điểm nhận hàng</label>
+              <select id="whReceivedOrdersSiteFilter" onchange="filterWhReceivedOrdersTable()" class="select">
+                <option value="ALL">Toàn hệ thống (Tất cả điểm)</option>
+              </select>
+            </div>
+            <div class="field flex-1 min-w-[220px]">
+              <label class="field-label">Tìm kiếm đơn hàng / Phiếu nhập</label>
+              <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="text" id="whReceivedOrdersSearchInput" oninput="filterWhReceivedOrdersTable()" placeholder="Nhập số PO, PR, mã phiếu nhập, NCC..." class="input pl-9">
+              </div>
+            </div>
+            <div class="field w-44">
+              <label class="field-label">Phân loại đơn</label>
+              <select id="whReceivedOrdersTypeFilter" onchange="filterWhReceivedOrdersTable()" class="select">
+                <option value="ALL">Tất cả loại đơn</option>
+                <option value="PO">Đơn đặt hàng PO (SAP)</option>
+                <option value="DIRECT">Nhập mua trực tiếp (PR / Chợ)</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="loadWhReceivedOrders()" class="btn btn-primary h-10 px-4">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Làm mới
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Summary Cards for Received Orders -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="kpi-card">
+              <div class="kpi-label">Tổng đơn đã nhập kho</div>
+              <div class="kpi-value num" id="whKpiReceivedOrdersCount">0</div>
+              <div class="kpi-sub">Số đơn hàng PO / PR hoàn tất</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Tổng số lượng đã nhập</div>
+              <div class="kpi-value num text-brand-600 dark:text-brand-400" id="whKpiReceivedOrdersTotalQty">0</div>
+              <div class="kpi-sub">Đơn vị vật tư / nguyên liệu</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Tổng giá trị đã nhập</div>
+              <div class="kpi-value num text-emerald-600 dark:text-emerald-400" id="whKpiReceivedOrdersTotalAmount">0 ₫</div>
+              <div class="kpi-sub">Giá trị thực tế nhập kho</div>
+            </div>
+          </div>
+
+          <!-- Received Orders Table Card (Desktop) -->
+          <div class="table-card hidden lg:block">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="w-12 text-center">STT</th>
+                    <th class="col-code">Số PO / PR</th>
+                    <th class="col-code">Mã phiếu nhập</th>
+                    <th class="text-center w-20">Điểm bán</th>
+                    <th class="col-date text-center">Ngày nhập</th>
+                    <th>Nhà cung cấp / Nguồn hàng</th>
+                    <th class="col-num text-right">Số món</th>
+                    <th class="col-num text-right">Tổng SL</th>
+                    <th class="col-num text-right">Tổng tiền</th>
+                    <th class="text-center w-28">Trạng thái</th>
+                    <th class="col-actions text-center w-44">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="whReceivedOrdersTableBody">
+                  <tr><td colspan="11" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải danh sách đơn hàng đã nhập kho...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Native Mobile Card View for Received Orders -->
+          <div id="whReceivedOrdersMobileCards" class="block lg:hidden space-y-3">
+            <div class="p-4 text-center text-gray-400 text-sm">Đang tải danh sách đơn hàng đã nhập kho...</div>
+          </div>
+        </div>
+        <!-- End VIEW 2 -->
       </section>
 <section id="portal-voucher" class="tab-panel space-y-5">
         <div class="page-header">
@@ -5194,6 +5295,96 @@
             <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Xuất Bếp
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Chi tiết đơn hàng đã nhập kho & Hủy nhập kho -->
+  <div id="whReceivedOrderDetailModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="badge badge-brand">Đã nhập kho</span>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white" id="whRecModalTitle">Chi tiết đơn hàng đã nhập kho</h3>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" id="whRecModalSubtitle">Thông tin chi tiết mặt hàng, số lượng và lô hạn dùng</p>
+        </div>
+        <button onclick="closeWhReceivedOrderDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800 text-xs">
+          <div>
+            <span class="text-gray-400 block">Số đơn PO / PR:</span>
+            <span class="code font-bold text-brand-600 dark:text-brand-400" id="whRecModalPoNumber">—</span>
+          </div>
+          <div>
+            <span class="text-gray-400 block">Mã phiếu nhập:</span>
+            <span class="code font-bold text-gray-900 dark:text-white" id="whRecModalReceiptCode">—</span>
+          </div>
+          <div>
+            <span class="text-gray-400 block">Điểm nhận hàng:</span>
+            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalSite">—</span>
+          </div>
+          <div>
+            <span class="text-gray-400 block">Ngày nhập kho:</span>
+            <span class="num font-semibold text-gray-900 dark:text-white" id="whRecModalDate">—</span>
+          </div>
+          <div class="col-span-2">
+            <span class="text-gray-400 block">Nhà cung cấp / Nguồn hàng:</span>
+            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalSupplier">—</span>
+          </div>
+          <div>
+            <span class="text-gray-400 block">Người nhập:</span>
+            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalCreatedBy">—</span>
+          </div>
+          <div>
+            <span class="text-gray-400 block">Tổng tiền nhập:</span>
+            <span class="num font-bold text-brand-600 dark:text-brand-400 text-sm" id="whRecModalTotalAmount">0 ₫</span>
+          </div>
+        </div>
+
+        <!-- Lines Table -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300">Danh mục hàng hóa đã nhập</h4>
+          <div class="table-scroll max-h-72 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="w-10 text-center">STT</th>
+                  <th class="col-code">Mã SKU</th>
+                  <th>Tên mặt hàng</th>
+                  <th class="text-center w-16">ĐVT</th>
+                  <th class="col-num text-right">Số lượng</th>
+                  <th class="col-num text-right">Đơn giá</th>
+                  <th class="col-num text-right">Thành tiền</th>
+                  <th class="text-center w-28">Mã lô</th>
+                  <th class="col-date text-center">Hạn dùng</th>
+                </tr>
+              </thead>
+              <tbody id="whRecModalLinesBody">
+                <tr><td colspan="9" class="p-4 text-center text-gray-400">Đang tải dòng hàng...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+        <button id="whRecModalCancelBtn" onclick="onWhRecModalCancelClick()" class="btn btn-danger">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Hủy nhập kho đơn này</span>
+        </button>
+        <button onclick="closeWhReceivedOrderDetailModal()" class="btn btn-secondary">
+          <span>Đóng</span>
+        </button>
       </div>
     </div>
   </div>
@@ -16188,6 +16379,405 @@ function updateAuditKpisAndChart(items) {
   }
 }
 
-</script>
+
+// ============================================================================
+// WH INVENTORY: DANH SÁCH ĐƠN HÀNG PO/PR ĐÃ NHẬP KHO & HỦY NHẬP KHO
+// ============================================================================
+
+window.gWhReceivedOrders = [];
+window.gWhCurrentReceivedDetail = null;
+
+window.switchWhInvSubView = function(view) {
+  const btnBalance = document.getElementById('whInvTabBtnBalance');
+  const btnReceipts = document.getElementById('whInvTabBtnReceipts');
+  const viewBalance = document.getElementById('whInvBalanceView');
+  const viewReceipts = document.getElementById('whInvReceiptsView');
+
+  if (view === 'balance') {
+    if (btnBalance) {
+      btnBalance.className = 'btn btn-primary btn-sm';
+    }
+    if (btnReceipts) {
+      btnReceipts.className = 'btn btn-secondary btn-sm';
+    }
+    if (viewBalance) viewBalance.classList.remove('hidden');
+    if (viewReceipts) viewReceipts.classList.add('hidden');
+  } else {
+    if (btnBalance) {
+      btnBalance.className = 'btn btn-secondary btn-sm';
+    }
+    if (btnReceipts) {
+      btnReceipts.className = 'btn btn-primary btn-sm';
+    }
+    if (viewBalance) viewBalance.classList.add('hidden');
+    if (viewReceipts) viewReceipts.classList.remove('hidden');
+    loadWhReceivedOrders();
+  }
+  if (window.lucide) lucide.createIcons();
+};
+
+window.populateWhReceivedOrdersSiteFilter = function() {
+  const siteSelect = document.getElementById('whReceivedOrdersSiteFilter');
+  if (!siteSelect) return;
+  if (siteSelect.options && siteSelect.options.length > 1) return;
+
+  const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
+  siteSelect.innerHTML = '<option value="ALL">Toàn Hệ Thống (Tất cả điểm)</option>' +
+    sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
+
+  const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'ALL');
+  if (saved && Array.from(siteSelect.options).some(o => o.value.toUpperCase() === saved.toUpperCase())) {
+    siteSelect.value = saved.toUpperCase();
+  }
+};
+
+window.loadWhReceivedOrders = async function() {
+  populateWhReceivedOrdersSiteFilter();
+  const siteSelect = document.getElementById('whReceivedOrdersSiteFilter');
+  const site = siteSelect ? siteSelect.value : 'ALL';
+
+  const tbody = document.getElementById('whReceivedOrdersTableBody');
+  const mob = document.getElementById('whReceivedOrdersMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Đang tải danh sách đơn hàng đã nhập kho...</td></tr>';
+  if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Đang tải danh sách đơn hàng đã nhập kho...</div>';
+
+  try {
+    const res = await fetch(`/api/wh/received-orders?site=${encodeURIComponent(site)}&no-cache=1`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      window.gWhReceivedOrders = json.data.orders || [];
+    } else {
+      window.gWhReceivedOrders = [];
+    }
+
+    const badge = document.getElementById('whInvBadgeReceiptsCount');
+    if (badge) badge.textContent = window.gWhReceivedOrders.length;
+
+    renderWhReceivedOrdersTable();
+  } catch (err) {
+    console.error('loadWhReceivedOrders error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-rose-500 font-medium">Lỗi tải danh sách: ${err.message}</td></tr>`;
+    if (mob) mob.innerHTML = `<div class="p-6 text-center text-rose-500 font-medium">Lỗi tải danh sách: ${err.message}</div>`;
+  }
+};
+
+window.filterWhReceivedOrdersTable = function() {
+  renderWhReceivedOrdersTable();
+};
+
+window.renderWhReceivedOrdersTable = function() {
+  const tbody = document.getElementById('whReceivedOrdersTableBody');
+  const mob = document.getElementById('whReceivedOrdersMobileCards');
+  const query = (document.getElementById('whReceivedOrdersSearchInput')?.value || '').trim().toLowerCase();
+  const typeFilter = document.getElementById('whReceivedOrdersTypeFilter')?.value || 'ALL';
+
+  let list = window.gWhReceivedOrders || [];
+
+  if (typeFilter !== 'ALL') {
+    list = list.filter(o => o.doc_type === typeFilter);
+  }
+
+  if (query) {
+    list = list.filter(o => 
+      (o.po_number || '').toLowerCase().includes(query) ||
+      (o.receipt_code || '').toLowerCase().includes(query) ||
+      (o.supplier || '').toLowerCase().includes(query) ||
+      (o.site_code || '').toLowerCase().includes(query) ||
+      (o.notes || '').toLowerCase().includes(query) ||
+      (o.created_by || '').toLowerCase().includes(query)
+    );
+  }
+
+  // Update KPIs
+  const kpiCount = document.getElementById('whKpiReceivedOrdersCount');
+  const kpiQty = document.getElementById('whKpiReceivedOrdersTotalQty');
+  const kpiAmt = document.getElementById('whKpiReceivedOrdersTotalAmount');
+  const countText = document.getElementById('whReceivedOrdersCountText');
+
+  let totalQty = 0;
+  let totalAmount = 0;
+  list.forEach(o => {
+    totalQty += Number(o.total_qty) || 0;
+    totalAmount += Number(o.total_amount) || 0;
+  });
+
+  if (kpiCount) kpiCount.textContent = list.length;
+  if (kpiQty) kpiQty.textContent = (typeof fmtNum === 'function' ? fmtNum(totalQty) : totalQty);
+  if (kpiAmt) kpiAmt.textContent = Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫';
+  if (countText) countText.textContent = list.length;
+
+  if (!list.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Không tìm thấy đơn hàng đã nhập kho nào khớp với bộ lọc.</td></tr>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy đơn hàng đã nhập kho nào khớp với bộ lọc.</div>';
+    return;
+  }
+
+  // Render Desktop Table
+  if (tbody) {
+    tbody.innerHTML = list.map((o, idx) => {
+      const isDirect = o.doc_type === 'DIRECT';
+      const badgeDocType = isDirect ? '<span class="badge badge-neutral text-xs">Trực tiếp</span>' : (o.doc_type === 'PR' ? '<span class="badge badge-brand text-xs">Đơn PR</span>' : '<span class="badge badge-brand text-xs">Đơn PO</span>');
+      const formattedDate = (typeof fmtDate === 'function' ? fmtDate(o.receipt_date) : o.receipt_date);
+      const amtStr = Math.round(Number(o.total_amount) || 0).toLocaleString('vi-VN') + ' ₫';
+
+      return `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="w-10 text-center text-gray-400 num font-mono text-xs">${idx + 1}</td>
+          <td class="col-code font-bold">
+            <span class="code font-bold text-brand-600 dark:text-brand-400">${escapeHtml(o.po_number || '—')}</span>
+            <div class="mt-0.5">${badgeDocType}</div>
+          </td>
+          <td class="col-code">
+            <span class="code text-gray-800 dark:text-gray-200">${escapeHtml(o.receipt_code || '—')}</span>
+          </td>
+          <td class="text-center font-semibold text-xs text-gray-700 dark:text-gray-300">
+            <span class="badge badge-neutral">${escapeHtml(o.site_code || 'K001')}</span>
+          </td>
+          <td class="col-date num whitespace-nowrap text-xs text-gray-600 dark:text-gray-300">${formattedDate}</td>
+          <td>
+            <div class="font-medium text-xs text-gray-900 dark:text-white">${escapeHtml(o.supplier || 'N/A')}</div>
+            ${o.notes ? `<div class="text-xs text-gray-400 truncate max-w-[200px]" title="${escapeHtml(o.notes)}">${escapeHtml(o.notes)}</div>` : ''}
+          </td>
+          <td class="col-num text-center num text-xs font-semibold">${o.item_count || 1} món</td>
+          <td class="col-num text-right font-bold text-gray-900 dark:text-white num text-xs">${amtStr}</td>
+          <td class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(o.created_by || 'Thủ kho')}</td>
+          <td class="col-badge text-center">
+            <span class="badge badge-brand text-xs whitespace-nowrap">Đã nhập kho</span>
+          </td>
+          <td class="col-actions text-center whitespace-nowrap">
+            <div class="inline-flex items-center gap-1.5 justify-center">
+              <button onclick="openWhReceivedOrderDetail('${o.id || ''}', '${escapeHtml(o.po_number || '')}')" class="btn btn-secondary btn-sm" title="Xem chi tiết dòng hàng">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Chi tiết
+              </button>
+              <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm" title="Hủy nhập kho và hoàn tác tồn kho">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Render Mobile Cards
+  if (mob) {
+    mob.innerHTML = list.map((o, idx) => {
+      const isDirect = o.doc_type === 'DIRECT';
+      const badgeDocType = isDirect ? '<span class="badge badge-neutral text-xs">Trực tiếp</span>' : (o.doc_type === 'PR' ? '<span class="badge badge-brand text-xs">Đơn PR</span>' : '<span class="badge badge-brand text-xs">Đơn PO</span>');
+      const formattedDate = (typeof fmtDate === 'function' ? fmtDate(o.receipt_date) : o.receipt_date);
+      const amtStr = Math.round(Number(o.total_amount) || 0).toLocaleString('vi-VN') + ' ₫';
+
+      return `
+        <div class="data-card">
+          <div class="data-card-header">
+            <div class="flex items-center gap-2">
+              <span class="code font-bold text-brand-600 dark:text-brand-400">${escapeHtml(o.po_number || o.receipt_code || '')}</span>
+              ${badgeDocType}
+            </div>
+            <span class="badge badge-brand text-xs">Đã nhập kho</span>
+          </div>
+
+          <div class="data-card-body space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-400">Phiếu nhập:</span>
+              <span class="code text-gray-700 dark:text-gray-300 font-semibold">${escapeHtml(o.receipt_code || '—')}</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-400">Nhà cung cấp:</span>
+              <span class="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">${escapeHtml(o.supplier || 'N/A')}</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-400">Điểm nhận / Ngày:</span>
+              <span class="text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(o.site_code || '')} • <span class="num">${formattedDate}</span></span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+              <div>
+                <span class="text-gray-400 block">Số mặt hàng</span>
+                <span class="num font-bold text-gray-900 dark:text-white">${o.item_count || 1} món (${fmtNum(o.total_qty || 0)})</span>
+              </div>
+              <div class="text-right">
+                <span class="text-gray-400 block">Tổng tiền nhập</span>
+                <span class="num font-bold text-brand-600 dark:text-brand-400 text-sm">${amtStr}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800">
+            <button onclick="openWhReceivedOrderDetail('${o.id || ''}', '${escapeHtml(o.po_number || '')}')" class="btn btn-secondary btn-sm w-full">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> Xem chi tiết
+            </button>
+            <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm w-full">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập kho
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.openWhReceivedOrderDetail = async function(receiptId, poNumber) {
+  const modal = document.getElementById('whReceivedOrderDetailModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const titleEl = document.getElementById('whRecModalTitle');
+  const poEl = document.getElementById('whRecModalPoNumber');
+  const rcEl = document.getElementById('whRecModalReceiptCode');
+  const siteEl = document.getElementById('whRecModalSite');
+  const dateEl = document.getElementById('whRecModalDate');
+  const supEl = document.getElementById('whRecModalSupplier');
+  const byEl = document.getElementById('whRecModalCreatedBy');
+  const amtEl = document.getElementById('whRecModalTotalAmount');
+  const tbody = document.getElementById('whRecModalLinesBody');
+
+  if (titleEl) titleEl.textContent = `Chi tiết đơn hàng đã nhập kho: ${poNumber || receiptId}`;
+  if (poEl) poEl.textContent = poNumber || '—';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-gray-400">Đang tải danh mục mặt hàng đã nhập...</td></tr>';
+
+  window.gWhCurrentReceivedDetail = { receiptId, poNumber };
+
+  try {
+    let orderInfo = (window.gWhReceivedOrders || []).find(o => (receiptId && String(o.id) === String(receiptId)) || (poNumber && o.po_number === poNumber));
+    if (orderInfo) {
+      if (rcEl) rcEl.textContent = orderInfo.receipt_code || '—';
+      if (siteEl) siteEl.textContent = orderInfo.site_code || '—';
+      if (dateEl) dateEl.textContent = (typeof fmtDate === 'function' ? fmtDate(orderInfo.receipt_date) : orderInfo.receipt_date) || '—';
+      if (supEl) supEl.textContent = orderInfo.supplier || '—';
+      if (byEl) byEl.textContent = orderInfo.created_by || 'Thủ kho';
+      if (amtEl) amtEl.textContent = Math.round(Number(orderInfo.total_amount) || 0).toLocaleString('vi-VN') + ' ₫';
+      window.gWhCurrentReceivedDetail.receiptCode = orderInfo.receipt_code;
+      window.gWhCurrentReceivedDetail.totalAmount = orderInfo.total_amount;
+    }
+
+    let lines = [];
+    if (receiptId) {
+      const res = await fetch(`/api/fnb/receipts?id=${encodeURIComponent(receiptId)}`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        lines = json.data.lines || [];
+      }
+    } else if (poNumber) {
+      const res = await fetch(`/api/fnb/po-details?po_number=${encodeURIComponent(poNumber)}`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        lines = (json.data || []).map(p => ({
+          item_code: p.article,
+          item_name: p.article_desc || p.article,
+          unit: p.order_unit || 'Phần',
+          qty: p.received_qty || p.order_qty,
+          unit_price: p.net_price,
+          amount: (p.received_qty || p.order_qty) * p.net_price,
+          batch_code: p.batch_code || 'LÔ-SAP',
+          exp_date: p.exp_date || null
+        }));
+      }
+    }
+
+    if (!lines.length) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-gray-400">Không có dòng hàng nào được ghi nhận cho phiếu này.</td></tr>';
+      return;
+    }
+
+    if (tbody) {
+      tbody.innerHTML = lines.map((l, idx) => {
+        const qty = Number(l.qty) || 0;
+        const price = Number(l.unit_price) || 0;
+        const amt = Number(l.amount) || (qty * price);
+        const expStr = l.exp_date ? (typeof fmtDate === 'function' ? fmtDate(l.exp_date.slice(0, 10)) : l.exp_date.slice(0, 10)) : '—';
+
+        return `
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+            <td class="text-center num text-xs font-mono text-gray-400">${idx + 1}</td>
+            <td class="col-code font-bold text-xs">${escapeHtml(l.item_code)}</td>
+            <td class="font-medium text-xs text-gray-900 dark:text-white">${escapeHtml(l.item_name || l.item_code)}</td>
+            <td class="text-center text-xs font-semibold text-gray-600 dark:text-gray-300">${escapeHtml(l.unit || 'Phần')}</td>
+            <td class="col-num text-right num font-bold text-emerald-600 dark:text-emerald-400 text-xs">${fmtNum(qty)}</td>
+            <td class="col-num text-right num text-xs">${Math.round(price).toLocaleString('vi-VN')} ₫</td>
+            <td class="col-num text-right num font-semibold text-gray-900 dark:text-white text-xs">${Math.round(amt).toLocaleString('vi-VN')} ₫</td>
+            <td class="text-center font-mono text-xs text-gray-700 dark:text-gray-300">${escapeHtml(l.batch_code || '—')}</td>
+            <td class="col-date text-center num text-xs text-gray-600 dark:text-gray-400">${expStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.error('Error openWhReceivedOrderDetail:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-rose-500 font-medium">Lỗi tải chi tiết: ${err.message}</td></tr>`;
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.closeWhReceivedOrderDetailModal = function() {
+  const modal = document.getElementById('whReceivedOrderDetailModal');
+  if (modal) modal.classList.add('hidden');
+  window.gWhCurrentReceivedDetail = null;
+};
+
+window.onWhRecModalCancelClick = function() {
+  if (!window.gWhCurrentReceivedDetail) return;
+  const { receiptId, poNumber, receiptCode, totalAmount } = window.gWhCurrentReceivedDetail;
+  confirmCancelReceivedOrder(receiptId, poNumber, receiptCode, totalAmount);
+};
+
+window.confirmCancelReceivedOrder = async function(receiptId, poNumber, receiptCode, totalAmount) {
+  const codeDisplay = receiptCode || poNumber || 'đơn hàng này';
+  const amtDisplay = totalAmount ? (Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫') : '';
+
+  const confirmMsg = `Bạn có chắc chắn muốn HỦY NHẬP KHO cho đơn hàng [${codeDisplay}]` +
+    (amtDisplay ? ` với giá trị ${amtDisplay}` : '') + `?\n\n` +
+    `• Toàn bộ số lượng nhập kho sẽ được HOÀN TÁC TRỪ KHỎI TỒN KHO thực tế.\n` +
+    `• Đơn hàng PO/PR sẽ được mở lại (trạng thái Chờ nhập) để có thể nhập lại khi cần.`;
+
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    if (typeof showLoading === 'function') showLoading('Đang hủy nhập kho và hoàn tác tồn kho...');
+
+    const res = await fetch('/api/fnb/receipts/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: receiptId || undefined,
+        po_number: poNumber || undefined
+      })
+    });
+    const json = await res.json();
+
+    if (json.success) {
+      if (typeof showToast === 'function') {
+        showToast(json.message || 'Hủy nhập kho thành công!', 'success');
+      } else {
+        alert(json.message || 'Hủy nhập kho thành công!');
+      }
+
+      closeWhReceivedOrderDetailModal();
+
+      // Refresh both views
+      await loadWhReceivedOrders();
+      if (typeof loadWhInventory === 'function') loadWhInventory();
+      if (typeof loadFnbReceipts === 'function') loadFnbReceipts();
+      if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
+    } else {
+      if (typeof showToast === 'function') {
+        showToast('Lỗi hủy nhập kho: ' + (json.error || 'Vui lòng thử lại'), 'error');
+      } else {
+        alert('Lỗi hủy nhập kho: ' + (json.error || 'Vui lòng thử lại'));
+      }
+    }
+  } catch (err) {
+    console.error('Cancel received order error:', err);
+    if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + err.message, 'error');
+    else alert('Lỗi kết nối: ' + err.message);
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+  </script>
 </body>
 </html>

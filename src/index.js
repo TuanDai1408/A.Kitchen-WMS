@@ -1785,6 +1785,126 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 1.9.1 GET /api/wh/received-orders - Danh sách các đơn hàng PO, PR đã nhập kho cho tab Tồn kho
+      if (pathname === '/api/wh/received-orders' && request.method === 'GET') {
+        const siteParam = (searchParams.get('site') || searchParams.get('site_code') || searchParams.get('branch') || 'ALL').trim().toUpperCase();
+        const search = (searchParams.get('search') || '').trim().toLowerCase();
+
+        try {
+          // 1. Lấy tất cả các phiếu nhập kho fnb_stock_receipts
+          let qReceipts = `
+            SELECT r.*,
+                   COUNT(l.id) as line_count,
+                   COALESCE(SUM(l.qty), 0) as total_qty
+            FROM fnb_stock_receipts r
+            LEFT JOIN fnb_stock_receipt_lines l ON r.id = l.receipt_id
+            WHERE 1=1
+          `;
+          const rParams = [];
+          if (siteParam !== 'ALL') {
+            qReceipts += ` AND UPPER(r.site_code) = ?`;
+            rParams.push(siteParam);
+          }
+          qReceipts += ` GROUP BY r.id, r.receipt_code, r.site_code, r.receipt_date, r.supplier, r.invoice_no, r.total_amount, r.notes, r.attachment_url, r.created_by, r.created_at ORDER BY r.receipt_date DESC, r.id DESC LIMIT 150`;
+          const { rows: receipts } = await db.query(env, qReceipts, rParams);
+
+          // 2. Lấy các PO từ sap_po_items có trạng thái COMPLETED
+          let qPo = `
+            SELECT 
+              po_number,
+              site as site_code,
+              MAX(doc_date) as receipt_date,
+              supplier_code,
+              COALESCE(NULLIF(supplier_name, ''), 'Bếp Trung Tâm Siba') as supplier,
+              COUNT(*) as line_count,
+              SUM(received_qty) as total_qty,
+              SUM(received_qty * net_price) as total_amount,
+              status
+            FROM wms.sap_po_items
+            WHERE status = 'COMPLETED'
+          `;
+          const poParams = [];
+          if (siteParam !== 'ALL') {
+            qPo += ` AND UPPER(site) = ?`;
+            poParams.push(siteParam);
+          }
+          qPo += ` GROUP BY po_number, site, supplier_code, supplier_name, status
+                   ORDER BY MAX(doc_date) DESC, po_number DESC LIMIT 150`;
+          const { rows: completedPos } = await db.query(env, qPo, poParams);
+
+          const poNumbersInReceipts = new Set();
+          const items = [];
+
+          (receipts || []).forEach(r => {
+            const inv = (r.invoice_no || '').trim();
+            if (inv) poNumbersInReceipts.add(inv.toUpperCase());
+            const isPo = inv.startsWith('PO') || /^\d{10}$/.test(inv) || /^\d{6,}$/.test(inv);
+            const isPr = inv.startsWith('PR') || inv.includes('PR');
+
+            items.push({
+              id: r.id,
+              receipt_code: r.receipt_code,
+              po_number: inv || 'Nhập ngoài PO/PR',
+              site_code: (r.site_code || '').toUpperCase(),
+              receipt_date: r.receipt_date ? (typeof r.receipt_date === 'string' ? r.receipt_date.slice(0, 10) : new Date(r.receipt_date).toISOString().slice(0, 10)) : '',
+              supplier: r.supplier || 'N/A',
+              item_count: Number(r.line_count) || 0,
+              total_qty: Number(r.total_qty) || 0,
+              total_amount: Number(r.total_amount) || 0,
+              created_by: r.created_by || 'Thủ kho / Bếp trưởng',
+              notes: r.notes || '',
+              doc_type: isPr ? 'PR' : (isPo ? 'PO' : 'DIRECT'),
+              status: 'COMPLETED',
+              status_label: 'Đã nhập kho',
+              has_receipt_record: true
+            });
+          });
+
+          (completedPos || []).forEach(po => {
+            if (!poNumbersInReceipts.has(po.po_number.toUpperCase())) {
+              const isPr = po.po_number.startsWith('PR') || po.po_number.includes('PR');
+              items.push({
+                id: null,
+                receipt_code: `PO-${po.po_number}`,
+                po_number: po.po_number,
+                site_code: (po.site_code || '').toUpperCase(),
+                receipt_date: po.receipt_date ? (typeof po.receipt_date === 'string' ? po.receipt_date.slice(0, 10) : new Date(po.receipt_date).toISOString().slice(0, 10)) : '',
+                supplier: po.supplier || 'Bếp Trung Tâm Siba',
+                item_count: Number(po.line_count) || 0,
+                total_qty: Number(po.total_qty) || 0,
+                total_amount: Number(po.total_amount) || 0,
+                created_by: 'SAP WMS Sync',
+                notes: 'Đơn hàng nhập kho từ hệ thống SAP',
+                doc_type: isPr ? 'PR' : 'PO',
+                status: 'COMPLETED',
+                status_label: 'Đã nhập kho',
+                has_receipt_record: false
+              });
+            }
+          });
+
+          // Lọc tìm kiếm
+          let filtered = items;
+          if (search) {
+            filtered = items.filter(it => 
+              it.po_number.toLowerCase().includes(search) ||
+              it.receipt_code.toLowerCase().includes(search) ||
+              it.supplier.toLowerCase().includes(search) ||
+              it.site_code.toLowerCase().includes(search) ||
+              it.notes.toLowerCase().includes(search)
+            );
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: { orders: filtered, total: filtered.length }
+          }), { headers: corsHeaders });
+        } catch (err) {
+          console.error('Error in /api/wh/received-orders:', err);
+          return new Response(JSON.stringify({ success: false, error: err.message }), { headers: corsHeaders, status: 500 });
+        }
+      }
+
       // ======================================================================
       // PHÂN HỆ 2: VẬT TƯ, ĐỊNH MỨC SITE & CHỨNG TỪ GIAO NHẬN (PORTAL)
       // ======================================================================
@@ -4315,7 +4435,7 @@ export default {
       }
 
       // 3.7 NHẬP HÀNG: GET & POST /api/fnb/receipts
-      if ((pathname === '/api/fnb/receipts' || pathname === '/fnb/receipts')) {
+      if ((pathname.startsWith('/api/fnb/receipts') || pathname.startsWith('/fnb/receipts'))) {
         if (request.method === 'GET') {
           const siteCode = searchParams.get('site_code');
           let q = `SELECT * FROM fnb_stock_receipts`;
@@ -4358,7 +4478,7 @@ export default {
           }), { headers: corsHeaders });
         }
 
-        if (request.method === 'POST') {
+        if (request.method === 'POST' && !pathname.endsWith('/cancel')) {
           try {
             const body = await request.json();
             const { site_code, receipt_date, supplier = '', invoice_no = '', notes = '', attachment_url = '', created_by = 'Thủ kho / Bếp trưởng', lines = [] } = body;
@@ -4455,6 +4575,119 @@ export default {
             }), { headers: corsHeaders });
           } catch (e) {
             return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
+        // 3.7.1 HỦY NHẬP KHO: DELETE /api/fnb/receipts hoặc POST /api/fnb/receipts/cancel
+        if (request.method === 'DELETE' || pathname.endsWith('/cancel')) {
+          try {
+            let receiptId = searchParams.get('id');
+            let poNumber = searchParams.get('po_number');
+
+            if (request.method === 'POST' || request.method === 'DELETE') {
+              try {
+                const body = await request.json();
+                if (!receiptId && body.id) receiptId = body.id;
+                if (!receiptId && body.receipt_id) receiptId = body.receipt_id;
+                if (!poNumber && body.po_number) poNumber = body.po_number;
+              } catch (_) {}
+            }
+
+            if (!receiptId && !poNumber) {
+              return new Response(JSON.stringify({ success: false, error: 'Vui lòng cung cấp mã phiếu nhập (id) hoặc số đơn đặt hàng (po_number)' }), { headers: corsHeaders, status: 400 });
+            }
+
+            let receipt = null;
+            if (receiptId) {
+              receipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE id = ?`, [receiptId]);
+            } else if (poNumber) {
+              receipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE invoice_no = ? ORDER BY id DESC LIMIT 1`, [poNumber]);
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              if (receipt) {
+                const rId = receipt.id;
+                const siteCode = receipt.site_code;
+                const poNum = receipt.invoice_no;
+                const rCode = receipt.receipt_code;
+
+                // Lấy các dòng mặt hàng
+                const { rows: lines } = await tx.query(`SELECT * FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [rId]);
+
+                for (const line of (lines || [])) {
+                  const qty = Number(line.qty) || 0;
+                  const unitPrice = Number(line.unit_price) || 0;
+                  const lineAmount = Number(line.amount) || (qty * unitPrice);
+
+                  // Hoàn tác tồn kho fnb_stock_balances
+                  await tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET receipt_qty = GREATEST(0, receipt_qty - ?),
+                        book_qty = opening_qty + (GREATEST(0, receipt_qty - ?)) - sales_bom_qty - waste_qty,
+                        total_value = (opening_qty + (GREATEST(0, receipt_qty - ?)) - sales_bom_qty - waste_qty) * ?,
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [qty, qty, qty, unitPrice, line.item_code, siteCode]);
+
+                  // Xóa batch nếu có
+                  if (line.batch_code) {
+                    try {
+                      await tx.exec(`
+                        DELETE FROM wms.inventory_batches
+                        WHERE sku = ? AND branch_id = ? AND batch_code = ?
+                      `, [line.item_code, siteCode.toLowerCase(), line.batch_code]);
+                    } catch (eBat) {}
+                  }
+
+                  // Ghi nhật ký HUY_NHAP_KHO
+                  try {
+                    await tx.exec(`
+                      INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                      VALUES (?, 'HUY_NHAP_KHO', ?, ?, ?, ?, ?, ?, ?)
+                    `, [rCode, line.item_code, siteCode, -qty, unitPrice, -lineAmount, `Hủy nhập kho phiếu ${rCode} (PO/HĐ: ${poNum || 'N/A'})`, 'Thủ kho / Quản trị']);
+                  } catch (eTx) {}
+                }
+
+                // Nếu có liên kết đơn PO/PR, hoàn tác trạng thái PO về OPEN
+                if (poNum) {
+                  try {
+                    await tx.exec(`
+                      UPDATE wms.sap_po_items
+                      SET received_qty = 0,
+                          status = 'OPEN',
+                          updated_at = NOW()
+                      WHERE po_number = ?
+                    `, [poNum]);
+                  } catch (ePo) {}
+                }
+
+                // Xóa chi tiết và phiếu nhập
+                await tx.exec(`DELETE FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [rId]);
+                await tx.exec(`DELETE FROM fnb_stock_receipts WHERE id = ?`, [rId]);
+              } else if (poNumber) {
+                // PO SAP không có record fnb_stock_receipts
+                await tx.exec(`
+                  UPDATE wms.sap_po_items
+                  SET received_qty = 0,
+                      status = 'OPEN',
+                      updated_at = NOW()
+                  WHERE po_number = ?
+                `, [poNumber]);
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+            invalidateMemoryCache('/api/wh');
+            invalidateMemoryCache('/api/po-sap');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Hủy nhập kho thành công! Toàn bộ số lượng tồn kho và trạng thái đơn hàng đã được hoàn tác.`
+            }), { headers: corsHeaders });
+          } catch (err) {
+            console.error('Cancel receipt error:', err);
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi hủy nhập kho: ' + err.message }), { headers: corsHeaders, status: 500 });
           }
         }
       }
