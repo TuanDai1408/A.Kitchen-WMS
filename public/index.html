@@ -2491,134 +2491,119 @@
 
 
       <section id="wh-stock" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-white/3 p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
-          
-          <!-- Header & Title -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
-            <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i data-lucide="hourglass" class="w-5 h-5 text-amber-500"></i>
-                Danh Sách Tồn Kho &amp; Quản Lý Hạn Dùng FEFO
-              </h2>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn HACCP.
-              </p>
-            </div>
-            
-            <div class="flex items-center gap-2 flex-wrap">
-              <button onclick="exportFefoToExcel()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-theme-xs active:translate-y-px transition-all" title="Xuất toàn bộ hoặc các dòng đã chọn ra Excel chuẩn Aptos">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
-              </button>
-              <button onclick="openReceiptModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold shadow-theme-xs active:translate-y-px transition-all">
-                <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
-              </button>
-            </div>
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Hạn dùng &amp; xuất FEFO</h1>
+            <p class="page-subtitle">Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn an toàn thực phẩm.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportFefoToExcel()" class="btn btn-secondary">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+            </button>
+            <button onclick="openReceiptModal()" class="btn btn-primary">
+              <i data-lucide="plus" class="w-4 h-4"></i> Nhập lô mới
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="relative flex-1 min-w-[240px]">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input 
+              type="text" 
+              id="fefoSearchInput" 
+              oninput="filterFefoLive()" 
+              placeholder="Tìm SKU, tên gia vị, mã lô..." 
+              class="input pl-9 w-full"
+            />
           </div>
 
-          <!-- Filters Bar (TailAdmin Data Table Style) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 text-xs">
-            <!-- Search Input -->
-            <div class="lg:col-span-5 relative">
-              <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <input 
-                type="text" 
-                id="fefoSearchInput" 
-                oninput="filterFefoLive()" 
-                placeholder="Tìm SKU, tên gia vị, mã lô..." 
-                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all"
-              />
-            </div>
-
-            <!-- Filter: Danh mục hàng -->
-            <div class="lg:col-span-3">
-              <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all">
-                <option value="">Tất cả nhóm hàng</option>
-                <option value="Gia vị">Gia vị</option>
-                <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
-                <option value="CCDC">CCDC</option>
-              </select>
-            </div>
-
-            <!-- Filter: Trạng thái hạn dùng -->
-            <div class="lg:col-span-3">
-              <select id="fefoStatusFilter" onchange="filterFefoLive()" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 transition-all">
-                <option value="">Tất cả trạng thái</option>
-                <option value="safe">An toàn</option>
-                <option value="yellow">Cận Date (≤ 15 ngày)</option>
-                <option value="red">Nguy cơ FEFO (≤ 7 ngày)</option>
-              </select>
-            </div>
-
-            <!-- Reset Filter Button -->
-            <div class="lg:col-span-1 flex items-center justify-end">
-              <button onclick="resetFefoFilters()" class="w-full p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-all" title="Đặt lại bộ lọc">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-              </button>
-            </div>
+          <div class="w-full sm:w-48">
+            <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select">
+              <option value="">Tất cả nhóm hàng</option>
+              <option value="Gia vị">Gia vị</option>
+              <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
+              <option value="CCDC">CCDC</option>
+            </select>
           </div>
 
-          <!-- Bulk Selection Indicator -->
-          <div id="stockBulkActionBar" class="hidden p-2.5 rounded-xl bg-brand-50 dark:bg-brand-500/15 border border-brand-200 dark:border-brand-500/30 flex items-center justify-between text-xs">
-            <div class="flex items-center gap-2 text-brand-500 dark:text-brand-400 font-medium">
-              <span id="selectedStockCount" class="font-bold">0</span> mặt hàng đã được chọn
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="exportSelectedStockExcel()" class="px-3 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i> Xuất các dòng đã chọn
-              </button>
-              <button onclick="clearStockSelection()" class="px-2 py-1 text-gray-500 hover:text-gray-700 dark:text-gray-400">
-                Bỏ chọn
-              </button>
-            </div>
+          <div class="w-full sm:w-52">
+            <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select">
+              <option value="">Tất cả trạng thái</option>
+              <option value="safe">An toàn</option>
+              <option value="yellow">Cận Date (≤ 15 ngày)</option>
+              <option value="red">Nguy cơ FEFO (≤ 7 ngày)</option>
+            </select>
           </div>
 
-          <!-- Table Container (TailAdmin Data Table Style - Desktop) -->
-          <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left border-collapse min-w-[1080px]">
-              <thead class="bg-gray-50/75 dark:bg-white/2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-100 dark:border-gray-800">
+          <button onclick="resetFefoFilters()" class="btn btn-secondary btn-icon" title="Đặt lại bộ lọc">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Bulk Selection Indicator -->
+        <div id="stockBulkActionBar" class="hidden p-3 rounded-lg bg-brand-50 dark:bg-brand-500/15 border border-brand-200 dark:border-brand-500/30 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2 text-brand-700 dark:text-brand-400 font-medium">
+            <span id="selectedStockCount" class="font-bold num">0</span> mặt hàng đã được chọn
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportSelectedStockExcel()" class="btn btn-primary btn-sm">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Xuất các dòng đã chọn
+            </button>
+            <button onclick="clearStockSelection()" class="btn btn-secondary btn-sm">
+              Bỏ chọn
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card p-5">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="p-3.5 text-center w-10 whitespace-nowrap">
-                    <input type="checkbox" id="selectAllStockCheckbox" onchange="toggleSelectAllStock(this.checked)" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer">
+                  <th class="text-center w-10">
+                    <input type="checkbox" id="selectAllStockCheckbox" onchange="toggleSelectAllStock(this.checked)" class="rounded border-gray-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                   </th>
-                  <th class="p-3.5 w-16 text-center cursor-pointer hover:text-gray-700 whitespace-nowrap" onclick="sortStockBy('fefo_priority')">Ưu Tiên</th>
-                  <th class="p-3.5 cursor-pointer hover:text-gray-700 whitespace-nowrap" onclick="sortStockBy('sku')">Mã SKU</th>
-                  <th class="p-3.5 cursor-pointer hover:text-gray-700 min-w-[180px]" onclick="sortStockBy('item_name')">Tên Mặt Hàng</th>
-                  <th class="p-3.5 whitespace-nowrap min-w-[95px]">Mã Lô</th>
-                  <th class="p-3.5 cursor-pointer hover:text-gray-700 whitespace-nowrap min-w-[135px]" onclick="sortStockBy('exp_date')">Hạn Dùng (EXP)</th>
-                  <th class="p-3.5 text-right cursor-pointer hover:text-gray-700 whitespace-nowrap min-w-[110px]" onclick="sortStockBy('qty')">Số Lượng Tồn</th>
-                  <th class="p-3.5 text-right cursor-pointer hover:text-gray-700 whitespace-nowrap min-w-[95px]" onclick="sortStockBy('days_remaining')">Ngày Còn</th>
-                  <th class="p-3.5 text-center whitespace-nowrap min-w-[140px]">Trạng Thái</th>
-                  <th class="p-3.5 text-right whitespace-nowrap min-w-[150px]">Thao Tác</th>
+                  <th class="text-center w-16 cursor-pointer hover:text-gray-900 dark:hover:text-white" onclick="sortStockBy('fefo_priority')">Ưu tiên</th>
+                  <th class="col-code cursor-pointer hover:text-gray-900 dark:hover:text-white" onclick="sortStockBy('sku')">Mã SKU</th>
+                  <th class="cursor-pointer hover:text-gray-900 dark:hover:text-white min-w-[180px]" onclick="sortStockBy('item_name')">Tên mặt hàng</th>
+                  <th class="col-code">Mã lô</th>
+                  <th class="col-date cursor-pointer hover:text-gray-900 dark:hover:text-white" onclick="sortStockBy('exp_date')">Hạn dùng (EXP)</th>
+                  <th class="col-num text-right cursor-pointer hover:text-gray-900 dark:hover:text-white" onclick="sortStockBy('qty')">Số lượng tồn</th>
+                  <th class="col-num text-right cursor-pointer hover:text-gray-900 dark:hover:text-white" onclick="sortStockBy('days_remaining')">Ngày còn</th>
+                  <th class="col-badge text-center">Trạng thái</th>
+                  <th class="col-actions text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody id="fefoTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody id="fefoTableBody">
                 <tr><td colspan="10" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang nạp dữ liệu tồn kho...</td></tr>
               </tbody>
             </table>
           </div>
 
-          <!-- Pagination Bar (TailAdmin Style) -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 gap-3 text-xs text-gray-500 dark:text-gray-400">
+          <!-- Pagination Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
             <div id="stockPaginationInfo">
-              Hiển thị <span class="font-bold text-gray-800 dark:text-white">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white">10</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white">0</span> mặt hàng
+              Hiển thị <span class="font-bold text-gray-800 dark:text-white num">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white num">10</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
             </div>
             <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
-              <button id="stockPrevBtn" onclick="changeStockPage(-1)" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <button id="stockPrevBtn" onclick="changeStockPage(-1)" class="btn btn-secondary btn-sm">
                 Trước
               </button>
-              <span id="stockCurrentPageBadge" class="px-3 py-1.5 rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-400 font-bold">1</span>
-              <button id="stockNextBtn" onclick="changeStockPage(1)" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <span id="stockCurrentPageBadge" class="badge badge-brand num px-3 py-1">1</span>
+              <button id="stockNextBtn" onclick="changeStockPage(1)" class="btn btn-secondary btn-sm">
                 Sau
               </button>
             </div>
           </div>
 
-          <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
+          <!-- Native Mobile Card View -->
           <div id="fefoMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
-
         </div>
       </section>
-
 <section id="wh-reorder" class="tab-panel space-y-4">
         <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
