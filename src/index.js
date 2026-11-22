@@ -1295,6 +1295,19 @@ export default {
         const site = searchParams.get('site');
         const siteParam = site && site !== 'ALL' ? site.toUpperCase().trim() : '';
 
+        const monthRaw = (searchParams.get('month') || searchParams.get('thang') || '').trim();
+        let monthParam = '';
+        if (monthRaw) {
+          if (monthRaw.includes('-')) {
+            monthParam = monthRaw; // e.g. '2026-11'
+          } else if (monthRaw.includes('/')) {
+            const parts = monthRaw.split('/');
+            if (parts.length === 2) {
+              monthParam = `${parts[1]}-${parts[0].padStart(2, '0')}`;
+            }
+          }
+        }
+
         const query = {
           d1: `
             SELECT 
@@ -1334,6 +1347,7 @@ export default {
               ROUND(SUM(CAST(po.order_qty AS NUMERIC) * CAST(po.net_price AS NUMERIC)), 0) as total_amount
             FROM sap_po_items po
             WHERE (? = '' OR UPPER(po.site) = ?)
+              AND (? = '' OR SUBSTR(po.doc_date, 1, 7) = ?)
             GROUP BY po.po_number, po.site, po.supplier_name
             ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
             LIMIT 100
@@ -1377,12 +1391,16 @@ export default {
               ROUND(SUM(po.order_qty::numeric * po.net_price::numeric)::numeric, 0) as total_amount
             FROM sap_po_items po
             WHERE ($1 = '' OR UPPER(po.site) = $1)
+              AND ($2 = '' OR TO_CHAR(po.doc_date, 'YYYY-MM') = $2)
             GROUP BY po.po_number, po.site, po.supplier_name
             ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
             LIMIT 100
           `
         };
-        const { rows: results } = await db.query(env, query, [siteParam]);
+        const queryParams = db.isPg(env) 
+          ? [siteParam, monthParam] 
+          : [siteParam, siteParam, monthParam, monthParam];
+        const { rows: results } = await db.query(env, query, queryParams);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
