@@ -3979,7 +3979,7 @@
   
   <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
   <div id="createReceiptModal" class="fixed inset-0 z-[120] hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -3988,7 +3988,7 @@
           </div>
           <div>
             <h3 id="receiptModalTitle" class="font-semibold text-base text-gray-900 dark:text-white">Nhập Kho Thực Tế Theo Đơn PO</h3>
-            <p id="receiptModalSubtitle" class="text-xs text-gray-500 dark:text-gray-400">Kiểm đếm số lượng thực nhập, tự động tăng tồn kho điểm bán và ghi nhận nhật ký.</p>
+            <p id="receiptModalSubtitle" class="text-xs text-gray-500 dark:text-gray-400">Kiểm đếm số lượng thực nhập, thiết lập số lô và hạn dùng (EXP) đẩy vào hệ thống FEFO.</p>
           </div>
         </div>
         <button onclick="closeCreateReceiptModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
@@ -4017,7 +4017,7 @@
           </div>
           <div>
             <label class="text-gray-500 dark:text-gray-400 block mb-0.5 font-medium text-[11px]">Ngày Nhập Kho Thực Tế:</label>
-            <input type="date" id="receiptModalDate" class="w-full px-2.5 py-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-medium text-xs outline-none focus:border-brand-500">
+            <input type="date" id="receiptModalDate" class="w-full px-2.5 py-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-medium text-xs outline-none focus:border-brand-500 font-mono">
           </div>
         </div>
 
@@ -4025,7 +4025,7 @@
         <div class="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 flex items-start gap-2.5">
           <i data-lucide="info" class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"></i>
           <p class="text-xs text-blue-800 dark:text-blue-300">
-            Hệ thống hiển thị số lượng theo đơn đặt hàng SAP. Bạn có thể <strong>sửa đổi cột "Số Lượng Thực Nhập"</strong> để khớp chính xác với lượng hàng thực nhận tại điểm bán.
+            Hệ thống hiển thị số lượng theo đơn đặt hàng SAP. Bạn có thể <strong>sửa đổi cột "SL Thực Nhập"</strong>, nhập <strong>Số Lô SX</strong> và <strong>Hạn Dùng (EXP)</strong> bằng các nút bấm nhanh (+1T, +6T, +1N, +2N) để tự động quản lý xuất kho FEFO chuẩn xác.
           </p>
         </div>
 
@@ -4039,13 +4039,15 @@
               <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 font-semibold">
                 <tr>
                   <th class="py-2.5 px-3 text-center w-10">STT</th>
-                  <th class="py-2.5 px-3">Tên &amp; Mã Hàng Hóa</th>
+                  <th class="py-2.5 px-3 min-w-[170px]">Tên &amp; Mã Hàng Hóa</th>
                   <th class="py-2.5 px-2 text-center w-14">ĐVT</th>
                   <th class="py-2.5 px-3 text-right">Đơn Giá</th>
-                  <th class="py-2.5 px-3 text-right">SL Đặt (SAP)</th>
-                  <th class="py-2.5 px-3 text-center w-36">SL Thực Nhập *</th>
+                  <th class="py-2.5 px-3 text-right">SL Đặt</th>
+                  <th class="py-2.5 px-3 text-center w-28">SL Thực Nhập *</th>
+                  <th class="py-2.5 px-3 text-center min-w-[125px]">Số Lô (Batch)</th>
+                  <th class="py-2.5 px-3 text-center min-w-[185px]">Hạn Dùng (EXP)</th>
                   <th class="py-2.5 px-3 text-right">Thành Tiền</th>
-                  <th class="py-2.5 px-3">Ghi Chú Dòng</th>
+                  <th class="py-2.5 px-3 min-w-[110px]">Ghi Chú</th>
                 </tr>
               </thead>
               <tbody id="receiptLinesTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/60">
@@ -11061,26 +11063,40 @@ window.openPoReceiptModal = async function(poNumber) {
     const supDisp = document.getElementById('receiptModalSupplierDisplay');
     const dateEl = document.getElementById('receiptModalDate');
 
+    const todayStr = new Date().toISOString().slice(0, 10);
     if (poNumEl) poNumEl.value = first.po_number;
     if (poNumDisp) poNumDisp.textContent = first.po_number;
     if (siteEl) siteEl.value = first.site;
     if (siteDisp) siteDisp.textContent = first.site;
     if (supEl) supEl.value = first.supplier_name;
     if (supDisp) supDisp.textContent = first.supplier_name;
-    if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+    if (dateEl) dateEl.value = todayStr;
+
+    // Default batch and default EXP
+    const defaultBatch = 'LÔ-' + todayStr.replace(/-/g, '').slice(2);
+    const dPlus1y = new Date();
+    dPlus1y.setFullYear(dPlus1y.getFullYear() + 1);
+    const defaultExp1y = dPlus1y.toISOString().slice(0, 10);
 
     // Prepare lines array for editing
-    window.gReceiptLines = lines.map(item => ({
-      po_item: item.po_item,
-      item_code: item.item_code,
-      item_name: item.item_name,
-      merch_category: item.merch_category,
-      unit: item.unit || 'KG',
-      unit_price: Number(item.unit_price) || 0,
-      order_qty: Number(item.order_qty) || 0,
-      actual_qty: Number(item.order_qty) || 0, // Mặc định bằng số lượng đặt hàng SAP, có thể sửa đổi khớp thực tế
-      note: ''
-    }));
+    window.gReceiptLines = lines.map(item => {
+      const cat = (item.merch_category || '').toLowerCase();
+      const isFood = !cat.includes('bao bì') && !cat.includes('công cụ') && !cat.includes('hóa chất') && !cat.includes('tạp phẩm');
+      return {
+        po_item: item.po_item,
+        item_code: item.item_code,
+        item_name: item.item_name,
+        merch_category: item.merch_category,
+        unit: item.unit || 'KG',
+        unit_price: Number(item.unit_price) || 0,
+        order_qty: Number(item.order_qty) || 0,
+        actual_qty: Number(item.order_qty) || 0, // Mặc định bằng số lượng đặt hàng SAP, có thể sửa đổi khớp thực tế
+        batch_code: defaultBatch,
+        exp_date: isFood ? defaultExp1y : '',
+        is_food: isFood,
+        note: ''
+      };
+    });
 
     renderReceiptLinesTable();
 
@@ -11092,6 +11108,61 @@ window.openPoReceiptModal = async function(poNumber) {
     if (typeof showToast === 'function') showToast('Lỗi mở đơn: ' + err.message);
   } finally {
     if (typeof hideLoading === 'function') hideLoading();
+  }
+};
+
+function getReceiptExpWarningHtml(dateStr) {
+  if (!dateStr) {
+    return `<span class="text-gray-400 text-[10px] italic">Chưa đặt EXP</span>`;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-octagon" class="w-3 h-3"></i> Hết hạn (${Math.abs(diffDays)} ngày)</span>`;
+  } else if (diffDays === 0) {
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Hết hạn hôm nay</span>`;
+  } else if (diffDays <= 7) {
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Cận date (${diffDays} ngày)</span>`;
+  } else if (diffDays <= 30) {
+    return `<span class="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="clock" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
+  } else {
+    return `<span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-[10px]"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
+  }
+}
+
+window.onReceiptLineBatchChange = function(idx, val) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  window.gReceiptLines[idx].batch_code = val;
+};
+
+window.onReceiptLineExpChange = function(idx, val) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  window.gReceiptLines[idx].exp_date = val;
+  const warnEl = document.getElementById(`receiptExpWarning_${idx}`);
+  if (warnEl) {
+    warnEl.innerHTML = getReceiptExpWarningHtml(val);
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.setReceiptLineQuickExp = function(idx, months) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  const baseDate = new Date();
+  baseDate.setMonth(baseDate.getMonth() + months);
+  const dateStr = baseDate.toISOString().slice(0, 10);
+  window.gReceiptLines[idx].exp_date = dateStr;
+
+  const input = document.getElementById(`receiptLineExpInput_${idx}`);
+  if (input) input.value = dateStr;
+
+  const warnEl = document.getElementById(`receiptExpWarning_${idx}`);
+  if (warnEl) {
+    warnEl.innerHTML = getReceiptExpWarningHtml(dateStr);
+    if (window.lucide) lucide.createIcons();
   }
 };
 
@@ -11118,6 +11189,7 @@ function renderReceiptLinesTable() {
             <div class="text-[10.5px] text-gray-400 tabular-nums flex items-center gap-1.5 mt-0.5">
               <span class="font-mono text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
               ${item.merch_category ? `<span>•</span><span>${escapeHtml(item.merch_category)}</span>` : ''}
+              ${item.is_food ? '<span class="text-emerald-500 font-semibold">• Thực phẩm</span>' : '<span class="text-gray-400">• Vật tư</span>'}
             </div>
           </td>
           <td class="py-2.5 px-2 text-center font-semibold text-gray-600 dark:text-gray-300 text-xs">
@@ -11132,13 +11204,34 @@ function renderReceiptLinesTable() {
           <td class="py-2.5 px-3 text-center">
             <input type="number" step="0.01" min="0" value="${item.actual_qty}" 
                    oninput="onReceiptLineQtyChange(${idx}, this.value)" 
-                   class="w-28 text-center py-1.5 px-2 rounded-xl border border-brand-300 dark:border-brand-700 bg-brand-50/40 dark:bg-brand-950/30 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500">
+                   class="w-24 text-center py-1.5 px-2 rounded-xl border border-brand-300 dark:border-brand-700 bg-brand-50/40 dark:bg-brand-950/30 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500 font-mono">
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô SX..." 
+                   oninput="onReceiptLineBatchChange(${idx}, this.value)" 
+                   class="w-28 text-center py-1.5 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex flex-col items-center">
+              <input type="date" id="receiptLineExpInput_${idx}" value="${item.exp_date || ''}" 
+                     onchange="onReceiptLineExpChange(${idx}, this.value)" 
+                     class="w-32 py-1 px-1.5 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              <div class="flex items-center gap-1 mt-1">
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 24)" title="+2 Năm" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+2N</button>
+              </div>
+              <div id="receiptExpWarning_${idx}" class="mt-0.5">
+                ${getReceiptExpWarningHtml(item.exp_date)}
+              </div>
+            </div>
           </td>
           <td id="receiptLineTotal_${idx}" class="py-2.5 px-3 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">
             ${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' đ' : '0 đ'}
           </td>
           <td class="py-2.5 px-3">
-            <input type="text" placeholder="Ghi chú giao..." value="${escapeHtml(item.note || '')}" 
+            <input type="text" placeholder="Ghi chú..." value="${escapeHtml(item.note || '')}" 
                    oninput="onReceiptLineNoteChange(${idx}, this.value)" 
                    class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-xs outline-none focus:border-brand-500">
           </td>
@@ -11206,6 +11299,26 @@ window.submitCreateReceipt = async function() {
     return;
   }
 
+  // Check if any line has expired date
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let hasExpired = false;
+  for (const l of validLines) {
+    if (l.exp_date) {
+      const expD = new Date(l.exp_date);
+      expD.setHours(0, 0, 0, 0);
+      if (expD <= today) {
+        hasExpired = true;
+        break;
+      }
+    }
+  }
+
+  if (hasExpired) {
+    const ok = confirm('Cảnh báo: Có mặt hàng có Hạn Dùng (EXP) đã hết hạn hoặc hết hạn hôm nay. Bạn có chắc chắn muốn tiếp tục nhập kho không?');
+    if (!ok) return;
+  }
+
   const siteCode = document.getElementById('receiptModalSite')?.value || getActiveFnbReceiptSite();
   const poNumber = document.getElementById('receiptModalInvoice')?.value || '';
   const receiptDate = document.getElementById('receiptModalDate')?.value || new Date().toISOString().slice(0, 10);
@@ -11224,6 +11337,8 @@ window.submitCreateReceipt = async function() {
       item_code: l.item_code,
       qty: l.actual_qty,
       unit_price: l.unit_price,
+      batch_code: (l.batch_code || '').trim(),
+      exp_date: (l.exp_date || '').trim() || null,
       note: l.note || ''
     }))
   };
@@ -11361,6 +11476,8 @@ window.viewReceiptDetail = async function(receiptId) {
               <th class="py-2 px-3">Mặt Hàng</th>
               <th class="py-2 px-2 text-center">ĐVT</th>
               <th class="py-2 px-3 text-right">SL Nhập</th>
+              <th class="py-2 px-3 text-center whitespace-nowrap min-w-[100px]">Mã Lô SX</th>
+              <th class="py-2 px-3 text-center whitespace-nowrap min-w-[110px]">Hạn Dùng (EXP)</th>
               <th class="py-2 px-3 text-right">Đơn Giá</th>
               <th class="py-2 px-3 text-right">Thành Tiền</th>
               <th class="py-2 px-3">Ghi Chú</th>
@@ -11372,6 +11489,8 @@ window.viewReceiptDetail = async function(receiptId) {
                 <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">${escapeHtml(l.item_name || l.item_code)}</td>
                 <td class="py-2 px-2 text-center text-gray-500">${escapeHtml(l.unit || '')}</td>
                 <td class="py-2 px-3 text-right font-bold text-brand-600">${Number(l.qty).toFixed(1)}</td>
+                <td class="py-2 px-3 text-center font-mono text-xs text-gray-700 dark:text-gray-300 font-semibold whitespace-nowrap">${escapeHtml(l.batch_code || '--')}</td>
+                <td class="py-2 px-3 text-center font-mono text-xs whitespace-nowrap ${l.exp_date ? 'text-brand-600 dark:text-brand-400 font-semibold' : 'text-gray-400'}">${escapeHtml(l.exp_date ? String(l.exp_date).slice(0, 10) : '--')}</td>
                 <td class="py-2 px-3 text-right text-gray-500">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
                 <td class="py-2 px-3 text-right font-bold text-gray-900 dark:text-white">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
                 <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${escapeHtml(l.note || '--')}</td>

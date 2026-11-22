@@ -3858,9 +3858,22 @@ export default {
           let lines = [];
           if (receiptId) {
             const { rows: l } = await db.query(env, `
-              SELECT l.*, i.name as item_name, i.unit, i.item_group
+              SELECT l.*, 
+                     COALESCE(d.material_desc, p.article_desc, i.name, l.item_code) as item_name, 
+                     COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit, 
+                     COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group
               FROM fnb_stock_receipt_lines l
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit 
+                FROM dim_article_stock 
+                GROUP BY material
+              ) d ON l.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit 
+                FROM sap_po_items 
+                GROUP BY article
+              ) p ON l.item_code = p.article
               WHERE l.receipt_id = ?
             `, [receiptId]);
             lines = l || [];
@@ -3905,11 +3918,29 @@ export default {
                 const qty = Number(item.qty) || 0;
                 const unitPrice = Number(item.unit_price) || 0;
                 const lineAmount = qty * unitPrice;
+                const batchCode = (item.batch_code || '').trim() || `LÔ-${validReceiptDate.replace(/-/g, '').slice(2)}`;
+                const expDate = (item.exp_date || '').trim() || null;
+                const mfgDate = (item.mfg_date || '').trim() || null;
 
                 await tx.exec(`
-                  INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, note)
-                  VALUES (?, ?, ?, ?, ?, ?)
-                `, [receiptId, item.item_code, qty, unitPrice, lineAmount, item.note || '']);
+                  INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, batch_code, exp_date, mfg_date, note)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [receiptId, item.item_code, qty, unitPrice, lineAmount, batchCode, expDate, mfgDate, item.note || '']);
+
+                if (batchCode && qty > 0) {
+                  try {
+                    const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+                    const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
+                    const invExpDate = expDate || fallbackExp;
+
+                    await tx.exec(`
+                      INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, 'Kệ Bếp', NOW())
+                    `, [batchId, item.item_code, site_code.toLowerCase(), batchCode, mfgDate, invExpDate, qty]);
+                  } catch (batErr) {
+                    console.warn('inventory_batches insert warning:', batErr.message);
+                  }
+                }
 
                 // Upsert vào fnb_stock_balances để luôn đảm bảo có tồn kho tại điểm bán sau khi nhập
                 await tx.exec(`
@@ -3974,7 +4005,7 @@ export default {
               SELECT l.*, 
                      COALESCE(d.material_desc, p.article_desc, i.name, l.item_code) as item_name, 
                      COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit, 
-                     COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group
+                     COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group
               FROM fnb_stock_waste_lines l
               LEFT JOIN dim_article_stock d ON l.item_code = d.material
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON l.item_code = p.article
