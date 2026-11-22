@@ -2643,56 +2643,55 @@
         </div>
       </section>
 <section id="wh-leadtime" class="tab-panel space-y-4">
-        <!-- Top Action & Filter Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
-          <div class="flex-1 min-w-[150px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ ĐẶT HÀNG (THÁNG)</label>
-            <input type="month" id="leadTimeMonth" value="2026-11" onchange="loadLeadTime()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Lead Time &amp; NCC</h1>
+            <p class="page-subtitle">Theo dõi thời gian giao hàng nhà cung cấp và đánh giá cam kết SLA</p>
           </div>
-          <div class="flex-1 min-w-[160px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">ĐÁNH GIÁ SLA</label>
-            <select id="leadTimeSlaFilter" onchange="filterLeadTimeSla(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
+        </div>
+
+        <!-- Top Action & Filter Bar -->
+        <div class="filter-bar">
+          <div class="field flex-1 min-w-[160px]">
+            <label class="field-label">Kỳ đặt hàng (Tháng)</label>
+            <input type="month" id="leadTimeMonth" value="2026-11" onchange="loadLeadTime()" class="input">
+          </div>
+          <div class="field flex-1 min-w-[160px]">
+            <label class="field-label">Đánh giá SLA</label>
+            <select id="leadTimeSlaFilter" onchange="filterLeadTimeSla(this.value)" class="select">
               <option value="ALL">Tất cả đơn PO</option>
               <option value="ON_TIME">Đúng hạn SLA</option>
               <option value="DELIVERING">Đang giao hàng</option>
               <option value="LATE">Trễ hẹn NCC</option>
             </select>
           </div>
-          <button onclick="loadLeadTime()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl flex items-center gap-1.5 shadow-theme-xs cursor-pointer transition-all">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải dữ liệu
+          <button onclick="loadLeadTime()" class="btn btn-primary self-end">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Tải dữ liệu
           </button>
         </div>
 
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <i data-lucide="truck" class="w-5 h-5 text-emerald-600"></i>
-              Hiệu Suất Giao Hàng Nhà Cung Cấp &amp; Cam Kết SLA
-            </h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Theo dõi thời gian từ lúc tạo đơn PO đến khi nhận hàng thực tế tại kho.</p>
-          </div>
-
-          <div class="hidden lg:block overflow-x-auto mt-4 rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+        <div class="table-card p-5">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="p-3">Mã Đơn PO</th>
-                  <th class="p-3">Điểm Nhận</th>
-                  <th class="p-3">Nhà Cung Cấp</th>
-                  <th class="p-3">Thời Gian Đặt</th>
-                  <th class="p-3">Thời Gian Nhận</th>
-                  <th class="p-3 text-right">Lead Time Thực Tế</th>
-                  <th class="p-3 text-center">Đánh Giá SLA</th>
+                  <th class="col-code">Mã đơn PO</th>
+                  <th>Điểm nhận</th>
+                  <th>Nhà cung cấp</th>
+                  <th class="col-date">Thời gian đặt</th>
+                  <th class="col-date">Thời gian nhận</th>
+                  <th class="col-num text-right">Lead time thực tế</th>
+                  <th class="col-badge text-center">Đánh giá SLA</th>
                 </tr>
               </thead>
-              <tbody id="leadTimeTableBody" class="divide-y divide-slate-100">
+              <tbody id="leadTimeTableBody">
                 <tr><td colspan="7" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải lịch sử giao hàng...</td></tr>
               </tbody>
             </table>
           </div>
-        <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
-        <div id="leadTimeMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
-
+          <!-- Native Mobile Card View -->
+          <div id="leadTimeMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
 <section id="wh-posap" class="tab-panel space-y-4">
