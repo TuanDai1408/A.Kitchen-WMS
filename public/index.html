@@ -608,7 +608,7 @@
             <span class="text-xs text-gray-400">Dữ liệu cập nhật thời gian thực</span>
           </div>
 
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -1108,7 +1108,7 @@
 
         <!-- Sites Master Table -->
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -1285,7 +1285,7 @@
 
         <!-- Desktop Matrix Table -->
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table" id="userMatrixDesktopTable">
               <thead id="userMatrixTableHead">
               </thead>
@@ -1666,7 +1666,7 @@
           </div>
 
           <!-- Table Container -->
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -1691,6 +1691,9 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Mobile Cards Container for Stock Alerts -->
+          <div id="dashStockAlertsMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
 
       </section>
@@ -1838,7 +1841,7 @@
 
         <!-- Counting Table -->
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -1869,7 +1872,7 @@
             </h3>
             <span class="text-xs text-gray-400">Lưu tự động trên hệ thống</span>
           </div>
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -1887,6 +1890,8 @@
               </tbody>
             </table>
           </div>
+          <!-- Mobile Cards Container for Recent Audit History -->
+          <div id="fnbCountsHistoryMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
 <section id="fnb-receipts" class="tab-panel space-y-4">
@@ -1967,7 +1972,7 @@
             <div id="fnbPoSummaryText" class="text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800 num">
               Đang tải danh sách PO...
             </div>
-            <div class="table-scroll">
+            <div class="hidden lg:block table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -2010,7 +2015,7 @@
 
           <!-- Receipts Table (Desktop) -->
           <div class="table-card p-5">
-            <div class="table-scroll">
+            <div class="hidden lg:block table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -2188,7 +2193,7 @@
             <div id="fnbWasteSummary" class="text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800 num">
               Đang tải dữ liệu...
             </div>
-            <div class="table-scroll">
+            <div class="hidden lg:block table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -2229,7 +2234,7 @@
         <!-- SUB-VIEW 2: LỊCH SỬ BIÊN BẢN HỦY -->
         <div id="fnbWasteSubViewHistory" class="hidden space-y-4">
           <div class="table-card p-5">
-            <div class="table-scroll">
+            <div class="hidden lg:block table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -2323,7 +2328,7 @@
 
         <!-- Table Card -->
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -2381,7 +2386,7 @@
 
         <!-- Table Card -->
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -2435,7 +2440,7 @@
         </div>
 
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -2596,7 +2601,7 @@
             </div>
           </div>
 
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table" id="whInventoryTable">
               <thead>
                 <tr>
@@ -3561,7 +3566,7 @@
         </div>
 
         <div class="table-card p-5">
-          <div class="table-scroll">
+          <div class="hidden lg:block table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
@@ -7669,22 +7674,34 @@ function updateTailadminDashboard(d) {
 
 function renderStockAlertsTable(alerts) {
   const tbody = document.getElementById('stockAlertsTableBody');
-  if (!tbody) return;
+  const mob = document.getElementById('dashStockAlertsMobileCards');
+  if (!tbody && !mob) return;
 
   if (!alerts || alerts.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="px-5 py-6 text-center text-gray-400 dark:text-gray-500">
-          <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 inline-block mb-1"></i>
-          <p class="font-medium text-xs">Hiện tại không có cảnh báo vi phạm an toàn kho!</p>
-        </td>
-      </tr>
-    `;
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-5 py-6 text-center text-gray-400 dark:text-gray-500">
+            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 inline-block mb-1"></i>
+            <p class="font-medium text-xs">Hiện tại không có cảnh báo vi phạm an toàn kho!</p>
+          </td>
+        </tr>
+      `;
+    }
+    if (mob) {
+      mob.innerHTML = `
+        <div class="card p-6 text-center text-gray-400 dark:text-gray-500">
+          <i data-lucide="check-circle" class="w-6 h-6 text-emerald-500 mx-auto mb-2"></i>
+          <p class="font-medium text-sm">Hiện tại không có cảnh báo vi phạm an toàn kho!</p>
+        </div>
+      `;
+    }
     lucide.createIcons();
     return;
   }
 
-  tbody.innerHTML = alerts.map(item => {
+  if (tbody) {
+    tbody.innerHTML = alerts.map(item => {
     let badgeClass = '';
     let badgeText = '';
 
@@ -7744,6 +7761,64 @@ function renderStockAlertsTable(alerts) {
       </tr>
     `;
   }).join('');
+  }
+
+  if (mob) {
+    mob.innerHTML = alerts.map(item => {
+      let badgeClass = 'badge-neutral';
+      let badgeText = 'Bình thường';
+      if (item.alert_level === 'OUT_OF_STOCK') {
+        badgeClass = 'badge-danger';
+        badgeText = 'Hết hàng';
+      } else if (item.alert_level === 'NEAR_EXPIRY') {
+        badgeClass = 'badge-warning';
+        badgeText = 'Cận Date (' + (item.days_left || 0) + 'd)';
+      } else if (item.alert_level === 'LOW_STOCK') {
+        badgeClass = 'badge-warning';
+        badgeText = 'Dưới mức an toàn';
+      }
+
+      return `
+        <div class="data-card">
+          <div class="data-card-header">
+            <div class="flex items-center gap-2">
+              <span class="code font-bold text-brand-600 dark:text-brand-400">${escapeHtml(item.sku || '')}</span>
+              <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <span class="text-xs text-gray-400">${escapeHtml(item.batch_code || 'Lô kho')}</span>
+          </div>
+          <div class="data-card-body space-y-1.5">
+            <div class="font-semibold text-sm text-gray-900 dark:text-white">${escapeHtml(item.item_name || item.sku || '')}</div>
+            <div class="text-xs text-gray-400">${escapeHtml(item.category || 'Gia vị')} • ${escapeHtml(item.unit || 'ĐVT')}</div>
+            <div class="grid grid-cols-2 gap-2 text-xs pt-1.5 border-t border-gray-100 dark:border-gray-800">
+              <div>
+                <span class="text-gray-400">Tồn hiện tại:</span>
+                <span class="num font-semibold text-gray-900 dark:text-white ml-1">${item.qty} ${escapeHtml(item.unit || '')}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-gray-400">An toàn:</span>
+                <span class="num font-semibold text-amber-600 dark:text-amber-400 ml-1">${item.safety_stock || 5.0} ${escapeHtml(item.unit || '')}</span>
+              </div>
+            </div>
+            ${item.exp_date ? `
+              <div class="flex items-center justify-between text-xs text-rose-600 dark:text-rose-400 pt-1">
+                <span>Hạn dùng:</span>
+                <span class="num font-medium">${typeof fmtDate === 'function' ? fmtDate(item.exp_date.slice(0, 10)) : item.exp_date.slice(0, 10)}</span>
+              </div>
+            ` : ''}
+          </div>
+          <div class="flex items-center justify-end gap-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800">
+            <button onclick="openItemDetailModal('${item.sku}')" class="btn btn-secondary btn-sm">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> Chi tiết
+            </button>
+            <button onclick="openReceiptModal('${item.sku}')" class="btn btn-primary btn-sm">
+              <i data-lucide="package-plus" class="w-3.5 h-3.5"></i> Nhập bổ sung
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 
   lucide.createIcons();
   const isDarkTheme = document.documentElement.classList.contains('dark');
@@ -13157,23 +13232,57 @@ window.loadFnbCountsHistory = async function(siteCode) {
     const res = await fetch(`/api/fnb/counts?site_code=${encodeURIComponent(siteCode)}`);
     const json = await res.json();
     const tbody = document.getElementById('fnbCountsHistoryBody');
-    if (tbody && json.success) {
+    const mob = document.getElementById('fnbCountsHistoryMobileCards');
+    if ((tbody || mob) && json.success) {
       const counts = json.data.counts || [];
       if (!counts.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-400">Chưa có phiếu kiểm kê nào cho điểm ${escapeHtml(siteCode)}.</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-400">Chưa có phiếu kiểm kê nào cho điểm ${escapeHtml(siteCode)}.</td></tr>`;
+        if (mob) mob.innerHTML = `<div class="card p-6 text-center text-gray-400 text-sm">Chưa có phiếu kiểm kê nào cho điểm ${escapeHtml(siteCode)}.</div>`;
       } else {
-        tbody.innerHTML = counts.map(c => `
-          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-            <td class="py-2.5 px-3 tabular-nums font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${escapeHtml(c.count_code)}</td>
-            <td class="py-2.5 px-3 font-semibold">${escapeHtml(c.site_code)}</td>
-            <td class="py-2.5 px-3 tabular-nums">${escapeHtml(c.count_date)}</td>
-            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-xs ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
-            <td class="py-2.5 px-3 text-right tabular-nums">${c.total_items}</td>
-            <td class="py-2.5 px-3 text-right tabular-nums ${c.diff_items > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${c.diff_items}</td>
-            <td class="py-2.5 px-3 text-right tabular-nums font-bold ${c.diff_value > 0 ? 'text-rose-600' : (c.diff_value < 0 ? 'text-rose-600' : 'text-emerald-600')}">${Math.round(c.diff_value).toLocaleString('vi-VN')} đ</td>
-            <td class="py-2.5 px-3 text-gray-400">${escapeHtml(c.notes || '—')}</td>
-          </tr>
-        `).join('');
+        if (tbody) {
+          tbody.innerHTML = counts.map(c => `
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+              <td class="py-2.5 px-3 tabular-nums font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${escapeHtml(c.count_code)}</td>
+              <td class="py-2.5 px-3 font-semibold">${escapeHtml(c.site_code)}</td>
+              <td class="py-2.5 px-3 tabular-nums">${escapeHtml(c.count_date)}</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-xs ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
+              <td class="py-2.5 px-3 text-right tabular-nums">${c.total_items}</td>
+              <td class="py-2.5 px-3 text-right tabular-nums ${c.diff_items > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${c.diff_items}</td>
+              <td class="py-2.5 px-3 text-right tabular-nums font-bold ${c.diff_value > 0 ? 'text-rose-600' : (c.diff_value < 0 ? 'text-rose-600' : 'text-emerald-600')}">${Math.round(c.diff_value).toLocaleString('vi-VN')} đ</td>
+              <td class="py-2.5 px-3 text-gray-400">${escapeHtml(c.notes || '—')}</td>
+            </tr>
+          `).join('');
+        }
+        if (mob) {
+          mob.innerHTML = counts.map(c => `
+            <div class="data-card cursor-pointer" onclick="viewCountDetail(${c.id})">
+              <div class="data-card-header">
+                <span class="code font-semibold text-brand-600 dark:text-brand-400">${escapeHtml(c.count_code)}</span>
+                <span class="badge ${c.count_type === 'DAILY' ? 'badge-brand' : 'badge-neutral'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span>
+              </div>
+              <div class="data-card-body space-y-1.5">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-400">Điểm bán: <b class="text-gray-700 dark:text-gray-200">${escapeHtml(c.site_code)}</b></span>
+                  <span class="num text-gray-500">${typeof fmtDate === 'function' ? fmtDate(c.count_date) : c.count_date}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                  <div>
+                    <span class="text-gray-400 block">Tổng món</span>
+                    <span class="num font-semibold text-gray-900 dark:text-white">${c.total_items || 0}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-400 block">Số lệch</span>
+                    <span class="num font-semibold ${Number(c.diff_items) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600'}>${c.diff_items || 0}</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-gray-400 block">Giá trị lệch</span>
+                    <span class="num font-semibold ${Number(c.diff_value) !== 0 ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'}>${Math.round(Number(c.diff_value) || 0).toLocaleString('vi-VN')} ₫</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
       }
     }
   } catch (e) {
