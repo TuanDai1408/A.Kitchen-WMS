@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.Kitchen-WMS Design System • Living Styleguide Gallery</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen p-6 md:p-10 font-sans transition-colors duration-200">
+
+  <!-- Header Banner -->
+  <header class="max-w-6xl mx-auto mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+    <div>
+      <div class="flex items-center gap-2 mb-1.5">
+        <span class="badge badge-brand">Design System v1.0</span>
+        <span class="badge badge-neutral">TailAdmin 2026</span>
+      </div>
+      <h1 class="page-title text-2xl md:text-3xl font-semibold">A.Kitchen-WMS Living Styleguide</h1>
+      <p class="page-subtitle text-sm">Hệ thống thành phần UI chuẩn hóa toàn bộ ứng dụng WMS & Bếp ăn công nghiệp</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="toggleDarkMode()" id="themeToggleBtn" class="btn btn-secondary">
+        <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+        <i data-lucide="sun" class="w-4 h-4 hidden dark:inline"></i>
+        <span id="themeToggleText">Chế độ tối</span>
+      </button>
+      <a href="/" class="btn btn-primary">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Vào ứng dụng WMS</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto space-y-12">
+
+    <!-- 1. TYPOGRAPHY & TOKENS -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="type" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">1. Typography & Tokens</h2>
+      </div>
+      <div class="table-card p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <div class="text-xs text-gray-400 font-medium">FONT CHÍNH: Estedad (Self-hosted)</div>
+          <div class="text-2xl font-semibold">Tiêu đề trang 24px (h1.page-title)</div>
+          <div class="text-lg font-semibold">Tiêu đề mục 18px (h2)</div>
+          <div class="text-base font-semibold">Tiêu đề thẻ 16px (.card-title)</div>
+          <div class="text-sm font-medium">Nhãn điều khiển 14px (.field-label)</div>
+          <div class="text-sm">Văn bản thân / ô bảng / nút 14px (body, td, btn)</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">Chú thích & gợi ý 12px (text-xs)</div>
+        </div>
+        <div class="space-y-3">
+          <div class="text-xs text-gray-400 font-medium">FONT SỐ & MÃ ĐỊNH DANH</div>
+          <div>
+            <span class="text-xs text-gray-500 block mb-1">Mã chứng từ & SKU (.code, JetBrains Mono, 12px):</span>
+            <div class="flex flex-wrap gap-2">
+              <span class="code">CT-20261117-012625-K001</span>
+              <span class="code">BB-HUY-20261122-001</span>
+              <span class="code">SKU-BTP-0042</span>
+            </div>
+          </div>
+          <div>
+            <span class="text-xs text-gray-500 block mb-1">Số liệu bảng & ngày tháng (.num, Inter Tabular-nums):</span>
+            <div class="flex flex-wrap items-baseline gap-4 text-sm font-semibold">
+              <span class="num">470,450,000 ₫</span>
+              <span class="num text-emerald-600">+12.5%</span>
+              <span class="num text-rose-600">-3.1%</span>
+              <span class="num">22/11/2026</span>
+            </div>
+          </div>
+          <div>
+            <span class="text-xs text-gray-500 block mb-1">Số KPI (.kpi-value, Estedad tự nhiên, 26-28px, KHÔNG tnum):</span>
+            <div class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">
+              1,245 <span class="text-sm font-medium text-gray-400">mã hàng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. BUTTONS -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="mouse-pointer-click" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">2. Buttons (.btn, .btn-*)</h2>
+      </div>
+      <div class="table-card p-6 space-y-6">
+        <div>
+          <div class="text-xs text-gray-400 font-medium mb-3">BIẾN THỂ MÀU (Chiều cao chuẩn 40px)</div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button class="btn btn-primary">
+              <i data-lucide="save" class="w-4 h-4"></i> .btn-primary
+            </button>
+            <button class="btn btn-secondary">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> .btn-secondary
+            </button>
+            <button class="btn btn-danger">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> .btn-danger
+            </button>
+            <button class="btn btn-secondary" disabled>
+              <i data-lucide="ban" class="w-4 h-4"></i> Disabled
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs text-gray-400 font-medium mb-3">KÍCH THƯỚC (Standard 40px, Small 32px, Icon 40px)</div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button class="btn btn-primary">
+              <i data-lucide="check" class="w-4 h-4"></i> Chuẩn (40px)
+            </button>
+            <button class="btn btn-primary btn-sm">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Nhỏ .btn-sm (32px)
+            </button>
+            <button class="btn btn-secondary btn-sm">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> Xem .btn-sm
+            </button>
+            <button class="btn btn-secondary btn-icon" title="Icon 40px">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FORM CONTROLS -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="form-input" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">3. Form Controls (.field, .input, .select, .textarea)</h2>
+      </div>
+      <div class="table-card p-6">
+        <div class="filter-bar mb-6">
+          <div class="relative flex-1 min-w-[200px]">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" placeholder="Tìm kiếm nhanh..." class="input pl-9 w-full">
+          </div>
+          <div class="field w-48">
+            <select class="select">
+              <option>Tất cả trạng thái</option>
+              <option>Đã hoàn thành</option>
+              <option>Đang xử lý</option>
+            </select>
+          </div>
+          <button class="btn btn-primary">
+            <i data-lucide="filter" class="w-4 h-4"></i> Áp dụng
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="field">
+            <label class="field-label">Ô nhập văn bản (.input)</label>
+            <input type="text" placeholder="Nhập họ và tên..." class="input">
+          </div>
+          <div class="field">
+            <label class="field-label">Danh sách chọn (.select)</label>
+            <select class="select">
+              <option>Bếp Trung Tâm Siba</option>
+              <option>BaF Meat</option>
+              <option>Rau củ Đà Lạt</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Ô chọn ngày (.input / type=date)</label>
+            <input type="date" value="2026-11-22" class="input">
+          </div>
+          <div class="field md:col-span-3">
+            <label class="field-label">Ghi chú & biên bản (.textarea)</label>
+            <textarea rows="3" placeholder="Nhập nội dung biên bản giải trình..." class="textarea"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. BADGES & CHIPS -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="tag" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">4. Badges & Chips (.badge, .badge-*)</h2>
+      </div>
+      <div class="table-card p-6 flex flex-wrap items-center gap-3">
+        <span class="badge badge-brand">.badge-brand (Hoạt động)</span>
+        <span class="badge badge-success">.badge-success (Đã kiểm tra)</span>
+        <span class="badge badge-warning">.badge-warning (Cận date)</span>
+        <span class="badge badge-danger">.badge-danger (Hết hàng / Lệch)</span>
+        <span class="badge badge-neutral">.badge-neutral (Kho tổng)</span>
+        <span class="file-chip">
+          <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+          <span>2 tệp đính kèm</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- 5. KPI CARDS -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="layout-grid" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">5. KPI Cards (.kpi-grid, .kpi-card, .kpi-card-hero)</h2>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card-hero">
+          <div class="kpi-header">
+            <div>
+              <span class="kpi-label">Tổng doanh thu chuỗi</span>
+              <p class="kpi-sub mt-0.5">14 điểm bán toàn hệ thống A.Kitchen</p>
+            </div>
+            <div class="kpi-icon"><i data-lucide="bar-chart-3" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value-hero num">470.4M ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good">
+                <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                <span>105,8% KH</span>
+              </span>
+              <span class="kpi-sub">vượt kế hoạch tháng</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <span class="kpi-label">Lợi nhuận EBITDA</span>
+              <p class="kpi-sub mt-0.5">Biên lợi nhuận gộp</p>
+            </div>
+            <div class="kpi-icon text-brand-600 bg-brand-50 dark:bg-brand-950/20"><i data-lucide="dollar-sign" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value num">119.7M ₫</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-good"><span>25.5%</span></span>
+              <span class="kpi-sub">biên EBITDA TB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <span class="kpi-label">Dưới mức tối thiểu</span>
+              <p class="kpi-sub mt-0.5">Ngưỡng an toàn ROP</p>
+            </div>
+            <div class="kpi-icon-warning"><i data-lucide="alert-triangle" class="size-5"></i></div>
+          </div>
+          <div class="kpi-body">
+            <div class="flex items-baseline">
+              <span class="kpi-value num text-amber-600">3 mã</span>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-delta-neutral"><span>Cần đặt thêm</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DATA TABLE -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <i data-lucide="table" class="w-5 h-5 text-brand-600"></i>
+        <h2 class="text-lg font-semibold">6. Data Table (.table-card > .table-scroll > table.data-table)</h2>
+      </div>
+      <div class="table-card p-5">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-code">Mã chứng từ</th>
+                <th class="col-date">Ngày ghi nhận</th>
+                <th>Điểm giao nhận</th>
+                <th>Nhà cung cấp / Đối tác</th>
+                <th class="col-num text-right">Giá trị (VNĐ)</th>
+                <th class="col-badge text-center">Trạng thái</th>
+                <th class="col-actions text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-code"><span class="code">CT-20261117-012625-K001</span></td>
+                <td class="col-date"><span class="date">17/11/2026</span></td>
+                <td><span class="site-chip">K001 - Bếp ĐH Hùng Vương</span></td>
+                <td class="font-medium text-gray-900 dark:text-white">Bếp Trung Tâm Siba Food</td>
+                <td class="col-num text-right num font-semibold">24,500,000 ₫</td>
+                <td class="col-badge text-center"><span class="badge badge-success">Đã duyệt</span></td>
+                <td class="col-actions text-center">
+                  <button class="btn btn-secondary btn-sm">Chi tiết</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="col-code"><span class="code">CT-20261118-084512-K002</span></td>
+                <td class="col-date"><span class="date">18/11/2026</span></td>
+                <td><span class="site-chip">K002 - Bếp ĐH Quốc Tế Hồng Bàng</span></td>
+                <td class="font-medium text-gray-900 dark:text-white">BaF Meat / MeatDeli</td>
+                <td class="col-num text-right num font-semibold">18,200,000 ₫</td>
+                <td class="col-badge text-center"><span class="badge badge-warning">Chờ duyệt</span></td>
+                <td class="col-actions text-center">
+                  <button class="btn btn-secondary btn-sm">Chi tiết</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-6xl mx-auto mt-16 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-500">
+    A.Kitchen WMS Design System • Built with Tailwind CSS v4 &amp; Estedad/Inter/JetBrains Mono
+  </footer>
+
+  <script>
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeBtn(isDark);
+    }
+
+    function updateThemeBtn(isDark) {
+      const text = document.getElementById('themeToggleText');
+      if (text) text.textContent = isDark ? 'Chế độ sáng' : 'Chế độ tối';
+    }
+
+    // Init theme
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      updateThemeBtn(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      updateThemeBtn(false);
+    }
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
