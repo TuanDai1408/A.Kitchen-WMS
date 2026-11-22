@@ -3915,6 +3915,8 @@ export default {
         let query = {};
         let binds = [];
 
+        const includeAll = searchParams.get('include_all') === '1' || searchParams.get('include_all') === 'true';
+
         if (inStockOnly) {
           query = {
             pg: `
@@ -3963,6 +3965,66 @@ export default {
             `
           };
           binds = [siteCode];
+        } else if (includeAll) {
+          query = {
+            pg: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                sub.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, false) as no_opening,
+                COALESCE(b.total_value, 0) as total_value
+              FROM (
+                SELECT DISTINCT item_code FROM fnb_stock_balances
+                UNION
+                SELECT DISTINCT code as item_code FROM fnb_stock_items
+                UNION
+                SELECT DISTINCT material as item_code FROM dim_article_stock
+              ) sub
+              LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND (UPPER(d.site) = UPPER(?) OR d.site IS NULL)
+              LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+              LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+            `,
+            d1: `
+              SELECT 
+                COALESCE(b.id, 0) as id,
+                sub.item_code as code,
+                COALESCE(d.material_desc, p.article_desc, i.name, sub.item_code) as name,
+                COALESCE(d.nhom_hang, d.nganh_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group,
+                COALESCE(d.nganh_hang, p.merch_category, 'Chưa phân loại') as nganh_hang,
+                COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as nhom_hang,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.price, p.net_price, i.unit_price, 0) as unit_price,
+                0 as min_stock,
+                COALESCE(b.book_qty, 0) as book_qty,
+                COALESCE(b.last_count_qty, NULL) as last_count_qty,
+                b.last_count_date,
+                COALESCE(b.no_opening, 0) as no_opening,
+                COALESCE(b.total_value, 0) as total_value
+              FROM (
+                SELECT DISTINCT item_code FROM fnb_stock_balances
+                UNION
+                SELECT DISTINCT code as item_code FROM fnb_stock_items
+                UNION
+                SELECT DISTINCT material as item_code FROM dim_article_stock
+              ) sub
+              LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND (UPPER(d.site) = UPPER(?) OR d.site IS NULL)
+              LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON sub.item_code = i.code
+              LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
+            `
+          };
+          binds = [siteCode, siteCode];
         } else {
           query = {
             pg: `
@@ -3990,6 +4052,10 @@ export default {
                 SELECT DISTINCT b2.item_code
                 FROM fnb_stock_balances b2
                 WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+                UNION
+                SELECT DISTINCT material as item_code
+                FROM dim_article_stock
+                WHERE UPPER(site) = UPPER(?)
               ) sub
               LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
@@ -4021,6 +4087,10 @@ export default {
                 SELECT DISTINCT b2.item_code
                 FROM fnb_stock_balances b2
                 WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+                UNION
+                SELECT DISTINCT material as item_code
+                FROM dim_article_stock
+                WHERE UPPER(site) = UPPER(?)
               ) sub
               LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
               LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
@@ -4028,7 +4098,7 @@ export default {
               LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
             `
           };
-          binds = [siteCode, siteCode, siteCode, siteCode];
+          binds = [siteCode, siteCode, siteCode, siteCode, siteCode];
         }
         if (groupParam && groupParam !== 'all') {
           const filterSql = inStockOnly ? ' AND' : ' WHERE';
@@ -4336,10 +4406,11 @@ export default {
                     const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
                     const invExpDate = expDate || fallbackExp;
 
+                    const storageLoc = item.storage_loc || 'Kệ Bếp';
                     await tx.exec(`
                       INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, 'Kệ Bếp', NOW())
-                    `, [batchId, item.item_code, site_code.toLowerCase(), batchCode, mfgDate, invExpDate, qty]);
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    `, [batchId, item.item_code, site_code.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]);
                   } catch (batErr) {
                     console.warn('inventory_batches insert warning:', batErr.message);
                   }
