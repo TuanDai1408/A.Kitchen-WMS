@@ -338,7 +338,7 @@
           <div class="min-w-0">
             <div id="sidebarUserName" class="font-bold text-xs text-gray-900 dark:text-white truncate">Tuấn Đại</div>
             <div class="flex items-center gap-1.5 mt-0.5">
-              <span id="sidebarUserRoleBadge" class="text-[9.5px] px-1.5 py-0.2 rounded font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+              <span id="sidebarUserRoleBadge" class="text-xs px-1.5 py-0.2 rounded font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
             </div>
           </div>
         </div>
@@ -377,7 +377,7 @@
           <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="39" height="34" decoding="async" class="h-8 sm:h-9 w-auto object-contain hidden dark:block">
           <div class="hidden sm:flex flex-col leading-tight">
             <span class="font-semibold text-gray-900 dark:text-white text-sm">A.Kitchen</span>
-            <span class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">WMS</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">WMS</span>
           </div>
         </div>
 
@@ -401,7 +401,7 @@
             class="h-full flex-1 rounded-none border-0 bg-transparent px-2.5 text-sm text-gray-900 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white dark:placeholder:text-gray-500"
           />
           <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3 text-xs font-medium text-gray-400 select-none">
-            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
+            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-xs font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
               F2
             </span>
           </div>
@@ -438,7 +438,7 @@
         <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="header-control hidden px-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
           <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
           <span class="hidden xl:inline">Duyệt Quyền</span>
-          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-rose-600 text-white">0</span>
+          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-xs font-semibold bg-rose-600 text-white">0</span>
         </button>
 
         <!-- Theme Toggler Button -->
@@ -451,7 +451,7 @@
           <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
           <div class="hidden xl:flex flex-col text-left leading-tight">
             <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
-            <span id="headerUserRoleBadge" class="text-[9px] font-bold text-brand-500 uppercase">ADMIN</span>
+            <span id="headerUserRoleBadge" class="text-xs font-bold text-brand-500 uppercase">ADMIN</span>
           </div>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 hidden xl:block shrink-0"></i>
         </button>
@@ -891,7 +891,7 @@
                 <span class="text-xs text-gray-400">Doanh thu &amp; Food Cost %</span>
               </div>
               <div class="table-scroll">
-                <table class="data-table text-xs">
+                <table class="data-table">
                   <thead>
                     <tr>
                       <th>Tuần</th>
@@ -915,19 +915,19 @@
               </div>
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                  <div class="text-[11px] text-gray-500">Số hóa đơn / ngày</div>
+                  <div class="text-xs text-gray-500">Số hóa đơn / ngày</div>
                   <div class="text-sm font-bold text-gray-900 dark:text-white num mt-0.5" id="plOpBillCount">450 bill</div>
                 </div>
                 <div class="p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                  <div class="text-[11px] text-gray-500">Giá trị bill TB (AOV)</div>
+                  <div class="text-xs text-gray-500">Giá trị bill TB (AOV)</div>
                   <div class="text-sm font-bold text-gray-900 dark:text-white num mt-0.5" id="plOpAvgBill">35,000 ₫</div>
                 </div>
                 <div class="p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                  <div class="text-[11px] text-gray-500">Doanh thu / ghế / ngày</div>
+                  <div class="text-xs text-gray-500">Doanh thu / ghế / ngày</div>
                   <div class="text-sm font-bold text-gray-900 dark:text-white num mt-0.5" id="plOpRevSeat">135,000 ₫</div>
                 </div>
                 <div class="p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                  <div class="text-[11px] text-gray-500">Lấp đầy giờ vàng</div>
+                  <div class="text-xs text-gray-500">Lấp đầy giờ vàng</div>
                   <div class="text-sm font-bold text-emerald-600 num mt-0.5" id="plOpOccupancy">92.5%</div>
                 </div>
               </div>
@@ -1264,19 +1264,19 @@
           <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400 select-none">
             <span class="font-medium text-gray-700 dark:text-gray-300">Quy ước:</span>
             <div class="flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center size-4 rounded bg-emerald-500 text-white font-bold text-[9px]">✓</span>
+              <span class="inline-flex items-center justify-center size-4 rounded bg-emerald-500 text-white font-bold text-xs">✓</span>
               <span>Theo Role</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center size-4 rounded bg-brand-500 text-white font-bold text-[9px]">+</span>
+              <span class="inline-flex items-center justify-center size-4 rounded bg-brand-500 text-white font-bold text-xs">+</span>
               <span class="text-brand-600 dark:text-brand-400 font-medium">Cấp riêng</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center size-4 rounded bg-rose-500 text-white font-bold text-[9px]">✕</span>
+              <span class="inline-flex items-center justify-center size-4 rounded bg-rose-500 text-white font-bold text-xs">✕</span>
               <span class="text-rose-600 dark:text-rose-400 font-medium">Bị thu hồi</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center size-4 rounded bg-gray-200 dark:bg-gray-700 text-gray-400 font-bold text-[9px]">-</span>
+              <span class="inline-flex items-center justify-center size-4 rounded bg-gray-200 dark:bg-gray-700 text-gray-400 font-bold text-xs">-</span>
               <span>Không có quyền</span>
             </div>
             <span class="italic text-xs text-gray-400 ml-auto">Bấm vào ô toggle để cấp / cắt quyền tức thì</span>
@@ -1588,11 +1588,11 @@
             </div>
             <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2 text-center text-xs">
               <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                <span class="text-gray-400 block text-[11px]">Lead Time PO</span>
+                <span class="text-gray-400 block text-xs">Lead Time PO</span>
                 <span id="dashLeadTimeText" class="font-semibold text-gray-900 dark:text-white num">24.5h</span>
               </div>
               <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                <span class="text-gray-400 block text-[11px]">Độ lệch kiểm kê</span>
+                <span class="text-gray-400 block text-xs">Độ lệch kiểm kê</span>
                 <span class="font-semibold text-emerald-600 num">0.8%</span>
               </div>
             </div>
@@ -3623,7 +3623,7 @@
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="trophy" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight font-medium">Chuỗi F&amp;B</span>
+        <span class="text-xs mt-0.5 leading-tight font-medium">Chuỗi F&amp;B</span>
       </button>
 
       <!-- Tab 2: Nhóm 2 & 3 - Vận Hành & Kho Vận -->
@@ -3631,7 +3631,7 @@
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight font-medium">Kho Vận</span>
+        <span class="text-xs mt-0.5 leading-tight font-medium">Kho Vận</span>
       </button>
 
       <!-- Tab 3: Nhóm 4 - Center Elevated FAB - Tạo & Duyệt Chứng Từ -->
@@ -3639,7 +3639,7 @@
         <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-700 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center border-4 border-white dark:border-gray-900 transition-all group-hover:scale-105">
           <i data-lucide="file-text" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
-        <span class="text-[9.5px] font-semibold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
+        <span class="text-xs font-semibold text-brand-500 dark:text-brand-400 mt-0.5 leading-tight">Chứng Từ</span>
       </button>
 
       <!-- Tab 4: Nhóm 4 - Báo Cáo Suất Ăn Ca -->
@@ -3647,7 +3647,7 @@
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="clipboard-list" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight font-medium">Suất Ăn</span>
+        <span class="text-xs mt-0.5 leading-tight font-medium">Suất Ăn</span>
       </button>
 
       <!-- Tab 5: Menu 9 Chấm / Launcher Hub (Đầy đủ 5 nhóm nghiệp vụ) -->
@@ -3655,7 +3655,7 @@
         <div class="mob-ic-wrap flex items-center justify-center w-8 h-8 rounded-xl transition-all">
           <i data-lucide="layout-grid" class="w-5 h-5"></i>
         </div>
-        <span class="text-[10px] mt-0.5 leading-tight font-medium">Tất Cả</span>
+        <span class="text-xs mt-0.5 leading-tight font-medium">Tất Cả</span>
       </button>
 
     </div>
@@ -3681,7 +3681,7 @@
             </div>
             <div>
               <div class="font-semibold text-gray-900 dark:text-white text-base leading-tight">Trung Tâm Ứng Dụng</div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400">A.Kitchen WMS • Chức năng vận hành</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">A.Kitchen WMS • Chức năng vận hành</div>
             </div>
           </div>
           <button onclick="closeMobileMenuHub()" class="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full bg-gray-100 dark:bg-gray-800 active:translate-y-px transition-transform">
@@ -3703,7 +3703,7 @@
         <div class="mobile-hub-category" data-cat="fnb-finance">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">1. Hiệu Quả &amp; Doanh Thu</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Finance</span>
+            <span class="text-xs px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Finance</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button onclick="switchFromHub('fnb-chain')" data-tab="fnb-chain" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3712,7 +3712,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Toàn Chuỗi &amp; Xếp Hạng</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">14 Điểm bán toàn chuỗi</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">14 Điểm bán toàn chuỗi</div>
               </div>
             </button>
             <button onclick="switchFromHub('fnb-pl')" data-tab="fnb-pl" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3721,7 +3721,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Báo Cáo P&amp;L Điểm Bán</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Prime Cost, EBITDA</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Prime Cost, EBITDA</div>
               </div>
             </button>
             <button onclick="switchFromHub('fnb-pos')" data-tab="fnb-pos" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3730,7 +3730,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Doanh Thu POS &amp; Bán Lẻ</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Hóa đơn &amp; Giờ cao điểm</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Hóa đơn &amp; Giờ cao điểm</div>
               </div>
             </button>
           </div>
@@ -3740,7 +3740,7 @@
         <div class="mobile-hub-category" data-cat="fnb-inventory">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">2. Vận Hành Kho Bếp</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">F&amp;B</span>
+            <span class="text-xs px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">F&amp;B</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button onclick="switchFromHub('wh-dashboard')" data-tab="wh-dashboard" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3749,7 +3749,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tổng Quan Kho Vận</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Điều hành &amp; Tồn kho</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Điều hành &amp; Tồn kho</div>
               </div>
             </button>
             <button onclick="switchFromHub('fnb-counts')" data-tab="fnb-counts" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3758,7 +3758,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Kiểm Kê Hằng Ngày</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Kiểm đếm thực tế điểm</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Kiểm đếm thực tế điểm</div>
               </div>
             </button>
             <button onclick="switchFromHub('fnb-receipts')" data-tab="fnb-receipts" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3767,7 +3767,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Nhập Hàng Điểm Bán</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Đơn PO &amp; Phiếu nhập</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Đơn PO &amp; Phiếu nhập</div>
               </div>
             </button>
             <button onclick="switchFromHub('fnb-waste')" data-tab="fnb-waste" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3776,7 +3776,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Hủy Hàng &amp; Hao Hụt</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Mã tồn &gt; 0 &amp; Giảm tồn</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Mã tồn &gt; 0 &amp; Giảm tồn</div>
               </div>
             </button>
           </div>
@@ -3786,7 +3786,7 @@
         <div class="mobile-hub-category" data-cat="wh-wms">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">3. Kho Vận &amp; WMS</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">WMS</span>
+            <span class="text-xs px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">WMS</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button onclick="switchFromHub('wh-stock')" data-tab="wh-stock" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3795,7 +3795,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Hạn Dùng &amp; Xuất FEFO</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Date &amp; Lô xuất kho tổng</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Date &amp; Lô xuất kho tổng</div>
               </div>
             </button>
             <button onclick="switchFromHub('wh-reorder')" data-tab="wh-reorder" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3804,7 +3804,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Cảnh Báo Tồn ROP</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Ngưỡng đặt hàng an toàn</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Ngưỡng đặt hàng an toàn</div>
               </div>
             </button>
             <button onclick="switchFromHub('wh-leadtime')" data-tab="wh-leadtime" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3813,7 +3813,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Lead Time &amp; NCC</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Độ trễ giao hàng NCC</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Độ trễ giao hàng NCC</div>
               </div>
             </button>
             <button onclick="switchFromHub('wh-posap')" data-tab="wh-posap" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3822,7 +3822,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tồn Kho</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Số lượng nhập &amp; Lô hàng</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Số lượng nhập &amp; Lô hàng</div>
               </div>
             </button>
           </div>
@@ -3832,7 +3832,7 @@
         <div class="mobile-hub-category" data-cat="portal-ops">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">4. Cổng Thông Tin &amp; Đặt Hàng</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Portal</span>
+            <span class="text-xs px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Portal</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button onclick="switchFromHub('portal-voucher')" data-tab="portal-voucher" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3841,7 +3841,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tạo &amp; Duyệt Chứng Từ</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Hóa đơn &amp; thanh toán</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Hóa đơn &amp; thanh toán</div>
               </div>
             </button>
             <button onclick="switchFromHub('portal-search')" data-tab="portal-search" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3850,7 +3850,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tra Cứu Chứng Từ</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Tìm kiếm nâng cao</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Tìm kiếm nâng cao</div>
               </div>
             </button>
             <button onclick="switchFromHub('portal-order')" data-tab="portal-order" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3859,7 +3859,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Đặt Hàng Vật Tư Bếp</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Đặt hàng kho tổng</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Đặt hàng kho tổng</div>
               </div>
             </button>
             <button onclick="switchFromHub('portal-history')" data-tab="portal-history" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3868,7 +3868,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Lịch Sử Đặt Hàng</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Tiến độ giao nhận</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Tiến độ giao nhận</div>
               </div>
             </button>
             <button onclick="switchFromHub('portal-baocao')" data-tab="portal-baocao" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3877,7 +3877,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Báo Cáo Suất Ăn Ca</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">8 nhóm nghiệp vụ</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">8 nhóm nghiệp vụ</div>
               </div>
             </button>
             <button onclick="switchFromHub('portal-kiemke')" data-tab="portal-kiemke" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3886,7 +3886,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Kiểm Kê Tồn Kho Kỳ</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">So khớp số dư tồn</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">So khớp số dư tồn</div>
               </div>
             </button>
           </div>
@@ -3896,7 +3896,7 @@
         <div class="mobile-hub-category" data-cat="sys-admin">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">5. Hệ Thống &amp; Danh Mục</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Admin</span>
+            <span class="text-xs px-2 py-0.5 rounded-md font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">Admin</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button onclick="switchFromHub('fnb-sites')" data-tab="fnb-sites" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3905,7 +3905,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Danh Mục 14 Điểm Bán</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">14 Điểm bán SAP ERP</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">14 Điểm bán SAP ERP</div>
               </div>
             </button>
             <button onclick="switchFromHub('user-matrix')" data-tab="user-matrix" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3914,7 +3914,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Phân Quyền User Matrix</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Ma trận quyền người dùng</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Ma trận quyền người dùng</div>
               </div>
             </button>
             <button onclick="handleUserProfileClick(); closeMobileMenuHub();" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
@@ -3923,7 +3923,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tài Khoản &amp; Vai Trò</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Thông tin &amp; Chuyển đổi</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Thông tin &amp; Chuyển đổi</div>
               </div>
             </button>
           </div>
@@ -4003,26 +4003,26 @@
       </div>
 
       <!-- Form Body -->
-      <div class="p-6 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+      <div class="p-6 overflow-y-auto space-y-4 text-sm custom-scrollbar">
         <!-- PO Header Info Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-xs">
           <div>
-            <span class="text-gray-400 block mb-0.5 text-[11px]">Số Đơn Đặt Hàng PO:</span>
+            <span class="text-gray-400 block mb-0.5 text-xs">Số Đơn Đặt Hàng PO:</span>
             <span id="receiptModalInvoiceDisplay" class="font-mono font-semibold text-brand-600 dark:text-brand-400 text-sm">—</span>
             <input type="hidden" id="receiptModalInvoice">
           </div>
           <div>
-            <span class="text-gray-400 block mb-0.5 text-[11px]">Điểm Bán Nhận:</span>
+            <span class="text-gray-400 block mb-0.5 text-xs">Điểm Bán Nhận:</span>
             <span id="receiptModalSiteDisplay" class="font-semibold text-gray-800 dark:text-gray-200">—</span>
             <input type="hidden" id="receiptModalSite">
           </div>
           <div>
-            <span class="text-gray-400 block mb-0.5 text-[11px]">Nhà Cung Cấp / Bếp:</span>
+            <span class="text-gray-400 block mb-0.5 text-xs">Nhà Cung Cấp / Bếp:</span>
             <span id="receiptModalSupplierDisplay" class="font-semibold text-gray-800 dark:text-gray-200 truncate block">—</span>
             <input type="hidden" id="receiptModalSupplier">
           </div>
           <div>
-            <label class="text-gray-500 dark:text-gray-400 block mb-0.5 font-medium text-[11px]">Ngày Nhập Kho Thực Tế:</label>
+            <label class="text-gray-500 dark:text-gray-400 block mb-0.5 font-medium text-xs">Ngày Nhập Kho Thực Tế:</label>
             <input type="date" id="receiptModalDate" class="w-full px-2.5 py-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-medium text-xs outline-none focus:border-brand-500 font-mono">
           </div>
         </div>
@@ -4041,7 +4041,7 @@
             <span class="font-semibold text-xs text-gray-800 dark:text-gray-200">Danh Sách Mặt Hàng Theo PO (<span id="receiptModalLineCount" class="tabular-nums">0</span> mã)</span>
           </div>
           <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="data-table">
               <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 font-semibold">
                 <tr>
                   <th class="py-2.5 px-3 text-center w-10">STT</th>
@@ -4100,7 +4100,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h3 class="font-bold text-base text-gray-900 dark:text-white">Nhập Hàng Thủ Công (Ngoài PO / PR)</h3>
-              <span id="manualReceiptSiteBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200/60">K001</span>
+              <span id="manualReceiptSiteBadge" class="px-2 py-0.5 rounded-full text-xs font-bold font-mono bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200/60">K001</span>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Dành cho hàng mua trực tiếp tại chợ, nhà cung cấp lẻ hoặc hàng bổ sung đột xuất chưa tạo đơn PO/PR từ SAP.</p>
           </div>
@@ -4111,18 +4111,18 @@
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 text-sm custom-scrollbar">
         <!-- Section 1: Thông tin phiếu nhập -->
         <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200/80 dark:border-gray-800 space-y-3">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+          <div class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
             <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i>
             <span>Thông Tin Chứng Từ Nhập Kho</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1 flex items-center justify-between">
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1 flex items-center justify-between">
                 <span>Điểm bán nhận hàng *</span>
-                <span class="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 font-medium bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200/60 dark:border-amber-800/60">
+                <span class="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 font-medium bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200/60 dark:border-amber-800/60">
                   <i data-lucide="lock" class="w-2.5 h-2.5"></i> Cố định theo điểm đăng nhập
                 </span>
               </label>
@@ -4131,16 +4131,16 @@
                   <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
                   <span id="manualReceiptSiteNameDisplay" class="font-bold text-xs text-gray-800 dark:text-gray-200 truncate">K001 - MN Bếp Ăn Đại Học Hùng Vương</span>
                 </div>
-                <span class="px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shrink-0 uppercase">Cố định</span>
+                <span class="px-1.5 py-0.5 rounded text-xs font-mono font-bold bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shrink-0 uppercase">Cố định</span>
               </div>
               <input type="hidden" id="manualReceiptSiteSelect" value="K001">
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Ngày nhập thực tế *</label>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Ngày nhập thực tế *</label>
               <input type="date" id="manualReceiptDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Hình thức nhập *</label>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Hình thức nhập *</label>
               <select id="manualReceiptType" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-semibold text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
                 <option value="NHAP_MUA_TRUC_TIEP">Mua trực tiếp (Chợ / Siêu thị / NCC lẻ)</option>
                 <option value="NHAP_DIEU_CHUYEN">Điều chuyển nội bộ (Bếp khác chuyển sang)</option>
@@ -4150,7 +4150,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Nhà cung cấp / Nguồn hàng *</label>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Nhà cung cấp / Nguồn hàng *</label>
               <input type="text" id="manualReceiptSupplier" list="manualSupplierDatalist" placeholder="Ví dụ: Chợ đầu mối, BaF Meat..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-medium text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
               <datalist id="manualSupplierDatalist">
                 <option value="Chợ đầu mối nông sản Thủ Đức"></option>
@@ -4162,11 +4162,11 @@
               </datalist>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Số hóa đơn / Phiếu giao kèm (nếu có)</label>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Số hóa đơn / Phiếu giao kèm (nếu có)</label>
               <input type="text" id="manualReceiptInvoiceNo" placeholder="Số HĐ đỏ, số biên nhận bán lẻ hoặc mã tham chiếu..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Ghi chú & Lý do nhập ngoài đơn PO/PR</label>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Ghi chú & Lý do nhập ngoài đơn PO/PR</label>
               <input type="text" id="manualReceiptNotes" placeholder="Ví dụ: Mua bổ sung rau củ tươi đột xuất cho ca trưa; NCC giao bù đợt trước..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
             </div>
           </div>
@@ -4177,11 +4177,11 @@
           <!-- Cột Trái: Danh mục mặt hàng của Site đó (với tìm kiếm theo tên) -->
           <div class="lg:col-span-5 bg-gray-50/70 dark:bg-gray-800/30 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+              <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <i data-lucide="boxes" class="w-3.5 h-3.5 text-emerald-500"></i>
                 <span>Mặt Hàng Của Site (<span id="manualCatalogCountText" class="font-mono text-brand-600">0</span>)</span>
               </div>
-              <button onclick="toggleManualShowAllCatalog()" id="btnToggleManualCatalog" class="text-[11px] text-brand-600 dark:text-brand-400 hover:underline font-semibold flex items-center gap-1">
+              <button onclick="toggleManualShowAllCatalog()" id="btnToggleManualCatalog" class="text-xs text-brand-600 dark:text-brand-400 hover:underline font-semibold flex items-center gap-1">
                 <span id="txtToggleManualCatalog">Xem toàn chuỗi</span>
               </button>
             </div>
@@ -4193,7 +4193,7 @@
                 <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5"></i>
               </div>
               <div class="flex items-center gap-1.5">
-                <select id="manualItemCategorySelect" onchange="filterManualCatalogList()" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[11px] font-medium text-gray-700 dark:text-gray-300 outline-none">
+                <select id="manualItemCategorySelect" onchange="filterManualCatalogList()" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-medium text-gray-700 dark:text-gray-300 outline-none">
                   <option value="">Tất cả ngành hàng</option>
                   <option value="113">Thực phẩm sơ chế / chế biến</option>
                   <option value="HANG_BAN">Hàng bán / Giải khát</option>
@@ -4212,11 +4212,11 @@
           <!-- Cột Phải: Bảng chi tiết mặt hàng đã thêm vào phiếu -->
           <div class="lg:col-span-7 bg-white dark:bg-gray-900 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
             <div class="flex items-center justify-between pb-1 border-b border-gray-100 dark:border-gray-800">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+              <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-brand-500"></i>
                 <span>Hàng Nhập Vào Phiếu (<span id="manualSelectedCountText" class="font-mono text-emerald-600">0</span>)</span>
               </div>
-              <button onclick="clearAllManualReceiptLines()" id="btnClearAllManualLines" class="text-[11px] text-rose-500 hover:text-rose-700 hover:underline font-semibold hidden">
+              <button onclick="clearAllManualReceiptLines()" id="btnClearAllManualLines" class="text-xs text-rose-500 hover:text-rose-700 hover:underline font-semibold hidden">
                 Xóa tất cả
               </button>
             </div>
@@ -4225,13 +4225,13 @@
             <div id="manualLinesEmptyState" class="p-8 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-gray-50/50 dark:bg-gray-800/20 space-y-2">
               <i data-lucide="shopping-cart" class="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto"></i>
               <div class="font-semibold text-gray-600 dark:text-gray-300">Chưa chọn mặt hàng nào</div>
-              <p class="text-[11px] text-gray-400 max-w-sm mx-auto">Gõ tìm kiếm theo tên hoặc click vào mặt hàng ở cột bên trái để đưa vào phiếu nhập kho thủ công.</p>
+              <p class="text-xs text-gray-400 max-w-sm mx-auto">Gõ tìm kiếm theo tên hoặc click vào mặt hàng ở cột bên trái để đưa vào phiếu nhập kho thủ công.</p>
             </div>
 
             <!-- Lines Table -->
             <div id="manualLinesTableWrapper" class="hidden overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 text-[11px]">
+              <table class="data-table">
+                <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 text-xs">
                   <tr>
                     <th class="py-2 px-2 text-center w-8">STT</th>
                     <th class="py-2 px-2.5 min-w-[130px]">Mặt Hàng & SKU</th>
@@ -4255,12 +4255,12 @@
         <div class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/50 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div class="flex items-center gap-4 text-xs">
             <div>
-              <span class="text-gray-500 dark:text-gray-400 block text-[11px]">Tổng số mặt hàng:</span>
+              <span class="text-gray-500 dark:text-gray-400 block text-xs">Tổng số mặt hàng:</span>
               <span id="manualSummaryTotalSkus" class="font-bold text-gray-900 dark:text-white font-mono text-sm">0 mã</span>
             </div>
             <div class="h-6 w-px bg-emerald-200 dark:bg-emerald-800"></div>
             <div>
-              <span class="text-gray-500 dark:text-gray-400 block text-[11px]">Tổng số lượng nhập:</span>
+              <span class="text-gray-500 dark:text-gray-400 block text-xs">Tổng số lượng nhập:</span>
               <span id="manualSummaryTotalQty" class="font-bold text-gray-900 dark:text-white font-mono text-sm">0</span>
             </div>
           </div>
@@ -4296,8 +4296,8 @@
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-semibold text-sm text-gray-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
-            <p class="text-[10.5px] text-gray-400">Tự động trừ số lượng tồn và hạch toán giá trị hủy</p>
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
+            <p class="text-xs text-gray-400">Tự động trừ số lượng tồn và hạch toán giá trị hủy</p>
           </div>
         </div>
         <button onclick="closeCreateWasteModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
@@ -4337,7 +4337,7 @@
         <!-- Lines Header -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <span class="font-bold text-gray-800 dark:text-gray-200 text-xs">Mặt Hàng Cần Hủy *</span>
-          <button onclick="addWasteLineRow()" class="px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[11px] flex items-center gap-1 transition-all">
+          <button onclick="addWasteLineRow()" class="px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1 transition-all">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm Hàng Hủy
           </button>
         </div>
@@ -4375,14 +4375,14 @@
     <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
-          <h3 id="invDetailModalTitle" class="font-semibold text-sm text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
-          <p id="invDetailModalSub" class="text-[10.5px] text-gray-400">A.Kitchen WMS Database</p>
+          <h3 id="invDetailModalTitle" class="font-semibold text-lg text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
+          <p id="invDetailModalSub" class="text-xs text-gray-500 dark:text-gray-400">A.Kitchen WMS Database</p>
         </div>
         <button onclick="closeInvDetailModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-      <div id="invDetailModalBody" class="p-5 overflow-y-auto space-y-3 text-xs custom-scrollbar">
+      <div id="invDetailModalBody" class="p-5 overflow-y-auto space-y-3 text-sm custom-scrollbar">
       </div>
       <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-end">
         <button onclick="closeInvDetailModal()" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs">
@@ -4424,9 +4424,9 @@
 
         <!-- Danh sách tài khoản đã lưu trên máy (nếu có) -->
         <div id="loginSavedAccountsContainer" class="hidden text-left space-y-2">
-          <div class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between">
+          <div class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between">
             <span>Tài khoản đã đăng nhập:</span>
-            <span class="text-[10px] text-gray-400 font-normal">Nhấn để chuyển đổi</span>
+            <span class="text-xs text-gray-400 font-normal">Nhấn để chuyển đổi</span>
           </div>
           <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[180px] overflow-y-auto custom-scrollbar">
             <!-- Rendered dynamically -->
@@ -4436,8 +4436,8 @@
         <!-- Phần chọn vai trò khi đăng nhập (Các vai trò chưa được duyệt sẽ tối mờ & không chọn được) -->
         <div id="loginRoleSelectionContainer" class="hidden text-left space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn vai trò khi đăng nhập:</span>
-            <span class="text-[10px] text-gray-400">Cần Ban Quản Trị duyệt</span>
+            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn vai trò khi đăng nhập:</span>
+            <span class="text-xs text-gray-400">Cần Ban Quản Trị duyệt</span>
           </div>
           <div id="loginRoleSelectionList" class="space-y-1.5 max-h-[150px] overflow-y-auto custom-scrollbar text-xs">
             <!-- Rendered dynamically -->
@@ -4446,7 +4446,7 @@
 
         <!-- Official Google GIS Button Container -->
         <div class="space-y-2 pt-1">
-          <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider" id="googleBtnLabel">Đăng nhập tài khoản Google khác</div>
+          <div class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider" id="googleBtnLabel">Đăng nhập tài khoản Google khác</div>
           <div id="googleSignInBtn" class="flex justify-center min-h-[46px]"></div>
           
           <!-- Fallback direct Google button if GIS button is delayed or customized -->
@@ -4464,7 +4464,7 @@
         </div>
 
         <!-- Privacy & Security note -->
-        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 text-[10.5px] text-gray-400">
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-400">
           Xác thực bảo mật OAuth 2.0 • A.Kitchen WMS
         </div>
 
@@ -4495,7 +4495,7 @@
       </div>
 
       <!-- Body -->
-      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-sm custom-scrollbar">
         
         <!-- Main User Card -->
         <div class="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center gap-3.5">
@@ -4504,8 +4504,8 @@
             <h4 id="profModalName" class="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">Tuấn Đại</h4>
             <div id="profModalEmail" class="text-xs text-gray-500 dark:text-gray-400 tabular-nums truncate">--</div>
             <div class="mt-1 flex items-center gap-2 flex-wrap">
-              <span id="profModalRoleBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
-              <span id="profModalSiteBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-blue-50 text-brand-500 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
+              <span id="profModalRoleBadge" class="text-xs px-2 py-0.5 rounded-full font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+              <span id="profModalSiteBadge" class="text-xs px-2 py-0.5 rounded-full font-semibold bg-blue-50 text-brand-500 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
                 <i data-lucide="map-pin" class="w-3 h-3"></i>
                 <span id="profModalSiteName">K001 - Hùng Vương</span>
               </span>
@@ -4519,7 +4519,7 @@
             <i data-lucide="shield" class="w-4 h-4 text-brand-500"></i>
             <span>Phạm vi quyền hạn của bạn:</span>
           </div>
-          <p id="profModalPermSummary" class="text-[11px] text-blue-800/80 dark:text-blue-300/80">
+          <p id="profModalPermSummary" class="text-xs text-blue-800/80 dark:text-blue-300/80">
             Toàn quyền quản trị hệ thống, xem và điều hành tất cả 19 phân hệ F&B và Kho tổng.
           </p>
         </div>
@@ -4527,8 +4527,8 @@
         <!-- Saved Accounts & Switcher Section -->
         <div class="space-y-2 pt-1">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-wider text-[11px]">Chuyển Đổi Tài Khoản Google:</span>
-            <button onclick="closeUserProfileModal(); openGoogleAuthModal(false);" class="text-brand-500 hover:underline font-bold text-[11px] flex items-center gap-1">
+            <span class="font-bold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-wider text-xs">Chuyển Đổi Tài Khoản Google:</span>
+            <button onclick="closeUserProfileModal(); openGoogleAuthModal(false);" class="text-brand-500 hover:underline font-bold text-xs flex items-center gap-1">
               <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm tài khoản
             </button>
           </div>
@@ -4543,7 +4543,7 @@
             <i data-lucide="store" class="w-4 h-4 text-brand-500"></i>
             <div>
               <div class="font-bold text-gray-800 dark:text-gray-200 text-xs">Điểm Bán / Bếp Phụ Trách</div>
-              <div id="profCurrentSiteText" class="text-[11px] text-gray-400">Đang chọn: K001</div>
+              <div id="profCurrentSiteText" class="text-xs text-gray-400">Đang chọn: K001</div>
             </div>
           </div>
           <button onclick="closeUserProfileModal(); openSiteSelectorModal();" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs flex items-center gap-1 transition-all">
@@ -4590,8 +4590,8 @@
       <!-- Region Filter Tabs -->
       <div class="px-5 sm:px-6 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800/80">
         <div class="flex items-center justify-between mb-2">
-          <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn Vùng Miền:</label>
-          <span class="text-[10.5px] text-gray-400">Dữ liệu từ hệ thống</span>
+          <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn Vùng Miền:</label>
+          <span class="text-xs text-gray-400">Dữ liệu từ hệ thống</span>
         </div>
         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap" id="modalRegionTabs">
           <button type="button" onclick="selectModalRegion('ALL')" data-region="ALL" class="modal-region-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-brand-500 bg-brand-500 text-white shadow-theme-xs">Tất Cả Miền</button>
@@ -4607,7 +4607,7 @@
           <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
           <input type="text" id="siteFilterSearch" oninput="filterSiteOptionCards(this.value)" placeholder="Tìm mã hoặc tên điểm bán..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 text-xs text-gray-800 dark:text-white outline-none focus:border-brand-500">
         </div>
-        <p class="text-[11px] text-gray-400 dark:text-gray-500 italic">
+        <p class="text-xs text-gray-400 dark:text-gray-500 italic">
           💡 Lưu ý: Khi chọn site, toàn bộ dữ liệu Tồn kho, Kiểm kê, Nhập hủy và Suất ăn sẽ tự động chuyển về đúng cơ sở của bạn.
         </p>
       </div>
@@ -4653,7 +4653,7 @@
       </div>
 
       <!-- Body -->
-      <div class="p-6 space-y-4 text-xs">
+      <div class="p-6 space-y-4 text-sm">
         
         <!-- Info Banner -->
         <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300">
@@ -4661,7 +4661,7 @@
             <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
             <span id="reqFeatureName">Chức Năng Nâng Cao</span>
           </div>
-          <p id="reqFeatureDesc" class="text-[11px] text-amber-700 dark:text-amber-400">
+          <p id="reqFeatureDesc" class="text-xs text-amber-700 dark:text-amber-400">
             Tài khoản hiện tại chỉ có quyền xem các chức năng cơ bản. Vui lòng gửi yêu cầu để Admin cấp quyền sử dụng.
           </p>
         </div>
@@ -4732,15 +4732,15 @@
       <!-- Table Body -->
       <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
         <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-          <table class="w-full text-left text-xs border-collapse">
+          <table class="data-table">
             <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
               <tr>
-                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Nhân Viên</th>
-                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Chức Năng Xin</th>
-                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Vai Trò Đề Xuất</th>
-                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Lý Do</th>
-                <th class="py-2.5 px-3 font-bold uppercase text-[10px]">Thời Gian</th>
-                <th class="py-2.5 px-3 text-center font-bold uppercase text-[10px]">Trạng Thái / Xử Lý</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-xs">Nhân Viên</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-xs">Chức Năng Xin</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-xs">Vai Trò Đề Xuất</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-xs">Lý Do</th>
+                <th class="py-2.5 px-3 font-bold uppercase text-xs">Thời Gian</th>
+                <th class="py-2.5 px-3 text-center font-bold uppercase text-xs">Trạng Thái / Xử Lý</th>
               </tr>
             </thead>
             <tbody id="adminRequestsTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/80">
@@ -4766,8 +4766,8 @@
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
         <div>
-          <h4 class="font-semibold text-sm text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h4>
-          <p class="text-[10.5px] text-gray-400">Kiểm tra ngay giao diện phân quyền từng vị trí</p>
+          <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Chuyển Vai Trò Kiểm Thử</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Kiểm tra ngay giao diện phân quyền từng vị trí</p>
         </div>
         <button onclick="closeRoleSwitcherModal()" class="p-1.5 rounded-full text-gray-400 bg-gray-100 dark:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
@@ -4781,12 +4781,12 @@
   <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
-        <h3 id="modalTitle" class="font-semibold text-sm text-gray-900 dark:text-white">Chi tiết</h3>
+        <h3 id="modalTitle" class="font-semibold text-lg text-gray-900 dark:text-white">Chi tiết</h3>
         <button onclick="closeGeneralModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 p-1 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div id="modalBody" class="p-5 overflow-y-auto text-xs space-y-4"></div>
+      <div id="modalBody" class="p-5 overflow-y-auto text-sm space-y-4"></div>
     </div>
   </div>
 
@@ -4813,23 +4813,23 @@
         </button>
       </div>
 
-      <div class="overflow-y-auto space-y-5 py-4 custom-scrollbar flex-1 text-xs">
+      <div class="overflow-y-auto space-y-5 py-4 custom-scrollbar flex-1 text-sm">
         <!-- 4 Key Specs Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-[11px]">Tồn Khả Dụng</span>
+            <span class="text-gray-400 block text-xs">Tồn Khả Dụng</span>
             <span id="detailQty" class="text-base font-bold tabular-nums text-gray-800 dark:text-white mt-0.5 block">0</span>
           </div>
           <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-[11px]">Định Mức An Toàn</span>
+            <span class="text-gray-400 block text-xs">Định Mức An Toàn</span>
             <span id="detailSafetyStock" class="text-base font-bold tabular-nums text-amber-600 mt-0.5 block">0</span>
           </div>
           <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-[11px]">Giá Chuẩn SAP</span>
+            <span class="text-gray-400 block text-xs">Giá Chuẩn SAP</span>
             <span id="detailStandardCost" class="text-base font-bold tabular-nums text-brand-500 mt-0.5 block">0 ₫</span>
           </div>
           <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-[11px]">Lead Time PO</span>
+            <span class="text-gray-400 block text-xs">Lead Time PO</span>
             <span id="detailLeadTime" class="text-base font-bold tabular-nums text-emerald-600 mt-0.5 block">24h</span>
           </div>
         </div>
@@ -4841,7 +4841,7 @@
               <i data-lucide="activity" class="w-4 h-4 text-brand-500"></i>
               Biến Động Tồn Kho 30 Ngày Gần Nhất
             </h4>
-            <span class="text-[11px] text-gray-400">Đơn vị: Số lượng tồn</span>
+            <span class="text-xs text-gray-400">Đơn vị: Số lượng tồn</span>
           </div>
           <div id="itemDetailStockChart" class="min-h-[180px]"></div>
         </div>
@@ -4853,7 +4853,7 @@
             Lịch Sử Nhập / Xuất Kho Gần Nhất
           </div>
           <div class="max-h-48 overflow-y-auto">
-            <table class="w-full text-left text-xs">
+            <table class="data-table">
               <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 sticky top-0">
                 <tr>
                   <th class="p-2.5">Thời Gian</th>
@@ -4921,15 +4921,15 @@
       <!-- Mini KPI Summary Bar -->
       <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
         <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
-          <span class="text-emerald-700 dark:text-emerald-400 block text-[11px] font-semibold">Tổng Lượng Nhập (+)</span>
+          <span class="text-emerald-700 dark:text-emerald-400 block text-xs font-semibold">Tổng Lượng Nhập (+)</span>
           <span id="histTotalIn" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
         </div>
         <div class="p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-800/40">
-          <span class="text-rose-700 dark:text-rose-400 block text-[11px] font-semibold">Tổng Lượng Xuất (-)</span>
+          <span class="text-rose-700 dark:text-rose-400 block text-xs font-semibold">Tổng Lượng Xuất (-)</span>
           <span id="histTotalOut" class="text-base font-bold font-mono text-rose-700 dark:text-rose-400 block mt-0.5">0</span>
         </div>
         <div class="p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-800/40">
-          <span class="text-blue-700 dark:text-blue-400 block text-[11px] font-semibold">Số Dòng Giao Dịch</span>
+          <span class="text-blue-700 dark:text-blue-400 block text-xs font-semibold">Số Dòng Giao Dịch</span>
           <span id="histRowCount" class="text-base font-bold font-mono text-blue-700 dark:text-blue-400 block mt-0.5">0</span>
         </div>
       </div>
@@ -4938,7 +4938,7 @@
       <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
         <!-- Desktop Table -->
         <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <table class="w-full text-left text-xs" id="whHistTable">
+          <table class="data-table" id="whHistTable">
             <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
               <tr>
                 <th class="p-2.5 text-center w-24">Ngày CT</th>
@@ -5006,15 +5006,15 @@
       <!-- Mini KPI Summary Bar -->
       <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
         <div class="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-800/40">
-          <span class="text-purple-700 dark:text-purple-400 block text-[11px] font-semibold">Tổng Số Lô Đã Nhập</span>
+          <span class="text-purple-700 dark:text-purple-400 block text-xs font-semibold">Tổng Số Lô Đã Nhập</span>
           <span id="batchTotalCount" class="text-base font-bold font-mono text-purple-700 dark:text-purple-400 block mt-0.5">0</span>
         </div>
         <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
-          <span class="text-emerald-700 dark:text-emerald-400 block text-[11px] font-semibold">Lô Còn Hạn An Toàn</span>
+          <span class="text-emerald-700 dark:text-emerald-400 block text-xs font-semibold">Lô Còn Hạn An Toàn</span>
           <span id="batchSafeCount" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
         </div>
         <div class="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800/40">
-          <span class="text-amber-700 dark:text-amber-400 block text-[11px] font-semibold">Cận Date (≤ 30 ngày) / Quá Hạn</span>
+          <span class="text-amber-700 dark:text-amber-400 block text-xs font-semibold">Cận Date (≤ 30 ngày) / Quá Hạn</span>
           <span id="batchWarnCount" class="text-base font-bold font-mono text-amber-700 dark:text-amber-400 block mt-0.5">0</span>
         </div>
       </div>
@@ -5023,7 +5023,7 @@
       <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
         <!-- Desktop Table -->
         <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <table class="w-full text-left text-xs" id="whBatchesTable">
+          <table class="data-table" id="whBatchesTable">
             <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
               <tr>
                 <th class="p-2.5">Mã Lô (Batch No)</th>
@@ -5061,7 +5061,7 @@
   <div id="modalEditItem" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-theme-xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+        <h3 class="font-semibold text-lg text-gray-900 dark:text-white flex items-center gap-2">
           <i data-lucide="edit-3" class="w-4 h-4 text-brand-500"></i>
           Chỉnh Sửa Định Mức &amp; Thông Số Kho
         </h3>
@@ -5070,7 +5070,7 @@
         </button>
       </div>
 
-      <div class="space-y-3.5 text-xs">
+      <div class="space-y-4 text-sm">
         <input type="hidden" id="editItemSku">
         <div>
           <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt Hàng</label>
@@ -5521,7 +5521,7 @@
       const taskbarName = document.getElementById('taskbarSiteName');
       if (taskbarRegion) {
         taskbarRegion.textContent = region;
-        taskbarRegion.className = `hidden xs:inline-block text-[9px] px-1.5 py-0.5 rounded font-semibold uppercase shrink-0 ${
+        taskbarRegion.className = `hidden xs:inline-block text-xs px-1.5 py-0.5 rounded font-semibold uppercase shrink-0 ${
           region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
           region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
           'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
@@ -5557,7 +5557,7 @@
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
         el.textContent = region;
-        el.className = `global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase ${
+        el.className = `global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-xs uppercase ${
           region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
           region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
           'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
@@ -6099,7 +6099,7 @@
             <div>Tổng tiền đơn: <b class="text-brand-700 tabular-nums text-sm">${fmtVND(totalAmount)}</b></div>
           </div>
           <div class="overflow-x-auto max-h-56 rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs">
+            <table class="data-table">
               <thead class="bg-gray-50 dark:bg-gray-900/50"><tr><th class="p-2">Mã</th><th class="p-2">Tên</th><th class="p-2 text-right">SL</th><th class="p-2 text-right">Thành tiền</th></tr></thead>
               <tbody>
                 ${orderItems.map(it => `
@@ -6198,7 +6198,7 @@
           <div class="flex items-center gap-2 overflow-hidden">
             <i data-lucide="file-text" class="w-4 h-4 text-brand-600 shrink-0"></i>
             <span class="font-bold text-gray-800 dark:text-gray-100 truncate">${f.name}</span>
-            <span class="text-gray-400 dark:text-gray-500 tabular-nums text-[11px]">(${Math.round(f.size / 1024)} KB)</span>
+            <span class="text-gray-400 dark:text-gray-500 tabular-nums text-xs">(${Math.round(f.size / 1024)} KB)</span>
           </div>
           <button type="button" onclick="removeFile(${i})" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 text-xs">Xóa</button>
         </div>
@@ -6452,7 +6452,7 @@
           <button type="button" onclick="bcXoaAnh(${i})" class="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 opacity-90 hover:opacity-100 shadow-sm" title="Xóa ảnh">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
-          <div class="absolute bottom-0 inset-x-0 bg-slate-900/60 text-[10px] text-white px-1.5 py-0.5 truncate tabular-nums">${im.name}</div>
+          <div class="absolute bottom-0 inset-x-0 bg-slate-900/60 text-xs text-white px-1.5 py-0.5 truncate tabular-nums">${im.name}</div>
         </div>
       `).join('');
       lucide.createIcons();
@@ -6550,7 +6550,7 @@
               <div class="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 inline-block tabular-nums text-xs">
                 Tổng suất ăn đã xuất: <b class="text-emerald-700 text-sm font-semibold">${fmtNum(tongXuat)} suất</b>
               </div>
-              <div class="text-[11px] text-gray-500 dark:text-gray-400">Dữ liệu đã được lưu trữ an toàn trên Cloudflare D1.</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">Dữ liệu đã được lưu trữ an toàn trên Cloudflare D1.</div>
               <button onclick="closeGeneralModal();" class="mt-2 px-6 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm">
                 Đã Hiểu
               </button>
@@ -6666,23 +6666,29 @@
         if (json.success) {
           const v = json.data;
           const html = `
-            <div class="space-y-3">
-              <div class="grid grid-cols-2 gap-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800">
-                <div>Mã: <b class="tabular-nums">${v.voucher_code}</b></div>
-                <div>Loại: <b>${v.invoice_type}</b></div>
-                <div>Site: <b>${v.site_name}</b></div>
-                <div>Nhà cung cấp: <b>${v.supplier_name || '—'}</b></div>
+            <div class="space-y-4 text-sm">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-200 dark:border-gray-800 text-sm">
+                <div><span class="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Mã chứng từ:</span> <span class="code font-semibold text-brand-600 dark:text-brand-400 text-sm">${v.voucher_code}</span></div>
+                <div><span class="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Loại chứng từ:</span> <span class="font-medium text-gray-900 dark:text-white">${v.invoice_type}</span></div>
+                <div><span class="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Điểm nhận:</span> <span class="font-medium text-gray-900 dark:text-white">${v.site_name}</span></div>
+                <div><span class="text-xs text-gray-500 dark:text-gray-400 block mb-0.5">Nhà cung cấp:</span> <span class="font-medium text-gray-900 dark:text-white">${v.supplier_name || '—'}</span></div>
               </div>
-              <div><b>Ghi chú:</b> <p class="text-gray-600 dark:text-gray-300 mt-1">${v.note || 'Không có ghi chú'}</p></div>
+              <div class="p-3.5 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1">Ghi chú:</span>
+                <p class="text-gray-800 dark:text-gray-200">${v.note || 'Không có ghi chú'}</p>
+              </div>
               <div>
-                <b>Tệp đính kèm:</b>
-                <div class="mt-2 space-y-1">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-2">Tệp tài liệu đính kèm:</span>
+                <div class="space-y-2">
                   ${v.files && v.files.length ? v.files.map(f => `
-                    <div class="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-800/80 rounded-lg">
-                      <span>📎 ${f.file_name}</span>
-                      <a href="${f.file_link}" target="_blank" class="px-2 py-1 bg-white border border-gray-300 dark:border-gray-700 rounded font-bold text-brand-700">Mở</a>
+                    <div class="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-800">
+                      <span class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
+                        <span>${f.file_name}</span>
+                      </span>
+                      <a href="${f.file_link}" target="_blank" class="btn btn-sm btn-secondary">Mở tệp</a>
                     </div>
-                  `).join('') : '<p class="text-gray-400 dark:text-gray-500">Không có tệp đính kèm</p>'}
+                  `).join('') : '<p class="text-sm text-gray-400 dark:text-gray-500 italic p-3 text-center bg-gray-50 dark:bg-gray-800/30 rounded-xl">Không có tệp đính kèm</p>'}
                 </div>
               </div>
             </div>
@@ -6754,7 +6760,7 @@
                 </button>
               </div>
               <div class="overflow-x-auto max-h-48 rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="w-full text-xs">
+                <table class="data-table">
                   <thead class="bg-gray-50 dark:bg-gray-900/50"><tr><th class="p-2">Mã</th><th class="p-2">Tên</th><th class="p-2">ĐVT</th><th class="p-2 text-right">SL</th><th class="p-2 text-right">Đơn giá</th><th class="p-2 text-right">Thành tiền</th></tr></thead>
                   <tbody>
                     ${items.map(it => `<tr><td class="p-2 tabular-nums">${it.maHang}</td><td class="p-2">${it.tenSP}</td><td class="p-2">${it.dvt}</td><td class="p-2 text-right tabular-nums font-bold">${it.soLuong}</td><td class="p-2 text-right tabular-nums">${fmtVND(it.donGia)}</td><td class="p-2 text-right tabular-nums font-bold">${fmtVND(it.thanhTien)}</td></tr>`).join('')}
@@ -6770,7 +6776,7 @@
                         <span>Bước ${s.buoc}: ${s.tenBuoc}</span>
                         <span class="tabular-nums text-gray-400 dark:text-gray-500 font-normal">${s.thoiGian || ''}</span>
                       </div>
-                      <div class="text-gray-500 dark:text-gray-400 text-[11px]">${s.nguoiXuLy || 'Hệ thống'} · Trạng thái: <span class="font-bold text-brand-700">${s.trangThai}</span></div>
+                      <div class="text-gray-500 dark:text-gray-400 text-xs">${s.nguoiXuLy || 'Hệ thống'} · Trạng thái: <span class="font-bold text-brand-700">${s.trangThai}</span></div>
                     </div>
                   `).join('')}
                 </div>
@@ -6992,7 +6998,7 @@
               <td class="col-code">${cellCode(it.item_code)}</td>
               <td>
                 <div class="font-medium text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
-                <div class="code text-gray-400 dark:text-gray-500 text-[11px]">${it.warehouse_code || 'Kho'}</div>
+                <div class="code text-gray-400 dark:text-gray-500 text-xs">${it.warehouse_code || 'Kho'}</div>
               </td>
               <td>
                 <span class="badge badge-neutral max-w-[160px] truncate" title="${escapeHtml(catLabel)}">
@@ -7035,17 +7041,17 @@
               </div>
               <div class="grid grid-cols-3 gap-2 text-xs p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
                 <div class="text-center">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Tồn đầu kỳ</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Tồn đầu kỳ</div>
                   <div class="num font-semibold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
                 </div>
                 <div class="text-center">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Sử dụng kỳ</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Sử dụng kỳ</div>
                   <input type="number" min="0" step="any" value="${suDung}"
                     class="input num text-center h-8 py-1 w-full text-xs"
                     oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}, ${price}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0)); const v = document.getElementById('aud-mob-value-${it.id}'); if(v) v.innerText = fmtNum((${tonTruoc} - (parseFloat(this.value)||0)) * ${price}) + ' ₫';">
                 </div>
                 <div class="text-center">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Tồn cuối kỳ</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Tồn cuối kỳ</div>
                   <div class="num font-semibold text-brand-600 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
                 </div>
               </div>
@@ -7705,11 +7711,11 @@ function renderStockAlertsTable(alerts) {
         </td>
         <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-gray-100 min-w-[160px]">
           <div>${item.item_name || item.sku}</div>
-          <span class="text-[10px] text-gray-400 font-normal">${item.category || 'Gia vị'} • ${item.unit || 'Đơn vị'}</span>
+          <span class="text-xs text-gray-400 font-normal">${item.category || 'Gia vị'} • ${item.unit || 'Đơn vị'}</span>
         </td>
         <td class="px-5 py-3.5 whitespace-nowrap min-w-[155px]">
           <div class="font-mono text-xs font-semibold text-gray-800 dark:text-gray-200">${item.batch_code || 'Lô kho'}</div>
-          <div class="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1 px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 whitespace-nowrap">
+          <div class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1 px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 whitespace-nowrap">
             <i data-lucide="calendar" class="w-3 h-3 shrink-0"></i>
             <span>EXP: ${item.exp_date ? item.exp_date.slice(0, 10) : 'Chưa có'}</span>
           </div>
@@ -8231,13 +8237,13 @@ function renderFnbChainTable(items) {
   tbody.innerHTML = items.map((s, idx) => {
     let statusBadge = '';
     if (s.status === 'VƯỢT CHỈ TIÊU') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
     } else if (s.status === 'TRONG MỨC') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
     } else if (s.status === 'CHƯA PHÁT SINH') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">CHƯA PHÁT SINH</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">CHƯA PHÁT SINH</span>`;
     } else {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
     }
 
     let rankBadge = '';
@@ -8251,10 +8257,10 @@ function renderFnbChainTable(items) {
         <td class="py-3 px-3 text-center">${rankBadge}</td>
         <td class="py-3 px-4">
           <div class="font-bold text-gray-900 dark:text-white">${s.name}</div>
-          <div class="text-[10.5px] tabular-nums text-gray-400">SAP: ${s.code}</div>
+          <div class="text-xs tabular-nums text-gray-400">SAP: ${s.code}</div>
         </td>
         <td class="py-3 px-3 text-center">
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
+          <span class="px-2 py-0.5 rounded text-xs font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
         </td>
         <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtVND(s.netRevenue)}</td>
         <td class="py-3 px-3 text-right tabular-nums text-gray-500">${fmtVND(s.targetRevenue)}</td>
@@ -8269,7 +8275,7 @@ function renderFnbChainTable(items) {
         <td class="py-3 px-3 text-right tabular-nums font-bold text-emerald-600">${fmtVND(s.operatingProfit)}</td>
         <td class="py-3 px-3 text-center">${statusBadge}</td>
         <td class="py-3 px-3 text-center">
-          <button onclick="viewSitePL('${s.code}')" class="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-300 text-[11px] font-bold transition-all flex items-center gap-1 mx-auto">
+          <button onclick="viewSitePL('${s.code}')" class="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-300 text-xs font-bold transition-all flex items-center gap-1 mx-auto">
             <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
             <span>P&amp;L</span>
           </button>
@@ -8524,10 +8530,10 @@ function renderFnbPL(d) {
       dishList.innerHTML = d.topDishes.map((m, i) => `
         <div class="flex items-center justify-between p-1.5 rounded-lg bg-gray-50 dark:bg-gray-900/40">
           <div class="flex items-center gap-2">
-            <span class="w-4 h-4 rounded-full bg-rose-100 dark:bg-rose-950 text-brand-500 font-bold text-[10px] flex items-center justify-center">${i + 1}</span>
+            <span class="w-4 h-4 rounded-full bg-rose-100 dark:bg-rose-950 text-brand-500 font-bold text-xs flex items-center justify-center">${i + 1}</span>
             <span class="font-bold text-gray-800 dark:text-gray-200">${m.name}</span>
           </div>
-          <div class="flex items-center gap-3 tabular-nums text-[11px]">
+          <div class="flex items-center gap-3 tabular-nums text-xs">
             <span class="text-gray-500">${m.qty} suất</span>
             <span class="font-bold text-gray-900 dark:text-white">${fmtVND(m.revenue || m.rev || 0)}</span>
           </div>
@@ -8660,16 +8666,16 @@ function renderFnbSites(sites) {
         <td class="py-3 px-4 tabular-nums font-bold text-brand-500 dark:text-brand-400">${s.code}</td>
         <td class="py-3 px-4 font-bold text-gray-900 dark:text-white">${s.name}</td>
         <td class="py-3 px-3 text-center">
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+          <span class="px-2 py-0.5 rounded text-xs font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
         </td>
         <td class="py-3 px-4 text-gray-500 dark:text-gray-400">${s.address || 'Hệ thống căn tin Tân Long Group'}</td>
         <td class="py-3 px-3">
           <div class="font-semibold text-gray-800 dark:text-gray-200">${s.site_type || 'Quản Lý Cơ Sở'}</div>
-          <div class="text-[10.5px] tabular-nums text-gray-400">${s.phone || '0903.xxx.xxx'}</div>
+          <div class="text-xs tabular-nums text-gray-400">${s.phone || '0903.xxx.xxx'}</div>
         </td>
         <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')}đ</td>
         <td class="py-3 px-3 text-center">
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
         </td>
       </tr>
     `;
@@ -8690,12 +8696,12 @@ function renderFnbSites(sites) {
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${s.code}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-bold border ${regionBadge}">${s.region || 'Miền Nam'}</span>
           </div>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
+          <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200">HOẠT ĐỘNG</span>
         </div>
         <div class="font-bold text-xs text-gray-900 dark:text-white">${s.name}</div>
-        <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-start gap-1">
+        <div class="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
           <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5"></i>
           <span>${s.address || 'Hệ thống căn tin Tân Long Group'}</span>
         </div>
@@ -8839,9 +8845,9 @@ function renderUserMatrixTable(data) {
 
   let headHtml = `
     <tr class="bg-gray-50/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-800 select-none">
-      <th rowspan="2" class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px] sticky left-0 z-30 bg-gray-50 dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">STT</th>
-      <th rowspan="2" class="py-3 px-4 text-left font-bold uppercase tracking-wider text-[11px] sticky left-12 z-30 bg-gray-50 dark:bg-gray-900 min-w-[220px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Nhân Sự &amp; Email</th>
-      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] sticky left-[268px] z-30 bg-gray-50 dark:bg-gray-900 min-w-[130px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Vai Trò Hệ Thống</th>
+      <th rowspan="2" class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-xs sticky left-0 z-30 bg-gray-50 dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">STT</th>
+      <th rowspan="2" class="py-3 px-4 text-left font-bold uppercase tracking-wider text-xs sticky left-12 z-30 bg-gray-50 dark:bg-gray-900 min-w-[220px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Nhân Sự &amp; Email</th>
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-xs sticky left-[268px] z-30 bg-gray-50 dark:bg-gray-900 min-w-[130px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Vai Trò Hệ Thống</th>
   `;
 
   groups.forEach(g => {
@@ -8852,16 +8858,16 @@ function renderUserMatrixTable(data) {
       : 'bg-purple-50/60 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300';
 
     headHtml += `
-      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-semibold uppercase tracking-wider text-[11px] border-l border-gray-200 dark:border-gray-800 ${colColor}">
+      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-semibold uppercase tracking-wider text-xs border-l border-gray-200 dark:border-gray-800 ${colColor}">
         ${g.groupName} (${g.features.length})
       </th>
     `;
   });
 
   headHtml += `
-      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] min-w-[100px] border-l border-gray-200 dark:border-gray-800">Thao Tác</th>
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-xs min-w-[100px] border-l border-gray-200 dark:border-gray-800">Thao Tác</th>
     </tr>
-    <tr class="bg-gray-50 dark:bg-white/3 border-b border-gray-200 dark:border-gray-800 text-[10.5px]">
+    <tr class="bg-gray-50 dark:bg-white/3 border-b border-gray-200 dark:border-gray-800 text-xs">
   `;
 
   visibleFeatures.forEach(f => {
@@ -8891,12 +8897,12 @@ function renderUserMatrixTable(data) {
       ? u.avatar_url
       : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
 
-    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
-      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
-      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
-      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
-      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
-      : '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
+    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
+      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
+      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
+      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
+      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
+      : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
 
     let rowHtml = `
       <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors ${isLocked ? 'opacity-60 bg-rose-50/20' : ''}">
@@ -8909,7 +8915,7 @@ function renderUserMatrixTable(data) {
             <img src="${avatarUrl}" class="size-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
             <div class="min-w-0">
               <div class="font-bold text-gray-900 dark:text-white truncate max-w-[160px]">${u.full_name || 'Chưa đặt tên'}</div>
-              <div class="text-[11px] text-gray-400 truncate max-w-[160px]" title="${u.email}">${u.email}</div>
+              <div class="text-xs text-gray-400 truncate max-w-[160px]" title="${u.email}">${u.email}</div>
             </div>
           </div>
         </td>
@@ -8962,7 +8968,7 @@ function renderUserMatrixTable(data) {
             >
               ${icon}
             </button>
-            <span class="text-[9px] px-1 py-0.2 rounded font-bold ${perm.badgeClass}">${perm.label}</span>
+            <span class="text-xs px-1 py-0.2 rounded font-bold ${perm.badgeClass}">${perm.label}</span>
           </div>
         </td>
       `;
@@ -9036,7 +9042,7 @@ function renderUserMatrixMobile(data) {
           </div>
           <button
             onclick="toggleUserPermission('${u.email}', '${f.code}', ${perm.isGranted}, '${perm.type}')"
-            class="px-2.5 py-1 rounded-lg text-[10px] font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
           >
             <span>${isGranted ? 'BẬT' : 'TẮT'}</span>
             <span class="text-[8px] opacity-80">(${perm.label})</span>
@@ -9052,11 +9058,11 @@ function renderUserMatrixMobile(data) {
             <img src="${avatarUrl}" class="size-9 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
             <div class="min-w-0">
               <div class="font-semibold text-xs text-gray-900 dark:text-white truncate">${u.full_name || 'Chưa đặt tên'}</div>
-              <div class="text-[11px] text-gray-400 truncate">${u.email}</div>
+              <div class="text-xs text-gray-400 truncate">${u.email}</div>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[9.5px] px-2 py-0.5 rounded font-semibold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
+            <span class="text-xs px-2 py-0.5 rounded font-semibold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
             <button onclick="openEditUserModal('${u.email}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
               <i data-lucide="more-vertical" class="w-4 h-4"></i>
             </button>
@@ -9886,7 +9892,7 @@ window.renderFefoRows = function(items) {
             <input type="checkbox" class="stock-row-checkbox rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer" data-sku="${r.sku}" onchange="toggleStockItemSelect('${r.sku}', this.checked)" ${isChecked ? 'checked' : ''}>
           </td>
           <td class="p-3.5 text-center whitespace-nowrap">
-            <span class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center font-mono font-bold text-[11px] mx-auto">${r.fefo_priority}</span>
+            <span class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center font-mono font-bold text-xs mx-auto">${r.fefo_priority}</span>
           </td>
           <td class="p-3.5 font-mono text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap">
             <a href="javascript:void(0)" onclick="openItemDetailModal('${r.sku}')" class="text-brand-500 dark:text-brand-400 hover:underline" title="Xem chi tiết kỹ thuật">
@@ -9904,11 +9910,11 @@ window.renderFefoRows = function(items) {
             </div>
           </td>
           <td class="p-3.5 text-right font-mono text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap min-w-[110px]">
-            ${typeof fmtNum === 'function' ? fmtNum(qtyNum) : qtyNum} <span class="font-sans text-[11px] font-normal text-gray-500">${uomDisp}</span>
+            ${typeof fmtNum === 'function' ? fmtNum(qtyNum) : qtyNum} <span class="font-sans text-xs font-normal text-gray-500">${uomDisp}</span>
           </td>
           <td class="p-3.5 text-right font-mono text-xs font-bold whitespace-nowrap min-w-[95px] ${r.danger_level === 'red' ? 'text-rose-600 dark:text-rose-400' : (r.danger_level === 'yellow' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')}">${daysText}</td>
           <td class="p-3.5 text-center whitespace-nowrap min-w-[110px]">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${badgeClass}">${r.status_text || 'An toàn'}</span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold border ${badgeClass}">${r.status_text || 'An toàn'}</span>
           </td>
           <td class="p-3.5 text-right whitespace-nowrap min-w-[120px]">
             <div class="inline-flex items-center gap-1.5 justify-end">
@@ -9918,7 +9924,7 @@ window.renderFefoRows = function(items) {
               <button onclick="openEditItemModal('${r.sku}')" class="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Chỉnh sửa định mức an toàn">
                 <i data-lucide="edit-3" class="w-4 h-4"></i>
               </button>
-              <button onclick="openIssueModal('${r.sku}', '${(r.item_name || '').replace(/'/g, "\\'")}', '${batchDisp}', ${qtyNum})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[11px] shadow-xs flex items-center gap-1 transition-all">
+              <button onclick="openIssueModal('${r.sku}', '${(r.item_name || '').replace(/'/g, "\\'")}', '${batchDisp}', ${qtyNum})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs shadow-xs flex items-center gap-1 transition-all">
                 <i data-lucide="package-minus" class="w-3.5 h-3.5"></i> Xuất Bếp
               </button>
             </div>
@@ -9953,26 +9959,26 @@ window.renderFefoRows = function(items) {
               <span class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center font-mono font-bold text-xs shrink-0">P${r.fefo_priority}</span>
               <span class="font-bold text-xs text-gray-900 dark:text-white truncate">${r.item_name}</span>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 whitespace-nowrap ${badgeClass}">${r.status_text || daysText}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold border shrink-0 whitespace-nowrap ${badgeClass}">${r.status_text || daysText}</span>
           </div>
           <div class="grid grid-cols-2 gap-2.5 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400 text-xs">
             <div class="space-y-0.5 min-w-0">
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Mã SKU</div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Mã SKU</div>
               <div class="font-mono font-bold text-gray-900 dark:text-white whitespace-nowrap truncate">${r.sku}</div>
             </div>
             <div class="space-y-0.5 min-w-0">
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Mã Lô / Điểm Bán</div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Mã Lô / Điểm Bán</div>
               <div class="font-mono font-semibold text-gray-900 dark:text-white whitespace-nowrap truncate">${batchDisp}</div>
             </div>
             <div class="space-y-0.5 min-w-0">
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Hạn Dùng (EXP)</div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Hạn Dùng (EXP)</div>
               <div class="inline-flex items-center gap-1 font-mono font-bold text-xs whitespace-nowrap ${expDateColor}">
                 <i data-lucide="calendar" class="w-3 h-3 shrink-0 opacity-70"></i>
                 <span>${expDisp}</span>
               </div>
             </div>
             <div class="space-y-0.5 min-w-0">
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Tình Trạng Hạn</div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 whitespace-nowrap">Tình Trạng Hạn</div>
               <div class="font-mono font-bold text-xs whitespace-nowrap ${r.danger_level === 'red' ? 'text-rose-600 dark:text-rose-400' : (r.danger_level === 'yellow' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')}">${daysText}</div>
             </div>
             <div class="col-span-2 flex justify-between items-center pt-2 border-t border-gray-200/60 dark:border-gray-800">
@@ -10014,7 +10020,7 @@ window.loadReorderROP = async function() {
             <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${r.current_stock}</td>
             <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${r.suggested_order}</td>
             <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
             </td>
           </tr>
         `).join('');
@@ -10026,11 +10032,11 @@ window.loadReorderROP = async function() {
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku}</div>
+                <div class="text-xs tabular-nums text-gray-400">SKU: ${r.sku}</div>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
+            <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
               <div>Tồn hiện tại: <b class="tabular-nums text-gray-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
               <div>Điểm ROP: <b class="tabular-nums text-amber-600">${r.rop} ${r.uom}</b></div>
               <div>Lead time: <b class="tabular-nums text-gray-900 dark:text-white">${r.lead_time_days} ngày</b></div>
@@ -10083,7 +10089,7 @@ window.renderLeadTimeTable = function(items) {
           <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${dDate}</td>
           <td class="p-3 text-right tabular-nums font-bold ${!isGood && !isPending ? 'text-rose-600' : 'text-emerald-600'}">${actual}</td>
           <td class="p-3 text-center">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${st}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeClass}">${st}</span>
           </td>
         </tr>
       `;
@@ -10112,11 +10118,11 @@ window.renderLeadTimeTable = function(items) {
           <div class="flex items-center justify-between">
             <div>
               <div class="font-bold text-xs text-gray-900 dark:text-white">${sup}</div>
-              <div class="text-[10.5px] tabular-nums text-gray-400">PO: ${r.po_number} · Điểm: <b class="text-brand-600 dark:text-brand-400">${r.branch_code || r.site || '—'}</b></div>
+              <div class="text-xs tabular-nums text-gray-400">PO: ${r.po_number} · Điểm: <b class="text-brand-600 dark:text-brand-400">${r.branch_code || r.site || '—'}</b></div>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${st}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeClass}">${st}</span>
           </div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
+          <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
             <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${oDate}</b></div>
             <div>Ngày nhận: <b class="tabular-nums text-gray-900 dark:text-white">${dDate}</b></div>
             <div>Cam kết SLA: <b class="tabular-nums text-gray-900 dark:text-white">${commit}</b></div>
@@ -10311,7 +10317,7 @@ window.filterWhInventoryTable = function() {
             <div class="line-clamp-2">${r.name || r.sku}</div>
           </td>
           <td class="px-2 py-2 whitespace-nowrap text-center">
-            <span class="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-[11px] font-medium border border-gray-200/60 dark:border-gray-700/60 inline-block max-w-[110px] truncate" title="${r.category || 'Chưa phân loại'}">${r.category || 'Chưa phân loại'}</span>
+            <span class="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-medium border border-gray-200/60 dark:border-gray-700/60 inline-block max-w-[110px] truncate" title="${r.category || 'Chưa phân loại'}">${r.category || 'Chưa phân loại'}</span>
           </td>
           <td class="px-1.5 py-2 text-center whitespace-nowrap font-medium text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</td>
           <td class="px-2 py-2 text-right whitespace-nowrap bg-emerald-50/30 dark:bg-emerald-950/10">
@@ -10341,10 +10347,10 @@ window.filterWhInventoryTable = function() {
           </td>
           <td class="px-2 py-2 text-center whitespace-nowrap">
             <div class="inline-flex items-center gap-1 justify-center">
-              <button onclick="openWhItemHistoryModal('${r.sku}')" class="px-1.5 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 hover:bg-emerald-100 text-[11px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-0.5 transition-all" title="Xem thẻ kho lịch sử xuất nhập">
+              <button onclick="openWhItemHistoryModal('${r.sku}')" class="px-1.5 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-0.5 transition-all" title="Xem thẻ kho lịch sử xuất nhập">
                 <i data-lucide="history" class="w-3 h-3"></i> Thẻ Kho
               </button>
-              <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-1.5 py-1 bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 hover:bg-purple-100 text-[11px] font-bold rounded-lg border border-purple-200 dark:border-purple-800/60 flex items-center gap-0.5 transition-all" title="Xem chi tiết các lô đã nhập">
+              <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-1.5 py-1 bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold rounded-lg border border-purple-200 dark:border-purple-800/60 flex items-center gap-0.5 transition-all" title="Xem chi tiết các lô đã nhập">
                 <i data-lucide="layers" class="w-3 h-3"></i> Lô
               </button>
             </div>
@@ -10366,14 +10372,14 @@ window.filterWhInventoryTable = function() {
           <div class="flex items-start justify-between gap-2">
             <div>
               <div class="flex items-center gap-2">
-                <span class="text-gray-400 text-[11px] font-mono">#${idx + 1}</span>
+                <span class="text-gray-400 text-xs font-mono">#${idx + 1}</span>
                 <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${r.sku}</span>
-                <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</span>
+                <span class="px-1.5 py-0.2 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</span>
               </div>
               <h4 class="font-bold text-xs text-gray-900 dark:text-white mt-1 leading-snug">${r.name || r.sku}</h4>
-              <div class="text-[10.5px] text-gray-500 mt-0.5">${r.category || 'Chưa phân loại'}</div>
+              <div class="text-xs text-gray-500 mt-0.5">${r.category || 'Chưa phân loại'}</div>
             </div>
-            <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-2 py-1 rounded-lg text-[10.5px] font-bold font-mono ${
+            <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-2 py-1 rounded-lg text-xs font-bold font-mono ${
               batchCount > 0 ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
             }">
               ${batchCount > 0 ? batchCount + ' Lô' : '0 Lô'}
@@ -10383,16 +10389,16 @@ window.filterWhInventoryTable = function() {
           <!-- Stats Grid -->
           <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-xs border border-gray-100 dark:border-gray-800">
             <div>
-              <span class="text-[10px] text-emerald-700 dark:text-emerald-400 block font-semibold">Đã Nhập Kho</span>
+              <span class="text-xs text-emerald-700 dark:text-emerald-400 block font-semibold">Đã Nhập Kho</span>
               <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">${fmtNum(receiptQty)}</span>
             </div>
             <div>
-              <span class="text-[10px] text-gray-500 block">Tồn Sổ Sách</span>
+              <span class="text-xs text-gray-500 block">Tồn Sổ Sách</span>
               <span class="font-mono font-bold tabular-nums ${bookQty < 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white'}">${fmtNum(bookQty)}</span>
             </div>
             <div>
-              <span class="text-[10px] text-gray-500 block">Giá Trị Tồn</span>
-              <span class="font-mono font-bold text-amber-600 dark:text-amber-400 tabular-nums text-[11px]">${fmtVND(r.total_value)}</span>
+              <span class="text-xs text-gray-500 block">Giá Trị Tồn</span>
+              <span class="font-mono font-bold text-amber-600 dark:text-amber-400 tabular-nums text-xs">${fmtVND(r.total_value)}</span>
             </div>
           </div>
 
@@ -10466,11 +10472,11 @@ window.openWhItemHistoryModal = async function(sku) {
               <td class="p-2.5 text-center whitespace-nowrap font-mono tabular-nums text-gray-600 dark:text-gray-300">${docDateDisp}</td>
               <td class="p-2.5 whitespace-nowrap font-mono font-semibold text-gray-900 dark:text-white">${h.doc_no || '—'}</td>
               <td class="p-2.5 whitespace-nowrap">
-                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold ${badgeColor}">${h.trans_name || h.trans_type}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeColor}">${h.trans_name || h.trans_type}</span>
               </td>
-              <td class="p-2.5 whitespace-nowrap font-mono text-[11px] text-gray-600 dark:text-gray-300">
+              <td class="p-2.5 whitespace-nowrap font-mono text-xs text-gray-600 dark:text-gray-300">
                 ${h.batch_code ? `<b class="text-purple-600 dark:text-purple-400">${h.batch_code}</b>` : '—'}
-                ${h.exp_date ? `<span class="text-gray-400 block text-[10px]">HSD: ${String(h.exp_date).split('T')[0]}</span>` : ''}
+                ${h.exp_date ? `<span class="text-gray-400 block text-xs">HSD: ${String(h.exp_date).split('T')[0]}</span>` : ''}
               </td>
               <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                 ${qtyIn > 0 ? `+${fmtNum(qtyIn)}` : '—'}
@@ -10505,7 +10511,7 @@ window.openWhItemHistoryModal = async function(sku) {
             <div class="bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
               <div class="flex items-center justify-between">
                 <div class="font-mono font-bold text-gray-900 dark:text-white">${h.doc_no || '—'}</div>
-                <span class="text-[10px] text-gray-400 font-mono">${docDateDisp}</span>
+                <span class="text-xs text-gray-400 font-mono">${docDateDisp}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="font-medium text-gray-700 dark:text-gray-300">${h.trans_name || h.trans_type}</span>
@@ -10513,9 +10519,9 @@ window.openWhItemHistoryModal = async function(sku) {
                   ${qtyIn > 0 ? `+${fmtNum(qtyIn)}` : `-${fmtNum(qtyOut)}`} ${item.unit || ''}
                 </span>
               </div>
-              ${h.batch_code ? `<div class="text-[11px] text-purple-600 dark:text-purple-400 font-mono">Lô: <b>${h.batch_code}</b> ${h.exp_date ? '• HSD: ' + String(h.exp_date).split('T')[0] : ''}</div>` : ''}
-              ${h.partner_name ? `<div class="text-[10.5px] text-gray-500">Đối tác: ${h.partner_name}</div>` : ''}
-              ${h.notes ? `<div class="text-[10.5px] text-gray-400 italic">${h.notes}</div>` : ''}
+              ${h.batch_code ? `<div class="text-xs text-purple-600 dark:text-purple-400 font-mono">Lô: <b>${h.batch_code}</b> ${h.exp_date ? '• HSD: ' + String(h.exp_date).split('T')[0] : ''}</div>` : ''}
+              ${h.partner_name ? `<div class="text-xs text-gray-500">Đối tác: ${h.partner_name}</div>` : ''}
+              ${h.notes ? `<div class="text-xs text-gray-400 italic">${h.notes}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -10599,7 +10605,7 @@ window.openWhItemBatchesModal = async function(sku) {
                 ${daysLeftDisp}
               </td>
               <td class="p-2.5 text-center whitespace-nowrap">
-                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold ${badgeStatus}">${statusText}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeStatus}">${statusText}</span>
               </td>
               <td class="p-2.5 text-right whitespace-nowrap font-mono text-gray-600 dark:text-gray-300 tabular-nums">
                 ${fmtNum(b.initial_qty)}
@@ -10607,7 +10613,7 @@ window.openWhItemBatchesModal = async function(sku) {
               <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-blue-700 dark:text-blue-400 tabular-nums">
                 ${fmtNum(b.current_qty)}
               </td>
-              <td class="p-2.5 whitespace-nowrap font-mono text-gray-500 text-[11px]">
+              <td class="p-2.5 whitespace-nowrap font-mono text-gray-500 text-xs">
                 ${b.receipt_code ? `<span class="text-brand-600 font-semibold">${b.receipt_code}</span>` : '—'}
               </td>
             </tr>
@@ -10622,17 +10628,17 @@ window.openWhItemBatchesModal = async function(sku) {
             <div class="bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
               <div class="flex items-center justify-between">
                 <span class="font-mono font-bold text-purple-700 dark:text-purple-400">Lô: ${b.batch_code || 'LÔ-CHUNG'}</span>
-                <span class="font-mono font-semibold text-[11px] ${b.status === 'EXPIRED' ? 'text-rose-600' : (b.status === 'NEAR_EXPIRY' ? 'text-amber-600' : 'text-emerald-600')}">
+                <span class="font-mono font-semibold text-xs ${b.status === 'EXPIRED' ? 'text-rose-600' : (b.status === 'NEAR_EXPIRY' ? 'text-amber-600' : 'text-emerald-600')}">
                   ${b.days_left !== 999 ? `Còn ${b.days_left} ngày` : ''}
                 </span>
               </div>
-              <div class="grid grid-cols-2 gap-2 text-[11px] text-gray-600 dark:text-gray-400">
+              <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
                 <div>Hạn dùng: <b class="font-mono text-gray-900 dark:text-white">${expDisp}</b></div>
                 <div>Vị trí: <b class="text-gray-900 dark:text-white">${b.storage_loc || 'Kệ Bếp'}</b></div>
                 <div>SL Nhập: <b class="font-mono text-gray-900 dark:text-white">${fmtNum(b.initial_qty)}</b></div>
                 <div>SL Tồn: <b class="font-mono font-bold text-blue-600 dark:text-blue-400">${fmtNum(b.current_qty)}</b></div>
               </div>
-              ${b.receipt_code ? `<div class="text-[10.5px] text-gray-400">Chứng từ: ${b.receipt_code}</div>` : ''}
+              ${b.receipt_code ? `<div class="text-xs text-gray-400">Chứng từ: ${b.receipt_code}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -10875,11 +10881,11 @@ window.renderFnbChainTable = function(items) {
     tbody.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankBadge = '';
@@ -10893,10 +10899,10 @@ window.renderFnbChainTable = function(items) {
           <td class="py-3 px-3 text-center">${rankBadge}</td>
           <td class="py-3 px-4">
             <div class="font-bold text-gray-900 dark:text-white">${s.name}</div>
-            <div class="text-[10.5px] tabular-nums text-gray-400">SAP: ${s.code}</div>
+            <div class="text-xs tabular-nums text-gray-400">SAP: ${s.code}</div>
           </td>
           <td class="py-3 px-3 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-bold ${s.region === 'Miền Nam' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}">${s.region}</span>
           </td>
           <td class="py-3 px-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtVND(s.netRevenue)}</td>
           <td class="py-3 px-3 text-right tabular-nums text-gray-500">${fmtVND(s.targetRevenue)}</td>
@@ -10921,11 +10927,11 @@ window.renderFnbChainTable = function(items) {
     mob.innerHTML = items.map((s, idx) => {
       let statusBadge = '';
       if (s.status === 'VƯỢT CHỈ TIÊU') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">VƯỢT CHỈ TIÊU</span>`;
       } else if (s.status === 'TRONG MỨC') {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">TRONG MỨC</span>`;
       } else {
-        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200 dark:border-rose-800">CẦN XEM XÉT</span>`;
       }
 
       let rankLabel = s.rank === 1 ? '🥇 #1' : s.rank === 2 ? '🥈 #2' : s.rank === 3 ? '🥉 #3' : `#${s.rank}`;
@@ -10937,26 +10943,26 @@ window.renderFnbChainTable = function(items) {
               <span class="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-semibold text-xs ${s.rank <= 3 ? 'text-brand-500 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400'}">${rankLabel}</span>
               <div>
                 <div class="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">${s.name}</div>
-                <div class="text-[10px] tabular-nums text-gray-400">Mã: ${s.code} • ${s.region}</div>
+                <div class="text-xs tabular-nums text-gray-400">Mã: ${s.code} • ${s.region}</div>
               </div>
             </div>
             ${statusBadge}
           </div>
           <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-xs text-gray-600 dark:text-gray-400">
             <div>
-              <span class="text-[10.5px] text-gray-400">Doanh thu thuần:</span><br>
+              <span class="text-xs text-gray-400">Doanh thu thuần:</span><br>
               <b class="tabular-nums text-sm text-gray-900 dark:text-white">${fmtVND(s.netRevenue)}</b>
             </div>
             <div>
-              <span class="text-[10.5px] text-gray-400">Đạt mục tiêu:</span><br>
+              <span class="text-xs text-gray-400">Đạt mục tiêu:</span><br>
               <b class="tabular-nums text-sm text-emerald-600">${s.achievementPct}%</b>
             </div>
             <div>
-              <span class="text-[10.5px] text-gray-400">Food Cost %:</span><br>
+              <span class="text-xs text-gray-400">Food Cost %:</span><br>
               <b class="tabular-nums ${parseFloat(s.foodCostPct) <= 43 ? 'text-emerald-600' : 'text-rose-600'} font-bold">${s.foodCostPct}%</b>
             </div>
             <div>
-              <span class="text-[10.5px] text-gray-400">EBITDA:</span><br>
+              <span class="text-xs text-gray-400">EBITDA:</span><br>
               <b class="tabular-nums text-emerald-600 font-bold">${fmtVND(s.ebitda)} (${s.margin}%)</b>
             </div>
           </div>
@@ -10995,7 +11001,7 @@ window.renderFnbSites = function(sites) {
           <td class="text-gray-500 dark:text-gray-400 text-xs">${escapeHtml(s.address || 'Hệ thống căn tin Tân Long Group')}</td>
           <td>
             <div class="font-medium text-gray-900 dark:text-white text-xs">${escapeHtml(s.site_type || 'Quản lý cơ sở')}</div>
-            <div class="num text-gray-400 text-[11px]">${s.phone || '0903.000.xxx'}</div>
+            <div class="num text-gray-400 text-xs">${s.phone || '0903.000.xxx'}</div>
           </td>
           <td class="col-num text-right num font-semibold text-gray-900 dark:text-white">${Number(s.budget || 10000000).toLocaleString('vi-VN')} ₫</td>
           <td class="col-badge text-center">
@@ -11142,19 +11148,19 @@ window.renderFnbStock = function() {
   if (thead) {
     let headHtml = `
       <tr>
-        <th class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px] border-b border-gray-200 dark:border-gray-800">STT</th>
-        <th class="py-3 px-4 text-left font-bold uppercase tracking-wider text-[11px] border-b border-gray-200 dark:border-gray-800 sticky left-0 z-20 bg-gray-50 dark:bg-white/3 min-w-[240px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Mặt Hàng F&amp;B</th>
-        <th class="py-3 px-3 text-center w-16 font-bold uppercase tracking-wider text-[11px] border-b border-gray-200 dark:border-gray-800">ĐVT</th>
+        <th class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-xs border-b border-gray-200 dark:border-gray-800">STT</th>
+        <th class="py-3 px-4 text-left font-bold uppercase tracking-wider text-xs border-b border-gray-200 dark:border-gray-800 sticky left-0 z-20 bg-gray-50 dark:bg-white/3 min-w-[240px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Mặt Hàng F&amp;B</th>
+        <th class="py-3 px-3 text-center w-16 font-bold uppercase tracking-wider text-xs border-b border-gray-200 dark:border-gray-800">ĐVT</th>
     `;
     sites.forEach(s => {
       const isMN = s.region === 'Miền Nam';
       headHtml += `
-        <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-[11px] border-b border-gray-200 dark:border-gray-800 min-w-[125px]">
+        <th class="py-3 px-3 text-right font-bold uppercase tracking-wider text-xs border-b border-gray-200 dark:border-gray-800 min-w-[125px]">
           <div class="flex items-center justify-end gap-1.5">
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-semibold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
+            <span class="text-xs px-1.5 py-0.2 rounded font-semibold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
             <span title="${s.name}" class="text-gray-800 dark:text-gray-200">${s.code}</span>
           </div>
-          <div class="text-[10px] font-normal text-gray-400 truncate max-w-[115px]" title="${s.name}">${s.name}</div>
+          <div class="text-xs font-normal text-gray-400 truncate max-w-[115px]" title="${s.name}">${s.name}</div>
         </th>
       `;
     });
@@ -11175,10 +11181,10 @@ window.renderFnbStock = function() {
             <td class="py-3 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
             <td class="py-3 px-4 sticky left-0 z-10 bg-white dark:bg-white/3 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
               <div class="flex items-center gap-2">
-                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${groupLabel}</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${groupLabel}</span>
                 <span class="font-bold text-gray-900 dark:text-white truncate max-w-[180px]">${r.name}</span>
               </div>
-              <div class="text-[10.5px] tabular-nums text-gray-400 mt-0.5 flex items-center gap-2">
+              <div class="text-xs tabular-nums text-gray-400 mt-0.5 flex items-center gap-2">
                 <span>${r.code}</span>
                 <span>•</span>
                 <span>Giá: ${r.price ? Number(r.price).toLocaleString('vi-VN') + ' đ' : '--'}</span>
@@ -11200,7 +11206,7 @@ window.renderFnbStock = function() {
             const numCount = Number(cell.lastCount);
             if (!isNaN(numCount)) {
               const countFormatted = Number.isInteger(numCount) ? numCount.toLocaleString('vi-VN') : numCount.toFixed(1);
-              lastCountHtml = ` <span class="text-gray-400 dark:text-gray-500 font-normal text-[10.5px]" title="Đếm gần nhất (${cell.lastDate || 'N/A'}): ${countFormatted}">(${countFormatted})</span>`;
+              lastCountHtml = ` <span class="text-gray-400 dark:text-gray-500 font-normal text-xs" title="Đếm gần nhất (${cell.lastDate || 'N/A'}): ${countFormatted}">(${countFormatted})</span>`;
             }
           }
           
@@ -11212,7 +11218,7 @@ window.renderFnbStock = function() {
           let valHtml = '';
           const numVal = Number(cell.value) || 0;
           if (gFnbStockFilter.showValue && numVal) {
-            valHtml = `<div class="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums mt-0.5">${Math.round(numVal).toLocaleString('vi-VN')} đ</div>`;
+            valHtml = `<div class="text-xs text-gray-400 dark:text-gray-500 tabular-nums mt-0.5">${Math.round(numVal).toLocaleString('vi-VN')} đ</div>`;
           }
           
           const bookFormatted = Number.isInteger(numBook) ? numBook.toLocaleString('vi-VN') : numBook.toFixed(1);
@@ -11273,14 +11279,14 @@ window.renderFnbStock = function() {
             <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-gray-100 dark:border-gray-800/80">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${groupLabel}</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">${groupLabel}</span>
                   <span class="text-xs tabular-nums text-gray-400 font-bold">${r.code}</span>
                 </div>
                 <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1 leading-snug">${r.name}</h4>
               </div>
               <div class="text-right shrink-0">
                 <span class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold tabular-nums">${r.unit}</span>
-                <div class="text-[10px] text-gray-400 tabular-nums mt-1">${r.price ? Number(r.price).toLocaleString('vi-VN') + ' đ' : ''}</div>
+                <div class="text-xs text-gray-400 tabular-nums mt-1">${r.price ? Number(r.price).toLocaleString('vi-VN') + ' đ' : ''}</div>
               </div>
             </div>
             
@@ -11291,15 +11297,15 @@ window.renderFnbStock = function() {
                 return `
                   <div class="p-2.5 rounded-xl ${sc.isNeg ? 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40' : (sc.isZero ? 'bg-gray-50 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60' : 'bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60')}">
                     <div class="flex items-center justify-between gap-1 mb-1">
-                      <span class="font-bold text-gray-800 dark:text-gray-200 text-[11px]">${sc.site.code}</span>
+                      <span class="font-bold text-gray-800 dark:text-gray-200 text-xs">${sc.site.code}</span>
                       <span class="text-[8.5px] px-1 rounded font-semibold ${isMN ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">${isMN ? 'MN' : 'MB'}</span>
                     </div>
                     <div class="flex items-baseline justify-between tabular-nums">
-                      <span class="text-[10px] text-gray-400">Tồn:</span>
-                      <span class="${sc.isNeg ? 'text-rose-600 dark:text-rose-400 font-semibold text-sm' : (sc.isZero ? 'text-gray-400 font-medium' : 'text-gray-900 dark:text-white font-bold text-sm')}">${sc.bookFormatted} <span class="text-[10px] text-gray-400 font-normal">${sc.countText}</span></span>
+                      <span class="text-xs text-gray-400">Tồn:</span>
+                      <span class="${sc.isNeg ? 'text-rose-600 dark:text-rose-400 font-semibold text-sm' : (sc.isZero ? 'text-gray-400 font-medium' : 'text-gray-900 dark:text-white font-bold text-sm')}">${sc.bookFormatted} <span class="text-xs text-gray-400 font-normal">${sc.countText}</span></span>
                     </div>
-                    ${sc.cell.noOpening ? '<div class="text-[9px] text-amber-500 font-semibold mt-0.5">⚠️ Chưa có tồn đầu</div>' : ''}
-                    ${gFnbStockFilter.showValue && sc.cell.value ? `<div class="text-[9.5px] text-gray-400 dark:text-gray-500 tabular-nums text-right mt-0.5">${Math.round(sc.cell.value).toLocaleString('vi-VN')} đ</div>` : ''}
+                    ${sc.cell.noOpening ? '<div class="text-xs text-amber-500 font-semibold mt-0.5">⚠️ Chưa có tồn đầu</div>' : ''}
+                    ${gFnbStockFilter.showValue && sc.cell.value ? `<div class="text-xs text-gray-400 dark:text-gray-500 tabular-nums text-right mt-0.5">${Math.round(sc.cell.value).toLocaleString('vi-VN')} đ</div>` : ''}
                   </div>
                 `;
               }).join('')}
@@ -11765,7 +11771,7 @@ window.renderFnbCountsTable = function() {
         if (diffVal > 0) diffValText = `<span class="text-emerald-600 dark:text-emerald-400 font-bold tabular-nums">+${Math.round(diffVal).toLocaleString('vi-VN')} đ</span>`;
         else if (diffVal < 0) diffValText = `<span class="text-rose-600 dark:text-rose-400 font-bold tabular-nums">${Math.round(diffVal).toLocaleString('vi-VN')} đ</span>`;
 
-        const bookDisplay = gFnbBlindCount ? '<span class="text-gray-300 dark:text-gray-700 italic tabular-nums text-[11px] select-none">••••</span>' : `<span class="font-bold tabular-nums ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${book.toFixed(1)}</span>`;
+        const bookDisplay = gFnbBlindCount ? '<span class="text-gray-300 dark:text-gray-700 italic tabular-nums text-xs select-none">••••</span>' : `<span class="font-bold tabular-nums ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${book.toFixed(1)}</span>`;
 
         const nhomBadge = item.nhom_hang || item.item_group || '';
 
@@ -11774,7 +11780,7 @@ window.renderFnbCountsTable = function() {
             <td class="py-3 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
             <td class="py-3 px-4">
               <div class="font-bold text-gray-900 dark:text-white">${escapeHtml(item.name)}</div>
-              <div class="text-[10.5px] tabular-nums text-gray-400 flex items-center gap-1.5 mt-0.5">
+              <div class="text-xs tabular-nums text-gray-400 flex items-center gap-1.5 mt-0.5">
                 <span class="font-mono">${escapeHtml(item.code)}</span>
                 ${nhomBadge ? `<span>•</span><span class="text-gray-500 dark:text-gray-400">${escapeHtml(nhomBadge)}</span>` : ''}
                 <span>•</span>
@@ -11791,7 +11797,7 @@ window.renderFnbCountsTable = function() {
             <td class="py-3 px-3 text-right select-all">${diffValText}</td>
             <td class="py-2.5 px-4">
               <input type="text" placeholder="Lý do chênh lệch (nếu có)..." value="${escapeHtml(item.userNote || '')}" oninput="onCountNoteChange('${escapeHtml(item.code)}', this.value)"
-                     class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-[11px] outline-none focus:border-blue-500">
+                     class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-xs outline-none focus:border-blue-500">
             </td>
           </tr>
         `;
@@ -11806,7 +11812,7 @@ window.renderFnbCountsTable = function() {
         mob.innerHTML = `<div class="text-center py-8 px-4 text-gray-500 dark:text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center gap-2">
           <i data-lucide="package-search" class="w-8 h-8 text-gray-400"></i>
           <p class="font-semibold text-xs text-gray-700 dark:text-gray-200">Chưa có mặt hàng nào được nhập kho tại điểm bán này.</p>
-          <p class="text-[11px] text-gray-400">Vui lòng nhập hàng tại tab <a href="javascript:void(0)" onclick="switchTab('fnb-receipts')" class="text-brand-500 underline font-medium">Nhập Hàng</a> trước khi kiểm kê.</p>
+          <p class="text-xs text-gray-400">Vui lòng nhập hàng tại tab <a href="javascript:void(0)" onclick="switchTab('fnb-receipts')" class="text-brand-500 underline font-medium">Nhập Hàng</a> trước khi kiểm kê.</p>
         </div>`;
       } else {
         mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc.</div>`;
@@ -11823,24 +11829,24 @@ window.renderFnbCountsTable = function() {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${escapeHtml(item.nhom_hang || item.item_group || 'Chưa phân loại')}</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${escapeHtml(item.nhom_hang || item.item_group || 'Chưa phân loại')}</span>
                 <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1">${escapeHtml(item.name)}</h4>
-                <div class="text-[10px] text-gray-400 tabular-nums"><span class="font-mono">${escapeHtml(item.code)}</span> • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${escapeHtml(item.unit || '')}</div>
+                <div class="text-xs text-gray-400 tabular-nums"><span class="font-mono">${escapeHtml(item.code)}</span> • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${escapeHtml(item.unit || '')}</div>
               </div>
               <div class="text-right">
-                <span class="text-[10px] text-gray-400">Tồn sách:</span>
+                <span class="text-xs text-gray-400">Tồn sách:</span>
                 <div class="font-bold tabular-nums text-xs ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${gFnbBlindCount ? '••••' : book.toFixed(1)} ${escapeHtml(item.unit || '')}</div>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
               <div>
-                <span class="text-[10px] text-gray-400 block mb-0.5">SL Thực tế:</span>
+                <span class="text-xs text-gray-400 block mb-0.5">SL Thực tế:</span>
                 <input type="number" step="0.1" value="${count}" oninput="onCountInputChange('${escapeHtml(item.code)}', this.value)"
                        class="w-full text-center py-1.5 px-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/20 font-bold tabular-nums text-gray-900 dark:text-white outline-none">
               </div>
               <div class="text-right">
-                <span class="text-[10px] text-gray-400 block mb-0.5">Chênh lệch:</span>
+                <span class="text-xs text-gray-400 block mb-0.5">Chênh lệch:</span>
                 <div class="font-bold text-xs pt-1.5 tabular-nums ${diff > 0 ? 'text-emerald-600' : (diff < 0 ? 'text-rose-600' : 'text-gray-400')}">
                   ${diff > 0 ? '+' : ''}${diff.toFixed(1)} (${(diffVal > 0 ? '+' : '') + Math.round(diffVal).toLocaleString('vi-VN')} đ)
                 </div>
@@ -11848,7 +11854,7 @@ window.renderFnbCountsTable = function() {
             </div>
 
             <input type="text" placeholder="Ghi chú lý do..." value="${escapeHtml(item.userNote || '')}" oninput="onCountNoteChange('${escapeHtml(item.code)}', this.value)"
-                   class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-[11px] outline-none">
+                   class="w-full py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-xs outline-none">
           </div>
         `;
       }).join('');
@@ -12061,8 +12067,8 @@ function renderFnbPoTable(query = '') {
 
         const isBTT = (po.po_number || '').startsWith('50000') || !po.supplier_code || po.supplier_name === 'Bếp Trung Tâm Siba';
         const sourceBadge = isBTT
-          ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300 mr-1.5">BẾP TRUNG TÂM</span>`
-          : `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300 mr-1.5">NCC NGOÀI</span>`;
+          ? `<span class="px-1.5 py-0.2 rounded text-xs font-bold bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300 mr-1.5">BẾP TRUNG TÂM</span>`
+          : `<span class="px-1.5 py-0.2 rounded text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300 mr-1.5">NCC NGOÀI</span>`;
 
         const totalAmt = Number(po.total_amount) || 0;
         const totalQty = Number(po.total_qty) || 0;
@@ -12080,7 +12086,7 @@ function renderFnbPoTable(query = '') {
                 ${sourceBadge}
                 <span class="font-medium text-gray-900 dark:text-white">${escapeHtml(po.supplier_name || 'Bếp Trung Tâm Siba')}</span>
               </div>
-              ${po.supplier_code ? `<div class="text-[10px] text-gray-400 font-mono mt-0.5">Mã NCC: ${escapeHtml(po.supplier_code)}</div>` : ''}
+              ${po.supplier_code ? `<div class="text-xs text-gray-400 font-mono mt-0.5">Mã NCC: ${escapeHtml(po.supplier_code)}</div>` : ''}
             </td>
             <td class="py-3 px-3 text-center tabular-nums text-xs font-medium text-gray-700 dark:text-gray-300">
               ${po.item_count} mã
@@ -12121,23 +12127,23 @@ function renderFnbPoTable(query = '') {
           <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold ${isBTT ? 'bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300' : 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300'}">${isBTT ? 'BẾP TRUNG TÂM' : 'NCC NGOÀI'}</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold ${isBTT ? 'bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300' : 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300'}">${isBTT ? 'BẾP TRUNG TÂM' : 'NCC NGOÀI'}</span>
                 <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1">${escapeHtml(po.supplier_name || 'Bếp Trung Tâm Siba')}</h4>
                 <div class="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold mt-0.5">PO: ${escapeHtml(po.po_number)} • ${escapeHtml(po.doc_date || '—')}</div>
               </div>
               <div class="text-right">
                 <span class="text-xs font-bold ${isCompleted ? 'text-emerald-600' : 'text-amber-600'} block">${isCompleted ? 'Đã Nhập' : 'Chờ Nhập'}</span>
-                <span class="text-[10px] text-gray-400 tabular-nums">${po.item_count} mặt hàng</span>
+                <span class="text-xs text-gray-400 tabular-nums">${po.item_count} mặt hàng</span>
               </div>
             </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs tabular-nums">
               <div>
-                <span class="text-gray-400 text-[11px]">Tổng SL:</span>
+                <span class="text-gray-400 text-xs">Tổng SL:</span>
                 <span class="font-bold text-gray-800 dark:text-gray-200 ml-1">${totalQty.toFixed(1)}</span>
               </div>
               <div>
-                <span class="text-gray-400 text-[11px]">Tổng tiền:</span>
+                <span class="text-gray-400 text-xs">Tổng tiền:</span>
                 <span class="font-bold text-gray-900 dark:text-white ml-1">${totalAmt > 0 ? Math.round(totalAmt).toLocaleString('vi-VN') + ' đ' : 'Nội bộ'}</span>
               </div>
             </div>
@@ -12224,7 +12230,7 @@ window.openPoReceiptModal = async function(poNumber) {
 
 function getReceiptExpWarningHtml(dateStr) {
   if (!dateStr) {
-    return `<span class="text-gray-400 text-[10px] italic">Chưa đặt EXP</span>`;
+    return `<span class="text-gray-400 text-xs italic">Chưa đặt EXP</span>`;
   }
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -12233,15 +12239,15 @@ function getReceiptExpWarningHtml(dateStr) {
   const diffDays = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-octagon" class="w-3 h-3"></i> Hết hạn (${Math.abs(diffDays)} ngày)</span>`;
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-xs"><i data-lucide="alert-octagon" class="w-3 h-3"></i> Hết hạn (${Math.abs(diffDays)} ngày)</span>`;
   } else if (diffDays === 0) {
-    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Hết hạn hôm nay</span>`;
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-xs"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Hết hạn hôm nay</span>`;
   } else if (diffDays <= 7) {
-    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Cận date (${diffDays} ngày)</span>`;
+    return `<span class="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded text-xs"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Cận date (${diffDays} ngày)</span>`;
   } else if (diffDays <= 30) {
-    return `<span class="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded text-[10px]"><i data-lucide="clock" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
+    return `<span class="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded text-xs"><i data-lucide="clock" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
   } else {
-    return `<span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-[10px]"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
+    return `<span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-xs"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Còn ${diffDays} ngày</span>`;
   }
 }
 
@@ -12297,7 +12303,7 @@ function renderReceiptLinesTable() {
           <td class="py-2.5 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
           <td class="py-2.5 px-3">
             <div class="font-bold text-gray-900 dark:text-white text-xs">${escapeHtml(item.item_name || 'Vật tư')}</div>
-            <div class="text-[10.5px] text-gray-400 tabular-nums flex items-center gap-1.5 mt-0.5">
+            <div class="text-xs text-gray-400 tabular-nums flex items-center gap-1.5 mt-0.5">
               <span class="font-mono text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
               ${item.merch_category ? `<span>•</span><span>${escapeHtml(item.merch_category)}</span>` : ''}
               ${item.is_food ? '<span class="text-emerald-500 font-semibold">• Thực phẩm</span>' : '<span class="text-gray-400">• Vật tư</span>'}
@@ -12328,10 +12334,10 @@ function renderReceiptLinesTable() {
                      onchange="onReceiptLineExpChange(${idx}, this.value)" 
                      class="w-32 py-1 px-1.5 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
               <div class="flex items-center gap-1 mt-1">
-                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
-                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
-                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
-                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 24)" title="+2 Năm" class="px-1.5 py-0.5 text-[9.5px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+2N</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 24)" title="+2 Năm" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+2N</button>
               </div>
               <div id="receiptExpWarning_${idx}" class="mt-0.5">
                 ${getReceiptExpWarningHtml(item.exp_date)}
@@ -12548,11 +12554,11 @@ window.loadFnbReceiptsHistory = async function(siteCodeArg) {
                 <div>
                   <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</span>
                   <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</h4>
-                  <div class="text-[11px] text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(r.receipt_date)} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
+                  <div class="text-xs text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(r.receipt_date)} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
                 </div>
                 <div class="text-right">
                   <span class="font-bold text-xs text-gray-900 dark:text-white tabular-nums block">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</span>
-                  <span class="text-[10px] text-gray-400">${escapeHtml(r.created_by || 'Thủ kho')}</span>
+                  <span class="text-xs text-gray-400">${escapeHtml(r.created_by || 'Thủ kho')}</span>
                 </div>
               </div>
             </div>
@@ -12581,7 +12587,7 @@ window.viewReceiptDetail = async function(receiptId) {
 
     let html = `
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="data-table">
           <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
             <tr>
               <th class="py-2 px-3">Mặt Hàng</th>
@@ -12604,7 +12610,7 @@ window.viewReceiptDetail = async function(receiptId) {
                 <td class="py-2 px-3 text-center font-mono text-xs whitespace-nowrap ${l.exp_date ? 'text-brand-600 dark:text-brand-400 font-semibold' : 'text-gray-400'}">${escapeHtml(l.exp_date ? String(l.exp_date).slice(0, 10) : '--')}</td>
                 <td class="py-2 px-3 text-right text-gray-500">${Number(l.unit_price).toLocaleString('vi-VN')} đ</td>
                 <td class="py-2 px-3 text-right font-bold text-gray-900 dark:text-white">${Math.round(l.amount).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${escapeHtml(l.note || '--')}</td>
+                <td class="py-2 px-3 font-sans text-gray-500 text-xs">${escapeHtml(l.note || '--')}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -12782,11 +12788,11 @@ window.filterManualCatalogList = function() {
             <span class="font-bold text-gray-900 dark:text-white text-xs truncate max-w-[210px]" title="${escapeHtml(item.name || code)}">
               ${escapeHtml(item.name || code)}
             </span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium">
+            <span class="text-xs px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium">
               ${escapeHtml(item.unit || 'Phần')}
             </span>
           </div>
-          <div class="flex items-center gap-2 text-[10.5px] text-gray-400 font-mono mt-0.5">
+          <div class="flex items-center gap-2 text-xs text-gray-400 font-mono mt-0.5">
             <span class="text-brand-600 dark:text-brand-400 font-semibold">${escapeHtml(code)}</span>
             <span>•</span>
             <span>Tồn: <b class="${bookQty > 0 ? 'text-emerald-600' : 'text-gray-500'}">${bookQty.toFixed(1)}</b></span>
@@ -12796,11 +12802,11 @@ window.filterManualCatalogList = function() {
         </div>
         <div>
           ${existing ? `
-            <span class="px-2 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1 shrink-0 shadow-xs">
+            <span class="px-2 py-1 rounded-lg bg-emerald-600 text-white text-xs font-bold flex items-center gap-1 shrink-0 shadow-xs">
               <i data-lucide="check" class="w-3 h-3"></i> x${existing.qty}
             </span>
           ` : `
-            <button type="button" class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-emerald-500 hover:text-white text-gray-700 dark:text-gray-300 text-[11px] font-semibold flex items-center gap-1 shrink-0 transition-colors">
+            <button type="button" class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-emerald-500 hover:text-white text-gray-700 dark:text-gray-300 text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors">
               <i data-lucide="plus" class="w-3 h-3"></i> Thêm
             </button>
           `}
@@ -12881,12 +12887,12 @@ window.renderManualReceiptLinesTable = function() {
 
       return `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="py-2 px-2 text-center text-gray-400 tabular-nums font-mono text-[11px]">${idx + 1}</td>
+          <td class="py-2 px-2 text-center text-gray-400 tabular-nums font-mono text-xs">${idx + 1}</td>
           <td class="py-2 px-2.5 min-w-[130px]">
             <div class="font-bold text-gray-900 dark:text-white text-xs truncate max-w-[150px]" title="${escapeHtml(item.item_name)}">
               ${escapeHtml(item.item_name)}
             </div>
-            <div class="text-[10.5px] text-gray-400 font-mono flex items-center gap-1.5 mt-0.5">
+            <div class="text-xs text-gray-400 font-mono flex items-center gap-1.5 mt-0.5">
               <span class="text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
               <span>•</span>
               <span class="font-sans font-medium text-gray-600 dark:text-gray-300">${escapeHtml(item.unit || '')}</span>
@@ -12914,12 +12920,12 @@ window.renderManualReceiptLinesTable = function() {
             <div class="flex flex-col items-center">
               <input type="date" id="manualLineExpInput_${idx}" value="${item.exp_date || ''}" 
                      onchange="onManualLineExpChange(${idx}, this.value)" 
-                     class="w-32 py-1 px-1 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-[11px] text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                     class="w-32 py-1 px-1 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
               <div class="flex items-center gap-1 mt-1">
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1 py-0.2 text-[9px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 3)" title="+3 Tháng" class="px-1 py-0.2 text-[9px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+3T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1 py-0.2 text-[9px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1 py-0.2 text-[9px] font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
+                <button type="button" onclick="setManualLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
+                <button type="button" onclick="setManualLineQuickExp(${idx}, 3)" title="+3 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+3T</button>
+                <button type="button" onclick="setManualLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
+                <button type="button" onclick="setManualLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
               </div>
               <div id="manualLineExpWarning_${idx}" class="mt-0.5">
                 ${getReceiptExpWarningHtml(item.exp_date)}
@@ -12927,7 +12933,7 @@ window.renderManualReceiptLinesTable = function() {
             </div>
           </td>
           <td class="py-2 px-2 text-center w-24">
-            <select onchange="onManualLineLocChange(${idx}, this.value)" class="w-full py-1 px-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[11px] font-medium text-gray-800 dark:text-gray-200 outline-none">
+            <select onchange="onManualLineLocChange(${idx}, this.value)" class="w-full py-1 px-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none">
               <option value="Kệ Bếp" ${item.storage_loc === 'Kệ Bếp' ? 'selected' : ''}>Kệ Bếp</option>
               <option value="Kho Khô" ${item.storage_loc === 'Kho Khô' ? 'selected' : ''}>Kho Khô</option>
               <option value="Tủ Mát" ${item.storage_loc === 'Tủ Mát' ? 'selected' : ''}>Tủ Mát</option>
@@ -13161,7 +13167,7 @@ window.loadFnbCountsHistory = async function(siteCode) {
             <td class="py-2.5 px-3 tabular-nums font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="viewCountDetail(${c.id})">${escapeHtml(c.count_code)}</td>
             <td class="py-2.5 px-3 font-semibold">${escapeHtml(c.site_code)}</td>
             <td class="py-2.5 px-3 tabular-nums">${escapeHtml(c.count_date)}</td>
-            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-bold text-xs ${c.count_type === 'DAILY' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}">${c.count_type === 'DAILY' ? 'Hằng Ngày' : 'Định Kỳ'}</span></td>
             <td class="py-2.5 px-3 text-right tabular-nums">${c.total_items}</td>
             <td class="py-2.5 px-3 text-right tabular-nums ${c.diff_items > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${c.diff_items}</td>
             <td class="py-2.5 px-3 text-right tabular-nums font-bold ${c.diff_value > 0 ? 'text-rose-600' : (c.diff_value < 0 ? 'text-rose-600' : 'text-emerald-600')}">${Math.round(c.diff_value).toLocaleString('vi-VN')} đ</td>
@@ -13242,7 +13248,7 @@ window.viewCountDetail = async function(countId) {
 
     let html = `
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="data-table">
           <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
             <tr>
               <th class="py-2 px-3">Mặt Hàng</th>
@@ -13261,7 +13267,7 @@ window.viewCountDetail = async function(countId) {
                 <td class="py-2 px-3 text-right font-bold text-blue-600">${l.count_qty}</td>
                 <td class="py-2 px-3 text-right font-semibold ${l.diff_qty < 0 ? 'text-rose-600' : (l.diff_qty > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_qty > 0 ? '+' : ''}${l.diff_qty}</td>
                 <td class="py-2 px-3 text-right font-semibold ${l.diff_val < 0 ? 'text-rose-600' : (l.diff_val > 0 ? 'text-emerald-600' : 'text-gray-400')}">${l.diff_val > 0 ? '+' : ''}${Math.round(l.diff_val).toLocaleString('vi-VN')} đ</td>
-                <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${l.note || '--'}</td>
+                <td class="py-2 px-3 font-sans text-gray-500 text-xs">${l.note || '--'}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -13542,7 +13548,7 @@ window.renderFnbWasteStockTable = function() {
           <td class="py-3 px-3 font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(item.code)}</td>
           <td class="py-3 px-4">
             <div class="font-semibold text-gray-900 dark:text-white text-xs">${escapeHtml(item.name || item.code)}</div>
-            <div class="text-[10.5px] text-gray-400 flex items-center gap-1.5 mt-0.5">
+            <div class="text-xs text-gray-400 flex items-center gap-1.5 mt-0.5">
               <span>${escapeHtml(item.nganh_hang || item.item_group || 'Chưa phân loại')}</span>
               ${item.nhom_hang && item.nhom_hang !== item.nganh_hang ? `<span>•</span><span>${escapeHtml(item.nhom_hang)}</span>` : ''}
             </div>
@@ -13595,23 +13601,23 @@ window.renderFnbWasteStockTable = function() {
             <div>
               <span class="font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(item.code)}</span>
               <h4 class="font-semibold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(item.name || item.code)}</h4>
-              <div class="text-[11px] text-gray-400">${escapeHtml(item.nganh_hang || item.item_group || '')}</div>
+              <div class="text-xs text-gray-400">${escapeHtml(item.nganh_hang || item.item_group || '')}</div>
             </div>
             <div class="text-right">
               <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">Tồn: ${bQty.toFixed(1)} ${escapeHtml(item.unit || '')}</span>
-              <div class="text-[11px] text-gray-400 tabular-nums">${Math.round(uPrice).toLocaleString('vi-VN')} ₫ / ${escapeHtml(item.unit || '')}</div>
+              <div class="text-xs text-gray-400 tabular-nums">${Math.round(uPrice).toLocaleString('vi-VN')} ₫ / ${escapeHtml(item.unit || '')}</div>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
             <div>
-              <label class="block text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">SL Cần Hủy (Tối đa ${bQty.toFixed(1)})</label>
+              <label class="block text-xs font-bold text-rose-600 dark:text-rose-400 mb-1">SL Cần Hủy (Tối đa ${bQty.toFixed(1)})</label>
               <input type="number" step="0.01" min="0" max="${bQty}" value="${wQty > 0 ? wQty : ''}" placeholder="0"
                      oninput="onWasteLineQtyChange('${escapeHtml(item.code)}', this.value)"
                      class="w-full text-center py-1.5 px-2 rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-gray-800 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500 text-xs">
             </div>
             <div>
-              <label class="block text-[11px] font-medium text-gray-500 mb-1">Thành Tiền Hủy</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Thành Tiền Hủy</label>
               <div id="mobWasteLineTotal_${escapeHtml(item.code)}" class="py-1.5 px-2 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-bold text-rose-600 dark:text-rose-400 tabular-nums text-right">
                 ${lineAmt > 0 ? Math.round(lineAmt).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}
               </div>
@@ -13619,7 +13625,7 @@ window.renderFnbWasteStockTable = function() {
           </div>
 
           <div>
-            <label class="block text-[11px] font-medium text-gray-500 mb-1">Lý Do Hủy</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Lý Do Hủy</label>
             <select onchange="onWasteLineReasonChange('${escapeHtml(item.code)}', this.value)" class="w-full py-1.5 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs outline-none focus:border-rose-500">
               ${reasonOptions.map(r => `<option value="${escapeHtml(r)}" ${item.wasteReason === r ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
             </select>
@@ -13824,11 +13830,11 @@ window.loadFnbWasteHistory = async function(siteCodeArg) {
                 <div>
                   <span class="font-mono font-bold text-rose-600 dark:text-rose-400 text-xs">${escapeHtml(w.waste_code)}</span>
                   <h4 class="font-semibold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(w.reason || 'Hàng hỏng')}</h4>
-                  <div class="text-[11px] text-gray-400 tabular-nums">Ngày: ${escapeHtml(String(w.waste_date || '').slice(0, 10))} • Điểm: ${escapeHtml(w.site_code)}</div>
+                  <div class="text-xs text-gray-400 tabular-nums">Ngày: ${escapeHtml(String(w.waste_date || '').slice(0, 10))} • Điểm: ${escapeHtml(w.site_code)}</div>
                 </div>
                 <div class="text-right">
                   <span class="font-bold text-xs text-rose-600 dark:text-rose-400 tabular-nums block">${Math.round(w.total_amount || 0).toLocaleString('vi-VN')} ₫</span>
-                  <span class="text-[10px] text-gray-400">${escapeHtml(w.confirmed_by || 'Bếp trưởng')}</span>
+                  <span class="text-xs text-gray-400">${escapeHtml(w.confirmed_by || 'Bếp trưởng')}</span>
                 </div>
               </div>
             </div>
@@ -13857,7 +13863,7 @@ window.viewWasteDetail = async function(wasteId) {
 
     let html = `
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="data-table">
           <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
             <tr>
               <th class="py-2 px-3">Mặt Hàng</th>
@@ -13873,13 +13879,13 @@ window.viewWasteDetail = async function(wasteId) {
               <tr>
                 <td class="py-2 px-3 font-sans font-bold text-gray-900 dark:text-white">
                   <div>${escapeHtml(l.item_name || l.item_code)}</div>
-                  <div class="text-[10px] text-gray-400 font-mono">${escapeHtml(l.item_code)}</div>
+                  <div class="text-xs text-gray-400 font-mono">${escapeHtml(l.item_code)}</div>
                 </td>
                 <td class="py-2 px-2 text-center text-gray-500">${escapeHtml(l.unit || '')}</td>
                 <td class="py-2 px-3 text-right font-bold text-rose-600">${Number(l.qty).toFixed(1)}</td>
                 <td class="py-2 px-3 text-right text-gray-500">${Number(l.unit_price).toLocaleString('vi-VN')} ₫</td>
                 <td class="py-2 px-3 text-right font-bold text-gray-900 dark:text-white">${Math.round(l.amount).toLocaleString('vi-VN')} ₫</td>
-                <td class="py-2 px-3 font-sans text-gray-500 text-[11px]">${escapeHtml(l.reason_detail || '--')}</td>
+                <td class="py-2 px-3 font-sans text-gray-500 text-xs">${escapeHtml(l.reason_detail || '--')}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -13973,15 +13979,15 @@ window.addWasteLineRow = function() {
       </div>
       <div class="grid grid-cols-3 gap-2">
         <div>
-          <label class="block text-[10px] text-gray-500 mb-0.5">SL Hủy</label>
+          <label class="block text-xs text-gray-500 mb-0.5">SL Hủy</label>
           <input type="number" step="0.01" min="0" placeholder="0" oninput="onWasteModalLineQtyInput('${rowId}', this.value)" class="waste-modal-qty w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold tabular-nums text-center outline-none focus:border-rose-500">
         </div>
         <div>
-          <label class="block text-[10px] text-gray-500 mb-0.5">Đơn Giá</label>
+          <label class="block text-xs text-gray-500 mb-0.5">Đơn Giá</label>
           <div class="waste-modal-price py-1 px-2 text-xs tabular-nums text-gray-600 dark:text-gray-300">0 ₫</div>
         </div>
         <div>
-          <label class="block text-[10px] text-gray-500 mb-0.5">Thành Tiền</label>
+          <label class="block text-xs text-gray-500 mb-0.5">Thành Tiền</label>
           <div class="waste-modal-amt py-1 px-2 text-xs font-bold tabular-nums text-rose-600 text-right">0 ₫</div>
         </div>
       </div>
@@ -14421,13 +14427,13 @@ window.renderSavedAccountsInLoginModal = function() {
           <div class="min-w-0 text-left">
             <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-1.5">
               <span>${acc.fullName}</span>
-              ${isCurrent ? '<span class="text-[9px] px-1 py-0.2 rounded font-semibold bg-brand-500 text-white">ĐANG DÙNG</span>' : ''}
+              ${isCurrent ? '<span class="text-xs px-1 py-0.2 rounded font-semibold bg-brand-500 text-white">ĐANG DÙNG</span>' : ''}
             </div>
-            <div class="text-[10px] text-gray-400 tabular-nums truncate">${acc.email}</div>
+            <div class="text-xs text-gray-400 tabular-nums truncate">${acc.email}</div>
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-[9px] px-1.5 py-0.5 rounded font-semibold uppercase ${roleBadgeColor}">${acc.role}</span>
+          <span class="text-xs px-1.5 py-0.5 rounded font-semibold uppercase ${roleBadgeColor}">${acc.role}</span>
           <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="p-1 rounded text-gray-400 hover:text-rose-600 hover:bg-gray-100 dark:hover:bg-gray-700">
             <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
@@ -14448,7 +14454,7 @@ window.renderSavedAccountsInProfileModal = function() {
   const otherAccounts = accounts.filter(a => !gCurrentUser || a.email.toLowerCase() !== gCurrentUser.email.toLowerCase());
 
   if (otherAccounts.length === 0) {
-    listEl.innerHTML = `<div class="p-3 text-center text-gray-400 text-[11px] italic bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">Chưa có tài khoản phụ nào khác được lưu trên máy này. Bấm "+ Thêm tài khoản" để đăng nhập thêm.</div>`;
+    listEl.innerHTML = `<div class="p-3 text-center text-gray-400 text-xs italic bg-gray-50/50 dark:bg-gray-800/30 rounded-xl">Chưa có tài khoản phụ nào khác được lưu trên máy này. Bấm "+ Thêm tài khoản" để đăng nhập thêm.</div>`;
     return;
   }
 
@@ -14463,7 +14469,7 @@ window.renderSavedAccountsInProfileModal = function() {
         <img src="${avSrc}" alt="${acc.fullName}" class="w-7 h-7 rounded-full object-cover shrink-0">
         <div class="min-w-0">
           <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${acc.fullName}</div>
-          <div class="text-[10px] text-gray-400 tabular-nums truncate">${acc.email}</div>
+          <div class="text-xs text-gray-400 tabular-nums truncate">${acc.email}</div>
         </div>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
@@ -14519,7 +14525,7 @@ window.openUserProfileModal = function() {
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
-    roleEl.className = `text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${
+    roleEl.className = `text-xs px-2 py-0.5 rounded-full font-semibold uppercase ${
       gCurrentUser.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
       gCurrentUser.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
       gCurrentUser.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
@@ -14647,11 +14653,11 @@ function updateUIForUnauthenticated() {
   if (hdrName) hdrName.textContent = 'Đăng nhập';
   if (roleEl) {
     roleEl.textContent = 'CHƯA ĐĂNG NHẬP';
-    roleEl.className = 'text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
+    roleEl.className = 'text-xs px-1.5 py-0.2 rounded font-semibold uppercase bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300';
   }
   if (hdrRole) {
     hdrRole.textContent = 'CHƯA ĐĂNG NHẬP';
-    hdrRole.className = 'text-[9px] font-semibold text-gray-400 uppercase';
+    hdrRole.className = 'text-xs font-semibold text-gray-400 uppercase';
   }
 
   // Ẩn toàn bộ menu điều hướng khi chưa đăng nhập
@@ -14707,12 +14713,12 @@ function applyUserSessionToUI() {
 
   if (roleEl) {
     roleEl.textContent = gCurrentUser.roleName || gCurrentUser.role;
-    roleEl.className = `text-[9.5px] px-1.5 py-0.2 rounded font-semibold uppercase truncate ${curStyle.bg}`;
+    roleEl.className = `text-xs px-1.5 py-0.2 rounded font-semibold uppercase truncate ${curStyle.bg}`;
   }
 
   if (hdrRole) {
     hdrRole.textContent = gCurrentUser.role || 'USER';
-    hdrRole.className = `text-[9px] font-semibold uppercase truncate ${curStyle.text}`;
+    hdrRole.className = `text-xs font-semibold uppercase truncate ${curStyle.text}`;
   }
 
   const adminBtn = document.getElementById('adminPendingReqBtn');
@@ -15055,15 +15061,15 @@ window.renderSitesOptions = function() {
             <i data-lucide="${site.code === 'ALL' ? 'globe' : 'store'}" class="w-4 h-4"></i>
           </div>
           <div class="min-w-0">
-            <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-2">
+            <div class="font-semibold text-sm text-gray-900 dark:text-white truncate flex items-center gap-2">
               <span>${site.name}</span>
-              <span class="text-[9.5px] px-1.5 py-0.2 rounded font-semibold ${
+              <span class="text-xs px-1.5 py-0.2 rounded font-semibold ${
                 site.region === 'Miền Nam' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
                 site.region === 'Miền Bắc' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
                 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
               }">${site.region}</span>
             </div>
-            <div class="text-[10.5px] text-gray-400 truncate">${site.desc}</div>
+            <div class="text-xs text-gray-400 truncate">${site.desc}</div>
           </div>
         </div>
         <div class="site-radio-check size-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
@@ -15272,7 +15278,7 @@ window.checkPendingAccessRequests = async function() {
         btn.classList.remove('hidden');
         if (badge) {
           badge.textContent = pending.length;
-          badge.className = `px-1.5 py-0.2 rounded-full text-[9.5px] font-semibold ${
+          badge.className = `px-1.5 py-0.2 rounded-full text-xs font-semibold ${
             pending.length > 0 ? 'bg-rose-600 text-white animate-pulse' : 'bg-gray-400 text-white'
           }`;
         }
@@ -15321,22 +15327,22 @@ function renderAdminRequestsTable() {
     const isApproved = req.status === 'APPROVED';
 
     const statusBadge = isPending 
-      ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">ĐANG CHỜ DUYỆT</span>'
+      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">ĐANG CHỜ DUYỆT</span>'
       : isApproved
-      ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">ĐÃ DUYỆT</span>'
-      : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">TỪ CHỐI</span>';
+      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">ĐÃ DUYỆT</span>'
+      : '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">TỪ CHỐI</span>';
 
     const actions = isPending ? `
       <div class="flex items-center justify-center gap-1.5">
-        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] flex items-center gap-1 shadow-xs active:translate-y-px transition-all">
+        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs active:translate-y-px transition-all">
           <i data-lucide="check" class="w-3 h-3"></i> Duyệt
         </button>
-        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-[10px] flex items-center gap-1 active:translate-y-px transition-all">
+        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1 active:translate-y-px transition-all">
           <i data-lucide="x" class="w-3 h-3"></i> Từ chối
         </button>
       </div>
     ` : `
-      <div class="text-center text-[10px] text-gray-400 tabular-nums">
+      <div class="text-center text-xs text-gray-400 tabular-nums">
         ${req.reviewed_by || 'Admin'}<br>${(req.reviewed_at || '').substring(0, 16)}
       </div>
     `;
@@ -15345,16 +15351,16 @@ function renderAdminRequestsTable() {
       <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
         <td class="py-2.5 px-3">
           <div class="font-bold text-gray-900 dark:text-white">${repairAtobMojibake(req.user_name || req.user_email)}</div>
-          <div class="text-[10.5px] text-gray-400 tabular-nums">${req.user_email}</div>
+          <div class="text-xs text-gray-400 tabular-nums">${req.user_email}</div>
         </td>
         <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">${req.requested_feature || '--'}</td>
         <td class="py-2.5 px-3">
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
+          <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
         </td>
-        <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-[11px] max-w-[200px] truncate" title="${req.reason || ''}">
+        <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-xs max-w-[200px] truncate" title="${req.reason || ''}">
           ${req.reason || '--'}
         </td>
-        <td class="py-2.5 px-3 text-[10px] text-gray-400 tabular-nums">
+        <td class="py-2.5 px-3 text-xs text-gray-400 tabular-nums">
           ${(req.created_at || '').substring(0, 16)}
         </td>
         <td class="py-2.5 px-3 text-center">
@@ -15563,13 +15569,13 @@ window.renderRoleSwitcherModal = function() {
             <div class="min-w-0 text-left">
               <div class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5 truncate">
                 <span>${r.name}</span>
-                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-brand-500 text-white shrink-0">ĐANG CHỌN</span>' : ''}
+                ${isCurrent ? '<span class="text-xs px-1.5 py-0.2 rounded font-semibold bg-brand-500 text-white shrink-0">ĐANG CHỌN</span>' : ''}
               </div>
-              <div class="text-[10px] text-gray-400 truncate mt-0.5">${r.desc}</div>
+              <div class="text-xs text-gray-400 truncate mt-0.5">${r.desc}</div>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[9px] px-2 py-0.5 rounded font-semibold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+            <span class="text-xs px-2 py-0.5 rounded font-semibold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
               <i data-lucide="check" class="w-3 h-3"></i> Đã duyệt
             </span>
           </div>
@@ -15586,13 +15592,13 @@ window.renderRoleSwitcherModal = function() {
             <div class="min-w-0 text-left">
               <div class="font-bold text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 truncate">
                 <span>${r.name}</span>
-                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 shrink-0">CẦN ADMIN DUYỆT</span>
+                <span class="text-xs px-1.5 py-0.2 rounded font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 shrink-0">CẦN ADMIN DUYỆT</span>
               </div>
-              <div class="text-[10px] text-gray-400 truncate mt-0.5">Bạn chưa có quyền sử dụng vai trò này</div>
+              <div class="text-xs text-gray-400 truncate mt-0.5">Bạn chưa có quyền sử dụng vai trò này</div>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold text-[10.5px] border border-brand-200 dark:border-brand-800 active:translate-y-px transition-all flex items-center gap-1">
+            <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold text-xs border border-brand-200 dark:border-brand-800 active:translate-y-px transition-all flex items-center gap-1">
               <i data-lucide="send" class="w-3 h-3"></i>
               <span>Xin duyệt</span>
             </button>
@@ -15716,7 +15722,7 @@ window.renderLoginRoleSelection = function(targetUser) {
             <span class="w-2 h-2 rounded-full ${isCurrent ? 'bg-emerald-500 ring-2 ring-emerald-200 dark:ring-emerald-900' : 'bg-gray-300 dark:bg-gray-600'} shrink-0"></span>
             <span class="font-bold text-gray-800 dark:text-gray-200 truncate">${r.name}</span>
           </div>
-          <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">ĐÃ DUYỆT</span>
+          <span class="text-xs px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">ĐÃ DUYỆT</span>
         </div>
       `;
     } else {
@@ -15727,7 +15733,7 @@ window.renderLoginRoleSelection = function(targetUser) {
             <i data-lucide="lock" class="w-3 h-3 text-gray-400 shrink-0"></i>
             <span class="font-bold text-gray-400 dark:text-gray-500 truncate">${r.name}</span>
           </div>
-          <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto text-[9.5px] px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold hover:underline shrink-0">Xin duyệt</button>
+          <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto text-xs px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold hover:underline shrink-0">Xin duyệt</button>
         </div>
       `;
     }
