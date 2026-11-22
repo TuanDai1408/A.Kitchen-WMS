@@ -3198,58 +3198,65 @@
 
         </div>
       </section>
-<section id="portal-history" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
+<section id="portal-history" class="tab-panel space-y-5">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Lịch sử đặt hàng</h1>
+            <p class="page-subtitle">Theo dõi tiến độ duyệt, giao nhận và tổng giá trị các đơn đặt hàng</p>
+          </div>
+        </div>
+
+        <div class="filter-bar">
           <select id="hsVung" class="hidden"></select>
           <select id="hsSite" class="hidden"></select>
-          <div class="flex-1 min-w-[160px]">
-            <div class="flex justify-between items-center mb-1">
-              <label class="font-bold text-gray-700 dark:text-gray-200">TRẠNG THÁI ĐƠN</label>
-            </div>
-            <select id="hsOrderStatusFilter" onchange="filterHsOrders(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-medium outline-none focus:border-brand-500">
+          <div class="field">
+            <label for="hsOrderStatusFilter" class="field-label">Trạng thái đơn</label>
+            <select id="hsOrderStatusFilter" onchange="filterHsOrders(this.value)" class="select">
               <option value="ALL">Tất cả trạng thái</option>
               <option value="APPROVED">Đã phê duyệt đơn</option>
-              <option value="PENDING">⏳ Chờ duyệt định mức</option>
+              <option value="PENDING">Chờ duyệt định mức</option>
               <option value="DELIVERED">Đã nhận hàng tại kho</option>
               <option value="REJECTED">Đã hủy đơn</option>
             </select>
           </div>
-          <div class="flex-1 min-w-[140px]">
-            <div class="flex justify-between items-center mb-1">
-              <label class="font-bold text-gray-700 dark:text-gray-200">THÁNG ĐẶT</label>
-              <button type="button" onclick="document.getElementById('hsMonth').value=''; loadHistory();" class="text-[11px] text-brand-600 hover:underline">Tất cả tháng</button>
+          <div class="field">
+            <div class="flex justify-between items-center">
+              <label for="hsMonth" class="field-label">Tháng đặt</label>
+              <button type="button" onclick="document.getElementById('hsMonth').value=''; loadHistory();" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">Tất cả tháng</button>
             </div>
-            <input type="month" id="hsMonth" onchange="loadHistory()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            <input type="month" id="hsMonth" onchange="loadHistory()" class="input">
           </div>
-          <button onclick="loadHistory()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="loadHistory()" class="btn btn-secondary w-full sm:w-auto">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Làm mới</span>
+            </button>
+          </div>
         </div>
 
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+        <div class="table-card p-5">
+          <div class="hidden lg:block table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="p-3">Mã đơn hàng</th>
-                  <th class="p-3">Ngày đặt</th>
-                  <th class="p-3">Site</th>
-                  <th class="p-3">Người đặt</th>
-                  <th class="p-3 text-right">Số dòng</th>
-                  <th class="p-3 text-right">Tổng SL</th>
-                  <th class="p-3 text-right">Tổng tiền</th>
-                  <th class="p-3 text-center">Trạng thái</th>
-                  <th class="p-3 text-right">Thao tác</th>
+                  <th class="col-code">Mã đơn hàng</th>
+                  <th class="col-date">Ngày đặt</th>
+                  <th>Site</th>
+                  <th>Người đặt</th>
+                  <th class="col-num text-right">Số dòng</th>
+                  <th class="col-num text-right">Tổng SL</th>
+                  <th class="col-num text-right">Tổng tiền</th>
+                  <th class="col-badge text-center">Trạng thái</th>
+                  <th class="col-actions text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody id="hsBody" class="divide-y divide-slate-100">
+              <tbody id="hsBody" class="divide-y divide-gray-100 dark:divide-gray-800">
                 <tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải lịch sử...</td></tr>
               </tbody>
             </table>
           </div>
-        <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
-        <div id="hsMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
-
+          <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
+          <div id="hsMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
 <section id="portal-baocao" class="tab-panel space-y-4">
@@ -6903,17 +6910,20 @@
         const tbody = document.getElementById('hsBody');
         if (json.success && json.data.length) {
           tbody.innerHTML = json.data.map(o => `
-            <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-              <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${o.maDon}</td>
-              <td class="p-3 tabular-nums">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
-              <td class="p-3 font-bold text-gray-900 dark:text-white">${o.site}</td>
-              <td class="p-3">${o.nguoiDat}</td>
-              <td class="p-3 text-right tabular-nums">${o.soDong}</td>
-              <td class="p-3 text-right tabular-nums font-bold">${fmtNum(o.tongSL)}</td>
-              <td class="p-3 text-right tabular-nums font-bold text-brand-800">${fmtVND(o.tongTien)}</td>
-              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200">${o.trangThai || 'Mới tạo'}</span></td>
-              <td class="p-3 text-right">
-                <button onclick="viewOrderDetail('${o.maDon}')" class="px-2.5 py-1 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 rounded font-bold">Xem</button>
+            <tr>
+              <td class="col-code">${cellCode(o.maDon)}</td>
+              <td class="col-date">${cellDate(o.ngayDat)}</td>
+              <td>${cellSite(o.site)}</td>
+              <td>${cellPerson(o.nguoiDat)}</td>
+              <td class="col-num">${o.soDong}</td>
+              <td class="col-num font-medium">${fmtNum(o.tongSL)}</td>
+              <td class="col-num font-semibold text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
+              <td class="col-badge">${cellBadge('neutral', o.trangThai || 'Mới tạo')}</td>
+              <td class="col-actions">
+                <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-sm btn-ghost" title="Xem chi tiết">
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <span>Xem</span>
+                </button>
               </td>
             </tr>
           `).join('');
@@ -10959,45 +10969,47 @@ window.renderHsOrdersList = function(items) {
   // Desktop Table
   if (tbody) {
     tbody.innerHTML = items.map(o => `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${o.maDon}</td>
-        <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
-        <td class="p-3 font-bold text-gray-900 dark:text-white">${o.site}</td>
-        <td class="p-3 text-gray-700 dark:text-gray-300">${o.nguoiDat}</td>
-        <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${o.soDong}</td>
-        <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-        <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
-        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span></td>
-        <td class="p-3 text-right">
-          <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-            Chi tiết
+      <tr>
+        <td class="col-code">${cellCode(o.maDon)}</td>
+        <td class="col-date">${cellDate(o.ngayDat)}</td>
+        <td>${cellSite(o.site)}</td>
+        <td>${cellPerson(o.nguoiDat)}</td>
+        <td class="col-num">${o.soDong}</td>
+        <td class="col-num font-medium">${fmtNum(o.tongSL)}</td>
+        <td class="col-num font-semibold text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
+        <td class="col-badge">${cellBadge('neutral', o.trangThai || 'Mới tạo')}</td>
+        <td class="col-actions">
+          <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-sm btn-ghost" title="Xem chi tiết">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span>Xem</span>
           </button>
         </td>
       </tr>
     `).join('');
   }
 
-  // Mobile Cards
+    // Mobile Cards
   if (mob) {
     mob.innerHTML = items.map(o => `
-      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${o.maDon}</span>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
+      <div class="data-card space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          ${cellCode(o.maDon)}
+          ${cellBadge('neutral', o.trangThai || 'Mới tạo')}
         </div>
-        <div class="font-bold text-xs text-gray-900 dark:text-white">${o.site}</div>
-        <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-          <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</b></div>
-          <div>Người đặt: <b class="text-gray-900 dark:text-white">${o.nguoiDat}</b></div>
-          <div>Số loại mặt hàng: <b class="tabular-nums text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
-          <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
-          <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
+        <div class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${o.site}</div>
+        <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-gray-800">
+          <div>Ngày đặt: <b class="num text-gray-900 dark:text-white whitespace-nowrap">${fmtDate(o.ngayDat)}</b></div>
+          <div>Người đặt: <b>${cellPerson(o.nguoiDat)}</b></div>
+          <div>Số mặt hàng: <b class="num text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
+          <div>Tổng SL: <b class="num text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
+          <div class="col-span-2 flex justify-between items-center pt-1.5 border-t border-gray-100 dark:border-gray-800">
             <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-            <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+            <span class="num font-semibold text-sm text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
           </div>
         </div>
-        <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-          <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết Đơn
+        <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-secondary w-full">
+          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          <span>Xem chi tiết</span>
         </button>
       </div>
     `).join('');
