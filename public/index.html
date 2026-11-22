@@ -3005,23 +3005,23 @@
           </div>
         </div>
 
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+        <div class="table-card p-5">
+          <div class="hidden lg:block table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="p-3">Mã chứng từ</th>
-                  <th class="p-3">Site</th>
-                  <th class="p-3">Loại chứng từ</th>
-                  <th class="p-3">Ngày xuất</th>
-                  <th class="p-3">Ngày nhận</th>
-                  <th class="p-3">Nhà cung cấp</th>
-                  <th class="p-3">Người nhập</th>
-                  <th class="p-3 text-center">Tệp đính kèm</th>
-                  <th class="p-3 text-right">Chi tiết</th>
+                  <th class="col-code">Mã chứng từ</th>
+                  <th>Site</th>
+                  <th class="col-badge">Loại chứng từ</th>
+                  <th class="col-date">Ngày xuất</th>
+                  <th class="col-date">Ngày nhận</th>
+                  <th>Nhà cung cấp</th>
+                  <th>Người nhập</th>
+                  <th class="col-badge text-center">Tệp</th>
+                  <th class="col-actions text-right">Chi tiết</th>
                 </tr>
               </thead>
-              <tbody id="scBody" class="divide-y divide-slate-100">
+              <tbody id="scBody">
                 <tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải chứng từ...</td></tr>
               </tbody>
             </table>
@@ -6779,6 +6779,38 @@
       return s;
     };
 
+    window.cellCode = function(v) {
+      if (!v || v === '—' || v === 'null') return '<span class="text-gray-400">—</span>';
+      return `<span class="code text-brand-600 dark:text-brand-400 font-semibold">${String(v)}</span>`;
+    };
+
+    window.cellDate = function(v) {
+      return `<span class="num whitespace-nowrap">${fmtDate(v)}</span>`;
+    };
+
+    window.cellBadge = function(kind, text) {
+      if (!text || text === '—' || text === 'null') return '<span class="text-gray-400">—</span>';
+      return `<span class="badge badge-${kind || 'neutral'}">${String(text)}</span>`;
+    };
+
+    window.cellFiles = function(n) {
+      const count = parseInt(n, 10) || 0;
+      if (!count) return '<span class="text-gray-400">—</span>';
+      return `<span class="file-chip" title="${count} tệp đính kèm"><svg class="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg><span>${count}</span></span>`;
+    };
+
+    window.cellPerson = function(v) {
+      if (!v || v === 'unknown' || v === 'N/A' || v === 'undefined' || v === 'null' || String(v).trim() === '') {
+        return '<span class="text-gray-400">—</span>';
+      }
+      return `<span class="text-gray-700 dark:text-gray-300">${String(v)}</span>`;
+    };
+
+    window.cellSite = function(code, name) {
+      const display = name ? `${code} - ${name}` : (code || '—');
+      return `<span class="text-gray-900 dark:text-white font-medium truncate block max-w-[140px]" title="${display}">${display}</span>`;
+    };
+
     async function searchVouchers() {
       const site = document.getElementById('scSite').value;
       const loai = document.getElementById('scLoai').value;
@@ -6789,17 +6821,20 @@
         const tbody = document.getElementById('scBody');
         if (json.success && json.data.length) {
           tbody.innerHTML = json.data.map(r => `
-            <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-              <td class="p-3"><span class="code text-brand-600 dark:text-brand-400">${r.maCT}</span></td>
-              <td class="p-3">${r.site}</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800/80 text-[11px] whitespace-nowrap">${r.loaiHoaDon}</span></td>
-              <td class="p-3 text-center"><span class="num whitespace-nowrap">${fmtDate(r.ngayXuat)}</span></td>
-              <td class="p-3 text-center"><span class="num whitespace-nowrap">${fmtDate(r.ngayNhan)}</span></td>
-              <td class="p-3 font-bold">${r.nhaCungCap || '—'}</td>
-              <td class="p-3">${r.nguoiNhap}</td>
-              <td class="p-3 text-center">${r.soFile ? `📎 ${r.soFile}` : '—'}</td>
-              <td class="p-3 text-right">
-                <button onclick="viewVoucherDetail('${r.maCT}')" class="px-2.5 py-1 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 rounded font-bold">Xem</button>
+            <tr>
+              <td class="col-code">${cellCode(r.maCT)}</td>
+              <td>${cellSite(r.site)}</td>
+              <td class="col-badge">${cellBadge('neutral', r.loaiHoaDon)}</td>
+              <td class="col-date">${cellDate(r.ngayXuat)}</td>
+              <td class="col-date">${cellDate(r.ngayNhan)}</td>
+              <td><span class="font-medium text-gray-900 dark:text-white">${r.nhaCungCap || '—'}</span></td>
+              <td>${cellPerson(r.nguoiNhap)}</td>
+              <td class="col-badge text-center">${cellFiles(r.soFile)}</td>
+              <td class="col-actions text-right">
+                <button onclick="viewVoucherDetail('${r.maCT}')" class="btn btn-sm btn-ghost" title="Xem chi tiết">
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <span>Xem</span>
+                </button>
               </td>
             </tr>
           `).join('');
@@ -9855,20 +9890,19 @@ window.searchVouchers = async function() {
     // Desktop Table
     if (tbody) {
       tbody.innerHTML = items.map(r => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3"><span class="code text-brand-600 dark:text-brand-400 font-semibold">${r.maCT}</span></td>
-          <td class="p-3 text-gray-900 dark:text-gray-100 font-medium">${r.site}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[11px] whitespace-nowrap border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span></td>
-          <td class="p-3 text-gray-600 dark:text-gray-300"><span class="num whitespace-nowrap">${fmtDate(r.ngayXuat)}</span></td>
-          <td class="p-3 text-gray-600 dark:text-gray-300"><span class="num whitespace-nowrap">${fmtDate(r.ngayNhan)}</span></td>
-          <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.nhaCungCap || '—'}</td>
-          <td class="p-3 text-gray-600 dark:text-gray-300">${r.nguoiNhap}</td>
-          <td class="p-3 text-center">
-            ${r.soFile ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 whitespace-nowrap">📎 ${r.soFile} file</span>` : '<span class="text-gray-400 text-xs">—</span>'}
-          </td>
-          <td class="p-3 text-right">
-            <button onclick="viewVoucherDetail('${r.maCT}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-              Xem
+        <tr>
+          <td class="col-code">${cellCode(r.maCT)}</td>
+          <td>${cellSite(r.site)}</td>
+          <td class="col-badge">${cellBadge('neutral', r.loaiHoaDon)}</td>
+          <td class="col-date">${cellDate(r.ngayXuat)}</td>
+          <td class="col-date">${cellDate(r.ngayNhan)}</td>
+          <td><span class="font-medium text-gray-900 dark:text-white">${r.nhaCungCap || '—'}</span></td>
+          <td>${cellPerson(r.nguoiNhap)}</td>
+          <td class="col-badge text-center">${cellFiles(r.soFile)}</td>
+          <td class="col-actions text-right">
+            <button onclick="viewVoucherDetail('${r.maCT}')" class="btn btn-sm btn-ghost" title="Xem chi tiết">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Xem</span>
             </button>
           </td>
         </tr>
@@ -9878,20 +9912,21 @@ window.searchVouchers = async function() {
     // Mobile Cards
     if (mobContainer) {
       mobContainer.innerHTML = items.map(r => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="code text-xs text-brand-600 dark:text-brand-400 font-semibold">${r.maCT}</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-nowrap">${r.loaiHoaDon}</span>
+        <div class="data-card space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            ${cellCode(r.maCT)}
+            ${cellBadge('neutral', r.loaiHoaDon)}
           </div>
-          <div class="font-bold text-xs text-gray-900 dark:text-white leading-snug">${r.site}</div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-gray-600 dark:text-gray-400">
+          <div class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${r.site}</div>
+          <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-gray-800">
             <div>Ngày nhận: <b class="num text-gray-900 dark:text-white whitespace-nowrap">${fmtDate(r.ngayNhan)}</b></div>
             <div>NCC: <b class="text-gray-900 dark:text-white truncate block">${r.nhaCungCap || '—'}</b></div>
-            <div>Người nhập: <b class="text-gray-900 dark:text-white">${r.nguoiNhap}</b></div>
-            <div>Đính kèm: <b class="${r.soFile ? 'text-rose-600 dark:text-rose-400' : 'text-gray-400'} whitespace-nowrap">${r.soFile ? `📎 ${r.soFile} file` : 'Không có'}</b></div>
+            <div>Người nhập: <b>${cellPerson(r.nguoiNhap)}</b></div>
+            <div>Đính kèm: <b>${cellFiles(r.soFile)}</b></div>
           </div>
-          <button onclick="viewVoucherDetail('${r.maCT}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-            <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết &amp; Ảnh Đính Kèm
+          <button onclick="viewVoucherDetail('${r.maCT}')" class="btn btn-secondary w-full">
+            <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span>Xem chi tiết</span>
           </button>
         </div>
       `).join('');
@@ -9918,9 +9953,10 @@ window.viewVoucherDetail = async function(maCT) {
       if (v.files && v.files.length) {
         galleryHtml = `
           <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-            <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-1.5">
-              <span>🖼️ Tệp đính kèm &amp; Hình ảnh</span>
-              <span class="px-2 py-0.2 rounded-full text-[10px] tabular-nums bg-rose-100 text-brand-500 dark:bg-rose-950 dark:text-rose-300 font-bold">${v.files.length}</span>
+            <div class="font-medium text-xs text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+              <span>Tệp đính kèm & hình ảnh</span>
+              <span class="badge badge-neutral">${v.files.length}</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               ${v.files.map((f, i) => {
@@ -9936,21 +9972,23 @@ window.viewVoucherDetail = async function(maCT) {
                     ${thumbUrl ? `
                       <div class="w-full h-36 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800 relative cursor-pointer group" onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')">
                         <img src="${thumbUrl}" alt="${f.file_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity">
-                          🔍 Phóng to xem ảnh
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-medium transition-opacity gap-1.5">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path></svg>
+                          <span>Phóng to xem ảnh</span>
                         </div>
                       </div>
                     ` : ''}
                     <div class="flex items-center justify-between gap-2 min-w-0">
-                      <div class="truncate text-xs font-medium text-gray-800 dark:text-gray-200" title="${f.file_name}">
-                        ${isImg ? '🖼️' : '📄'} ${f.file_name}
+                      <div class="truncate text-xs font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1.5" title="${f.file_name}">
+                        <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="truncate">${f.file_name}</span>
                       </div>
                       <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')" class="px-2.5 py-1 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-[11px] font-bold transition-all shadow-2xs">
+                        <button onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')" class="btn btn-sm btn-primary">
                           Xem
                         </button>
-                        <a href="${f.file_link}" target="_blank" class="p-1 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 text-[11px]" title="Mở Drive tab mới">
-                          ↗
+                        <a href="${f.file_link}" target="_blank" class="btn btn-sm btn-secondary p-1" title="Mở Drive tab mới">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                         </a>
                       </div>
                     </div>
@@ -9966,15 +10004,15 @@ window.viewVoucherDetail = async function(maCT) {
 
       const html = `
         <div class="space-y-3 text-xs">
-          <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <div><span class="text-gray-400">Mã chứng từ:</span><br><b class="tabular-nums text-sm text-brand-500 dark:text-brand-400">${v.voucher_code}</b></div>
+          <div class="grid grid-cols-2 gap-2.5 p-3.5 bg-gray-50 dark:bg-gray-900/60 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div><span class="text-gray-400">Mã chứng từ:</span><br><b class="code text-sm text-brand-600 dark:text-brand-400 font-semibold">${v.voucher_code}</b></div>
             <div><span class="text-gray-400">Loại hóa đơn:</span><br><b class="text-gray-800 dark:text-gray-200">${v.invoice_type}</b></div>
             <div><span class="text-gray-400">Điểm bán:</span><br><b class="text-gray-800 dark:text-gray-200">${v.site_name}</b></div>
             <div><span class="text-gray-400">Nhà cung cấp:</span><br><b class="text-gray-800 dark:text-gray-200">${v.supplier_name || '—'}</b></div>
-            <div><span class="text-gray-400">Người giao:</span><br><b class="text-gray-800 dark:text-gray-200">${v.deliverer_name || '—'}</b></div>
-            <div><span class="text-gray-400">Người nhận:</span><br><b class="text-gray-800 dark:text-gray-200">${v.receiver_name || '—'}</b></div>
-            <div><span class="text-gray-400">Ngày xuất HĐ:</span><br><b class="tabular-nums text-gray-800 dark:text-gray-200">${v.invoice_date || '—'}</b></div>
-            <div><span class="text-gray-400">Ngày nhận hàng:</span><br><b class="tabular-nums text-gray-800 dark:text-gray-200">${v.receive_date || '—'}</b></div>
+            <div><span class="text-gray-400">Người giao:</span><br>${cellPerson(v.deliverer_name)}</div>
+            <div><span class="text-gray-400">Người nhận:</span><br>${cellPerson(v.receiver_name)}</div>
+            <div><span class="text-gray-400">Ngày xuất HĐ:</span><br><b class="num text-gray-800 dark:text-gray-200">${fmtDate(v.invoice_date)}</b></div>
+            <div><span class="text-gray-400">Ngày nhận hàng:</span><br><b class="num text-gray-800 dark:text-gray-200">${fmtDate(v.receive_date)}</b></div>
           </div>
           <div>
             <span class="text-gray-400">Ghi chú nghiệp vụ:</span>
