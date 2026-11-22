@@ -767,6 +767,863 @@
               <span class="text-xs text-gray-400">Đơn vị: VNĐ</span>
             </div>
 
+            <!-- Desktop P&L Statement Table -->
+            <div class="hidden md:block table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Khoản mục P&amp;L</th>
+                    <th class="col-num text-right">Số tiền (VNĐ)</th>
+                    <th class="col-num text-right">% Doanh thu</th>
+                    <th class="col-badge text-center">Đánh giá</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                  <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+                    <td class="font-semibold text-gray-900 dark:text-white">1. Doanh thu gộp (Gross Sales)</td>
+                    <td class="col-num text-right num font-semibold" id="plRowGross">485,000,000 ₫</td>
+                    <td class="col-num text-right num text-gray-500">103.1%</td>
+                    <td class="col-badge text-center"><span class="badge badge-neutral">Trước KM</span></td>
+                  </tr>
+                  <tr class="text-gray-500">
+                    <td class="pl-8">(-) Chiết khấu / Khuyến mãi POS</td>
+                    <td class="col-num text-right num text-rose-600 dark:text-rose-400" id="plRowDiscount">-14,550,000 ₫</td>
+                    <td class="col-num text-right num">-3.1%</td>
+                    <td class="col-badge text-center"><span class="badge badge-warning">&lt; 4%</span></td>
+                  </tr>
+                  <tr class="bg-brand-50/40 dark:bg-brand-950/20 font-semibold text-brand-700 dark:text-brand-300">
+                    <td>Doanh thu thuần (Net Sales)</td>
+                    <td class="col-num text-right num font-bold text-brand-700 dark:text-brand-300" id="plRowNetSales">470,450,000 ₫</td>
+                    <td class="col-num text-right num font-bold">100.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-brand">Cơ sở 100%</span></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+                    <td class="font-semibold text-gray-900 dark:text-white">2. Chi phí nguyên vật liệu (Food Cost)</td>
+                    <td class="col-num text-right num font-semibold text-rose-600 dark:text-rose-400" id="plRowFoodCost">-150,544,000 ₫</td>
+                    <td class="col-num text-right num font-semibold text-rose-600 dark:text-rose-400" id="plRowFoodCostPct">32.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-brand" id="plBadgeFoodCost">Tốt (Mục tiêu 32%)</span></td>
+                  </tr>
+                  <tr class="bg-emerald-50/40 dark:bg-emerald-950/20 font-semibold text-emerald-800 dark:text-emerald-300">
+                    <td>Lợi nhuận gộp (Gross Profit)</td>
+                    <td class="col-num text-right num font-bold" id="plRowGrossProfit">319,906,000 ₫</td>
+                    <td class="col-num text-right num font-bold" id="plRowGrossMarginPct">68.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-brand">Biên 68%</span></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/20">
+                    <td class="font-semibold text-gray-900 dark:text-white">3. Chi phí nhân công (Labor / COL)</td>
+                    <td class="col-num text-right num font-semibold text-rose-600 dark:text-rose-400" id="plRowLabor">-94,090,000 ₫</td>
+                    <td class="col-num text-right num font-semibold text-rose-600 dark:text-rose-400" id="plRowLaborPct">20.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-brand" id="plBadgeLabor">Chuẩn (Mục tiêu 20%)</span></td>
+                  </tr>
+                  <tr class="bg-blue-50/40 dark:bg-blue-950/20 font-semibold text-blue-800 dark:text-blue-300">
+                    <td>Lợi nhuận trước khấu hao (EBITDA)</td>
+                    <td class="col-num text-right num font-bold" id="plRowEBITDA">225,816,000 ₫</td>
+                    <td class="col-num text-right num font-bold" id="plRowEBITDAPct">48.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-brand">Prime Margin 52%</span></td>
+                  </tr>
+                  <tr class="text-gray-500">
+                    <td class="pl-8">4. Chi phí mặt bằng &amp; Tiện ích (Rent &amp; Utilities)</td>
+                    <td class="col-num text-right num">-47,045,000 ₫</td>
+                    <td class="col-num text-right num">10.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-neutral">Cố định</span></td>
+                  </tr>
+                  <tr class="text-gray-500">
+                    <td class="pl-8">5. Chi phí vận hành khác (Other Opex)</td>
+                    <td class="col-num text-right num">-14,113,500 ₫</td>
+                    <td class="col-num text-right num">3.0%</td>
+                    <td class="col-badge text-center"><span class="badge badge-neutral">Biến phí</span></td>
+                  </tr>
+                  <tr class="bg-gray-900 text-white font-bold text-sm">
+                    <td class="py-3 px-3">LỢI NHUẬN RÒNG (NET PROFIT)</td>
+                    <td class="col-num text-right py-3 px-3 num font-bold text-emerald-400" id="plRowNetProfit">164,657,500 ₫</td>
+                    <td class="col-num text-right py-3 px-3 num font-bold text-emerald-400" id="plRowNetProfitPct">35.0%</td>
+                    <td class="col-badge text-center py-3 px-3"><span class="badge badge-brand">Vượt 5% Kế hoạch</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile Native Scorecard for P&L Statement -->
+            <div id="plBreakdownMobileCards" class="block md:hidden space-y-2.5">
+              <!-- Doanh thu thuần Card -->
+              <div class="data-card p-3 border-l-4 border-l-brand-600 bg-brand-50/30 dark:bg-brand-950/20">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-gray-900 dark:text-white">Doanh thu thuần (Net Sales)</span>
+                  <span class="badge badge-brand text-[11px]">100%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1">
+                  <span class="text-[11px] text-gray-400">Gross: <span id="plMobGross" class="num font-medium text-gray-600 dark:text-gray-300">485.000.000 ₫</span></span>
+                  <span id="plMobNetSales" class="num font-bold text-sm text-brand-700 dark:text-brand-300">470.450.000 ₫</span>
+                </div>
+              </div>
+
+              <!-- Chi phí Food Cost Card -->
+              <div class="data-card p-3">
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-xs text-gray-800 dark:text-gray-200">2. Chi phí Food Cost</span>
+                  <span id="plMobFoodCostPct" class="num font-bold text-xs text-rose-600 dark:text-rose-400">32.0%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1">
+                  <span class="badge badge-brand text-[11px]">Mục tiêu 32%</span>
+                  <span id="plMobFoodCost" class="num font-semibold text-xs text-rose-600 dark:text-rose-400">-150.544.000 ₫</span>
+                </div>
+              </div>
+
+              <!-- Lợi nhuận gộp Card -->
+              <div class="data-card p-3 bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-800/40">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-emerald-900 dark:text-emerald-300">Lợi nhuận gộp (Gross Profit)</span>
+                  <span id="plMobGrossMarginPct" class="num font-bold text-xs text-emerald-700 dark:text-emerald-400">68.0%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1">
+                  <span class="text-[11px] text-gray-400">Biên gộp:</span>
+                  <span id="plMobGrossProfit" class="num font-bold text-sm text-emerald-800 dark:text-emerald-300">319.906.000 ₫</span>
+                </div>
+              </div>
+
+              <!-- Chi phí Nhân sự Labor Card -->
+              <div class="data-card p-3">
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-xs text-gray-800 dark:text-gray-200">3. Chi phí nhân công (Labor / COL)</span>
+                  <span id="plMobLaborPct" class="num font-bold text-xs text-rose-600 dark:text-rose-400">20.0%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1">
+                  <span class="badge badge-brand text-[11px]">Mục tiêu 20%</span>
+                  <span id="plMobLabor" class="num font-semibold text-xs text-rose-600 dark:text-rose-400">-94.090.000 ₫</span>
+                </div>
+              </div>
+
+              <!-- EBITDA Card -->
+              <div class="data-card p-3 bg-blue-50/40 dark:bg-blue-950/20 border-blue-100 dark:border-blue-800/40">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-blue-900 dark:text-blue-300">Lợi nhuận trước khấu hao (EBITDA)</span>
+                  <span id="plMobEBITDAPct" class="num font-bold text-xs text-blue-700 dark:text-blue-400">48.0%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1">
+                  <span class="text-[11px] text-gray-400">Prime margin 52%</span>
+                  <span id="plMobEBITDA" class="num font-bold text-sm text-blue-800 dark:text-blue-300">225.816.000 ₫</span>
+                </div>
+              </div>
+
+              <!-- LỢI NHUẬN RÒNG Card -->
+              <div class="data-card p-3.5 bg-gray-900 text-white rounded-xl">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-white">LỢI NHUẬN RÒNG (NET PROFIT)</span>
+                  <span id="plMobNetProfitPct" class="num font-bold text-xs text-emerald-400">35.0%</span>
+                </div>
+                <div class="flex items-baseline justify-between mt-1.5">
+                  <span class="badge badge-brand text-[11px]">Vượt kế hoạch</span>
+                  <span id="plMobNetProfit" class="num font-bold text-base text-emerald-400">164.657.500 ₫</span>
+                </div>
+              </div>
+            </div>
+        <img src="/assets/brand/logo-mark.png" alt="A.Kitchen" width="28" height="24" class="absolute w-7 h-auto object-contain block dark:hidden">
+        <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="28" height="24" class="absolute w-7 h-auto object-contain hidden dark:block">
+      </div>
+      <span class="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wide">A.Kitchen WMS</span>
+    </div>
+  </div>
+
+  <!-- Screen Reader Skip Link -->
+  <a class="sr-only" href="#main-content">skip to the main content</a>
+
+  <!-- Sidebar Backdrop (Mobile Drawer) -->
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 z-99 bg-gray-900/50 backdrop-blur-xs hidden xl:hidden" aria-hidden="true"></div>
+
+
+  <!-- Mobile / Tablet Drawer Overlay -->
+  
+
+  <!-- Sidebar Component (Desktop docked w-72, Tablet & Mobile off-canvas drawer) -->
+    <!-- =====================================================================
+       ORBIT SIBA FOOD: MODERN MINIMALIST ERP SIDEBAR (PC & TABLET)
+       ===================================================================== -->
+    <!-- =====================================================================
+       TAILADMIN EXACT SPECIFICATION SIDEBAR (Width: w-72.5 / 290px, Dark: dark:bg-black)
+       ===================================================================== -->
+  <aside id="sidebar" class="sidebar fixed top-0 left-0 z-9999 flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-all duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
+    
+    <!-- SIDEBAR HEADER (A.Kitchen Brand Exact Specification) -->
+    <div class="sidebar-header flex items-center justify-between gap-2 pt-5 pb-5">
+      <a href="#" onclick="switchTab('fnb-chain'); return false;" class="flex items-center gap-2 min-w-0" title="A.Kitchen WMS">
+        <img src="/assets/brand/logo-horizontal.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain block dark:hidden">
+        <img src="/assets/brand/logo-horizontal-dark.png" alt="A.Kitchen" width="176" height="40" decoding="async" class="h-10 w-auto max-w-[190px] object-contain hidden dark:block">
+      </a>
+      <button onclick="closeSidebar()" class="xl:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 active:translate-y-px transition-all" title="Đóng menu">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- SIDEBAR SEARCH BAR (TailAdmin exact input styling) -->
+    <div class="mb-5">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <input type="text" id="sidebarMenuSearch" oninput="filterSidebarMenu(this.value)" placeholder="Tìm chức năng..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-gray-50 dark:bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100/5 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none focus:border-brand-500 transition-all">
+      </div>
+    </div>
+
+    <!-- SIDEBAR NAVIGATION MENU (Scrollable Area) -->
+    <div class="no-scrollbar flex flex-1 flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
+      <nav class="space-y-6">
+        <!-- Group: Hiệu Quả & Doanh Thu (Chỉ hiển thị cho Admin) -->
+        <div class="sidebar-category hidden" data-cat="fnb-finance">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Hiệu quả & doanh thu</h3>
+            
+          </div>
+          <ul class="mb-4 flex flex-col gap-2">
+            <li>
+              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-brand-500 dark:text-brand-400"></i>
+                  <span class="truncate">Toàn Chuỗi & Xếp Hạng</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('fnb-pl', this)" data-tab="fnb-pl" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="pie-chart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Báo Cáo P&L Điểm Bán</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('fnb-pos', this)" data-tab="fnb-pos" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="zap" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Doanh Thu POS & Bán Lẻ</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <!-- Group: Vận Hành Kho Bếp -->
+        <div class="sidebar-category" data-cat="fnb-inventory">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Vận hành kho bếp</h3>
+            
+          </div>
+          <ul class="mb-4 flex flex-col gap-2">
+            <li>
+              <button onclick="switchTab('wh-dashboard', this)" data-tab="wh-dashboard" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="layout-dashboard" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tổng Quan Kho Vận</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('fnb-counts', this)" data-tab="fnb-counts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="clipboard-check" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Kiểm Kê Hằng Ngày</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="package-plus" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Nhập Hàng Điểm Bán</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('fnb-waste', this)" data-tab="fnb-waste" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="trash-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Hủy Hàng & Hao Hụt</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <!-- Group: Kho Vận & WMS -->
+        <div class="sidebar-category" data-cat="wh-wms">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Kho vận & WMS</h3>
+            
+          </div>
+          <ul class="mb-4 flex flex-col gap-2">
+            <li>
+              <button onclick="switchTab('wh-stock', this)" data-tab="wh-stock" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="calendar-clock" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Hạn Dùng & Xuất FEFO</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('wh-reorder', this)" data-tab="wh-reorder" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="alert-triangle" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Cảnh Báo Tồn ROP</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('wh-leadtime', this)" data-tab="wh-leadtime" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="truck" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Lead Time & NCC</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="boxes" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tồn Kho</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <!-- Group: Cổng Thông Tin & Đặt Hàng -->
+        <div class="sidebar-category" data-cat="portal-ops">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Cổng thông tin & đặt hàng</h3>
+          </div>
+          <ul class="mb-4 flex flex-col gap-2">
+            <li>
+              <button onclick="switchTab('portal-voucher', this)" data-tab="portal-voucher" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="file-text" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tạo & Duyệt Chứng Từ</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('portal-search', this)" data-tab="portal-search" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="search" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tra Cứu Chứng Từ</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="shopping-cart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Đặt Hàng Vật Tư Bếp</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('portal-history', this)" data-tab="portal-history" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="clock" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Lịch Sử Đặt Hàng</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('portal-baocao', this)" data-tab="portal-baocao" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="clipboard-list" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Báo Cáo Suất Ăn Ca</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('portal-kiemke', this)" data-tab="portal-kiemke" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="check-square" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Kiểm Kê Tồn Kho Kỳ</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <!-- Group: Hệ Thống & Danh Mục -->
+        <div class="sidebar-category" data-cat="sys-admin">
+          <div class="mb-2.5 px-3.5 flex items-center justify-between">
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Hệ thống & danh mục</h3>
+            
+          </div>
+          <ul class="mb-4 flex flex-col gap-2">
+            <li>
+              <button onclick="switchTab('fnb-sites', this)" data-tab="fnb-sites" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="building-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Danh Mục 14 Điểm Bán</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('user-matrix', this)" data-tab="user-matrix" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="shield-check" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Phân Quyền User Matrix</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <!-- SIDEBAR WIDGET / USER PROFILE FOOTER (TailAdmin Widget Box) -->
+    <div class="pt-3 pb-4 shrink-0 mt-auto border-t border-gray-200 dark:border-gray-800">
+      <div class="rounded-2xl bg-gray-50 dark:bg-white/3 p-3 border border-gray-200/80 dark:border-gray-800/80 flex items-center justify-between gap-2.5">
+        <!-- User Info (Click to open Auth Modal) -->
+        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer hover:opacity-90 transition-opacity" onclick="handleUserProfileClick()" role="button" title="Thông tin tài khoản & Chuyển đổi">
+          <div class="relative shrink-0">
+            <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=TD&background=19723c&color=fff&bold=true" alt="User" class="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700">
+            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-black"></span>
+          </div>
+          <div class="min-w-0">
+            <div id="sidebarUserName" class="font-bold text-xs text-gray-900 dark:text-white truncate">Tuấn Đại</div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="sidebarUserRoleBadge" class="text-xs px-1.5 py-0.2 rounded font-semibold uppercase bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="openRoleSwitcherModal()" title="Chuyển vai trò thử nghiệm" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/60 dark:hover:bg-white/5 active:translate-y-px transition-all">
+            <i data-lucide="shield" class="w-4 h-4 text-brand-500"></i>
+          </button>
+          <button onclick="dangXuatAdmin()" title="Đăng xuất" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-white/5 active:translate-y-px transition-all">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- Main Container -->
+  <div class="relative flex flex-1 flex-col h-screen overflow-x-hidden overflow-y-auto min-w-0">
+    
+    <!-- Top Header Bar (100% TailAdmin Specification, Mobile-Optimized) -->
+    <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2.5 sm:px-4 md:px-6 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs min-h-[56px] sm:min-h-[64px]">
+      
+      <!-- Left: Mobile Toggle & Brand / Active Tab -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <!-- Sidebar Toggle Button (Mobile / Desktop) -->
+        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="header-control inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-theme-xs active:translate-y-px transition-all">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Brand Logo on Mobile only (A.Kitchen Logo Mark) -->
+        <div class="flex items-center gap-2 lg:hidden shrink-0">
+          <img src="/assets/brand/logo-mark.png" alt="A.Kitchen" width="39" height="34" decoding="async" class="h-8 sm:h-9 w-auto object-contain block dark:hidden">
+          <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="39" height="34" decoding="async" class="h-8 sm:h-9 w-auto object-contain hidden dark:block">
+          <div class="hidden sm:flex flex-col leading-tight">
+            <span class="font-semibold text-gray-900 dark:text-white text-sm">A.Kitchen</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">WMS</span>
+          </div>
+        </div>
+
+        <!-- Hidden container for JS title sync -->
+        <span id="mobileHeaderTitle" class="hidden"></span>
+      </div>
+
+      <!-- Center: Global Quick Search -->
+      <div class="hidden lg:block flex-1 max-w-md xl:max-w-xl mx-2 xl:mx-4">
+        <div data-slot="input-group" class="header-control group/input-group relative flex w-full min-w-0 items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-theme-xs outline-hidden transition-colors has-[input:focus]:border-brand-300 has-[input:focus]:ring-4 has-[input:focus]:ring-brand-500/10">
+          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 ps-3 text-sm font-medium text-gray-400 select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" class="size-4.5 text-gray-400">
+              <path d="M14.382 14.383l3.325 3.326m-1.249-8.334a7.082 7.082 0 01-7.083 7.081 7.082 7.082 0 110-14.163 7.082 7.082 0 017.083 7.082z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <input
+            id="globalHeaderSearch"
+            oninput="filterGlobalQuickSearch(this.value)"
+            type="text"
+            placeholder="Tìm chức năng, SKU, hàng hóa... (F2)"
+            class="h-full flex-1 rounded-none border-0 bg-transparent px-2.5 text-sm text-gray-900 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white dark:placeholder:text-gray-500"
+          />
+          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3 text-xs font-medium text-gray-400 select-none">
+            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-xs font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
+              F2
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Controls, Filters & User Profile -->
+      <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 shrink-0">
+        
+        <!-- Global Branch & Region Taskbar Display (Interactive Pill) -->
+        <div onclick="openSiteSelectorModal()" class="header-control rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-3 flex items-center gap-2 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
+          <div class="w-5 h-5 rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center shrink-0">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          </div>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
+            <span id="taskbarSiteName" class="font-medium text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
+          </div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
+          <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
+        </div>
+
+        <!-- Global Month Picker (Hiển thị nhãn Tiếng Việt "Tháng MM/YYYY") -->
+        <div class="hidden md:flex items-center relative shrink-0">
+          <button type="button" onclick="const p = document.getElementById('globalMonthPicker'); if (p.showPicker) p.showPicker(); else p.click();" class="header-control px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium flex items-center gap-2 shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
+            <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0"></i>
+            <span id="currentDateDisplay" class="hidden 2xl:inline text-xs text-gray-500 dark:text-gray-400"></span>
+            <span id="globalMonthDisplay" class="text-sm font-medium text-gray-800 dark:text-gray-200">Tháng 11/2026</span>
+          </button>
+          <input type="month" id="globalMonthPicker" value="2026-11" onchange="if (typeof updateGlobalMonthLabel === 'function') updateGlobalMonthLabel(this.value); onGlobalMonthChange(this.value);" class="sr-only">
+        </div>
+
+        <!-- Admin Pending Requests Button (Visible for Admin) -->
+        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="header-control hidden px-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+          <span class="hidden xl:inline">Duyệt Quyền</span>
+          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-xs font-semibold bg-rose-600 text-white">0</span>
+        </button>
+
+        <!-- Theme Toggler Button -->
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="header-control size-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:translate-y-px transition-all shrink-0">
+          <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- User Profile Button -->
+        <button onclick="handleUserProfileClick()" class="header-control flex items-center gap-2 px-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/80 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+          <div class="hidden xl:flex flex-col text-left leading-tight">
+            <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
+            <span id="headerUserRoleBadge" class="text-xs font-bold text-brand-500 uppercase">ADMIN</span>
+          </div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 hidden xl:block shrink-0"></i>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Main Content Body (pb-24 on mobile/tablet to clear the bottom navigation bar) -->
+    <main id="main-content" class="flex-1 bg-gray-50/50 dark:bg-black">
+    <div class="w-full p-4 md:p-6 lg:p-8 2xl:p-10 space-y-6 md:space-y-8 pb-28 xl:pb-12">
+
+
+      <!-- ====================================================================
+           PHÂN HỆ F&B 1: TOÀN CHUỖI & XẾP HẠNG 14 ĐIỂM BÁN (ORBIT SIBA FOOD)
+           ==================================================================== -->
+      <section id="fnb-chain" class="tab-panel active space-y-4">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Hiệu quả &amp; xếp hạng toàn chuỗi</h1>
+            <p class="page-subtitle">Theo dõi doanh thu, tỷ suất EBITDA, Food Cost &amp; Labor Cost trên toàn hệ thống 14 điểm bán</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs text-gray-600 dark:text-gray-300 font-medium shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-600"></i>
+              Kỳ báo cáo: <strong id="fnbChainPeriodLabel" class="text-gray-900 dark:text-white font-semibold">Tháng 11/2026</strong>
+            </span>
+            <button id="btnSyncFnbSummary" onclick="triggerSyncFnbMonthlySummary()" class="btn btn-secondary" title="Cập nhật số liệu mới nhất của tháng này vào bảng tổng hợp">
+              <i id="syncFnbIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400"></i>
+              <span id="syncFnbLabel">Đồng bộ số liệu</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+          <!-- Card 1: Tổng Doanh Thu Chuỗi (Hero) -->
+          <div class="kpi-card-hero">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Tổng doanh thu chuỗi</span>
+                <p class="kpi-sub mt-0.5">14 điểm bán toàn hệ thống</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="bar-chart-3" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value-hero num" id="chainTotalRevenue" title="—">—</span>
+                <span class="kpi-unit" id="chainTotalRevenueUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="chainTotalRevenueDelta">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>105,8% KH</span>
+                </span>
+                <span class="kpi-sub">vượt kế hoạch tháng</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Lợi Nhuận EBITDA -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Lợi nhuận EBITDA</span>
+                <p class="kpi-sub mt-0.5">Lợi nhuận gộp toàn chuỗi</p>
+              </div>
+              <div class="kpi-icon text-brand-600 bg-brand-50 dark:bg-brand-950/20"><i data-lucide="dollar-sign" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="chainTotalProfit" title="—">—</span>
+                <span class="kpi-unit" id="chainTotalProfitUnit"></span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral" id="chainAvgMargin">
+                  <span>—</span>
+                </span>
+                <span class="kpi-sub">biên EBITDA TB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Food Cost TB Chuỗi -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Food Cost TB chuỗi</span>
+                <p class="kpi-sub mt-0.5">Mục tiêu trần ≤ 43,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="chainAvgFoodCost">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" title="Đạt chuẩn định mức">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                  <span>Đạt chuẩn</span>
+                </span>
+                <span class="kpi-sub">dưới ngưỡng 43%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Labor Cost (COL) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Labor Cost (COL)</span>
+                <p class="kpi-sub mt-0.5">Mục tiêu nhân công ≤ 19,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="users" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="chainAvgLaborCost">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+                  <span>Tối ưu</span>
+                </span>
+                <span class="kpi-sub">dưới ngưỡng 19%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="flex items-center gap-2">
+            <span class="font-medium text-gray-700 dark:text-gray-300 text-xs">Vùng vận hành:</span>
+            <div class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800 text-xs font-medium">
+              <button onclick="filterFnbChainByRegion('ALL')" id="filterRegALL" class="rounded-md bg-white px-3 py-1 text-gray-900 shadow-xs dark:bg-white/10 dark:text-white transition-all font-semibold">Tất cả (14)</button>
+              <button onclick="filterFnbChainByRegion('Miền Nam')" id="filterRegMN" class="rounded-md px-3 py-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">Miền Nam (10)</button>
+              <button onclick="filterFnbChainByRegion('Miền Bắc')" id="filterRegMB" class="rounded-md px-3 py-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">Miền Bắc (4)</button>
+            </div>
+          </div>
+          <div class="relative flex-1 min-w-[220px]">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="searchChainSiteInput" oninput="onSearchChainSite(this.value)" placeholder="Tìm mã SAP hoặc tên điểm bán..." class="input pl-9 w-full">
+          </div>
+        </div>
+
+        <!-- Rankings Table -->
+        <div class="table-card p-5">
+          <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="list-ordered" class="w-4 h-4 text-brand-600"></i>
+              <h2 class="font-semibold text-sm text-gray-900 dark:text-white">Bảng xếp hạng 14 điểm bán theo doanh thu &amp; hiệu quả chi phí</h2>
+            </div>
+            <span class="text-xs text-gray-400">Dữ liệu cập nhật thời gian thực</span>
+          </div>
+
+          <div class="hidden lg:block table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="text-center w-12">Hạng</th>
+                  <th>Điểm bán &amp; Mã SAP</th>
+                  <th class="text-center">Vùng</th>
+                  <th class="col-num text-right">Doanh thu thuần</th>
+                  <th class="col-num text-right">Mục tiêu</th>
+                  <th class="col-num text-center">% Đạt</th>
+                  <th class="col-num text-center">Food Cost %</th>
+                  <th class="col-num text-center">Labor Cost %</th>
+                  <th class="col-num text-right">EBITDA</th>
+                  <th class="col-badge text-center">Trạng thái</th>
+                  <th class="col-actions text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="fnbChainTableBody">
+              </tbody>
+            </table>
+          </div>
+          <!-- Native Mobile Card View -->
+          <div id="fnbChainMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+        </div>
+      </section>
+<section id="fnb-pl" class="tab-panel space-y-4">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="badge badge-brand">P&amp;L Report</span>
+              <h1 class="page-title" id="plSiteTitle">Báo cáo P&amp;L: K001 - MN Bếp Ăn ĐH Hùng Vương</h1>
+            </div>
+            <p class="page-subtitle">Chi tiết doanh thu thuần, Prime Cost (Food Cost + Labor Cost), chi phí cố định và EBITDA</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="plSiteSelector" class="hidden"></select>
+            <div class="field w-56">
+              <select id="plFocusFilter" onchange="filterPlBreakdown(this.value)" class="select">
+                <option value="ALL">Toàn bộ cấu trúc P&amp;L</option>
+                <option value="COGS">Chi phí giá vốn (Food Cost)</option>
+                <option value="LABOR">Chi phí nhân công (Labor)</option>
+                <option value="OPEX">Chi phí vận hành &amp; mặt bằng</option>
+                <option value="EBITDA">Lợi nhuận gộp &amp; EBITDA</option>
+              </select>
+            </div>
+            <button onclick="exportFnbPLExcel()" class="btn btn-secondary">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              <span>Xuất Excel P&amp;L</span>
+            </button>
+            <button onclick="loadFnbPL()" class="btn btn-secondary btn-icon" title="Tải lại">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Doanh thu thuần</span>
+                <p class="kpi-sub mt-0.5">Sau chiết khấu</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="trending-up" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="plNetRev" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="plAchievement">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>—%</span>
+                </span>
+                <span class="kpi-sub">so với mục tiêu</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Prime Cost %</span>
+                <p class="kpi-sub mt-0.5">Trần ≤ 62,0%</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="pie-chart" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline justify-between">
+                <span class="kpi-value num" id="plPrimeCostPct">—</span>
+                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Trần 62%</span>
+              </div>
+              <div class="kpi-progress-track mt-2">
+                <div id="plPrimeCostBar" class="kpi-progress-bar" style="width: 0%;"></div>
+              </div>
+              <div class="kpi-footer justify-between text-xs text-gray-500">
+                <span>Food: <b id="plFoodCostPct" class="num font-semibold text-gray-900 dark:text-white">—</b> <span id="plFoodCostVal" class="hidden"></span></span>
+                <span>Labor: <b id="plLaborCostPct" class="num font-semibold text-gray-900 dark:text-white">—</b> <span id="plLaborCostVal" class="hidden"></span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Lợi nhuận EBITDA</span>
+                <p class="kpi-sub mt-0.5">Lợi nhuận hoạt động</p>
+              </div>
+              <div class="kpi-icon text-brand-600 bg-brand-50 dark:bg-brand-950/20"><i data-lucide="dollar-sign" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="plProfitVal" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-good" id="plProfitMargin">
+                  <svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+                  <span>—</span>
+                </span>
+                <span class="kpi-sub">biên EBITDA</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div>
+                <span class="kpi-label">Điểm hòa vốn</span>
+                <p class="kpi-sub mt-0.5">Doanh thu an toàn tối thiểu</p>
+              </div>
+              <div class="kpi-icon"><i data-lucide="target" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body">
+              <div class="flex items-baseline">
+                <span class="kpi-value num" id="plBreakEven" title="—">—</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta-neutral">
+                  <span>Mức sàn</span>
+                </span>
+                <span class="kpi-sub">Cố định tháng</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Columns Grid: P&L Statement on Left, Analytics on Right -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Column Left: P&L Breakdown Table (7 Cols) -->
+          <div class="lg:col-span-7 table-card p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-brand-600"></i>
+                <h2 class="font-semibold text-sm text-gray-900 dark:text-white">Báo cáo kết quả hoạt động (P&amp;L Statement)</h2>
+              </div>
+              <span class="text-xs text-gray-400">Đơn vị: VNĐ</span>
+            </div>
+
             <div class="table-scroll">
               <table class="data-table">
                 <thead>
@@ -890,7 +1747,8 @@
                 </div>
                 <span class="text-xs text-gray-400">Doanh thu &amp; Food Cost %</span>
               </div>
-              <div class="table-scroll">
+              <!-- Desktop Weekly Trend Table -->
+              <div class="hidden md:block table-scroll">
                 <table class="data-table">
                   <thead>
                     <tr>
@@ -905,6 +1763,9 @@
                   </tbody>
                 </table>
               </div>
+
+              <!-- Native Mobile Cards for Weekly Trends -->
+              <div id="plWeeklyTrendMobileCards" class="block md:hidden space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
 
             <!-- Core Operational Metrics -->
@@ -4146,7 +5007,7 @@
           <div class="flex items-center justify-between mb-2">
             <span class="font-semibold text-xs text-gray-800 dark:text-gray-200">Danh Sách Mặt Hàng Theo PO (<span id="receiptModalLineCount" class="tabular-nums">0</span> mã)</span>
           </div>
-          <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
+          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs"> rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
             <table class="data-table">
               <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 font-semibold">
                 <tr>
@@ -4166,6 +5027,9 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Native Mobile Card View for PO Receipt Lines -->
+          <div id="receiptLinesMobileCards" class="block lg:hidden space-y-3"></div>
         </div>
 
         <!-- Total & Notes -->
@@ -4335,15 +5199,15 @@
             </div>
 
             <!-- Lines Table -->
-            <div id="manualLinesTableWrapper" class="hidden overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
+            <div id="manualLinesTableWrapper" class="hidden lg:block overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
               <table class="data-table">
                 <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 text-xs">
                   <tr>
                     <th class="py-2 px-2 text-center w-8">STT</th>
                     <th class="py-2 px-2.5 min-w-[130px]">Mặt Hàng & SKU</th>
-                    <th class="py-2 px-2 text-center w-20">SL Nhập *</th>
-                    <th class="py-2 px-2 text-right w-24">Đơn Giá (đ)</th>
-                    <th class="py-2 px-2 text-right w-24">Thành Tiền</th>
+                    <th class="py-2 px-2 text-center w-20">Số Lượng</th>
+                    <th class="py-2 px-2 text-right min-w-[90px]">Đơn Giá</th>
+                    <th class="py-2 px-2 text-right min-w-[100px]">Thành Tiền</th>
                     <th class="py-2 px-2 text-center min-w-[110px]">Số Lô (Batch)</th>
                     <th class="py-2 px-2 text-center min-w-[170px]">Hạn Dùng (EXP)</th>
                     <th class="py-2 px-2 text-center w-24">Vị Trí Kho</th>
@@ -4354,6 +5218,9 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Native Mobile Card View for Manual Receipt Lines -->
+            <div id="manualLinesMobileCards" class="block lg:hidden space-y-3 max-h-[360px] overflow-y-auto"></div>
           </div>
         </div>
 
@@ -4837,7 +5704,8 @@
 
       <!-- Table Body -->
       <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
-        <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+        <!-- Requests Table (Desktop) -->
+        <div class="hidden md:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
           <table class="data-table">
             <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
               <tr>
@@ -4855,6 +5723,11 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Native Mobile Card View for Admin Requests -->
+        <div id="adminRequestsMobileCards" class="block md:hidden space-y-3">
+          <div class="p-6 text-center text-gray-400 text-xs">Đang tải danh sách yêu cầu...</div>
         </div>
       </div>
 
@@ -4958,7 +5831,7 @@
             <i data-lucide="history" class="w-4 h-4 text-gray-500"></i>
             Lịch Sử Nhập / Xuất Kho Gần Nhất
           </div>
-          <div class="max-h-48 overflow-y-auto">
+          <div class="hidden md:block max-h-48 overflow-y-auto">
             <table class="data-table">
               <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 sticky top-0">
                 <tr>
@@ -4973,6 +5846,11 @@
                 <tr><td colspan="5" class="p-4 text-center text-gray-400">Chưa có phát sinh trong kỳ</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Native Mobile Cards for Inventory Detail Transactions -->
+          <div id="detailTransactionsMobileCards" class="block md:hidden space-y-2 max-h-48 overflow-y-auto p-2">
+            <div class="p-4 text-center text-gray-400 text-xs">Chưa có phát sinh trong kỳ</div>
           </div>
         </div>
       </div>
@@ -5353,7 +6231,7 @@
         <!-- Lines Table -->
         <div class="space-y-2">
           <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300">Danh mục hàng hóa đã nhập</h4>
-          <div class="table-scroll max-h-72 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+          <div class="table-scroll hidden lg:block max-h-72 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
             <table class="data-table">
               <thead>
                 <tr>
@@ -5372,6 +6250,11 @@
                 <tr><td colspan="9" class="p-4 text-center text-gray-400">Đang tải dòng hàng...</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Native Mobile Card View for Received Order Detail Lines -->
+          <div id="whRecModalLinesMobileCards" class="block lg:hidden space-y-3 max-h-72 overflow-y-auto">
+            <div class="p-4 text-center text-gray-400 text-xs">Đang tải dòng hàng...</div>
           </div>
         </div>
       </div>
@@ -6294,7 +7177,8 @@
             <div>Tháng: <b>${thang}</b></div>
             <div>Tổng tiền đơn: <b class="text-brand-700 tabular-nums text-sm">${fmtVND(totalAmount)}</b></div>
           </div>
-          <div class="overflow-x-auto max-h-56 rounded-xl border border-gray-200 dark:border-gray-800">
+          <!-- Desktop Table -->
+          <div class="hidden sm:block overflow-x-auto max-h-56 rounded-xl border border-gray-200 dark:border-gray-800">
             <table class="data-table">
               <thead class="bg-gray-50 dark:bg-gray-900/50"><tr><th class="p-2">Mã</th><th class="p-2">Tên</th><th class="p-2 text-right">SL</th><th class="p-2 text-right">Thành tiền</th></tr></thead>
               <tbody>
@@ -6303,6 +7187,21 @@
                 `).join('')}
               </tbody>
             </table>
+          </div>
+          <!-- Mobile Order Items Cards -->
+          <div class="block sm:hidden space-y-2 max-h-56 overflow-y-auto">
+            ${orderItems.map(it => `
+              <div class="p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs flex justify-between items-center gap-2">
+                <div class="min-w-0">
+                  <div class="font-bold text-gray-900 dark:text-white truncate">${escapeHtml(it.tenSP)}</div>
+                  <div class="font-mono text-[11px] text-gray-400">${escapeHtml(it.maHang)}</div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="num font-bold text-brand-600 dark:text-brand-400">SL: ${it.soLuongDat}</div>
+                  <div class="num text-[11px] text-gray-500">${fmtVND(it.soLuongDat * it.donGia)}</div>
+                </div>
+              </div>
+            `).join('')}
           </div>
           <div>
             <label class="font-bold block mb-1">Ghi chú / Giải trình:</label>
@@ -6955,13 +7854,30 @@
                   Xuất Excel
                 </button>
               </div>
-              <div class="overflow-x-auto max-h-48 rounded-xl border border-gray-200 dark:border-gray-800">
+              <!-- Desktop Table -->
+              <div class="hidden sm:block overflow-x-auto max-h-48 rounded-xl border border-gray-200 dark:border-gray-800">
                 <table class="data-table">
                   <thead class="bg-gray-50 dark:bg-gray-900/50"><tr><th class="p-2">Mã</th><th class="p-2">Tên</th><th class="p-2">ĐVT</th><th class="p-2 text-right">SL</th><th class="p-2 text-right">Đơn giá</th><th class="p-2 text-right">Thành tiền</th></tr></thead>
                   <tbody>
                     ${items.map(it => `<tr><td class="p-2 tabular-nums">${it.maHang}</td><td class="p-2">${it.tenSP}</td><td class="p-2">${it.dvt}</td><td class="p-2 text-right tabular-nums font-bold">${it.soLuong}</td><td class="p-2 text-right tabular-nums">${fmtVND(it.donGia)}</td><td class="p-2 text-right tabular-nums font-bold">${fmtVND(it.thanhTien)}</td></tr>`).join('')}
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Native Mobile Cards for Order Details -->
+              <div class="block sm:hidden space-y-2 max-h-48 overflow-y-auto">
+                ${items.map(it => `
+                  <div class="p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs flex justify-between items-center gap-2">
+                    <div class="min-w-0">
+                      <div class="font-bold text-gray-900 dark:text-white truncate">${escapeHtml(it.tenSP)}</div>
+                      <div class="font-mono text-[11px] text-gray-400">${escapeHtml(it.maHang)} · <span class="font-sans">${escapeHtml(it.dvt || '')}</span></div>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <div class="num font-bold text-brand-600 dark:text-brand-400">SL: ${it.soLuong}</div>
+                      <div class="num text-[11px] text-gray-500">${fmtVND(it.thanhTien)}</div>
+                    </div>
+                  </div>
+                `).join('')}
               </div>
               <div class="pt-2">
                 <b class="block mb-2 text-gray-900 dark:text-white">Tiến trình quy trình:</b>
@@ -12541,6 +13457,237 @@ window.setReceiptLineQuickExp = function(idx, months) {
 
   const input = document.getElementById(`receiptLineExpInput_${idx}`);
   if (input) input.value = dateStr;
+  const inputMob = document.getElementById(`receiptLineExpInputMob_${idx}`);
+  if (inputMob) inputMob.value = dateStr;
+
+  const warnEl = document.getElementById(`receiptExpWarning_${idx}`);
+  if (warnEl) warnEl.innerHTML = getReceiptExpWarningHtml(dateStr);
+  const warnMob = document.getElementById(`receiptExpWarningMob_${idx}`);
+  if (warnMob) warnMob.innerHTML = getReceiptExpWarningHtml(dateStr);
+
+  if (window.lucide) lucide.createIcons();
+};
+
+function renderReceiptLinesTable() {
+  const tbody = document.getElementById('receiptLinesTableBody');
+  const mob = document.getElementById('receiptLinesMobileCards');
+  const countEl = document.getElementById('receiptModalLineCount');
+  const totalEl = document.getElementById('receiptModalTotalAmount');
+
+  const lines = window.gReceiptLines || [];
+  if (countEl) countEl.textContent = lines.length;
+
+  let grandTotal = 0;
+
+  if (tbody) {
+    tbody.innerHTML = lines.map((item, idx) => {
+      const lineTotal = (item.actual_qty || 0) * (item.unit_price || 0);
+      grandTotal += lineTotal;
+
+      return `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-2.5 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
+          <td class="py-2.5 px-3">
+            <div class="font-bold text-gray-900 dark:text-white text-xs">${escapeHtml(item.item_name || 'Vật tư')}</div>
+            <div class="text-xs text-gray-400 tabular-nums flex items-center gap-1.5 mt-0.5">
+              <span class="font-mono text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
+              ${item.merch_category ? `<span>•</span><span>${escapeHtml(item.merch_category)}</span>` : ''}
+              ${item.is_food ? '<span class="text-emerald-500 font-semibold">• Thực phẩm</span>' : '<span class="text-gray-400">• Vật tư</span>'}
+            </div>
+          </td>
+          <td class="py-2.5 px-2 text-center font-semibold text-gray-600 dark:text-gray-300 text-xs">
+            ${escapeHtml(item.unit || '')}
+          </td>
+          <td class="py-2.5 px-3 text-right tabular-nums text-xs text-gray-600 dark:text-gray-300">
+            ${Number(item.unit_price).toLocaleString('vi-VN')} đ
+          </td>
+          <td class="py-2.5 px-3 text-right tabular-nums text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-800/20">
+            ${Number(item.order_qty).toFixed(1)}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <input type="number" step="0.01" min="0" value="${item.actual_qty}" 
+                   oninput="onReceiptLineQtyChange(${idx}, this.value)" 
+                   class="w-24 text-center py-1.5 px-2 rounded-xl border border-brand-300 dark:border-brand-700 bg-brand-50/40 dark:bg-brand-950/30 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500 font-mono">
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô SX..." 
+                   oninput="onReceiptLineBatchChange(${idx}, this.value)" 
+                   class="w-28 text-center py-1.5 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex flex-col items-center">
+              <input type="date" id="receiptLineExpInput_${idx}" value="${item.exp_date || ''}" 
+                     onchange="onReceiptLineExpChange(${idx}, this.value)" 
+                     class="w-32 py-1 px-1.5 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              <div class="flex items-center gap-1 mt-1">
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
+                <button type="button" onclick="setReceiptLineQuickExp(${idx}, 24)" title="+2 Năm" class="px-1.5 py-0.5 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 dark:hover:bg-brand-900/40 text-gray-600 dark:text-gray-300 transition-colors">+2N</button>
+              </div>
+              <div id="receiptExpWarning_${idx}" class="mt-0.5">
+                ${getReceiptExpWarningHtml(item.exp_date)}
+              </div>
+            </div>
+          </td>
+          <td id="receiptLineTotal_${idx}" class="py-2.5 px-3 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">
+            ${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' đ' : '0 đ'}
+          </td>
+          <td class="py-2.5 px-3">
+            <input type="text" placeholder="Ghi chú..." value="${escapeHtml(item.note || '')}" 
+                   oninput="onReceiptLineNoteChange(${idx}, this.value)" 
+                   class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-xs outline-none focus:border-brand-500">
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Native Mobile Cards for PO Receipt Lines
+  if (mob) {
+    if (!lines.length) {
+      mob.innerHTML = '<div class="p-6 text-center text-gray-400 text-xs">Không có dòng hàng nào theo đơn.</div>';
+    } else {
+      mob.innerHTML = lines.map((item, idx) => {
+        const lineTotal = (item.actual_qty || 0) * (item.unit_price || 0);
+        return `
+          <div class="data-card space-y-3">
+            <div class="flex items-start justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2.5">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="badge badge-neutral text-xs font-mono">#${idx + 1}</span>
+                  <span class="code font-semibold text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
+                </div>
+                <div class="font-bold text-sm text-gray-900 dark:text-white truncate">${escapeHtml(item.item_name || 'Vật tư')}</div>
+              </div>
+              <span class="badge badge-brand text-xs shrink-0">${escapeHtml(item.unit || '')}</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs bg-gray-50/70 dark:bg-gray-800/40 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800/60">
+              <div>
+                <span class="text-gray-400 block text-[11px]">Đơn giá:</span>
+                <span class="num font-semibold text-gray-700 dark:text-gray-300">${Number(item.unit_price).toLocaleString('vi-VN')} ₫</span>
+              </div>
+              <div>
+                <span class="text-gray-400 block text-[11px]">SL Đặt hàng:</span>
+                <span class="num font-semibold text-gray-500">${Number(item.order_qty).toFixed(1)}</span>
+              </div>
+              <div>
+                <span class="text-gray-400 block text-[11px]">Thành tiền:</span>
+                <span id="receiptLineTotalMob_${idx}" class="num font-bold text-brand-600 dark:text-brand-400">${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}</span>
+              </div>
+              <div>
+                <span class="text-gray-400 block text-[11px]">Phân loại:</span>
+                <span class="text-xs font-medium">${item.is_food ? 'Thực phẩm' : 'Vật tư'}</span>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1 text-xs">
+              <div class="flex items-center gap-2">
+                <label class="w-24 shrink-0 font-medium text-gray-600 dark:text-gray-400">SL thực nhập:</label>
+                <input type="number" step="0.01" min="0" value="${item.actual_qty}" 
+                       oninput="onReceiptLineQtyChange(${idx}, this.value)" 
+                       class="flex-1 py-1.5 px-3 rounded-xl border border-brand-300 dark:border-brand-700 bg-brand-50/40 dark:bg-brand-950/30 font-bold tabular-nums text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500 font-mono text-center">
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="w-24 shrink-0 font-medium text-gray-600 dark:text-gray-400">Số lô (Batch):</label>
+                <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô SX..." 
+                       oninput="onReceiptLineBatchChange(${idx}, this.value)" 
+                       class="flex-1 py-1.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              </div>
+
+              <div>
+                <div class="flex items-center gap-2 mb-1.5">
+                  <label class="w-24 shrink-0 font-medium text-gray-600 dark:text-gray-400">Hạn dùng (EXP):</label>
+                  <input type="date" id="receiptLineExpInputMob_${idx}" value="${item.exp_date || ''}" 
+                         onchange="onReceiptLineExpChange(${idx}, this.value)" 
+                         class="flex-1 py-1 px-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-700 dark:text-gray-300 outline-none">
+                </div>
+                <div class="flex items-center gap-1.5 justify-end">
+                  <span class="text-[11px] text-gray-400">Chọn nhanh:</span>
+                  <button type="button" onclick="setReceiptLineQuickExp(${idx}, 1)" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">+1T</button>
+                  <button type="button" onclick="setReceiptLineQuickExp(${idx}, 6)" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">+6T</button>
+                  <button type="button" onclick="setReceiptLineQuickExp(${idx}, 12)" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">+1N</button>
+                  <button type="button" onclick="setReceiptLineQuickExp(${idx}, 24)" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">+2N</button>
+                </div>
+                <div id="receiptExpWarningMob_${idx}" class="mt-1">
+                  ${getReceiptExpWarningHtml(item.exp_date)}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <label class="w-24 shrink-0 font-medium text-gray-600 dark:text-gray-400">Ghi chú dòng:</label>
+                <input type="text" value="${escapeHtml(item.note || '')}" placeholder="Ghi chú mặt hàng..." 
+                       oninput="onReceiptLineNoteChange(${idx}, this.value)" 
+                       class="flex-1 py-1.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  if (totalEl) {
+    totalEl.textContent = (grandTotal > 0 ? Math.round(grandTotal).toLocaleString('vi-VN') + ' đ' : '0 đ');
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+window.onReceiptLineQtyChange = function(idx, val) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  const num = parseFloat(val);
+  window.gReceiptLines[idx].actual_qty = isNaN(num) ? 0 : num;
+
+  const item = window.gReceiptLines[idx];
+  const lineTotal = (item.actual_qty || 0) * (item.unit_price || 0);
+
+  const tdTotal = document.getElementById(`receiptLineTotal_${idx}`);
+  if (tdTotal) {
+    tdTotal.textContent = lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' đ' : '0 đ';
+  }
+  const mobTotal = document.getElementById(`receiptLineTotalMob_${idx}`);
+  if (mobTotal) {
+    mobTotal.textContent = lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' ₫' : '0 ₫';
+  }
+
+  // Recalculate grand total
+  let grandTotal = 0;
+  window.gReceiptLines.forEach(l => {
+    grandTotal += (l.actual_qty || 0) * (l.unit_price || 0);
+  });
+  const totalEl = document.getElementById('receiptModalTotalAmount');
+  if (totalEl) {
+    totalEl.textContent = grandTotal > 0 ? Math.round(grandTotal).toLocaleString('vi-VN') + ' đ' : '0 đ';
+  }
+};
+
+window.onReceiptLineBatchChange = function(idx, val) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  window.gReceiptLines[idx].batch_code = val;
+};
+
+window.onReceiptLineExpChange = function(idx, val) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  window.gReceiptLines[idx].exp_date = val;
+  const warnEl = document.getElementById(`receiptExpWarning_${idx}`);
+  if (warnEl) {
+    warnEl.innerHTML = getReceiptExpWarningHtml(val);
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.setReceiptLineQuickExp = function(idx, months) {
+  if (!window.gReceiptLines || !window.gReceiptLines[idx]) return;
+  const baseDate = new Date();
+  baseDate.setMonth(baseDate.getMonth() + months);
+  const dateStr = baseDate.toISOString().slice(0, 10);
+  window.gReceiptLines[idx].exp_date = dateStr;
+
+  const input = document.getElementById(`receiptLineExpInput_${idx}`);
+  if (input) input.value = dateStr;
 
   const warnEl = document.getElementById(`receiptExpWarning_${idx}`);
   if (warnEl) {
@@ -13118,6 +14265,7 @@ window.addManualReceiptItem = function(itemCode) {
 window.renderManualReceiptLinesTable = function() {
   const emptyState = document.getElementById('manualLinesEmptyState');
   const tableWrapper = document.getElementById('manualLinesTableWrapper');
+  const mobWrapper = document.getElementById('manualLinesMobileCards');
   const btnClear = document.getElementById('btnClearAllManualLines');
   const tbody = document.getElementById('manualLinesTableBody');
   const countBadge = document.getElementById('manualSelectedCountText');
@@ -13132,6 +14280,7 @@ window.renderManualReceiptLinesTable = function() {
   if (!lines.length) {
     if (emptyState) emptyState.classList.remove('hidden');
     if (tableWrapper) tableWrapper.classList.add('hidden');
+    if (mobWrapper) mobWrapper.classList.add('hidden');
     if (btnClear) btnClear.classList.add('hidden');
     if (kpiQty) kpiQty.textContent = '0';
     if (kpiAmount) kpiAmount.textContent = '0 đ';
@@ -13140,6 +14289,7 @@ window.renderManualReceiptLinesTable = function() {
 
   if (emptyState) emptyState.classList.add('hidden');
   if (tableWrapper) tableWrapper.classList.remove('hidden');
+  if (mobWrapper) mobWrapper.classList.remove('hidden');
   if (btnClear) btnClear.classList.remove('hidden');
 
   let grandQty = 0;
@@ -13172,43 +14322,28 @@ window.renderManualReceiptLinesTable = function() {
           <td class="py-2 px-2 text-right w-24">
             <input type="number" step="100" min="0" value="${item.unit_price}" 
                    oninput="onManualLinePriceChange(${idx}, this.value)" 
-                   class="w-24 text-right py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs tabular-nums text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                   class="w-24 text-right py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs tabular-nums text-gray-900 dark:text-white outline-none focus:border-brand-500">
           </td>
-          <td id="manualLineTotal_${idx}" class="py-2 px-2 text-right font-mono font-bold text-gray-900 dark:text-white text-xs tabular-nums whitespace-nowrap">
+          <td id="manualLineTotal_${idx}" class="py-2 px-2 text-right font-mono font-bold text-xs tabular-nums text-brand-600 dark:text-brand-400 whitespace-nowrap">
             ${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' đ' : '0 đ'}
           </td>
-          <td class="py-2 px-2 text-center min-w-[110px]">
-            <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô SX..." 
+          <td class="py-2 px-2 text-center">
+            <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô..." 
                    oninput="onManualLineBatchChange(${idx}, this.value)" 
-                   class="w-24 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                   class="w-24 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center min-w-[170px]">
-            <div class="flex flex-col items-center">
-              <input type="date" id="manualLineExpInput_${idx}" value="${item.exp_date || ''}" 
-                     onchange="onManualLineExpChange(${idx}, this.value)" 
-                     class="w-32 py-1 px-1 text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-              <div class="flex items-center gap-1 mt-1">
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 1)" title="+1 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 3)" title="+3 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+3T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 6)" title="+6 Tháng" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+6T</button>
-                <button type="button" onclick="setManualLineQuickExp(${idx}, 12)" title="+1 Năm" class="px-1 py-0.2 text-xs font-semibold rounded bg-gray-100 hover:bg-brand-50 hover:text-brand-600 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">+1N</button>
-              </div>
-              <div id="manualLineExpWarning_${idx}" class="mt-0.5">
-                ${getReceiptExpWarningHtml(item.exp_date)}
-              </div>
-            </div>
+          <td class="py-2 px-2 text-center">
+            <input type="date" value="${item.exp_date || ''}" 
+                   onchange="onManualLineExpChange(${idx}, this.value)" 
+                   class="w-32 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center w-24">
-            <select onchange="onManualLineLocChange(${idx}, this.value)" class="w-full py-1 px-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-medium text-gray-800 dark:text-gray-200 outline-none">
-              <option value="Kệ Bếp" ${item.storage_loc === 'Kệ Bếp' ? 'selected' : ''}>Kệ Bếp</option>
-              <option value="Kho Khô" ${item.storage_loc === 'Kho Khô' ? 'selected' : ''}>Kho Khô</option>
-              <option value="Tủ Mát" ${item.storage_loc === 'Tủ Mát' ? 'selected' : ''}>Tủ Mát</option>
-              <option value="Tủ Đông" ${item.storage_loc === 'Tủ Đông' ? 'selected' : ''}>Tủ Đông</option>
-              <option value="Kho Bao Bì" ${item.storage_loc === 'Kho Bao Bì' ? 'selected' : ''}>Kho Bao Bì</option>
-            </select>
+          <td class="py-2 px-2 text-center">
+            <input type="text" value="${escapeHtml(item.location || '')}" placeholder="Vị trí..." 
+                   oninput="onManualLineLocationChange(${idx}, this.value)" 
+                   class="w-20 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center w-8">
-            <button type="button" onclick="removeManualReceiptLine(${idx})" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 hover:text-rose-700 transition-colors" title="Xóa mặt hàng này">
+          <td class="py-2 px-2 text-center">
+            <button onclick="removeManualLine(${idx})" class="p-1 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </td>
@@ -13217,8 +14352,57 @@ window.renderManualReceiptLinesTable = function() {
     }).join('');
   }
 
-  if (kpiQty) kpiQty.textContent = grandQty.toFixed(1);
-  if (kpiAmount) kpiAmount.textContent = Math.round(grandTotal).toLocaleString('vi-VN') + ' đ';
+  // Native Mobile Cards for Manual Lines
+  if (mobWrapper) {
+    mobWrapper.innerHTML = lines.map((item, idx) => {
+      const lineTotal = (item.qty || 0) * (item.unit_price || 0);
+      return `
+        <div class="data-card space-y-2.5">
+          <div class="flex items-start justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="badge badge-neutral text-xs">#${idx + 1}</span>
+                <span class="code font-semibold text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
+              </div>
+              <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${escapeHtml(item.item_name)}</div>
+            </div>
+            <button onclick="removeManualLine(${idx})" class="p-1 rounded text-gray-400 hover:text-rose-500 transition-colors" title="Xóa dòng">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="text-gray-400 block text-[11px] mb-1">Số lượng (${escapeHtml(item.unit || '')}):</label>
+              <input type="number" step="0.01" min="0.01" value="${item.qty}" 
+                     oninput="onManualLineQtyChange(${idx}, this.value)" 
+                     class="w-full py-1 px-2 rounded-lg border border-brand-300 dark:border-brand-700 bg-brand-50/30 font-mono text-center font-bold text-xs">
+            </div>
+            <div>
+              <label class="text-gray-400 block text-[11px] mb-1">Đơn giá (₫):</label>
+              <input type="number" step="100" min="0" value="${item.unit_price}" 
+                     oninput="onManualLinePriceChange(${idx}, this.value)" 
+                     class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 font-mono text-right font-medium text-xs">
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-xs pt-1.5 border-t border-gray-100 dark:border-gray-800">
+            <span class="text-gray-400 text-[11px]">Thành tiền:</span>
+            <span class="num font-bold text-emerald-600 dark:text-emerald-400 text-sm">${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+            <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Mã lô..." 
+                   oninput="onManualLineBatchChange(${idx}, this.value)" 
+                   class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-mono">
+            <input type="date" value="${item.exp_date || ''}" 
+                   onchange="onManualLineExpChange(${idx}, this.value)" 
+                   class="w-full py-1 px-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-mono">
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (kpiQty) kpiQty.textContent = grandQty > 0 ? (Number.isInteger(grandQty) ? grandQty : grandQty.toFixed(1)) : '0';
+  if (kpiAmount) kpiAmount.textContent = grandTotal > 0 ? Math.round(grandTotal).toLocaleString('vi-VN') + ' đ' : '0 đ';
 
   if (window.lucide) lucide.createIcons();
 };
