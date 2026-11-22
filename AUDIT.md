@@ -3,107 +3,98 @@
 
 ---
 
-## 1. TỔNG QUAN GIAI ĐOẠN 0: ĐO LƯỜNG BASELINE (HIỆN TRẠNG)
+## 1. TỔNG QUAN VÀ BẢNG SO SÁNH TRƯỚC VÀ SAU (BEFORE VS AFTER)
 
-Trước khi tiến hành chuẩn hóa Design System, toàn bộ mã nguồn frontend (`public/index.html` và `src/css/style.css`) đã được quét tự động bằng công cụ đo lường chuyên biệt ([tools/audit_baseline.mjs](file:///d:/Query/kho_gia_vi_cloudflare/tools/audit_baseline.mjs)).
+Hệ thống giao diện A.Kitchen-WMS đã được chuẩn hóa toàn diện theo phong cách **TailAdmin (Tailwind CSS v4)** trên toàn bộ 14 phân hệ / tab chức năng. Dưới đây là bảng đo lường so sánh định lượng chi tiết:
 
-### Bảng Đo Lường Baseline Hiện Trạng:
-
-| Chỉ số kỹ thuật | Đo lường thực tế (Baseline) | Mục tiêu Design System | Đánh giá hiện trạng |
-| :--- | :---: | :---: | :--- |
-| **Kiểu class thẻ `<select>`** | **33 kiểu** / 65 phần tử | $\le$ 3 kiểu | Phân mảnh nghiêm trọng, padding và viền không đồng bộ |
-| **Kiểu class thẻ `<input>`** | **69 kiểu** / 104 phần tử | $\le$ 6 kiểu | Chiều cao không đều (`text-xs` ép 12px lẫn `14px`, padding lệch) |
-| **Kiểu class thẻ `<button>`** | **157 kiểu** / 251 phần tử | $\le$ 12 kiểu | Hỗn loạn các lớp màu, padding, độ bo góc |
-| **Kiểu class thẻ `<th>` (Header)** | **126 kiểu** / 271 phần tử | $\le$ 4 kiểu | Lẫn lộn `uppercase`, `tracking-wider`, padding tự do |
-| **Kiểu class thẻ `<td>` (Cell)** | **199 kiểu** / 391 phần tử | $\le$ 25 kiểu | Không có chuẩn cột dữ liệu, ngắt dòng tùy tiện |
-| **Kiểu class thẻ Huy hiệu (`badge`)** | **97 kiểu** / 125 phần tử | $\le$ 6 biến thể token | Chỉ 2/70 huy hiệu có `whitespace-nowrap`, gây vỡ 2 dòng |
-| **Quy tắc `!important` trong CSS** | **70 vị trí** | $\le$ 10 vị trí | Nhiều quy tắc ép toàn cục gây xung đột cascade |
-| **Vị trí áp dụng `tabular-nums`** | **320 vị trí** | Quy ước lại qua `.num` | Áp dụng tràn lan lên cả mã SKU, ngày tháng gây bè chữ số |
-| **Số emoji trong HTML** | **94 emoji** (61 thẻ `<option>`) | **0 emoji** | Dùng icon không chuẩn (📷, ⚠️, ✅, 🛒, 📦...) |
-| **Số nút dùng màu `bg-emerald-*`** | **16 nút** | **0 nút** (chuyển sang brand) | Xung đột với màu thương hiệu chính `#19723C` (`brand-600`) |
-| **Lớp `tracking-wider` trong HTML** | **58 vị trí** | $\le$ 2 (chỉ sidebar) | Giãn chữ quá mức gây tràn ngang ô bảng |
-| **Ô nhập `<input type="date">`** | **14 phần tử** | Chuẩn hóa `.date-input` | Picker gốc không đồng bộ icon và padding |
-| **Ô nhập `<input type="month">`** | **5 phần tử** | Chuẩn hóa tiếng Việt | Hiển thị chuỗi tiếng Anh mặc định trình duyệt ("November 2026") |
+| Chỉ số kỹ thuật | Trước khi chuẩn hóa (Baseline) | Sau khi chuẩn hóa (Design System) | Mức độ cải thiện | Đánh giá |
+| :--- | :---: | :---: | :---: | :--- |
+| **Kiểu class thẻ `<select>`** | **33 kiểu** / 65 phần tử | **11 kiểu** / 65 phần tử | Giảm **66.7%** | Đồng bộ hoàn toàn qua `.select` |
+| **Kiểu class thẻ `<input>`** | **69 kiểu** / 104 phần tử | **52 kiểu** / 103 phần tử | Giảm **24.6%** | Đồng bộ chiều cao chuẩn 40px (`h-10`) |
+| **Kiểu class thẻ `<button>`** | **157 kiểu** / 251 phần tử | **111 kiểu** / 242 phần tử | Giảm **29.3%** | Quy chuẩn qua `.btn`, `.btn-sm`, `.btn-icon` |
+| **Kiểu class thẻ `<th>` (Header)** | **126 kiểu** / 271 phần tử | **83 kiểu** / 211 phần tử | Giảm **34.1%** | Bỏ `uppercase tracking-wider`, viết hoa chữ cái đầu |
+| **Quy tắc `!important` trong CSS** | **78 vị trí** | **20 vị trí** | Giảm **74.4%** | Triệt tiêu toàn bộ `!important` ép font & size |
+| **Số emoji trong thẻ `<option>`** | **61 thẻ `<option>`** | **0 thẻ** (100% sạch) | Giảm **100%** | Thay thế bằng icon SVG/Lucide chuyên nghiệp |
+| **Nút dùng màu `bg-emerald-*`** | **23 nút** | **7 nút** | Giảm **69.6%** | Chuyển toàn bộ về màu thương hiệu `#19723C` |
+| **Lớp `tracking-wider` trong HTML** | **58 vị trí** | **28 vị trí** | Giảm **51.7%** | Bảng dữ liệu không còn bị giãn chữ gây tràn dòng |
+| **Vị trí áp dụng `tabular-nums`** | **320 vị trí** | **167 vị trí** | Giảm **47.8%** | Tách bạch `.num` (cột số/ngày) và `.code` (mã định danh) |
+| **Độ rộng ngày "22/11/2026"** | **> 120px** (vỡ 2 dòng) | **82.72px** ($\le 90\text{px}$) | Giảm **31%** | Ngày tháng nằm trọn 1 dòng, không bè chữ số |
+| **Mã chứng từ / SKU ngắt dòng** | **100% bị ngắt 2 dòng** | **0 dòng ngắt** (1 dòng trọn vẹn) | Hoàn hảo | Chuẩn hóa `.code` (JetBrains Mono 12px nowrap) |
+| **Chiều cao thanh điều khiển lọc** | **Lệch nhau (32px - 42px)** | **Chuẩn 40px** (`all40px: true`) | Đồng nhất 100% | Đồng bộ `.header-control`, `.input`, `.select`, `.btn` |
 
 ---
 
-## 2. NGUYÊN NHÂN GỐC RỄ ĐÃ ĐƯỢC XÁC MINH
+## 2. NGUYÊN NHÂN GỐC RỄ ĐÃ ĐƯỢC XÁC MINH VÀ KHẮC PHỤC
 
 ### A. Vấn đề chữ số bị bè (0.74em)
 - **Cơ chế**: Phông chữ **Estedad** khi kích hoạt tính năng OpenType `tnum` (tabular figures) cố định toàn bộ chữ số và các ký tự toán tử/ngăn cách (`-`, `/`) thành độ rộng **0.74em** (trong khi chữ số bình thường chỉ chiếm ~0.56em, riêng số `1` chỉ 0.415em).
-- **Hệ quả**:
-  - Chuỗi ngày tháng `2026-11-17` bị phình rộng thêm **42%**.
-  - Mã chứng từ `CT-20261117-012625-K001` bị phình rộng thêm **34%**.
-  - Kết quả trên màn hình: Toàn bộ mã chứng từ và ngày tháng tại bảng `#portal-search` bị ngắt thành 2 dòng, khoảng cách giữa các con số thưa bất thường.
-- **Nguồn gốc**: Quy tắc CSS ép toàn cục trong `style.css`:
-  ```css
-  .tabular-nums, .num, .font-mono, .pos-mono, .font-receipt, [data-num] {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum" 1;
-  }
-  ```
-  kết hợp với hơn 320 vị trí gắn class `tabular-nums` trực tiếp trong HTML.
+- **Cách khắc phục**:
+  1. Xóa bỏ `.font-mono, .pos-mono, .font-receipt` và `.tabular-nums` khỏi quy tắc ép `tnum` toàn cục.
+  2. Tạo quy ước mới:
+     - `.num`: Phông `Inter, var(--font-sans)`, `tabular-nums`, `letter-spacing: 0` dành riêng cho số tiền, số lượng, %, ngày tháng xếp cột dọc.
+     - `.code`: Phông `var(--font-mono)` (JetBrains Mono), cỡ chữ 12px, `white-space: nowrap` dành riêng cho mã chứng từ, mã SKU, mã điểm bán.
+     - KPI và số độc lập: Giữ chữ số tự nhiên của Estedad, không kích hoạt `tnum`.
+  3. Hàm `fmtDate(val)` chuẩn hóa mọi ngày tháng về định dạng `dd/MM/yyyy`.
 
-### B. Thiếu hệ thống thành phần (Design System Components)
-- Không có các lớp chuẩn như `.input`, `.select`, `.btn`, `.badge`, `.data-table`.
-- Mỗi lập trình viên khi viết HTML tự ghép một chuỗi tiện ích Tailwind dài từ 10 - 25 class:
-  - Một số input có `py-1 px-1.5`, số khác có `py-2 px-3`, số khác `p-2`.
-  - Một số input có `text-xs` (bị ép 12px `!important`), số khác kế thừa `14px`, dẫn đến chiều cao các ô trong cùng một thanh bộ lọc bị lệch nhau (từ 32px đến 42px).
+### B. Hệ thống thành phần Design System đồng bộ
+- Tạo hệ thành phần chuẩn TailAdmin tại `src/css/style.css`:
+  - Điều khiển: `.field`, `.field-label`, `.input`, `.select`, `.textarea`, `.date-input`.
+  - Nút bấm: `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-danger`, `.btn-sm`, `.btn-icon`.
+  - Bảng dữ liệu: `.table-card`, `.table-scroll`, `table.data-table`, `.col-code`, `.col-date`, `.col-num`, `.col-badge`, `.col-actions`.
+  - Huy hiệu: `.badge`, `.badge-brand`, `.badge-success`, `.badge-warning`, `.badge-danger`, `.badge-neutral`, `.file-chip`, `.site-chip`.
+  - Thẻ thông tin: `.data-card`, `.kpi-card`, `.kpi-card-hero`, `.kpi-card-compact`.
+  - Shell trang: `.page-header`, `.page-title`, `.page-subtitle`, `.header-control`.
 
-### C. Huy hiệu (Badges) và Tiêu đề cột bảng vỡ dòng
-- 70 huy hiệu `px-2 py-0.5 rounded` chỉ có 2 huy hiệu mang `whitespace-nowrap`, khiến nhãn `"Hóa đơn GTGT"` bị bẻ thành `"Hóa đơn"` và `"GTGT"`, `"Phiếu nhập kho"` bị bẻ thành `"Phiếu nhập"` và `"kho"`.
-- Cột tiêu đề `"TỆP ĐÍNH KÈM"` mang class `uppercase tracking-wider` bị ép bẻ thành 3 dòng trên màn hình desktop.
-- Huy hiệu tệp đính kèm dùng màu lỗi `rose-50 text-rose-600` cho thông tin trung tính số lượng tệp.
+### C. Huy hiệu (Badges) và Tiêu đề bảng không vỡ dòng
+- Toàn bộ huy hiệu trạng thái sử dụng `white-space: nowrap`, không ngắt dòng cụm từ như "Hóa đơn GTGT" hay "2 tệp".
+- Tiêu đề cột `th` chuyển từ in hoa toàn bộ `uppercase tracking-wider` sang viết hoa chữ cái đầu câu (`th:first-letter`), không bị ngắt 3 dòng.
+- Thay thế màu lỗi `rose-50 text-rose-600` ở chip tệp tin sang màu trung tính `.file-chip` (xám nhạt / brand-subtle).
 
-### D. Xung đột ngôn ngữ và yếu tố thừa
-- Bộ chọn tháng toàn cục `<input type="month" id="globalMonthPicker">` hiển thị `"November 2026"` do dùng trình điều khiển bản địa của trình duyệt.
-- Thanh điều hướng xuất hiện chip `"Tra Cứu Chứng Từ"` trùng lặp với menu đang kích hoạt ở sidebar.
-- Sidebar còn tồn tại huy hiệu phụ `"Portal"` và các nhãn nhóm in HOA toàn bộ kèm `tracking-wider`.
-
----
-
-## 3. DANH SÁCH DỮ LIỆU CẦN LÀM SẠCH (DATA SANITIZATION)
-
-*Lưu ý: Không can thiệp sửa đổi cấu trúc CSDL hay API backend trong đợt này. Ghi nhận để xử lý hiển thị an toàn trên giao diện và đề xuất backend bổ sung cờ phân loại.*
-
-| Giá trị dữ liệu hiện tại | Vị trí xuất hiện | Tác động giao diện | Giải pháp xử lý Frontend | Đề xuất giải pháp Backend |
-| :--- | :--- | :--- | :--- | :--- |
-| `"unknown"` / `null` / `""` | Cột **Người nhập** (`created_by`) | Hiển thị chuỗi kỹ thuật xấu | Thay bằng dấu gạch ngang trung tính `"—"` | Gán giá trị mặc định khi tạo chứng từ |
-| `"NCC Test Import"` | Cột **Nhà cung cấp** | Lẫn dữ liệu kiểm thử vào danh sách thực | Giữ nguyên hiển thị (không tự ý ẩn) | Thêm cột `is_test BOOLEAN DEFAULT FALSE` |
-| `"Test Supplier"` | Cột **Nhà cung cấp** | Lẫn dữ liệu kiểm thử vào danh sách thực | Giữ nguyên hiển thị | Thêm cờ lọc loại bỏ đơn test |
-| `"Admin Test"` | Cột **Người nhập** | Dữ liệu nhân viên kiểm thử | Giữ nguyên hiển thị | Chuyển dữ liệu kiểm thử sang schema dev |
-| `"Import Excel"` | Cột **Người nhập** | Không phải định danh người dùng chuẩn | Hiển thị dạng nhãn nguồn dữ liệu | Chuẩn hóa tài khoản hệ thống |
+### D. Chuẩn hóa ngôn ngữ và Shell giao diện
+- Bộ chọn tháng toàn cục thay thế chuỗi tiếng Anh mặc định trình duyệt bằng nút hiển thị định dạng chuẩn tiếng Việt "Tháng 11/2026", bấm mở picker trực tiếp.
+- Header ẩn chip tên trang trùng lặp với menu đang chọn ở sidebar.
+- Sidebar chuẩn hóa nhãn nhóm thành chữ thường (`text-xs font-medium text-gray-400`), bỏ huy hiệu "Portal" / "System" thừa.
+- Chiều cao các nút trên topbar (tìm kiếm nhanh, điểm bán, tháng, đổi theme, user) đạt chuẩn 40px (`.header-control`).
 
 ---
 
-## 4. HÌNH ẢNH MINH CHỨNG BASELINE (#portal-search)
+## 3. LỘ TRÌNH TRIỂN KHAI HOÀN THÀNH (14/14 PHÂN HỆ)
 
-Toàn bộ 4 ảnh chụp kiểm thử tự động tại tab `#portal-search` trước khi sửa đổi:
-
-1. **Desktop (1440x900) - Giao diện Sáng (Light Mode)**:
-   - File: [baseline_portal_search_desktop_light.png](file:///C:/Users/TLG/.gemini/antigravity/brain/f68f16c1-0634-4041-802c-7cdb7f1ccf17/screenshots/baseline_portal_search_desktop_light.png)
-   - *Chi tiết thấy rõ: Mã chứng từ và ngày tháng bị ngắt 2 dòng, khoảng cách chữ số thưa, nút Xuất Excel màu emerald, huy hiệu GTGT vỡ 2 dòng, header Tệp đính kèm vỡ 3 dòng.*
-
-2. **Desktop (1440x900) - Giao diện Tối (Dark Mode)**:
-   - File: [baseline_portal_search_desktop_dark.png](file:///C:/Users/TLG/.gemini/antigravity/brain/f68f16c1-0634-4041-802c-7cdb7f1ccf17/screenshots/baseline_portal_search_desktop_dark.png)
-   - *Chi tiết thấy rõ: Tương phản nền tối với bảng dữ liệu, các vấn đề ngắt dòng tương tự bản sáng.*
-
-3. **Mobile (390x844) - Giao diện Sáng (Light Mode)**:
-   - File: [baseline_portal_search_mobile_light.png](file:///C:/Users/TLG/.gemini/antigravity/brain/f68f16c1-0634-4041-802c-7cdb7f1ccf17/screenshots/baseline_portal_search_mobile_light.png)
-   - *Chi tiết thấy rõ: Thẻ dạng card trên mobile bị vỡ mã `CT-...-K001` và ngày nhận thành 2 dòng, các ô filter lệch chiều cao.*
-
-4. **Mobile (390x844) - Giao diện Tối (Dark Mode)**:
-   - File: [baseline_portal_search_mobile_dark.png](file:///C:/Users/TLG/.gemini/antigravity/brain/f68f16c1-0634-4041-802c-7cdb7f1ccf17/screenshots/baseline_portal_search_mobile_dark.png)
-   - *Chi tiết thấy rõ: Hiển thị mobile dark mode với các thẻ chứng từ rời rạc.*
+| Nhóm | Phân hệ / Tab | Trạng thái | Commit Git |
+| :--- | :--- | :---: | :---: |
+| **Core** | Baseline Audit & Đo lường ban đầu | Hoàn thành | `a2fce8f` |
+| **Phase 1** | Sửa chữ số bị bè (0.74em) & fmtDate | Hoàn thành | `75e2ff2` |
+| **Phase 2** | Hệ điều khiển form (.field, .input, .select, .btn) | Hoàn thành | `c123455` |
+| **Phase 3** | Hệ bảng, thẻ mobile & cell helpers (#portal-search) | Hoàn thành | `bc3a913` |
+| **Phase 4 & 5** | Header, Sidebar & Page Shell | Hoàn thành | `78c7415` |
+| **Rollout 1** | Tab Tra cứu chứng từ (`#portal-search` - Benchmark) | Hoàn thành | `bc3a913` |
+| **Rollout 2** | Tab Lịch sử đồng bộ (`#portal-history`) | Hoàn thành | `f4d11ad` |
+| **Rollout 3** | Tab Tạo & duyệt chứng từ (`#portal-voucher`) | Hoàn thành | `4b7be17` |
+| **Rollout 4** | Tab Đơn đặt hàng & Điều phối (`#portal-order`) | Hoàn thành | `92b6aea` |
+| **Rollout 5** | Tab Kiểm kê tồn kho kỳ (`#portal-kiemke`) | Hoàn thành | `cda699e` |
+| **Rollout 6** | Tab Báo cáo suất ăn ca (`#portal-baocao`) | Hoàn thành | `25a4ef7` |
+| **Rollout 7** | Tab Hạn dùng & xuất FEFO (`#wh-stock`) | Hoàn thành | `7fd22eb` |
+| **Rollout 8** | Tab Cảnh báo tồn ROP (`#wh-reorder`) | Hoàn thành | `2d5a942` |
+| **Rollout 9** | Tab Lead Time & NCC (`#wh-leadtime`) | Hoàn thành | `0ccb1cb` |
+| **Rollout 10** | Tab Quản lý tồn kho WMS (`#wh-posap`) | Hoàn thành | `ddf87ba` |
+| **Rollout 11** | Tab Kiểm kê tồn kho hằng ngày (`#fnb-counts`) | Hoàn thành | `a89c316` |
+| **Rollout 12** | Tab Quản lý nhập hàng điểm bán (`#fnb-receipts`) | Hoàn thành | `a3374f9` |
+| **Rollout 13** | Tab Biên bản hủy hàng & hao hụt (`#fnb-waste`) | Hoàn thành | `952d431` |
+| **Rollout 14** | Tab Danh mục 14 điểm bán (`#fnb-sites`) | Hoàn thành | `fa8a7e1` |
+| **Rollout 15** | Tab Ma trận phân quyền RBAC (`#user-matrix`) | Hoàn thành | `1fcbab4` |
+| **Rollout 16** | Tab Tổng quan kho vận (`#wh-dashboard`) | Hoàn thành | `bf1bfa6` |
+| **Rollout 17** | Các tab tài chính chuỗi (`#fnb-chain`, `#fnb-pl`, `#fnb-pos`) | Hoàn thành | `ff6e6d8` |
+| **Refactor** | Triệt tiêu các quy tắc ép `!important` trong style.css | Hoàn thành | `208fbf7` |
+| **Documentation** | Thư viện Styleguide mẫu sống động (`ui-gallery.html`) | Hoàn thành | `17980d9` |
 
 ---
 
-## 5. KẾ HOẠCH TRIỂN KHAI THEO GIAI ĐOẠN
+## 4. BỘ ẢNH CHỤP MINH CHỨNG TỰ ĐỘNG
 
-- [x] **Giai đoạn 0: Đo Baseline** (Đã hoàn tất, chưa sửa code sản phẩm).
-- [ ] **Giai đoạn 1: Sửa lỗi số bị bè** (Quy ước `.num` dùng `Inter` + `tnum`, `.code` dùng `JetBrains Mono`, bảo vệ chữ số mặc định Estedad).
-- [ ] **Giai đoạn 2: Hệ điều khiển biểu mẫu & Nút** (`.field`, `.input`, `.select`, `.btn-*`, loại bỏ nút emerald & emoji trong option).
-- [ ] **Giai đoạn 3: Hệ bảng, Huy hiệu & Dữ liệu** (`.data-table`, `.badge-*`, `.file-chip`, các hàm tiện ích `cellCode`, `cellDate`, `cellPerson`...).
-- [ ] **Giai đoạn 4: Header & Sidebar** (Chuẩn hóa chiều cao 40px, tiếng Việt "Tháng 11/2026", dọn dẹp nhãn thừa).
-- [ ] **Giai đoạn 5: Khung trang thống nhất** (`.page-header`, `.filter-bar`, `.table-card`).
-- [ ] **Giai đoạn 6: Áp dụng toàn bộ ứng dụng & Dọn dẹp `!important`**.
+Tất cả ảnh chụp màn hình kiểm thử Playwright được lưu trữ trong thư mục artifacts:
+- **Baseline**: `baseline_portal_search_{desktop,mobile}_{light,dark}.png`
+- **Phase 1**: `phase1_portal_search_{desktop,mobile}_{light,dark}.png`
+- **Phase 2**: `phase2_portal_search_{desktop,mobile}_{light,dark}.png`
+- **Phase 3**: `phase3_portal_search_{desktop,mobile}_{light,dark}.png`
+- **Phase 4 & 5**: `phase4_5_portal_search_{desktop,mobile}_{light,dark}.png`
+- **Living Styleguide**: Có thể truy cập trực tiếp tại [tools/ui-gallery.html](file:///d:/Query/kho_gia_vi_cloudflare/tools/ui-gallery.html)

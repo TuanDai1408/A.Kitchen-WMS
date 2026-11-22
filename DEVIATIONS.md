@@ -1,61 +1,75 @@
-# DEVIATIONS: Các Quyết Định Thiết Kế & Sai Lệch Có Chủ Đích So Với Mẫu Gốc TailAdmin
+# TÀI LIỆU QUY CHUẨN KỸ THUẬT VÀ CÁC ĐIỂM ĐIỀU CHỈNH (DEVIATIONS)
+## Hệ Thống Giao Diện A.Kitchen-WMS (TailAdmin + Tailwind CSS v4)
 
-Tài liệu này ghi nhận các điểm điều chỉnh (deliberate design deviations) so với template gốc **TailAdmin HTML/Tailwind v4** nhằm phù hợp với đặc thù của hệ thống **A.Kitchen-WMS** (Data App cho chuỗi nhà hàng F&B / Kho vận tại Việt Nam).
-
----
-
-## 1. Lựa Chọn Hệ Chữ: `Inter` Thay Vì `Outfit`
-
-- **Mẫu TailAdmin gốc**: Sử dụng phông chữ `Outfit` làm font chính.
-- **Quyết định điều chỉnh**: Thay thế hoàn toàn bằng `Inter` (`wght@400;500;600;700`).
-- **Lý do**:
-  1. **Hiển thị tiếng Việt hoàn hảo**: `Inter` có bộ ký tự dấu tiếng Việt được tối ưu hóa xuất sắc ở các kích thước nhỏ (11px - 14px), không bị lỗi dính dấu, lệch trọng âm hoặc nhảy dòng như `Outfit`.
-  2. **Tối ưu hiển thị số liệu & bảng biểu**: `Inter` hỗ trợ `font-variant-numeric: tabular-nums` (`tnum`) với các con số thẳng tắp theo trục dọc, rất quan trọng đối với màn hình tài chính (P&L, Doanh thu, Tồn kho).
-  3. **Độ trung tính cao**: Tạo cảm giác tin cậy, nghiêm túc của một phần mềm quản trị chuỗi doanh nghiệp thay vì phong cách marketing tiêu dùng.
+Tài liệu này ghi nhận các quyết định kỹ thuật, sự khác biệt (deviations) so với thiết kế lý thuyết và cơ sở logic giải pháp đã triển khai trên nhánh `feat/ui-design-system`.
 
 ---
 
-## 2. Hệ Thống Màu Thương Hiệu: Bảo Tồn Màu Tông Xanh Brand (`#19723C`) & Cam Accent (`#FF600F`)
-
-- **Mẫu TailAdmin gốc**: Sử dụng tông màu xanh dương (`#465FFF` / indigo) làm tông brand mặc định.
-- **Quyết định điều chỉnh**:
-  - Giữ vững bảng màu brand của A.Kitchen:
-    - Xanh lá thương hiệu: `--color-brand-600: #19723C`, `--color-brand-50: #f0fdf4`, `--color-brand-500: #22c55e`.
-    - Cam điểm nhấn: `--color-accent-600: #FF600F`, `--color-accent-50: #fff7ed`.
-  - Bổ sung bộ token ngữ nghĩa TailAdmin:
-    - Success: `--color-success-50: #ecfdf5`, `--color-success-500: #10b981`, `--color-success-600: #059669`.
-    - Error: `--color-error-50: #fef2f2`, `--color-error-500: #f43f5e`, `--color-error-600: #e11d48`.
-    - Warning: `--color-warning-50: #fffbeb`, `--color-warning-500: #f59e0b`, `--color-warning-600: #d97706`.
-- **Lý do**: Đảm bảo nhận diện thương hiệu nhất quán của tập đoàn ẩm thực, đồng thời chuẩn hóa chỉ báo tốt/xấu theo đúng chuẩn trực quan quốc tế.
-
----
-
-## 3. Bổ Sung Biến Thể Rút Gọn (`kpi-card-compact`)
-
-- **Mẫu TailAdmin gốc**: Chỉ cung cấp thẻ KPI kích thước tiêu chuẩn (`p-5` hoặc `p-6`), phù hợp với các trang dashboard tổng quan (overview).
-- **Quyết định điều chỉnh**: Bổ sung biến thể `kpi-card-compact` (`p-4`, nhãn `text-xs font-medium`, số `text-xl font-semibold`, không icon hoặc icon thu nhỏ `size-8`).
-- **Lý do**:
-  - Ứng dụng WMS có nhiều màn hình dữ liệu mật độ cao (Dense Data Screens) như Quản lý tồn kho (`fnb-stock`, `wh-stock`), Quản lý phiếu đếm (`fnb-counts`).
-  - Người dùng nghiệp vụ kho cần xem được cả 4 chỉ số tổng quát và danh sách hàng chục dòng bảng biểu mà không phải cuộn trang quá nhiều trên laptop 13-14 inch.
+### 1. Xử Lý Đơn Vị Chiều Cao Điều Khiển: `rem` vs `px` (Quy chuẩn 40px)
+- **Vấn đề thực tế**:
+  Trong `src/css/style.css`, ứng dụng cấu hình `:root { font-size: 14px; }` nhằm phù hợp với tỷ lệ hiển thị của font Estedad (x-height nhỏ ~0.49em). Trong Tailwind CSS chuẩn, lớp `h-10` được biên dịch thành `height: 2.5rem`. Do đó, `2.5rem * 14px = 35px`, không đạt chiều cao chuẩn 40px theo yêu cầu thiết kế hệ thống.
+- **Giải pháp triển khai**:
+  Định nghĩa tường minh các thuộc tính chiều cao pixel trong các lớp thành phần Design System tại `src/css/style.css`:
+  ```css
+  .input, .select, .date-input, .btn, .header-control {
+    height: 40px !important;
+    min-height: 40px !important;
+    box-sizing: border-box;
+  }
+  .btn-sm {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+  ```
+  Nhờ đó, toàn bộ ô nhập liệu, hộp chọn, nút bấm và các điều khiển trên thanh điều hướng đầu trang (header controls) luôn đạt chuẩn đồng đều tuyệt đối 40px trên mọi kích thước màn hình.
 
 ---
 
-## 4. Cơ Chế Chỉ Số "Thấp Hơn Là Tốt" (Lower-Is-Better)
-
-- **Mẫu TailAdmin gốc**: Mặc định tăng là xanh (mũi tên lên), giảm là đỏ (mũi tên xuống).
-- **Quyết định điều chỉnh**: Thêm cờ `deltaGood` trong hàm `renderKpi`:
-  - Đối với các chỉ số chi phí như Food Cost % (`chainAvgFoodCost`), Labor Cost % (`chainAvgLaborCost`), Tồn âm (`fnbStockKpiNegative`), Hao hụt:
-    - Nếu giá trị nằm dưới ngưỡng mục tiêu (ví dụ $\le 43\%$ với Food Cost, $\le 19\%$ với Labor Cost), badge tự động nhận kiểu `kpi-delta-good` (xanh).
-    - Nếu vượt ngưỡng cho phép, badge tự động nhận kiểu `kpi-delta-bad` (đỏ) kèm cảnh báo.
-- **Lý do**: Phản ánh chính xác thực tế vận hành F&B: giảm chi phí nguyên vật liệu và nhân công là thành tích tích cực, không phải tiêu cực.
+### 2. Xử Lý Font Chữ: Estedad, Inter và JetBrains Mono
+- **Vấn đề thực tế**:
+  1. Font **Estedad** khi bật thuộc tính số học bảng (`tabular-nums` / `tnum 1`) khiến bề rộng các chữ số và ký tự dấu gạch ngang bị bè to lên tới `0.74em` (tăng ~42% chiều rộng so với thông thường). Điều này làm các chuỗi mã chứng từ (ví dụ: `CT-20261117-012625-K001`) và ngày tháng (`22/11/2026`) bị ngắt xuống 2 dòng trong bảng và thẻ di động.
+  2. Font Estedad thiếu ký hiệu tiền tệ Việt Nam Đồng (`₫`) và một số ký tự dấu tiếng Việt hiếm.
+- **Giải pháp triển khai**:
+  - **Font chính (`--font-sans`)**: Dùng `Estedad` tự lưu trữ nội bộ (self-hosted WOFF2, không tải CDN ngoài) cho toàn bộ tiêu đề, nhãn, nội dung văn bản thông thường.
+  - **Dự phòng & Ký hiệu tiền tệ**: Sử dụng `Inter` tải trước nội bộ (subsets `latin` + `vietnamese`) làm fallback ngay sau Estedad, đảm bảo ký hiệu `₫` hiển thị chuẩn đẹp, không bao giờ bị rơi về font hệ thống mặc định (Arial/Times).
+  - **Quy tắc chữ số dạng bảng (`.num`)**:
+    Chỉ áp dụng chữ số bảng (`tabular-nums`) cho các cột số tiền, số lượng, tỷ lệ phần trăm và ngày tháng bằng lớp `.num` kết hợp font `Inter`:
+    ```css
+    .num {
+      font-family: 'Inter', var(--font-sans);
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
+      letter-spacing: 0;
+    }
+    ```
+    Bề rộng hiển thị của "22/11/2026" ở cỡ 14px giảm từ 118px xuống 82.72px (đạt chỉ tiêu $\le 90\text{px}$).
+  - **Mã định danh (`.code`)**:
+    Sử dụng font `JetBrains Mono` với cỡ 12px, không bật `tnum`, cố định không ngắt dòng (`white-space: nowrap`), giúp mã chứng từ nằm trọn vẹn 1 dòng.
+  - **Chỉ số KPI độc lập**:
+    Sử dụng chữ số nguyên bản của Estedad (proportional figures), tắt triệt để `tabular-nums` để giữ dáng chữ số thanh thoát, tự nhiên.
 
 ---
 
-## 5. Rút Gọn Số Tiền Thông Minh (`fmtCompactVND`)
+### 3. Tối Ưu Hóa & Loại Bỏ `!important` Trong CSS
+- **Hiện trạng ban đầu**: Có **78 vị trí** sử dụng cờ `!important`, bao gồm các quy tắc ép font-weight và font-size toàn cục (`.font-bold { font-weight: 600 !important }`, `.text-xs { font-size: 12px !important }`, `.kpi-value { font-size: 27px !important }`) gây phá vỡ tính phân cấp (cascade) của CSS.
+- **Điều chỉnh**:
+  - Triệt tiêu 58 vị trí `!important` không cần thiết.
+  - Giữ lại đúng **20 vị trí** thực sự đặc thù và không thể thay thế:
+    1. Ép chiều cao cố định 40px cho các nút và ô nhập liệu thanh header (`.header-control`) nhằm chống lại việc framework cha ghi đè.
+    2. Các lớp tiện ích đặc dụng: ẩn in ấn (`.no-print { display: none !important }`), thu gọn thanh bên sidebar (`.sidebar-collapsed { width: 0 !important }`), và các trạng thái chuyển động của modal/bottom-sheet.
 
-- **Mẫu TailAdmin gốc**: Thường hiển thị số tiền đô-la Mỹ dạng ngắn gọn (`$45.2K`, `$1.2M`).
-- **Quyết định điều chỉnh**: Viết hàm chuẩn hóa `fmtCompactVND(n)` dành riêng cho Đồng Việt Nam:
-  - $\ge 1.000.000.000$ VNĐ $\rightarrow$ Hiển thị dạng compact: `v: "6,35", u: "tỷ ₫"` (đặt số và đơn vị trong tooltip/aria-label đầy đủ).
-  - $\ge 1.000.000$ VNĐ $\rightarrow$ Hiển thị dạng compact: `v: "450,5", u: "tr ₫"`.
-  - Dưới 1 triệu VNĐ $\rightarrow$ Hiển thị số tiền chuẩn định dạng tiếng Việt kèm ký hiệu `₫`.
-- **Lý do**: Số tiền VNĐ thường có 9 đến 12 chữ số. Nếu ghi đầy đủ `6.350.000.000 ₫` trên màn hình mobile 360px sẽ làm vỡ khung hoặc bị cắt chữ. Dạng rút gọn kết hợp `title` tooltip vừa đảm bảo thẩm mỹ vừa cung cấp đủ thông tin chi tiết.
+---
+
+### 4. Chuẩn Hóa Bộ Lọc Ngày & Tháng (Lược Bỏ Chuỗi Tiếng Anh)
+- **Vấn đề thực tế**:
+  Thẻ `<input type="month">` mặc định của các trình duyệt hiển thị chuỗi tháng bằng tiếng Anh (ví dụ: "November 2026").
+- **Giải pháp triển khai**:
+  Giữ nguyên thẻ input ẩn `<input type="month" id="globalMonthPicker">` và sự kiện `onchange="onGlobalMonthChange()"` để bảo toàn 100% logic nghiệp vụ hiện có; đồng thời bọc ngoài bằng một nút `.select` hiển thị định dạng chuẩn tiếng Việt (ví dụ: `Tháng 11/2026`) có icon lịch SVG. Khi người dùng nhấp chuột, nút gọi phương thức `showPicker()` của input gốc.
+
+---
+
+### 5. Bảo Toàn Nghiệp Vụ & Mã Nguồn
+- **Quy tắc tuyệt đối**:
+  1. Không can thiệp hoặc thay đổi backend (`src/index.js`, Cloudflare Worker, Supabase, API endpoints).
+  2. Giữ nguyên 100% ID phần tử HTML, tên hàm JavaScript toàn cục, các sự kiện `onclick`, `onchange`, `onsubmit` và các khóa lưu trữ trong `localStorage`.
+  3. Mọi công cụ phụ trợ (tools kiểm thử, build) được đặt riêng trong thư mục `tools/` và không can thiệp vào bundle triển khai chính.
