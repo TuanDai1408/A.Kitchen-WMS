@@ -652,9 +652,17 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Chi tiết doanh thu thuần, Prime Cost (Food Cost + Labor Cost), chi phí cố định và EBITDA.</p>
           </div>
           <div class="flex items-center gap-2">
-            <select id="plSiteSelector" onchange="onSelectPLSite(this.value)" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs outline-none">
-              <!-- Dynamically populated 14 sites -->
-            </select>
+            <select id="plSiteSelector" class="hidden"></select>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0 hidden sm:inline">Trọng tâm:</span>
+              <select id="plFocusFilter" onchange="filterPlBreakdown(this.value)" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-xs outline-none focus:border-brand-500">
+                <option value="ALL">📊 Toàn bộ cấu trúc P&amp;L</option>
+                <option value="COGS">🥩 Chi phí Giá vốn (Food Cost)</option>
+                <option value="LABOR">👨‍🍳 Chi phí Nhân công (Labor)</option>
+                <option value="OPEX">🏢 Chi phí Vận hành &amp; Mặt bằng</option>
+                <option value="EBITDA">📈 Lợi nhuận gộp &amp; EBITDA</option>
+              </select>
+            </div>
             <button onclick="exportFnbPLExcel()" class="px-3 py-1.5 rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-all">
               <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-500"></i>
               <span>Xuất Excel P&amp;L</span>
@@ -1548,14 +1556,15 @@
 
           <!-- Right Actions: Branch Indicator & Quick Action Buttons -->
           <div class="flex items-center gap-2.5 flex-wrap">
-            <div class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 dark:text-gray-200">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500"></i>
-              <span>Điểm phụ trách:</span>
-              <span id="dashBranchTitle" class="font-bold text-brand-500 dark:text-brand-400">K505</span>
-              <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
-                <span class="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                D1 Live
-              </span>
+            <div class="flex items-center gap-1.5">
+              <span id="dashBranchTitle" class="hidden"></span>
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:inline">Trọng tâm:</span>
+              <select id="whDashScopeFilter" onchange="if(typeof onWhDashScopeChange==='function')onWhDashScopeChange(this.value)" class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-theme-xs dark:border-gray-800 dark:bg-white/3 dark:text-gray-200 outline-none focus:border-brand-500">
+                <option value="ALL">📦 Toàn bộ danh mục kho</option>
+                <option value="NEAR_EXP">⚠️ Lô cận date (≤ 7 ngày)</option>
+                <option value="MIN_STOCK">📉 Chạm ngưỡng an toàn (ROP)</option>
+                <option value="SLOW_MOVING">⏳ Tồn chậm luân chuyển (> 20 ngày)</option>
+              </select>
             </div>
 
             <button onclick="openReceiptModal()" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-theme-xs hover:bg-brand-600 active:translate-y-px transition-all">
@@ -1868,12 +1877,16 @@
           <select id="fnbCountSiteSelect" class="hidden"><option value="K001">K001</option></select>
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2.5">
-              <!-- Site Selector Pill (Synchronized with global site selection) -->
-              <div onclick="openSiteSelectorModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs cursor-pointer hover:border-brand-500/60 transition-all group shrink-0" title="Bấm để đổi điểm bán & cơ sở">
-                <i data-lucide="map-pin" class="size-3.5 text-brand-500 shrink-0"></i>
-                <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Cơ sở:</span>
-                <span id="fnbCountCurrentSiteBadge" class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate max-w-[200px]">K001 - MN Bếp Ăn Đại Học Hùng Vương</span>
-                <span class="text-brand-500 group-hover:underline font-bold text-[10px] shrink-0 ml-1">Đổi ↗</span>
+              <!-- Filter Trạng thái kiểm kê & chênh lệch tồn -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Chênh lệch:</span>
+                <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                  <option value="all">Tất cả mặt hàng</option>
+                  <option value="diff">⚠️ Lệch tồn (Thừa / Thiếu)</option>
+                  <option value="matched">🎯 Khớp 100% sổ sách</option>
+                  <option value="counted">✅ Đã kiểm đếm</option>
+                  <option value="uncounted">⏳ Chưa kiểm đếm</option>
+                </select>
               </div>
 
               <!-- Filter Ngành hàng -->
@@ -2088,13 +2101,17 @@
             </p>
           </div>
           <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Site Sync Pill -->
-            <button type="button" onclick="openSiteSelectorModal()" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-brand-200 dark:border-brand-800/60 bg-brand-50/50 dark:bg-brand-950/20 text-xs font-medium text-brand-700 dark:text-brand-300 hover:bg-brand-100/50 transition-colors shadow-theme-xs" title="Nhấp để chuyển đổi điểm bán">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span id="fnbReceiptCurrentSiteBadge" class="font-semibold truncate max-w-[200px]">Đang tải điểm...</span>
-              <span class="text-[11px] text-brand-500/80 underline font-normal">Đổi ↗</span>
-            </button>
             <select id="fnbReceiptFilterSite" class="hidden"><option value="K001">K001</option></select>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nguồn giao:</span>
+              <select id="fnbPoSupplierFilter" onchange="renderFnbPoTable(document.getElementById('fnbPoSearchInput')?.value || '')" class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 shadow-theme-xs outline-none focus:border-brand-500">
+                <option value="">Tất cả nguồn hàng</option>
+                <option value="SIBA">🍲 Bếp Trung Tâm Siba</option>
+                <option value="BAF">🥩 BaF Meat / MeatDeli</option>
+                <option value="SPICE">🧂 Gia vị &amp; Hàng khô</option>
+                <option value="VEG">🥦 Rau củ Đà Lạt</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -2333,10 +2350,16 @@
         <!-- Filter Bar -->
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col md:flex-row items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto">
+            <select id="fnbWasteFilterSite" class="hidden"><option value="K001">K001</option></select>
             <div class="flex items-center gap-1.5">
-              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Điểm bán:</span>
-              <select id="fnbWasteFilterSite" onchange="onFnbWasteSiteChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500">
-                <option value="K001">K001 - Cửa hàng Ba Đình</option>
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Lý do hủy:</span>
+              <select id="fnbWasteReasonFilter" onchange="onFnbWasteFilterChange()" class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-rose-500 max-w-[185px]">
+                <option value="">Tất cả lý do hủy</option>
+                <option value="EXP">⏰ Quá hạn sử dụng (EXP)</option>
+                <option value="DAMAGE">📦 Rách / vỡ / hỏng bao bì</option>
+                <option value="QUALITY">⚠️ Cảm quan / biến chất</option>
+                <option value="COOK">🔥 Khét / cháy / lỗi chế biến</option>
+                <option value="OTHER">📋 Khác / hao hụt rã đông</option>
               </select>
             </div>
             <div class="flex items-center gap-1.5">
@@ -2675,19 +2698,20 @@
       </section>
 <section id="portal-voucher" class="tab-panel space-y-4">
         <!-- Top filter bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-center justify-between gap-3 text-xs">
           <select id="ctVung" class="hidden"></select>
           <select id="ctSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nghiệp vụ:</span>
+            <select id="ctVoucherTypeFilter" onchange="if(typeof onCtTypeFilterChange==='function')onCtTypeFilterChange(this.value)" class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+              <option value="ALL">📋 Tất cả nghiệp vụ chứng từ</option>
+              <option value="NHAP_NCC">📥 Nhập mua Nhà Cung Cấp</option>
+              <option value="NHAP_BTT">🍲 Nhập từ Bếp Trung Tâm</option>
+              <option value="XUAT_TRA">📤 Xuất trả Nhà Cung Cấp</option>
+              <option value="DIEU_CHUYEN">🔄 Điều chuyển nội bộ</option>
+            </select>
           </div>
-          <button onclick="resetChungTuForm()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
+          <button onclick="resetChungTuForm()" class="px-4 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
           </button>
         </div>
@@ -2787,14 +2811,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="scVung" class="hidden"></select>
           <select id="scSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+          <div class="flex-1 min-w-[160px]">
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TRẠNG THÁI ĐỐI SOÁT</label>
+            <select id="scAuditFilter" onchange="searchVouchers()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-medium outline-none focus:border-brand-500">
+              <option value="">Tất cả trạng thái</option>
+              <option value="HAS_IMG">📷 Đã đính kèm ảnh Drive</option>
+              <option value="NO_IMG">⚠️ Chưa có ảnh hóa đơn</option>
+              <option value="VERIFIED">✅ Đã kiểm tra khớp số</option>
+            </select>
           </div>
           <div class="flex-1 min-w-[160px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">LOẠI HÓA ĐƠN</label>
@@ -2844,14 +2868,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="orderVung" class="hidden"></select>
           <select id="orderSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Site đặt hàng:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+          <div class="w-full sm:flex-1 sm:min-w-[170px]">
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">NGUỒN CUNG ỨNG</label>
+            <select id="orderSupplyChannel" onchange="filterItems()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-medium outline-none focus:border-brand-500">
+              <option value="ALL">📦 Tất cả nguồn cung ứng</option>
+              <option value="BTT">🍲 Bếp Trung Tâm Siba</option>
+              <option value="NCC">🚚 NCC giao trực tiếp điểm</option>
+              <option value="URGENT">⚡ Đặt hàng khẩn cấp</option>
+            </select>
           </div>
           <div class="w-full sm:flex-1 sm:min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">THÁNG ÁP DỤNG</label>
@@ -3005,14 +3029,17 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="hsVung" class="hidden"></select>
           <select id="hsSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Áp dụng:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
+          <div class="flex-1 min-w-[160px]">
+            <div class="flex justify-between items-center mb-1">
+              <label class="font-bold text-gray-700 dark:text-gray-200">TRẠNG THÁI ĐƠN</label>
             </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+            <select id="hsOrderStatusFilter" onchange="filterHsOrders(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-medium outline-none focus:border-brand-500">
+              <option value="ALL">📋 Tất cả trạng thái</option>
+              <option value="APPROVED">✅ Đã phê duyệt đơn</option>
+              <option value="PENDING">⏳ Chờ duyệt định mức</option>
+              <option value="DELIVERED">🚚 Đã nhận hàng tại kho</option>
+              <option value="REJECTED">❌ Đã hủy đơn</option>
+            </select>
           </div>
           <div class="flex-1 min-w-[140px]">
             <div class="flex justify-between items-center mb-1">
@@ -3057,14 +3084,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="bcVung" class="hidden"></select>
           <select id="bcSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Báo cáo cho:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+          <div class="flex-1 min-w-[170px]">
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">CA BÁO CÁO</label>
+            <select id="bcShiftSelect" name="Ca báo cáo" class="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
+              <option value="CA_SANG">🌅 Ca Sáng (06:00 - 14:00)</option>
+              <option value="CA_CHIEU">☀️ Ca Chiều (14:00 - 22:00)</option>
+              <option value="CA_TOI">🌙 Ca Tối / Giao Ca Đêm</option>
+              <option value="CA_HC">🏢 Hành Chính / Trọn Ngày</option>
+            </select>
           </div>
           <button onclick="resetBaoCao()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl flex items-center gap-1.5 border border-gray-300 dark:border-gray-700 transition-all">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Làm mới form
@@ -3075,7 +3102,7 @@
         <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3 text-xs text-amber-800">
           <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
           <div>
-            <b>Lưu ý quan trọng:</b> Chọn đúng tên <b>Site</b> mình đang quản lý (ở thanh lọc phía trên) trước khi ghi nhận và gửi báo cáo ca bếp.
+            <b>Lưu ý quan trọng:</b> Chọn đúng tên <b>Site</b> mình đang quản lý (ở thanh điều hướng phía trên) trước khi ghi nhận và gửi báo cáo ca bếp.
           </div>
         </div>
 
@@ -3345,14 +3372,14 @@
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
           <select id="kkVung" class="hidden"></select>
           <select id="kkSite" class="hidden"></select>
-          <div onclick="openSiteSelectorModal()" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-xs cursor-pointer hover:border-brand-500/50 transition-all group min-w-0 max-w-full" title="Bấm để đổi Điểm bán & Khu vực">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-              <span class="text-gray-400 font-medium shrink-0 hidden xs:inline">Kiểm kê:</span>
-              <span class="global-tab-region-badge px-1.5 py-0.5 rounded font-bold text-[9.5px] uppercase shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Miền Nam</span>
-              <span class="global-tab-site-label font-bold text-gray-800 dark:text-gray-100 truncate min-w-0 flex-1 sm:max-w-[240px]">K001 - Bếp Ăn ĐH Hùng Vương</span>
-            </div>
-            <span class="text-brand-500 group-hover:underline font-bold text-[11px] shrink-0 ml-1">Đổi ↗</span>
+          <div class="flex-1 min-w-[170px]">
+            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TRỌNG TÂM KIỂM KÊ</label>
+            <select id="kkDiscrepancyFilter" onchange="onKkDiscrepancyFilterChange(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
+              <option value="ALL">📋 Toàn bộ danh mục kiểm kê</option>
+              <option value="DIFF">⚠️ Có chênh lệch (Thừa / Thiếu)</option>
+              <option value="COUNTED">✅ Đã kiểm xong (Có số thực tế)</option>
+              <option value="UNCOUNTED">⏳ Chưa nhập số lượng kiểm</option>
+            </select>
           </div>
           <div class="flex-1 min-w-[140px]">
             <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
@@ -5540,11 +5567,22 @@
       const search = (document.getElementById('orderSearch')?.value || '').toLowerCase();
       const type = document.getElementById('fLoai')?.value || '';
       const onlyTyped = document.getElementById('fChiNhap')?.checked;
+      const channel = document.getElementById('orderSupplyChannel')?.value || 'ALL';
 
       let filtered = App.items.filter(it => {
         if (search && !it.maHang.toLowerCase().includes(search) && !it.tenSP.toLowerCase().includes(search)) return false;
         if (type && it.tenLoai !== type) return false;
         if (onlyTyped && (!it.soLuongDat || it.soLuongDat <= 0)) return false;
+        if (channel === 'BTT') {
+          const txt = ((it.nguonCung || '') + ' ' + (it.tenLoai || '') + ' ' + (it.tenSP || '')).toLowerCase();
+          if (!txt.includes('btt') && !txt.includes('trung tâm') && !txt.includes('chế biến')) return false;
+        } else if (channel === 'NCC') {
+          const txt = ((it.nguonCung || '') + ' ' + (it.tenLoai || '')).toLowerCase();
+          if (txt.includes('btt') || txt.includes('trung tâm')) return false;
+        } else if (channel === 'URGENT') {
+          const txt = ((it.nganh_hang || '') + ' ' + (it.tenLoai || '') + ' ' + (it.tenSP || '')).toLowerCase();
+          if (!txt.includes('tươi') && !txt.includes('thịt') && !txt.includes('rau') && !txt.includes('khẩn')) return false;
+        }
         return true;
       });
 
@@ -6116,7 +6154,7 @@
 
     async function guiBaoCao() {
       const site = document.getElementById('bcSite') ? document.getElementById('bcSite').value : '';
-      if (!site) { showToast('Vui lòng chọn Site ở thanh lọc phía trên!'); return; }
+      if (!site) { showToast('Vui lòng chọn Site ở thanh điều hướng phía trên!'); return; }
 
       const ngay = document.getElementById('bcNgay') ? document.getElementById('bcNgay').value : '';
       if (!ngay) { showToast('Vui lòng chọn Ngày báo cáo!'); return; }
@@ -6510,18 +6548,28 @@
     }
     window.filterAuditItems = filterAuditItems;
 
+    window.onKkDiscrepancyFilterChange = function(val) {
+      const statusSel = document.getElementById('kkStatusSelect');
+      if (statusSel) {
+        statusSel.value = val;
+      }
+      filterAuditItems();
+    };
+
     function resetAuditFilters() {
       const searchInput = document.getElementById('kkSearchInput');
       const nganhSel = document.getElementById('kkNganhSelect');
       const nhomSel = document.getElementById('kkNhomSelect');
       const priceSel = document.getElementById('kkPriceSelect');
       const statusSel = document.getElementById('kkStatusSelect');
+      const topFocusSel = document.getElementById('kkDiscrepancyFilter');
 
       if (searchInput) searchInput.value = '';
       if (nganhSel) nganhSel.value = '';
       if (nhomSel) nhomSel.value = '';
       if (priceSel) priceSel.value = 'ALL';
       if (statusSel) statusSel.value = 'ALL';
+      if (topFocusSel) topFocusSel.value = 'ALL';
 
       onAuditNganhChange();
     }
@@ -7907,24 +7955,22 @@ function viewSitePL(siteCode) {
 async function loadFnbPL() {
   try {
     showLoading();
-    const plSel = document.getElementById('plSiteSelector');
-    if (plSel && plSel.options.length === 0) {
-      const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []).filter(s => s.code !== 'ALL');
-      if (sites.length > 0) {
-        plSel.innerHTML = sites.map(s => `<option value="${s.code}">${s.code} - ${s.name}</option>`).join('');
-      }
-    }
-    const site = plSel?.value || document.getElementById('globalBranchSelect')?.value || 'K001';
+    const site = document.getElementById('globalBranchSelect')?.value || localStorage.getItem('orbit_user_site') || 'K001';
     const month = document.getElementById('globalMonthPicker')?.value || '2026-11';
 
     const resp = await fetch(`/api/fnb/pl?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(month)}`);
     const res = await resp.json();
     if (res.success && res.data) {
       window.currentPLData = res.data;
+      const plSel = document.getElementById('plSiteSelector');
       if (plSel && res.data.siteCode) {
         plSel.value = res.data.siteCode;
       }
       renderFnbPL(res.data);
+      if (typeof filterPlBreakdown === 'function') {
+        const focusVal = document.getElementById('plFocusFilter')?.value || 'ALL';
+        filterPlBreakdown(focusVal);
+      }
     }
   } catch (err) {
     console.error('Error loadFnbPL:', err);
@@ -7934,6 +7980,42 @@ async function loadFnbPL() {
     lucide.createIcons();
   }
 }
+
+window.filterPlBreakdown = function(focus) {
+  const tbody = document.querySelector('#fnb-pl table tbody');
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  rows.forEach(tr => {
+    const text = tr.textContent.toLowerCase();
+    if (!focus || focus === 'ALL') {
+      tr.style.display = '';
+    } else if (focus === 'COGS') {
+      if (text.includes('giá vốn') || text.includes('food cost') || text.includes('nguyên vật liệu') || text.includes('doanh thu thuần')) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    } else if (focus === 'LABOR') {
+      if (text.includes('nhân sự') || text.includes('labor') || text.includes('quỹ lương') || text.includes('doanh thu thuần')) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    } else if (focus === 'OPEX') {
+      if (text.includes('vận hành') || text.includes('thuê') || text.includes('điện') || text.includes('cố định') || text.includes('doanh thu thuần')) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    } else if (focus === 'EBITDA') {
+      if (text.includes('ebitda') || text.includes('lợi nhuận') || text.includes('doanh thu thuần')) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    }
+  });
+};
 
 // Render P&L Data
 function renderFnbPL(d) {
@@ -9676,6 +9758,81 @@ window.loadPoSap = async function() {
 };
 
 // 8. Upgraded loadHistory (Desktop Table + Mobile Cards)
+window.renderHsOrdersList = function(items) {
+  const tbody = document.getElementById('hsBody');
+  const mob = document.getElementById('hsMobileCards');
+
+  if (!items || !items.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào phù hợp với bộ lọc.</td></tr>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào phù hợp với bộ lọc.</div>';
+    return;
+  }
+
+  // Desktop Table
+  if (tbody) {
+    tbody.innerHTML = items.map(o => `
+      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${o.maDon}</td>
+        <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
+        <td class="p-3 font-bold text-gray-900 dark:text-white">${o.site}</td>
+        <td class="p-3 text-gray-700 dark:text-gray-300">${o.nguoiDat}</td>
+        <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${o.soDong}</td>
+        <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</td>
+        <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
+        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span></td>
+        <td class="p-3 text-right">
+          <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
+            Chi tiết
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Mobile Cards
+  if (mob) {
+    mob.innerHTML = items.map(o => `
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${o.maDon}</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
+        </div>
+        <div class="font-bold text-xs text-gray-900 dark:text-white">${o.site}</div>
+        <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
+          <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</b></div>
+          <div>Người đặt: <b class="text-gray-900 dark:text-white">${o.nguoiDat}</b></div>
+          <div>Số loại mặt hàng: <b class="tabular-nums text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
+          <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
+          <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
+            <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
+            <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+          </div>
+        </div>
+        <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết Đơn
+        </button>
+      </div>
+    `).join('');
+  }
+};
+
+window.filterHsOrders = function(status) {
+  const allOrders = (window.App && window.App.historyOrders) ? window.App.historyOrders : [];
+  if (!status || status === 'ALL') {
+    window.renderHsOrdersList(allOrders);
+    return;
+  }
+  const filtered = allOrders.filter(o => {
+    const st = (o.trangThai || '').toUpperCase();
+    if (status === 'APPROVED') return st.includes('DUYỆT') || st.includes('APPROVED');
+    if (status === 'PENDING') return st.includes('CHỜ') || st.includes('TẠO') || st.includes('PENDING');
+    if (status === 'DELIVERED') return st.includes('NHẬN') || st.includes('GIAO') || st.includes('DELIVERED');
+    if (status === 'REJECTED') return st.includes('HỦY') || st.includes('TỪ CHỐI') || st.includes('REJECT');
+    return true;
+  });
+  window.renderHsOrdersList(filtered);
+};
+
 window.loadHistory = async function() {
   const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
   const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
@@ -9688,61 +9845,11 @@ window.loadHistory = async function() {
     showLoading('Tải lịch sử đơn hàng...');
     const res = await fetch(`/api/orders?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
     const json = await res.json();
-    const tbody = document.getElementById('hsBody');
-    const mob = document.getElementById('hsMobileCards');
+    if (!window.App) window.App = {};
+    window.App.historyOrders = (json.success && json.data) ? json.data : [];
 
-    if (!json.success || !json.data || !json.data.length) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Không có đơn hàng nào trong kỳ.</td></tr>';
-      if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn hàng nào trong kỳ.</div>';
-      return;
-    }
-
-    // Desktop Table
-    if (tbody) {
-      tbody.innerHTML = json.data.map(o => `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${o.maDon}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</td>
-          <td class="p-3 font-bold text-gray-900 dark:text-white">${o.site}</td>
-          <td class="p-3 text-gray-700 dark:text-gray-300">${o.nguoiDat}</td>
-          <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${o.soDong}</td>
-          <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</td>
-          <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
-          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span></td>
-          <td class="p-3 text-right">
-            <button onclick="viewOrderDetail('${o.maDon}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
-              Chi tiết
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // Mobile Cards
-    if (mob) {
-      mob.innerHTML = json.data.map(o => `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${o.maDon}</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${o.trangThai || 'Mới tạo'}</span>
-          </div>
-          <div class="font-bold text-xs text-gray-900 dark:text-white">${o.site}</div>
-          <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-            <div>Ngày đặt: <b class="tabular-nums text-gray-900 dark:text-white">${o.ngayDat ? o.ngayDat.split(' ')[0] : '—'}</b></div>
-            <div>Người đặt: <b class="text-gray-900 dark:text-white">${o.nguoiDat}</b></div>
-            <div>Số loại mặt hàng: <b class="tabular-nums text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
-            <div>Tổng số lượng: <b class="tabular-nums text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
-            <div class="col-span-2 flex justify-between items-center pt-1 border-t border-gray-200/60 dark:border-gray-800">
-              <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-              <span class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
-            </div>
-          </div>
-          <button onclick="viewOrderDetail('${o.maDon}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
-            <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết Đơn
-          </button>
-        </div>
-      `).join('');
-    }
+    const currentFilter = document.getElementById('hsOrderStatusFilter')?.value || 'ALL';
+    window.filterHsOrders(currentFilter);
   } catch (e) {
     console.error(e);
   } finally {
@@ -10582,6 +10689,7 @@ window.renderFnbCountsTable = function() {
   const mob = document.getElementById('fnbCountsMobileCards');
   const selectedNganh = (document.getElementById('fnbCountNganhHangFilter')?.value || '').trim().toLowerCase();
   const selectedNhom = (document.getElementById('fnbCountNhomHangFilter')?.value || '').trim().toLowerCase();
+  const statusFilter = (document.getElementById('fnbCountStatusFilter')?.value || 'all');
   const query = (document.getElementById('fnbCountSearchInput')?.value || '').trim().toLowerCase();
 
   const filtered = (gFnbAllItems || []).filter(i => {
@@ -10595,7 +10703,19 @@ window.renderFnbCountsTable = function() {
       const nh = (i.nhom_hang || i.item_group || '').trim().toLowerCase();
       if (nh !== selectedNhom) return false;
     }
-    // 3. Filter by search query
+    // 3. Filter by status filter
+    if (statusFilter !== 'all') {
+      const book = Number(i.book_qty) || 0;
+      const count = (i.userCount !== undefined) ? Number(i.userCount) : (i.last_count_qty !== null && i.last_count_qty !== undefined ? Number(i.last_count_qty) : book);
+      const diff = count - book;
+      const isCounted = (i.userCount !== undefined || i.last_count_qty !== null);
+
+      if (statusFilter === 'diff' && Math.abs(diff) < 0.001) return false;
+      if (statusFilter === 'matched' && Math.abs(diff) >= 0.001) return false;
+      if (statusFilter === 'counted' && !isCounted) return false;
+      if (statusFilter === 'uncounted' && isCounted) return false;
+    }
+    // 4. Filter by search query
     if (query) {
       const name = (i.name || '').toLowerCase();
       const code = (i.code || '').toLowerCase();
@@ -10918,9 +11038,20 @@ function renderFnbPoTable(query = '') {
   const tbody = document.getElementById('fnbPoTableBody');
   const mob = document.getElementById('fnbPoMobileCards');
   const sumEl = document.getElementById('fnbPoSummaryText');
+  const supplierFilter = (document.getElementById('fnbPoSupplierFilter')?.value || '').toLowerCase();
   const q = (query || '').toLowerCase().trim();
 
   let list = window.gFnbPoList || [];
+  if (supplierFilter) {
+    list = list.filter(p => {
+      const sup = (p.supplier_name || '').toLowerCase();
+      if (supplierFilter === 'siba') return sup.includes('siba') || sup.includes('bếp trung tâm') || sup.includes('trung tâm');
+      if (supplierFilter === 'baf') return sup.includes('baf') || sup.includes('thịt');
+      if (supplierFilter === 'spice') return sup.includes('gia vị') || sup.includes('đường') || sup.includes('unilever') || sup.includes('cholimex') || sup.includes('muối');
+      if (supplierFilter === 'veg') return sup.includes('rau') || sup.includes('đà lạt') || sup.includes('củ');
+      return true;
+    });
+  }
   if (q) {
     list = list.filter(p => {
       const num = (p.po_number || '').toLowerCase();
@@ -11656,13 +11787,12 @@ window.closeInvDetailModal = function() {
 // ============================================================================
 
 function getActiveFnbWasteSite() {
-  const filterSel = document.getElementById('fnbWasteFilterSite')?.value;
-  if (filterSel && filterSel !== 'all' && filterSel !== 'ALL') return filterSel.toUpperCase();
-  const localSaved = localStorage.getItem('orbit_user_site');
   const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const localSaved = localStorage.getItem('orbit_user_site');
   const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+  const filterSel = document.getElementById('fnbWasteFilterSite')?.value;
 
-  let siteCode = localSaved || globalSel || appBranch || 'K001';
+  let siteCode = globalSel || localSaved || appBranch || filterSel || 'K001';
   if (siteCode === 'ALL' || siteCode === 'all') siteCode = 'K001';
   return siteCode.toUpperCase();
 }
@@ -11822,6 +11952,7 @@ window.renderFnbWasteStockTable = function() {
 
   const selectedNganh = (document.getElementById('fnbWasteNganhHangFilter')?.value || '').trim().toLowerCase();
   const selectedNhom = (document.getElementById('fnbWasteNhomHangFilter')?.value || '').trim().toLowerCase();
+  const selectedReason = (document.getElementById('fnbWasteReasonFilter')?.value || '').trim();
   const query = (document.getElementById('fnbWasteSearchInput')?.value || '').trim().toLowerCase();
 
   const allItems = window.gFnbWasteStockItems || [];
@@ -11848,6 +11979,10 @@ window.renderFnbWasteStockTable = function() {
 
   // Filter items for display
   const filtered = allItems.filter(i => {
+    if (selectedReason === 'EXP') {
+      const days = (i.days_remaining !== undefined) ? Number(i.days_remaining) : 999;
+      if (days > 15 && !i.is_expired) return false;
+    }
     if (selectedNganh) {
       const ng = (i.nganh_hang || '').trim().toLowerCase();
       if (ng !== selectedNganh) return false;
