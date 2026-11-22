@@ -4299,13 +4299,20 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Điểm bán nhận hàng *</label>
-              <select id="manualReceiptSiteSelect" onchange="onManualReceiptSiteChange(this.value)" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-semibold text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
-                <option value="K001">K001 - MN Bếp Ăn Đại Học Hùng Vương</option>
-                <option value="K002">K002 - MN Bếp Ăn Trường THPT Chuyên</option>
-                <option value="K003">K003 - MN Bếp Ăn Bệnh Viện Đa Khoa</option>
-                <option value="K505">K505 - Bếp Trung Tâm Siba Food</option>
-              </select>
+              <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1 flex items-center justify-between">
+                <span>Điểm bán nhận hàng *</span>
+                <span class="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 font-medium bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200/60 dark:border-amber-800/60">
+                  <i data-lucide="lock" class="w-2.5 h-2.5"></i> Cố định theo điểm đăng nhập
+                </span>
+              </label>
+              <div class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100/90 dark:bg-gray-800/80 flex items-center justify-between cursor-not-allowed select-none shadow-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                  <span id="manualReceiptSiteNameDisplay" class="font-bold text-xs text-gray-800 dark:text-gray-200 truncate">K001 - MN Bếp Ăn Đại Học Hùng Vương</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shrink-0 uppercase">Cố định</span>
+              </div>
+              <input type="hidden" id="manualReceiptSiteSelect" value="K001">
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">Ngày nhập thực tế *</label>
@@ -12760,8 +12767,17 @@ window.gManualSiteCatalog = [];
 window.gManualShowAllCatalog = false;
 
 window.openManualReceiptModal = async function(preselectedSite) {
-  const activeSite = preselectedSite || (typeof getActiveFnbReceiptSite === 'function' ? getActiveFnbReceiptSite() : 'K001') || 'K001';
+  // Điểm nhận hàng cố định theo site user đã chọn khi đăng nhập (không được chọn site khác)
+  const activeSite = localStorage.getItem('orbit_user_site') || (window.gCurrentUser && window.gCurrentUser.assignedSite) || (typeof getActiveFnbReceiptSite === 'function' ? getActiveFnbReceiptSite() : 'K001') || 'K001';
   
+  const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []);
+  const siteObj = sites.find(s => s.code.toUpperCase() === activeSite.toUpperCase());
+  const siteName = siteObj ? (siteObj.ten || siteObj.name) : activeSite;
+  const fullSiteDisplay = siteName.startsWith(activeSite) ? siteName : `${activeSite} - ${siteName}`;
+
+  const nameDisplay = document.getElementById('manualReceiptSiteNameDisplay');
+  if (nameDisplay) nameDisplay.textContent = fullSiteDisplay;
+
   const sel = document.getElementById('manualReceiptSiteSelect');
   if (sel) sel.value = activeSite;
 
@@ -12814,7 +12830,8 @@ window.toggleManualShowAllCatalog = async function() {
   if (txt) {
     txt.textContent = window.gManualShowAllCatalog ? 'Xem chỉ của site' : 'Xem toàn chuỗi';
   }
-  const siteCode = document.getElementById('manualReceiptSiteSelect')?.value || 'K001';
+  // Điểm nhận hàng luôn khóa theo site đăng nhập của user
+  const siteCode = localStorage.getItem('orbit_user_site') || (window.gCurrentUser && window.gCurrentUser.assignedSite) || document.getElementById('manualReceiptSiteSelect')?.value || 'K001';
   await loadManualCatalogItems(siteCode, window.gManualShowAllCatalog);
 };
 
@@ -13191,7 +13208,8 @@ window.submitManualReceipt = async function() {
     if (!ok) return;
   }
 
-  const siteCode = document.getElementById('manualReceiptSiteSelect')?.value || 'K001';
+  // Điểm nhận hàng luôn khóa theo site đăng nhập của user
+  const siteCode = localStorage.getItem('orbit_user_site') || (window.gCurrentUser && window.gCurrentUser.assignedSite) || document.getElementById('manualReceiptSiteSelect')?.value || 'K001';
   const receiptDate = document.getElementById('manualReceiptDate')?.value || new Date().toISOString().slice(0, 10);
   const receiptType = document.getElementById('manualReceiptType')?.value || 'NHAP_MUA_TRUC_TIEP';
   const invoiceNo = (document.getElementById('manualReceiptInvoiceNo')?.value || '').trim() || 'NHAP-THU-CONG';
