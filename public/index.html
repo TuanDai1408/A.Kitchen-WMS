@@ -3572,69 +3572,76 @@
         </form>
       </section>
 <section id="portal-kiemke" class="tab-panel space-y-4">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Kiểm kê tồn kho kỳ</h1>
+            <p class="page-subtitle">Đối soát, phát hiện chênh lệch và cập nhật số lượng tồn kho thực tế</p>
+          </div>
+        </div>
+
         <!-- Top Action Bar -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-wrap items-end gap-3 text-xs">
+        <div class="filter-bar">
           <select id="kkVung" class="hidden"></select>
           <select id="kkSite" class="hidden"></select>
-          <div class="flex-1 min-w-[170px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">TRỌNG TÂM KIỂM KÊ</label>
-            <select id="kkDiscrepancyFilter" onchange="onKkDiscrepancyFilterChange(this.value)" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-xs font-semibold outline-none focus:border-brand-500">
+          <div class="field flex-1 min-w-[200px]">
+            <label class="field-label">Trọng tâm kiểm kê</label>
+            <select id="kkDiscrepancyFilter" onchange="onKkDiscrepancyFilterChange(this.value)" class="select">
               <option value="ALL">Toàn bộ danh mục kiểm kê</option>
               <option value="DIFF">Có chênh lệch (Thừa / Thiếu)</option>
               <option value="COUNTED">Đã kiểm xong (Có số thực tế)</option>
-              <option value="UNCOUNTED">⏳ Chưa nhập số lượng kiểm</option>
+              <option value="UNCOUNTED">Chưa nhập số lượng kiểm</option>
             </select>
           </div>
-          <div class="flex-1 min-w-[140px]">
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">KỲ KIỂM KÊ (THÁNG)</label>
-            <input type="month" id="kkMonth" onchange="loadAudit()" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+          <div class="field flex-1 min-w-[160px]">
+            <label class="field-label">Kỳ kiểm kê (Tháng)</label>
+            <input type="month" id="kkMonth" onchange="loadAudit()" class="input">
           </div>
-          <button onclick="loadAudit()" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-800/80 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-lg border border-gray-300 dark:border-gray-700 flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Tải dữ liệu
-          </button>
-          <button onclick="saveAudit()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5">
-            <i data-lucide="save" class="w-3.5 h-3.5"></i> Lưu kiểm kê
-          </button>
-          <button onclick="exportAuditExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm ml-auto flex items-center gap-1.5">
-            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Xuất Excel
-          </button>
+          <div class="flex items-center gap-2 self-end">
+            <button onclick="loadAudit()" class="btn btn-secondary">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Tải dữ liệu
+            </button>
+            <button onclick="saveAudit()" class="btn btn-primary">
+              <i data-lucide="save" class="w-4 h-4"></i> Lưu kiểm kê
+            </button>
+            <button onclick="exportAuditExcel()" class="btn btn-secondary">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+            </button>
+          </div>
         </div>
 
         <!-- Thanh Tìm Kiếm & Bộ Lọc Nâng Cao Cho Kiểm Kê Theo Site -->
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+        <div class="table-card p-4 space-y-3">
           <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <!-- Ô tìm kiếm chi tiết -->
             <div class="relative flex-1 min-w-[260px]">
               <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <input type="text" id="kkSearchInput" oninput="filterAuditItems()" placeholder="Tìm kiếm theo mã vật tư, tên sản phẩm, ngành hàng, nhóm hàng..."
-                class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-gray-100 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+              <input type="text" id="kkSearchInput" oninput="filterAuditItems()" placeholder="Tìm kiếm mã vật tư, tên sản phẩm, ngành hàng, nhóm..."
+                class="input pl-9 w-full">
             </div>
 
             <!-- Các bộ lọc chi tiết -->
             <div class="flex flex-wrap items-center gap-2 text-xs">
               <!-- Lọc Ngành hàng -->
               <div class="flex items-center gap-1.5 min-w-[150px]">
-                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Ngành:</span>
-                <select id="kkNganhSelect" onchange="onAuditNganhChange()"
-                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <span class="text-gray-500 dark:text-gray-400 font-medium shrink-0">Ngành:</span>
+                <select id="kkNganhSelect" onchange="onAuditNganhChange()" class="select h-9 py-1 text-xs">
                   <option value="">-- Tất cả ngành hàng --</option>
                 </select>
               </div>
 
               <!-- Lọc Nhóm hàng -->
               <div class="flex items-center gap-1.5 min-w-[150px]">
-                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Nhóm:</span>
-                <select id="kkNhomSelect" onchange="filterAuditItems()"
-                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <span class="text-gray-500 dark:text-gray-400 font-medium shrink-0">Nhóm:</span>
+                <select id="kkNhomSelect" onchange="filterAuditItems()" class="select h-9 py-1 text-xs">
                   <option value="">-- Tất cả nhóm hàng --</option>
                 </select>
               </div>
 
               <!-- Lọc Đơn giá -->
               <div class="flex items-center gap-1.5 min-w-[130px]">
-                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Giá:</span>
-                <select id="kkPriceSelect" onchange="filterAuditItems()"
-                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <span class="text-gray-500 dark:text-gray-400 font-medium shrink-0">Giá:</span>
+                <select id="kkPriceSelect" onchange="filterAuditItems()" class="select h-9 py-1 text-xs">
                   <option value="ALL">Tất cả đơn giá</option>
                   <option value="WITH_PRICE">Có đơn giá (> 0đ)</option>
                   <option value="NO_PRICE">Chưa có giá (0đ)</option>
@@ -3643,9 +3650,8 @@
 
               <!-- Lọc Trạng thái kiểm kê -->
               <div class="flex items-center gap-1.5 min-w-[140px]">
-                <span class="text-gray-500 dark:text-gray-400 font-semibold shrink-0">Trạng thái:</span>
-                <select id="kkStatusSelect" onchange="filterAuditItems()"
-                  class="flex-1 px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <span class="text-gray-500 dark:text-gray-400 font-medium shrink-0">Trạng thái:</span>
+                <select id="kkStatusSelect" onchange="filterAuditItems()" class="select h-9 py-1 text-xs">
                   <option value="ALL">Tất cả trạng thái</option>
                   <option value="COUNTED">Đã nhập số lượng</option>
                   <option value="UNCOUNTED">Chưa nhập số lượng</option>
@@ -3655,7 +3661,7 @@
 
               <!-- Nút Reset Filter -->
               <button onclick="resetAuditFilters()" title="Xóa toàn bộ bộ lọc và tìm kiếm"
-                class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold flex items-center gap-1">
+                class="btn btn-secondary btn-sm h-9">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                 <span class="hidden sm:inline">Đặt lại</span>
               </button>
@@ -3663,18 +3669,18 @@
           </div>
 
           <!-- Thông tin số lượng kết quả -->
-          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-800">
+          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
             <div>
-              Hiển thị: <span id="kkFilteredCount" class="font-bold text-gray-900 dark:text-white tabular-nums font-mono">0</span> / <span id="kkTotalCount" class="font-bold tabular-nums font-mono">0</span> mặt hàng danh mục tồn kho site
+              Hiển thị: <span id="kkFilteredCount" class="font-bold text-gray-900 dark:text-white num">0</span> / <span id="kkTotalCount" class="font-bold num">0</span> mặt hàng danh mục tồn kho site
             </div>
-            <div id="kkActiveFilterBadge" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-300 font-medium">
+            <div id="kkActiveFilterBadge" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-300 font-medium">
               Đang lọc dữ liệu
             </div>
           </div>
         </div>
 
         <!-- TailAdmin Unified KPI Grid: Báo Cáo Kiểm Kê -->
-        <div class="kpi-grid mb-6">
+        <div class="kpi-grid">
           <!-- Card 1: Tổng Mặt Hàng Site -->
           <div class="kpi-card">
             <div class="kpi-header">
@@ -3766,50 +3772,48 @@
         </div>
 
         <!-- Biểu Đồ Đối Chiếu Sổ Sách vs Thực Tế -->
-        <div class="p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-theme-xs">
+        <div class="table-card p-5 md:p-6">
           <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
             <div>
-              <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
                 <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-500"></i>
-                Đối Chiếu Số Lượng Tồn Sổ Sách vs Tồn Thực Tế Sau Kiểm Kê
+                Đối chiếu số lượng tồn sổ sách vs tồn thực tế sau kiểm kê
               </h3>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">So sánh các mặt hàng trọng yếu của điểm bán</p>
             </div>
             <div class="flex items-center gap-3 text-xs">
               <span class="inline-flex items-center gap-1.5 text-gray-500"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span> Sổ sách</span>
-              <span class="inline-flex items-center gap-1.5 text-gray-500"><span class="h-2.5 w-2.5 rounded-full bg-green-500"></span> Thực tế</span>
+              <span class="inline-flex items-center gap-1.5 text-gray-500"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Thực tế</span>
             </div>
           </div>
           <div id="auditComparisonChart" class="min-h-[240px]"></div>
         </div>
 
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+        <div class="table-card p-5">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="p-3">Mã hàng</th>
-                  <th class="p-3">Tên hàng hóa</th>
-                  <th class="p-3">Ngành / Nhóm hàng</th>
-                  <th class="p-3 text-center">ĐVT</th>
-                  <th class="p-3 text-right">Đơn giá</th>
-                  <th class="p-3 text-right">Tồn kỳ trước</th>
-                  <th class="p-3 text-right w-28">Sử dụng kỳ</th>
-                  <th class="p-3 text-right">Tồn cuối kỳ</th>
-                  <th class="p-3 text-right">Thành tiền tồn</th>
+                  <th class="col-code">Mã hàng</th>
+                  <th>Tên hàng hóa</th>
+                  <th>Ngành / Nhóm hàng</th>
+                  <th class="text-center">ĐVT</th>
+                  <th class="col-num text-right">Đơn giá</th>
+                  <th class="col-num text-right">Tồn kỳ trước</th>
+                  <th class="text-right w-28">Sử dụng kỳ</th>
+                  <th class="col-num text-right">Tồn cuối kỳ</th>
+                  <th class="col-num text-right">Thành tiền tồn</th>
                 </tr>
               </thead>
-              <tbody id="kkBody" class="divide-y divide-slate-100 dark:divide-gray-800">
+              <tbody id="kkBody">
                 <tr><td colspan="9" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải danh mục kiểm kê của site...</td></tr>
               </tbody>
             </table>
           </div>
-        <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
-        <div id="kkMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
-
+          <!-- Native Mobile Card View -->
+          <div id="kkMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
-</section>
       <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
       <section id="tab-404" class="tab-panel py-16 px-4 text-center">
         <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
@@ -6362,26 +6366,26 @@
 
           return `
             <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="p-3 tabular-nums font-mono font-bold text-gray-900 dark:text-white">${it.item_code}</td>
-              <td class="p-3">
-                <div class="font-bold text-gray-800 dark:text-gray-100">${escapeHtml(it.item_name)}</div>
-                <div class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">${it.warehouse_code || 'Kho'}</div>
+              <td class="col-code">${cellCode(it.item_code)}</td>
+              <td>
+                <div class="font-medium text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
+                <div class="code text-gray-400 dark:text-gray-500 text-[11px]">${it.warehouse_code || 'Kho'}</div>
               </td>
-              <td class="p-3">
-                <span class="inline-block px-2 py-0.5 text-[10px] rounded-md font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 max-w-[160px] truncate" title="${escapeHtml(catLabel)}">
+              <td>
+                <span class="badge badge-neutral max-w-[160px] truncate" title="${escapeHtml(catLabel)}">
                   ${escapeHtml(catLabel)}
                 </span>
               </td>
-              <td class="p-3 text-center text-gray-600 dark:text-gray-300 font-semibold">${it.unit || ''}</td>
-              <td class="p-3 text-right tabular-nums font-mono text-gray-700 dark:text-gray-300">${price > 0 ? fmtNum(price) + ' ₫' : '<span class="text-gray-400">0 ₫</span>'}</td>
-              <td class="p-3 text-right tabular-nums font-mono text-gray-900 dark:text-white font-semibold">${fmtNum(tonTruoc)}</td>
-              <td class="p-3 text-right">
+              <td class="text-center text-gray-600 dark:text-gray-300 font-medium">${it.unit || ''}</td>
+              <td class="col-num text-right num">${price > 0 ? fmtNum(price) + ' ₫' : '<span class="text-gray-400">0 ₫</span>'}</td>
+              <td class="col-num text-right num font-medium text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</td>
+              <td class="text-right">
                 <input type="number" min="0" step="any" value="${suDung}"
-                  class="w-24 p-1.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg tabular-nums font-mono text-right text-xs focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"
+                  class="input num text-right h-8 py-1 w-24 text-xs"
                   oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}, ${price})">
               </td>
-              <td class="p-3 text-right tabular-nums font-mono font-bold text-brand-600 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
-              <td class="p-3 text-right tabular-nums font-mono font-bold text-emerald-600 dark:text-emerald-400" id="aud-value-${it.id}">${fmtNum(thanhTien)} ₫</td>
+              <td class="col-num text-right num font-semibold text-brand-600 dark:text-brand-400" id="aud-close-${it.id}">${fmtNum(tonCuoi)}</td>
+              <td class="col-num text-right num font-semibold text-gray-900 dark:text-white" id="aud-value-${it.id}">${fmtNum(thanhTien)} ₫</td>
             </tr>
           `;
         }).join('');
@@ -6398,33 +6402,33 @@
           const catLabel = (it.nhom_hang && it.nhom_hang !== 'Chưa phân loại') ? it.nhom_hang : (it.nganh_hang || 'Vật tư');
 
           return `
-            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+            <div class="data-card space-y-2.5">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <div class="font-semibold text-xs text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
-                  <div class="text-[10.5px] tabular-nums font-mono text-gray-400">Mã: ${it.item_code} • ĐVT: ${it.unit || ''} • Giá: ${fmtNum(price)} ₫</div>
+                  <div class="font-medium text-sm text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</div>
+                  <div class="code text-gray-400 mt-0.5">Mã: ${it.item_code} • ĐVT: ${it.unit || ''} • Giá: <span class="num">${fmtNum(price)} ₫</span></div>
                 </div>
-                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 shrink-0 max-w-[120px] truncate">${escapeHtml(catLabel)}</span>
+                <span class="badge badge-neutral shrink-0 max-w-[120px] truncate">${escapeHtml(catLabel)}</span>
               </div>
-              <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50">
+              <div class="grid grid-cols-3 gap-2 text-xs p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
                 <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn đầu kỳ</div>
-                  <div class="tabular-nums font-mono font-bold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Tồn đầu kỳ</div>
+                  <div class="num font-semibold text-gray-900 dark:text-white">${fmtNum(tonTruoc)}</div>
                 </div>
                 <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Sử dụng kỳ</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Sử dụng kỳ</div>
                   <input type="number" min="0" step="any" value="${suDung}"
-                    class="w-full text-center p-1 border border-gray-300 dark:border-gray-700 rounded-lg tabular-nums font-mono text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    class="input num text-center h-8 py-1 w-full text-xs"
                     oninput="onAuditChange(${it.id}, this.value, ${tonTruoc}, ${price}); const c = document.getElementById('aud-mob-close-${it.id}'); if(c) c.innerText = fmtNum(${tonTruoc} - (parseFloat(this.value)||0)); const v = document.getElementById('aud-mob-value-${it.id}'); if(v) v.innerText = fmtNum((${tonTruoc} - (parseFloat(this.value)||0)) * ${price}) + ' ₫';">
                 </div>
                 <div class="text-center">
-                  <div class="text-[10px] text-gray-400">Tồn cuối kỳ</div>
-                  <div class="tabular-nums font-mono font-bold text-brand-500 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Tồn cuối kỳ</div>
+                  <div class="num font-semibold text-brand-600 dark:text-brand-400" id="aud-mob-close-${it.id}">${fmtNum(tonCuoi)}</div>
                 </div>
               </div>
               <div class="flex items-center justify-between text-xs pt-1 px-1">
-                <span class="text-gray-400 text-[11px]">Thành tiền tồn:</span>
-                <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="aud-mob-value-${it.id}">${fmtNum(thanhTien)} ₫</span>
+                <span class="text-gray-500 dark:text-gray-400">Thành tiền tồn:</span>
+                <span class="num font-semibold text-gray-900 dark:text-white" id="aud-mob-value-${it.id}">${fmtNum(thanhTien)} ₫</span>
               </div>
             </div>
           `;
