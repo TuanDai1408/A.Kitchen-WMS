@@ -111,12 +111,12 @@
         <!-- Group: Hiệu Quả & Doanh Thu (Chỉ hiển thị cho Admin) -->
         <div class="sidebar-category hidden" data-cat="fnb-finance">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hiệu Quả & Doanh Thu</h3>
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Hiệu quả & doanh thu</h3>
             
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-500 font-semibold dark:dark:bg-brand-500/[0.12] dark:text-brand-400">
+              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
                 <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-brand-500 dark:text-brand-400"></i>
                   <span class="truncate">Toàn Chuỗi & Xếp Hạng</span>
@@ -147,7 +147,7 @@
         <!-- Group: Vận Hành Kho Bếp -->
         <div class="sidebar-category" data-cat="fnb-inventory">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vận Hành Kho Bếp</h3>
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Vận hành kho bếp</h3>
             
           </div>
           <ul class="mb-4 flex flex-col gap-2">
@@ -192,7 +192,7 @@
         <!-- Group: Kho Vận & WMS -->
         <div class="sidebar-category" data-cat="wh-wms">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Kho Vận & WMS</h3>
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Kho vận & WMS</h3>
             
           </div>
           <ul class="mb-4 flex flex-col gap-2">
@@ -237,8 +237,7 @@
         <!-- Group: Cổng Thông Tin & Đặt Hàng -->
         <div class="sidebar-category" data-cat="portal-ops">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Cổng Thông Tin & Đặt Hàng</h3>
-            <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">Portal</span>
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Cổng thông tin & đặt hàng</h3>
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
@@ -300,7 +299,7 @@
         <!-- Group: Hệ Thống & Danh Mục -->
         <div class="sidebar-category" data-cat="sys-admin">
           <div class="mb-2.5 px-3.5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold leading-5 text-gray-400 dark:text-gray-500 uppercase tracking-wider">Hệ Thống & Danh Mục</h3>
+            <h3 class="text-xs font-medium leading-5 text-gray-400 dark:text-gray-500">Hệ thống & danh mục</h3>
             
           </div>
           <ul class="mb-4 flex flex-col gap-2">
@@ -368,8 +367,8 @@
       <!-- Left: Mobile Toggle & Brand / Active Tab -->
       <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <!-- Sidebar Toggle Button (Mobile / Desktop) -->
-        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="inline-flex size-9 sm:size-10 lg:size-11 shrink-0 items-center justify-center rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 text-gray-600 dark:text-gray-300 shadow-theme-xs active:translate-y-px transition-all">
-          <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        <button onclick="toggleSidebar()" type="button" aria-label="Toggle Sidebar" class="header-control inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-theme-xs active:translate-y-px transition-all">
+          <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
 
         <!-- Brand Logo on Mobile only (A.Kitchen Logo Mark) -->
@@ -382,15 +381,15 @@
           </div>
         </div>
 
-        <!-- Active Page Badge -->
-        <span id="mobileHeaderTitle" class="hidden md:inline-flex items-center text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/40 px-2.5 py-1 rounded-md border border-brand-200/80 dark:border-brand-800/80 shrink-0 whitespace-nowrap">Toàn Chuỗi</span>
+        <!-- Hidden container for JS title sync -->
+        <span id="mobileHeaderTitle" class="hidden"></span>
       </div>
 
-      <!-- Center: TailAdmin Global Quick Search (100% TailAdmin Specification with ⌘K Badge) -->
+      <!-- Center: Global Quick Search -->
       <div class="hidden lg:block flex-1 max-w-md xl:max-w-xl mx-2 xl:mx-4">
-        <div data-slot="input-group" class="group/input-group relative flex h-11 w-full min-w-0 items-center rounded-[10px] border border-gray-200 bg-transparent shadow-theme-xs outline-hidden transition-colors has-[input:focus]:border-brand-300 has-[input:focus]:ring-3 has-[input:focus]:ring-brand-500/20 dark:border-gray-800 dark:bg-white/3 dark:has-[input:focus]:border-brand-500/40">
-          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 ps-3.5 text-sm font-medium text-gray-500 select-none dark:text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" class="size-5 text-gray-500 dark:text-gray-400">
+        <div data-slot="input-group" class="header-control group/input-group relative flex w-full min-w-0 items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-theme-xs outline-hidden transition-colors has-[input:focus]:border-brand-300 has-[input:focus]:ring-4 has-[input:focus]:ring-brand-500/10">
+          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 ps-3 text-sm font-medium text-gray-400 select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" class="size-4.5 text-gray-400">
               <path d="M14.382 14.383l3.325 3.326m-1.249-8.334a7.082 7.082 0 01-7.083 7.081 7.082 7.082 0 110-14.163 7.082 7.082 0 017.083 7.082z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
@@ -398,8 +397,8 @@
             id="globalHeaderSearch"
             oninput="filterGlobalQuickSearch(this.value)"
             type="text"
-            placeholder="Tìm theo mã SKU, tên hàng hóa, số phiếu (F2)..."
-            class="h-full flex-1 rounded-none border-0 bg-transparent px-2 text-xs sm:text-sm text-gray-800 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white/90 dark:placeholder:text-white/30"
+            placeholder="Tìm chức năng, SKU, hàng hóa... (F2)"
+            class="h-full flex-1 rounded-none border-0 bg-transparent px-2.5 text-sm text-gray-900 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white dark:placeholder:text-gray-500"
           />
           <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3 text-xs font-medium text-gray-400 select-none">
             <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
@@ -409,17 +408,17 @@
         </div>
       </div>
 
-      <!-- Right: Controls, Filters & User Profile (Properly Gapped, Never Overlapping) -->
+      <!-- Right: Controls, Filters & User Profile -->
       <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 shrink-0">
         
         <!-- Global Branch & Region Taskbar Display (Interactive Pill) -->
-        <div onclick="openSiteSelectorModal()" class="h-9 sm:h-10 lg:h-11 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-2 sm:px-3 flex items-center gap-1.5 sm:gap-2 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
-          <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0">
+        <div onclick="openSiteSelectorModal()" class="header-control rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-3 flex items-center gap-2 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
+          <div class="w-5 h-5 rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center shrink-0">
             <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
           </div>
           <div class="flex items-center gap-1.5 min-w-0">
-            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-[10px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
-            <span id="taskbarSiteName" class="font-bold text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
+            <span id="taskbarRegionBadge" class="hidden xs:inline-block text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
+            <span id="taskbarSiteName" class="font-medium text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
           </div>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
           <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
@@ -427,7 +426,7 @@
 
         <!-- Global Month Picker (Hiển thị nhãn Tiếng Việt "Tháng MM/YYYY") -->
         <div class="hidden md:flex items-center relative shrink-0">
-          <button type="button" onclick="const p = document.getElementById('globalMonthPicker'); if (p.showPicker) p.showPicker(); else p.click();" class="h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium flex items-center gap-2 shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
+          <button type="button" onclick="const p = document.getElementById('globalMonthPicker'); if (p.showPicker) p.showPicker(); else p.click();" class="header-control px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium flex items-center gap-2 shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
             <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0"></i>
             <span id="currentDateDisplay" class="hidden 2xl:inline text-xs text-gray-500 dark:text-gray-400"></span>
             <span id="globalMonthDisplay" class="text-sm font-medium text-gray-800 dark:text-gray-200">Tháng 11/2026</span>
@@ -436,20 +435,20 @@
         </div>
 
         <!-- Admin Pending Requests Button (Visible for Admin) -->
-        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="hidden h-9 sm:h-10 lg:h-11 px-2 sm:px-2.5 rounded-[10px] border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
-          <i data-lucide="shield-alert" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400"></i>
+        <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="header-control hidden px-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
           <span class="hidden xl:inline">Duyệt Quyền</span>
-          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[9.5px] font-semibold bg-rose-600 text-white">0</span>
+          <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-rose-600 text-white">0</span>
         </button>
 
-        <!-- TailAdmin Theme Toggler Button -->
-        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="size-9 sm:size-10 lg:size-11 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:translate-y-px transition-all shrink-0">
-          <i id="themeIcon" data-lucide="moon" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <!-- Theme Toggler Button -->
+        <button onclick="toggleTheme()" title="Chuyển chế độ Sáng / Tối" class="header-control size-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/80 dark:hover:text-white shadow-theme-xs active:translate-y-px transition-all shrink-0">
+          <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
         </button>
 
-        <!-- TailAdmin User Profile Button -->
-        <button onclick="handleUserProfileClick()" class="h-9 sm:h-10 lg:h-11 flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2.5 rounded-[10px] border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700/80 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
-          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+        <!-- User Profile Button -->
+        <button onclick="handleUserProfileClick()" class="header-control flex items-center gap-2 px-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/80 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Thông tin tài khoản & Chuyển đổi">
+          <img id="headerUserAvatar" src="https://ui-avatars.com/api/?name=TD&background=465fff&color=fff&bold=true" alt="Avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
           <div class="hidden xl:flex flex-col text-left leading-tight">
             <span id="headerUserName" class="text-xs sm:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[100px]">Tuấn Đại</span>
             <span id="headerUserRoleBadge" class="text-[9px] font-bold text-brand-500 uppercase">ADMIN</span>
@@ -2972,7 +2971,13 @@
           </div>
         </div>
       </section>
-<section id="portal-search" class="tab-panel space-y-4">
+<section id="portal-search" class="tab-panel space-y-5">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Tra cứu chứng từ</h1>
+            <p class="page-subtitle">Tìm kiếm số liệu hóa đơn, biên bản giao nhận và chứng từ kho đa chiều</p>
+          </div>
+        </div>
         <div class="filter-bar">
           <select id="scVung" class="hidden"></select>
           <select id="scSite" class="hidden"></select>
@@ -5626,7 +5631,7 @@
       if (tabId === 'fnb-stock') tabId = 'wh-dashboard';
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-500', 'font-semibold', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
+        b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
         b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
         const ic = b.querySelector('.menu-icon');
         if (ic) {
@@ -5647,7 +5652,7 @@
         btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
       }
       if (btn) {
-        btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-500', 'font-semibold', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
+        btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
         btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
         const ic = btn.querySelector('.menu-icon');
         if (ic) {

@@ -638,6 +638,56 @@ h1.page-title {
   border-radius: 0.5rem;
 }
 
+/* --- Page Header --- */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+@media (min-width: 640px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.page-title {
+  font-size: 24px;
+  line-height: 2rem;
+  font-weight: 600;
+  color: #111827; /* text-gray-900 */
+}
+:is(.dark *) .page-title,
+.dark .page-title {
+  color: #ffffff;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  line-height: 1.25rem;
+  color: #6b7280; /* text-gray-500 */
+  margin-top: 0.125rem;
+}
+:is(.dark *) .page-subtitle,
+.dark .page-subtitle {
+  color: #9ca3af;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- Header Controls (Standard 40px) --- */
+.header-control {
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  box-sizing: border-box;
+}
+
 /* --- Filter Bar Container --- */
 .filter-bar {
   background-color: #ffffff;
@@ -896,6 +946,27 @@ h1.page-title {
 .dark .data-card {
   background-color: rgba(255, 255, 255, 0.03);
   border-color: #1f2937;
+}
+
+/* --- Sidebar Menu Item Standard --- */
+.nav-btn.menu-item {
+  height: 2.75rem; /* 44px (h-11) */
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 0.75rem; /* rounded-xl */
+}
+.nav-btn.menu-item.menu-item-active,
+.nav-btn.menu-item.active {
+  background-color: #f0fdf4;
+  color: #15803d; /* text-brand-700 */
+}
+:is(.dark *) .nav-btn.menu-item.menu-item-active,
+:is(.dark *) .nav-btn.menu-item.active,
+.dark .nav-btn.menu-item.menu-item-active,
+.dark .nav-btn.menu-item.active {
+  background-color: rgba(25, 114, 60, 0.15);
+  color: #4ade80; /* text-brand-400 */
 }
 
 /* ==========================================================================
