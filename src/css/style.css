@@ -270,7 +270,7 @@ b, strong, th, h1, h2, h3, h4, h5, h6 {
 .font-bold,
 .font-extrabold,
 .font-black {
-  font-weight: 600 !important;
+  font-weight: 600;
 }
 
 /* Thân trang: mặc định 14px */
@@ -302,14 +302,8 @@ table th,
 caption,
 small,
 .caption,
-.text-caption,
-.text-xs,
-.text-\[9px\],
-.text-\[9\.5px\],
-.text-\[10px\],
-.text-\[10\.5px\],
-.text-\[11px\] {
-  font-size: 12px !important;
+.text-caption {
+  font-size: 12px;
 }
 
 /* Tiêu đề thẻ: 16px */
@@ -335,8 +329,8 @@ h1.page-title {
 .kpi-card-compact-num,
 .kpi-value-hero,
 .kpi-value-compact {
-  font-size: 27px !important;
-  font-weight: 600 !important;
+  font-size: 26px;
+  font-weight: 600;
   font-variant-numeric: normal;
   font-feature-settings: normal;
 }
@@ -624,11 +618,11 @@ h1.page-title {
 
 /* Button Sizes */
 .btn-sm {
-  height: 2rem !important; /* 32px (h-8) */
-  min-height: 32px !important;
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
-  font-size: 13px !important;
+  height: 2rem; /* 32px (h-8) */
+  min-height: 32px;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  font-size: 13px;
 }
 
 .btn-icon {
@@ -1037,12 +1031,12 @@ h1.page-title {
 }
 :is(.dark *) .kpi-card,
 .dark .kpi-card {
-  border-color: #1f2937 !important;
-  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: #1f2937;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 :is(.dark *) .kpi-card:hover,
 .dark .kpi-card:hover {
-  border-color: #374151 !important;
+  border-color: #374151;
 }
 
 .kpi-card-compact {
@@ -1050,12 +1044,12 @@ h1.page-title {
 }
 :is(.dark *) .kpi-card-compact,
 .dark .kpi-card-compact {
-  border-color: #1f2937 !important;
-  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: #1f2937;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 :is(.dark *) .kpi-card-compact:hover,
 .dark .kpi-card-compact:hover {
-  border-color: #374151 !important;
+  border-color: #374151;
 }
 
 .kpi-card-hero {
@@ -1063,12 +1057,12 @@ h1.page-title {
 }
 :is(.dark *) .kpi-card-hero,
 .dark .kpi-card-hero {
-  border-color: #1f2937 !important;
-  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: #1f2937;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 :is(.dark *) .kpi-card-hero:hover,
 .dark .kpi-card-hero:hover {
-  border-color: #374151 !important;
+  border-color: #374151;
 }
 
 /* Elements inside KPI Card */
@@ -1081,7 +1075,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-label,
 .dark .kpi-label {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .kpi-label-compact {
@@ -1089,7 +1083,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-label-compact,
 .dark .kpi-label-compact {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .kpi-icon {
@@ -1097,8 +1091,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-icon,
 .dark .kpi-icon {
-  background-color: rgba(53, 131, 83, 0.15) !important;
-  color: #599973 !important;
+  background-color: rgba(53, 131, 83, 0.15);
+  color: #599973;
 }
 
 .kpi-icon-compact {
@@ -1106,8 +1100,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-icon-compact,
 .dark .kpi-icon-compact {
-  background-color: rgba(53, 131, 83, 0.15) !important;
-  color: #599973 !important;
+  background-color: rgba(53, 131, 83, 0.15);
+  color: #599973;
 }
 
 .kpi-icon-accent {
@@ -1115,8 +1109,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-icon-accent,
 .dark .kpi-icon-accent {
-  background-color: rgba(255, 96, 15, 0.15) !important;
-  color: #ff8d52 !important;
+  background-color: rgba(255, 96, 15, 0.15);
+  color: #ff8d52;
 }
 
 .kpi-icon-warning {
@@ -1124,8 +1118,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-icon-warning,
 .dark .kpi-icon-warning {
-  background-color: rgba(247, 144, 9, 0.15) !important;
-  color: #f79009 !important;
+  background-color: rgba(247, 144, 9, 0.15);
+  color: #f79009;
 }
 
 .kpi-icon-error {
@@ -1133,8 +1127,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-icon-error,
 .dark .kpi-icon-error {
-  background-color: rgba(240, 68, 56, 0.15) !important;
-  color: #f04438 !important;
+  background-color: rgba(240, 68, 56, 0.15);
+  color: #f04438;
 }
 
 .kpi-body {
@@ -1148,7 +1142,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-value,
 .dark .kpi-value {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .kpi-value-compact {
@@ -1158,7 +1152,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-value-compact,
 .dark .kpi-value-compact {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .kpi-value-hero {
@@ -1168,7 +1162,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-value-hero,
 .dark .kpi-value-hero {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .kpi-unit {
@@ -1176,7 +1170,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-unit,
 .dark .kpi-unit {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .kpi-footer {
@@ -1192,8 +1186,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-delta-good,
 .dark .kpi-delta-good {
-  background-color: rgba(18, 183, 106, 0.15) !important;
-  color: #4ade80 !important;
+  background-color: rgba(18, 183, 106, 0.15);
+  color: #4ade80;
 }
 
 .kpi-delta-bad {
@@ -1201,8 +1195,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-delta-bad,
 .dark .kpi-delta-bad {
-  background-color: rgba(240, 68, 56, 0.15) !important;
-  color: #f87171 !important;
+  background-color: rgba(240, 68, 56, 0.15);
+  color: #f87171;
 }
 
 .kpi-delta-neutral {
@@ -1210,8 +1204,8 @@ h1.page-title {
 }
 :is(.dark *) .kpi-delta-neutral,
 .dark .kpi-delta-neutral {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  color: #9ca3af !important;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #9ca3af;
 }
 
 .kpi-sub {
@@ -1219,7 +1213,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-sub,
 .dark .kpi-sub {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .kpi-progress-track {
@@ -1227,7 +1221,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-progress-track,
 .dark .kpi-progress-track {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .kpi-progress-bar {
@@ -1243,7 +1237,7 @@ h1.page-title {
 }
 :is(.dark *) .kpi-skeleton,
 .dark .kpi-skeleton {
-  background-color: #1f2937 !important;
+  background-color: #1f2937;
 }
 
 .font-mono,
@@ -1420,35 +1414,35 @@ textarea:not(.bg-transparent) {
 .dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not(.bg-transparent),
 .dark select:not(.bg-transparent),
 .dark textarea:not(.bg-transparent) {
-  background-color: #111827 !important; /* dark card / input surface */
-  color: #f9fafb !important;
-  border-color: #374151 !important;
+  background-color: #111827; /* dark card / input surface */
+  color: #f9fafb;
+  border-color: #374151;
 }
 
 .dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not(.bg-transparent):focus,
 .dark select:not(.bg-transparent):focus,
 .dark textarea:not(.bg-transparent):focus {
-  background-color: #1f2937 !important;
-  border-color: var(--color-brand-500, #358353) !important;
-  color: #ffffff !important;
+  background-color: #1f2937;
+  border-color: var(--color-brand-500, #358353);
+  color: #ffffff;
 }
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .dark select option {
-  background-color: #111827 !important;
-  color: #f9fafb !important;
+  background-color: #111827;
+  color: #f9fafb;
 }
 
 .dark input:disabled,
 .dark select:disabled,
 .dark textarea:disabled {
-  background-color: #1f2937 !important;
-  color: #6b7280 !important;
-  border-color: #374151 !important;
+  background-color: #1f2937;
+  color: #6b7280;
+  border-color: #374151;
 }
 
 .dark input[type="date"]::-webkit-calendar-picker-indicator,
@@ -1616,13 +1610,13 @@ textarea:not(.bg-transparent) {
 /* TailAdmin dark translucent card and table surfaces */
 :is(.dark *) .dark\:bg-white\/3,
 .dark .dark\:bg-white\/3 {
-  background-color: rgba(255, 255, 255, 0.03) !important;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 :is(.dark *) .dark\:bg-white\/2,
 .dark .dark\:bg-white\/2 {
-  background-color: rgba(255, 255, 255, 0.02) !important;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 :is(.dark *) .dark\:bg-white\/5,
 .dark .dark\:bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.05);
 }
