@@ -222,8 +222,8 @@
             <li>
               <button onclick="switchTab('wh-posap', this)" data-tab="wh-posap" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
-                  <i data-lucide="file-check-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
-                  <span class="truncate">Đơn Hàng PO SAP</span>
+                  <i data-lucide="boxes" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Tồn Kho</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -2684,36 +2684,152 @@
         </div>
       </section>
 <section id="wh-posap" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-white/3 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
-          <div class="pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <i data-lucide="file-diff" class="w-5 h-5 text-purple-600"></i>
-              Đối Chiếu Biến Động Giá Đơn Mua PO So Với Giá Chuẩn SAP
-            </h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Cảnh báo chênh lệch giá mua thực tế so với định mức SAP (PPV).</p>
+        <!-- Top Filter & Control Card -->
+        <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3.5 border-b border-gray-100 dark:border-gray-800">
+            <div>
+              <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="boxes" class="w-5 h-5 text-brand-600"></i>
+                Quản Lý Tồn Kho &amp; Lô Hàng (WMS)
+              </h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Theo dõi số lượng các mặt hàng đã nhập kho, tồn kho thực tế, tra cứu thẻ kho lịch sử xuất nhập và chi tiết các lô đã nhập.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="exportWhInventoryToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>Xuất Excel Tồn Kho</span>
+              </button>
+              <button onclick="loadWhInventory()" class="px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>Làm mới</span>
+              </button>
+            </div>
           </div>
 
-          <div class="hidden lg:block overflow-x-auto mt-4 rounded-xl border border-gray-200 dark:border-gray-800">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+          <!-- Filters Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Điểm bán / Kho -->
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Điểm bán / Điểm kho</label>
+              <select id="whInvSiteSelect" onchange="loadWhInventory()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <option value="ALL">🏢 Toàn Hệ Thống (Tất cả điểm)</option>
+              </select>
+            </div>
+            <!-- Tìm kiếm -->
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Tìm kiếm vật tư</label>
+              <div class="relative">
+                <input type="text" id="whInvSearchInput" oninput="filterWhInventoryTable()" placeholder="Nhập mã SKU hoặc tên hàng..." class="w-full pl-8 pr-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5"></i>
+              </div>
+            </div>
+            <!-- Nhóm hàng -->
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Nhóm ngành hàng</label>
+              <select id="whInvCategorySelect" onchange="filterWhInventoryTable()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <option value="">Tất cả nhóm ngành</option>
+              </select>
+            </div>
+            <!-- Trạng thái -->
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">Trạng thái tồn kho</label>
+              <select id="whInvStatusSelect" onchange="filterWhInventoryTable()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                <option value="ALL">Tất cả mặt hàng</option>
+                <option value="HAS_RECEIPT">📦 Đã nhập trong kỳ (&gt; 0)</option>
+                <option value="IN_STOCK">✅ Còn tồn kho (&gt; 0)</option>
+                <option value="HAS_BATCH">🏷️ Có quản lý lô hàng</option>
+                <option value="NEGATIVE">⚠️ Âm kho / Cần kiểm tra</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 Summary KPI Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+            <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs font-medium">
+              <i data-lucide="package" class="w-4 h-4 text-blue-500"></i>
+              <span>Tổng Mặt Hàng</span>
+            </div>
+            <div id="whKpiTotalSkus" class="text-xl font-bold text-gray-900 dark:text-white mt-1.5 font-mono">0</div>
+            <div class="text-[10px] text-gray-400 mt-0.5">Danh mục vật tư</div>
+          </div>
+
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/60 bg-emerald-50/20 dark:bg-emerald-950/10 shadow-theme-xs">
+            <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+              <i data-lucide="arrow-down-left" class="w-4 h-4 text-emerald-600"></i>
+              <span>Tổng Lượng Đã Nhập</span>
+            </div>
+            <div id="whKpiTotalReceiptQty" class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1.5 font-mono">0</div>
+            <div class="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">Số lượng hàng đã nhập kho</div>
+          </div>
+
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+            <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">
+              <i data-lucide="database" class="w-4 h-4"></i>
+              <span>Tổng Tồn Sổ Sách</span>
+            </div>
+            <div id="whKpiTotalBookQty" class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1.5 font-mono">0</div>
+            <div class="text-[10px] text-gray-400 mt-0.5">Khối lượng tồn hiện tại</div>
+          </div>
+
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+            <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs font-semibold">
+              <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
+              <span>Tổng Giá Trị Tồn</span>
+            </div>
+            <div id="whKpiTotalValue" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1.5 font-mono">0 ₫</div>
+            <div class="text-[10px] text-gray-400 mt-0.5">Giá trị tồn kho tính theo giá chuẩn</div>
+          </div>
+
+          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs col-span-2 sm:col-span-1">
+            <div class="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-xs font-semibold">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+              <span>Lô Hàng Quản Lý</span>
+            </div>
+            <div id="whKpiTotalBatches" class="text-xl font-bold text-purple-600 dark:text-purple-400 mt-1.5 font-mono">0</div>
+            <div class="text-[10px] text-gray-400 mt-0.5">Lô date đang lưu kho</div>
+          </div>
+        </div>
+
+        <!-- Main Table & Mobile Cards -->
+        <div class="bg-white dark:bg-white/3 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="flex items-center justify-between pb-2">
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Hiển thị <span id="whInvRowCount" class="font-bold text-gray-800 dark:text-white font-mono">0</span> mặt hàng
+            </div>
+            <div class="text-[11px] text-gray-400 italic">
+              * Click nút "Thẻ Kho" để xem lịch sử xuất nhập, hoặc click "Lô Hàng" để xem chi tiết từng lô date
+            </div>
+          </div>
+
+          <div class="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+            <table class="w-full text-xs text-left" id="whInventoryTable">
+              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-200 font-bold uppercase tracking-wider border-b border-gray-200 dark:border-gray-800 text-[11px]">
                 <tr>
-                  <th class="p-3">Mã SKU</th>
-                  <th class="p-3">Tên Gia Vị</th>
-                  <th class="p-3">Đơn Vị</th>
-                  <th class="p-3 text-right">Giá Cũ (SAP)</th>
-                  <th class="p-3 text-right">Giá Mới (PO)</th>
-                  <th class="p-3 text-right font-bold">Chênh Lệch %</th>
-                  <th class="p-3">Số PO Tham Chiếu</th>
+                  <th class="px-2 py-2.5 text-center w-8">STT</th>
+                  <th class="px-2 py-2.5 whitespace-nowrap">Mã SKU</th>
+                  <th class="px-2 py-2.5 min-w-[150px]">Tên Mặt Hàng</th>
+                  <th class="px-2 py-2.5 whitespace-nowrap text-center w-24">Ngành Hàng</th>
+                  <th class="px-1.5 py-2.5 text-center whitespace-nowrap">ĐVT</th>
+                  <th class="px-2 py-2.5 text-right whitespace-nowrap bg-emerald-50/60 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 font-bold">Đã Nhập</th>
+                  <th class="px-2 py-2.5 text-right whitespace-nowrap bg-blue-50/60 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300 font-bold">Tồn Sách</th>
+                  <th class="px-2 py-2.5 text-right whitespace-nowrap">Đơn Giá</th>
+                  <th class="px-2 py-2.5 text-right whitespace-nowrap">Giá Trị Tồn</th>
+                  <th class="px-1.5 py-2.5 text-center whitespace-nowrap">Lô Hàng</th>
+                  <th class="px-2 py-2.5 text-center whitespace-nowrap w-28">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody id="poSapTableBody" class="divide-y divide-slate-100">
-                <tr><td colspan="7" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang so sánh giá SAP...</td></tr>
+              <tbody id="whInventoryTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tr><td colspan="11" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải dữ liệu tồn kho...</td></tr>
               </tbody>
             </table>
           </div>
-        <!-- Native Mobile Card View (No horizontal scrolling on mobile/tablet) -->
-        <div id="poSapMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
 
+          <!-- Native Mobile Card View -->
+          <div id="whInventoryMobileCards" class="block lg:hidden space-y-3"></div>
         </div>
       </section>
 <section id="portal-voucher" class="tab-panel space-y-4">
@@ -3858,12 +3974,12 @@
               </div>
             </button>
             <button onclick="switchFromHub('wh-posap')" data-tab="wh-posap" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
-              <div class="hub-icon-wrap w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
-                <i data-lucide="file-check-2" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
+              <div class="hub-icon-wrap w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 transition-colors">
+                <i data-lucide="boxes" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
               </div>
               <div class="min-w-0 flex-1">
-                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Đơn Hàng PO SAP</div>
-                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Đồng bộ SAP ERP</div>
+                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Tồn Kho</div>
+                <div class="text-[10px] text-gray-500 leading-tight line-clamp-1 mt-0.5">Số lượng nhập &amp; Lô hàng</div>
               </div>
             </button>
           </div>
@@ -4526,7 +4642,7 @@
           <label class="font-bold text-gray-700 dark:text-gray-300 block">Vị trí / Quyền hạn mong muốn cấp:</label>
           <select id="reqRoleSelect" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
             <option value="BEP_TRUONG">Bếp Trưởng / Quản Lý Điểm (Nhập hàng, Hủy hàng, Kiểm kê)</option>
-            <option value="KHO_TRUONG">Quản Lý Kho WMS (Kho tổng gia vị, PO SAP, FEFO, ROP)</option>
+            <option value="KHO_TRUONG">Quản Lý Kho WMS (Tồn kho, Lô hàng, FEFO, ROP)</option>
             <option value="KE_TOAN">Kế Toán Kiểm Soát (Báo cáo P&L, Doanh thu POS, Hóa đơn)</option>
             <option value="ADMIN">Ban Quản Trị Hệ Thống (Toàn quyền quản trị)</option>
           </select>
@@ -4720,6 +4836,180 @@
         </button>
         <button onclick="closeModal('modalInventoryDetail'); openReceiptModal();" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold flex items-center gap-1.5 shadow-sm transition-all">
           <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal 1: Thẻ Kho & Lịch Sử Biến Động Xuất Nhập (WMS Ledger History Modal) -->
+  <div id="modalWhItemHistory" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-5xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 font-bold text-sm shrink-0">
+            <i data-lucide="history" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-800 dark:text-white flex items-center gap-2">
+              <span>Thẻ Kho &amp; Lịch Sử Biến Động Xuất Nhập</span>
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
+              <span>Mã SKU: <strong id="histItemSku" class="font-mono text-gray-700 dark:text-gray-300"></strong></span>
+              <span>•</span>
+              <span id="histItemName" class="font-semibold text-gray-900 dark:text-white"></span>
+              <span>•</span>
+              <span>ĐVT: <b id="histItemUnit" class="text-gray-700 dark:text-gray-300"></b></span>
+              <span>•</span>
+              <span>Điểm: <b id="histItemSite" class="text-brand-600 dark:text-brand-400"></b></span>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportWhItemHistoryToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs">
+            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+            <span>Xuất Excel Thẻ Kho</span>
+          </button>
+          <button onclick="closeModal('modalWhItemHistory')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mini KPI Summary Bar -->
+      <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
+        <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
+          <span class="text-emerald-700 dark:text-emerald-400 block text-[11px] font-semibold">Tổng Lượng Nhập (+)</span>
+          <span id="histTotalIn" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-800/40">
+          <span class="text-rose-700 dark:text-rose-400 block text-[11px] font-semibold">Tổng Lượng Xuất (-)</span>
+          <span id="histTotalOut" class="text-base font-bold font-mono text-rose-700 dark:text-rose-400 block mt-0.5">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-800/40">
+          <span class="text-blue-700 dark:text-blue-400 block text-[11px] font-semibold">Số Dòng Giao Dịch</span>
+          <span id="histRowCount" class="text-base font-bold font-mono text-blue-700 dark:text-blue-400 block mt-0.5">0</span>
+        </div>
+      </div>
+
+      <!-- History Content List -->
+      <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
+        <!-- Desktop Table -->
+        <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <table class="w-full text-left text-xs" id="whHistTable">
+            <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+              <tr>
+                <th class="p-2.5 text-center w-24">Ngày CT</th>
+                <th class="p-2.5">Số Chứng Từ</th>
+                <th class="p-2.5">Nghiệp Vụ</th>
+                <th class="p-2.5">Mã Lô / HSD</th>
+                <th class="p-2.5 text-right bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">Nhập (+)</th>
+                <th class="p-2.5 text-right bg-rose-50/40 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300">Xuất (-)</th>
+                <th class="p-2.5 text-right">Đơn Giá</th>
+                <th class="p-2.5 text-right">Thành Tiền</th>
+                <th class="p-2.5">Đối Tác / NCC</th>
+                <th class="p-2.5">Ghi Chú</th>
+              </tr>
+            </thead>
+            <tbody id="whHistTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              <tr><td colspan="10" class="p-8 text-center text-gray-400">Đang tải thẻ kho...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards List -->
+        <div id="whHistMobileCards" class="block lg:hidden space-y-2.5"></div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-400">
+        <span>* Ghi nhận từ phiếu nhập kho, phiếu xuất hủy F&amp;B và chứng từ SAP MB51.</span>
+        <button onclick="closeModal('modalWhItemHistory')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold transition-all">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal 2: Chi Tiết Các Lô Hàng Đã Nhập (WMS Batches Modal) -->
+  <div id="modalWhItemBatches" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 font-bold text-sm shrink-0">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-800 dark:text-white flex items-center gap-2">
+              <span>Chi Tiết Các Lô Hàng Đã Nhập (FEFO)</span>
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
+              <span>Mã SKU: <strong id="batchItemSku" class="font-mono text-gray-700 dark:text-gray-300"></strong></span>
+              <span>•</span>
+              <span id="batchItemName" class="font-semibold text-gray-900 dark:text-white"></span>
+              <span>•</span>
+              <span>ĐVT: <b id="batchItemUnit" class="text-gray-700 dark:text-gray-300"></b></span>
+              <span>•</span>
+              <span>Điểm: <b id="batchItemSite" class="text-brand-600 dark:text-brand-400"></b></span>
+            </p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalWhItemBatches')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Mini KPI Summary Bar -->
+      <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
+        <div class="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-800/40">
+          <span class="text-purple-700 dark:text-purple-400 block text-[11px] font-semibold">Tổng Số Lô Đã Nhập</span>
+          <span id="batchTotalCount" class="text-base font-bold font-mono text-purple-700 dark:text-purple-400 block mt-0.5">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
+          <span class="text-emerald-700 dark:text-emerald-400 block text-[11px] font-semibold">Lô Còn Hạn An Toàn</span>
+          <span id="batchSafeCount" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800/40">
+          <span class="text-amber-700 dark:text-amber-400 block text-[11px] font-semibold">Cận Date (≤ 30 ngày) / Quá Hạn</span>
+          <span id="batchWarnCount" class="text-base font-bold font-mono text-amber-700 dark:text-amber-400 block mt-0.5">0</span>
+        </div>
+      </div>
+
+      <!-- Batches Content List -->
+      <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
+        <!-- Desktop Table -->
+        <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <table class="w-full text-left text-xs" id="whBatchesTable">
+            <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+              <tr>
+                <th class="p-2.5">Mã Lô (Batch No)</th>
+                <th class="p-2.5">Điểm Kho / Vị Trí</th>
+                <th class="p-2.5 text-center">Hạn Sử Dụng (HSD)</th>
+                <th class="p-2.5 text-center">Còn Lại</th>
+                <th class="p-2.5 text-center">Trạng Thái FEFO</th>
+                <th class="p-2.5 text-right bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">SL Nhập Ban Đầu</th>
+                <th class="p-2.5 text-right bg-blue-50/40 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">SL Tồn Hiện Tại</th>
+                <th class="p-2.5">Chứng Từ Nhập</th>
+              </tr>
+            </thead>
+            <tbody id="whBatchesTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              <tr><td colspan="8" class="p-8 text-center text-gray-400">Đang tải danh sách lô...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards List -->
+        <div id="whBatchesMobileCards" class="block lg:hidden space-y-2.5"></div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-400">
+        <span>* Thứ tự ưu tiên xuất kho tự động sắp xếp theo chuẩn FEFO (First Expired, First Out).</span>
+        <button onclick="closeModal('modalWhItemBatches')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold transition-all">
+          Đóng
         </button>
       </div>
     </div>
@@ -5163,7 +5453,10 @@
       if (tabId === 'wh-stock') loadStockFEFO();
       if (tabId === 'wh-reorder') loadReorderROP();
       if (tabId === 'wh-leadtime') loadLeadTime();
-      if (tabId === 'wh-posap') loadPoSap();
+      if (tabId === 'wh-posap') {
+        if (typeof loadWhInventory === 'function') loadWhInventory();
+        else if (typeof loadPoSap === 'function') loadPoSap();
+      }
       if (tabId === 'portal-order') loadQuota();
       if (tabId === 'portal-search') searchVouchers();
       if (tabId === 'portal-history') loadHistory();
@@ -5257,7 +5550,8 @@
         if (typeof loadFnbReceipts === 'function') loadFnbReceipts();
         if (typeof loadAudit === 'function') loadAudit();
         if (typeof loadLeadTime === 'function') loadLeadTime();
-        if (typeof loadPoSap === 'function') loadPoSap();
+        if (typeof loadWhInventory === 'function') loadWhInventory();
+        else if (typeof loadPoSap === 'function') loadPoSap();
       } catch (e) {
         console.warn('Reload notice:', e);
       }
@@ -5467,27 +5761,13 @@
     }
 
     async function loadPoSap() {
-      try {
-        const res = await fetch('/api/po-sap');
-        const json = await res.json();
-        if (json.success) {
-          const tbody = document.getElementById('poSapTableBody');
-          tbody.innerHTML = json.data.map(r => `
-            <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-              <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${r.sku}</td>
-              <td class="p-3 font-bold text-gray-900 dark:text-white">${r.item_name}</td>
-              <td class="p-3">${r.unit}</td>
-              <td class="p-3 text-right tabular-nums">${fmtVND(r.old_cost_sap)}</td>
-              <td class="p-3 text-right tabular-nums font-bold">${fmtVND(r.standard_cost_sap)}</td>
-              <td class="p-3 text-right tabular-nums font-bold ${r.price_change_pct > 0 ? 'text-rose-600' : 'text-emerald-600'}">
-                ${r.price_change_pct > 0 ? '+' : ''}${r.price_change_pct || 0}%
-              </td>
-              <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.po_number || 'PO-GIA-VI'}</td>
-            </tr>
-          `).join('');
-        }
-      } catch (e) {
-        console.error(e);
+      if (typeof window.loadWhInventory === 'function') {
+        return window.loadWhInventory();
+      }
+    }
+    async function loadWhInventory() {
+      if (typeof window.loadWhInventory === 'function') {
+        return window.loadWhInventory();
       }
     }
 
@@ -7605,7 +7885,7 @@ const TAB_META = {
   'wh-stock': { title: 'Hạn Dùng & Xuất FEFO', mobTab: 'wh-dashboard' },
   'wh-reorder': { title: 'Cảnh Báo Tồn ROP', mobTab: 'wh-dashboard' },
   'wh-leadtime': { title: 'Lead Time & NCC', mobTab: 'wh-dashboard' },
-  'wh-posap': { title: 'Đơn Hàng PO SAP', mobTab: 'wh-dashboard' },
+  'wh-posap': { title: 'Tồn Kho & Quản Lý Lô', mobTab: 'wh-dashboard' },
 
   // Nhóm 4: Cổng Thông Tin & Đặt Hàng -> mobTab: 'portal-voucher' hoặc 'portal-baocao'
   'portal-voucher': { title: 'Tạo & Duyệt Chứng Từ', mobTab: 'portal-voucher' },
@@ -9787,54 +10067,591 @@ window.loadLeadTime = async function() {
   }
 };
 
-// 7. Upgraded loadPoSap (Desktop Table + Mobile Cards)
-window.loadPoSap = async function() {
+// ========================================================================
+// 7. WMS: QUẢN LÝ TỒN KHO & LÔ HÀNG (THAY THẾ TAB PO SAP)
+// ========================================================================
+window.gWhInventoryData = [];
+window.gWhFilteredInventory = [];
+window.gWhActiveHistory = null;
+window.gWhActiveBatches = null;
+
+window.loadWhInventory = async function() {
+  const siteSelect = document.getElementById('whInvSiteSelect');
+  if (siteSelect && (!siteSelect.options || siteSelect.options.length <= 1)) {
+    const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
+    siteSelect.innerHTML = '<option value="ALL">🏢 Toàn Hệ Thống (Tất cả điểm)</option>' +
+      sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
+    
+    const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'K001');
+    if (saved && Array.from(siteSelect.options).some(o => o.value.toUpperCase() === saved.toUpperCase())) {
+      siteSelect.value = saved.toUpperCase();
+    }
+  }
+
+  const site = siteSelect ? siteSelect.value : 'ALL';
+  const tbody = document.getElementById('whInventoryTableBody');
+  const mob = document.getElementById('whInventoryMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Đang tải dữ liệu tồn kho WMS...</td></tr>';
+  if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Đang tải dữ liệu tồn kho WMS...</div>';
+
   try {
-    const res = await fetch('/api/po-sap');
+    const res = await fetch(`/api/wh/inventory?site=${encodeURIComponent(site)}&nocache=1`);
     const json = await res.json();
     if (json.success) {
-      const tbody = document.getElementById('poSapTableBody');
-      const mob = document.getElementById('poSapMobileCards');
+      window.gWhInventoryData = json.data || [];
+
+      // Populate Category filter dropdown
+      const catSelect = document.getElementById('whInvCategorySelect');
+      if (catSelect) {
+        const curCat = catSelect.value;
+        const cats = Array.from(new Set(window.gWhInventoryData.map(i => i.category).filter(Boolean))).sort();
+        catSelect.innerHTML = '<option value="">Tất cả nhóm ngành</option>' +
+          cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (curCat && cats.includes(curCat)) catSelect.value = curCat;
+      }
+
+      window.filterWhInventoryTable();
+    } else {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-rose-500">Lỗi tải dữ liệu: ${json.error || 'Không xác định'}</td></tr>`;
+    }
+  } catch (e) {
+    console.error('loadWhInventory error:', e);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-rose-500">Lỗi kết nối: ${e.message}</td></tr>`;
+  }
+};
+
+window.filterWhInventoryTable = function() {
+  const search = (document.getElementById('whInvSearchInput')?.value || '').toLowerCase().trim();
+  const category = document.getElementById('whInvCategorySelect')?.value || '';
+  const status = document.getElementById('whInvStatusSelect')?.value || 'ALL';
+
+  let list = window.gWhInventoryData || [];
+
+  if (search) {
+    list = list.filter(i => (i.sku && i.sku.toLowerCase().includes(search)) || (i.name && i.name.toLowerCase().includes(search)));
+  }
+  if (category) {
+    list = list.filter(i => i.category === category);
+  }
+  if (status === 'HAS_RECEIPT') {
+    list = list.filter(i => parseFloat(i.receipt_qty || 0) > 0);
+  } else if (status === 'IN_STOCK') {
+    list = list.filter(i => parseFloat(i.book_qty || 0) > 0);
+  } else if (status === 'HAS_BATCH') {
+    list = list.filter(i => parseInt(i.batch_count || 0, 10) > 0);
+  } else if (status === 'NEGATIVE') {
+    list = list.filter(i => parseFloat(i.book_qty || 0) < 0);
+  }
+
+  window.gWhFilteredInventory = list;
+
+  // Calculate & update 5 KPI cards
+  let totalReceipt = 0;
+  let totalBook = 0;
+  let totalValue = 0;
+  let totalBatches = 0;
+
+  list.forEach(i => {
+    totalReceipt += parseFloat(i.receipt_qty || 0);
+    totalBook += parseFloat(i.book_qty || 0);
+    totalValue += parseFloat(i.total_value || 0);
+    totalBatches += parseInt(i.batch_count || 0, 10);
+  });
+
+  const kpiSkus = document.getElementById('whKpiTotalSkus');
+  if (kpiSkus) kpiSkus.textContent = fmtNum(list.length);
+  const kpiReceipt = document.getElementById('whKpiTotalReceiptQty');
+  if (kpiReceipt) kpiReceipt.textContent = fmtNum(Math.round(totalReceipt * 10) / 10);
+  const kpiBook = document.getElementById('whKpiTotalBookQty');
+  if (kpiBook) kpiBook.textContent = fmtNum(Math.round(totalBook * 10) / 10);
+  const kpiVal = document.getElementById('whKpiTotalValue');
+  if (kpiVal) kpiVal.textContent = fmtVND(totalValue);
+  const kpiBatches = document.getElementById('whKpiTotalBatches');
+  if (kpiBatches) kpiBatches.textContent = fmtNum(totalBatches);
+
+  const rowCountEl = document.getElementById('whInvRowCount');
+  if (rowCountEl) rowCountEl.textContent = fmtNum(list.length);
+
+  // Render Desktop Table
+  const tbody = document.getElementById('whInventoryTableBody');
+  const mob = document.getElementById('whInventoryMobileCards');
+
+  if (!list.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</td></tr>';
+    if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</div>';
+    return;
+  }
+
+  if (tbody) {
+    tbody.innerHTML = list.map((r, idx) => {
+      const receiptQty = parseFloat(r.receipt_qty || 0);
+      const bookQty = parseFloat(r.book_qty || 0);
+      const batchCount = parseInt(r.batch_count || 0, 10);
+      
+      let stockBadgeClass = 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+      if (bookQty < 0) {
+        stockBadgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/80';
+      } else if (bookQty > 0) {
+        stockBadgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/80';
+      }
+
+      return `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="px-2 py-2 text-center text-gray-400 tabular-nums font-mono">${idx + 1}</td>
+          <td class="px-2 py-2 whitespace-nowrap">
+            <button onclick="openWhItemHistoryModal('${r.sku}')" class="font-mono font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1" title="Xem thẻ kho chi tiết">
+              <span>${r.sku}</span>
+              <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
+            </button>
+          </td>
+          <td class="px-2 py-2 font-semibold text-gray-900 dark:text-white min-w-[150px]">
+            <div class="line-clamp-2">${r.name || r.sku}</div>
+          </td>
+          <td class="px-2 py-2 whitespace-nowrap text-center">
+            <span class="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-[11px] font-medium border border-gray-200/60 dark:border-gray-700/60 inline-block max-w-[110px] truncate" title="${r.category || 'Chưa phân loại'}">${r.category || 'Chưa phân loại'}</span>
+          </td>
+          <td class="px-1.5 py-2 text-center whitespace-nowrap font-medium text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</td>
+          <td class="px-2 py-2 text-right whitespace-nowrap bg-emerald-50/30 dark:bg-emerald-950/10">
+            <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-xs px-1.5 py-0.5 rounded-md bg-emerald-100/60 dark:bg-emerald-900/30 tabular-nums">
+              ${fmtNum(receiptQty)}
+            </span>
+          </td>
+          <td class="px-2 py-2 text-right whitespace-nowrap bg-blue-50/30 dark:bg-blue-950/10">
+            <span class="font-mono font-bold text-xs px-1.5 py-0.5 rounded-md tabular-nums ${stockBadgeClass}">
+              ${fmtNum(bookQty)}
+            </span>
+          </td>
+          <td class="px-2 py-2 text-right whitespace-nowrap font-mono text-gray-600 dark:text-gray-300 tabular-nums">
+            ${fmtVND(r.unit_price)}
+          </td>
+          <td class="px-2 py-2 text-right whitespace-nowrap font-mono font-semibold text-gray-900 dark:text-white tabular-nums">
+            ${fmtVND(r.total_value)}
+          </td>
+          <td class="px-1.5 py-2 text-center whitespace-nowrap">
+            <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-1.5 py-0.5 rounded-lg text-xs font-semibold font-mono transition-all ${
+              batchCount > 0 
+                ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 hover:bg-purple-200 border border-purple-200/80 dark:border-purple-800/80' 
+                : 'bg-gray-100 text-gray-400 dark:bg-gray-800 hover:text-gray-600'
+            }" title="Xem chi tiết các lô hàng">
+              ${batchCount > 0 ? batchCount + ' Lô' : '0 Lô'}
+            </button>
+          </td>
+          <td class="px-2 py-2 text-center whitespace-nowrap">
+            <div class="inline-flex items-center gap-1 justify-center">
+              <button onclick="openWhItemHistoryModal('${r.sku}')" class="px-1.5 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 hover:bg-emerald-100 text-[11px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-0.5 transition-all" title="Xem thẻ kho lịch sử xuất nhập">
+                <i data-lucide="history" class="w-3 h-3"></i> Thẻ Kho
+              </button>
+              <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-1.5 py-1 bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 hover:bg-purple-100 text-[11px] font-bold rounded-lg border border-purple-200 dark:border-purple-800/60 flex items-center gap-0.5 transition-all" title="Xem chi tiết các lô đã nhập">
+                <i data-lucide="layers" class="w-3 h-3"></i> Lô
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Render Mobile Cards
+  if (mob) {
+    mob.innerHTML = list.map((r, idx) => {
+      const receiptQty = parseFloat(r.receipt_qty || 0);
+      const bookQty = parseFloat(r.book_qty || 0);
+      const batchCount = parseInt(r.batch_count || 0, 10);
+
+      return `
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-gray-400 text-[11px] font-mono">#${idx + 1}</span>
+                <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${r.sku}</span>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</span>
+              </div>
+              <h4 class="font-bold text-xs text-gray-900 dark:text-white mt-1 leading-snug">${r.name || r.sku}</h4>
+              <div class="text-[10.5px] text-gray-500 mt-0.5">${r.category || 'Chưa phân loại'}</div>
+            </div>
+            <button onclick="openWhItemBatchesModal('${r.sku}')" class="px-2 py-1 rounded-lg text-[10.5px] font-bold font-mono ${
+              batchCount > 0 ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
+            }">
+              ${batchCount > 0 ? batchCount + ' Lô' : '0 Lô'}
+            </button>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-xs border border-gray-100 dark:border-gray-800">
+            <div>
+              <span class="text-[10px] text-emerald-700 dark:text-emerald-400 block font-semibold">Đã Nhập Kho</span>
+              <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">${fmtNum(receiptQty)}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-500 block">Tồn Sổ Sách</span>
+              <span class="font-mono font-bold tabular-nums ${bookQty < 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white'}">${fmtNum(bookQty)}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-500 block">Giá Trị Tồn</span>
+              <span class="font-mono font-bold text-amber-600 dark:text-amber-400 tabular-nums text-[11px]">${fmtVND(r.total_value)}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="openWhItemHistoryModal('${r.sku}')" class="w-full py-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold rounded-xl border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="history" class="w-3.5 h-3.5"></i> Thẻ Kho Xuất Nhập
+            </button>
+            <button onclick="openWhItemBatchesModal('${r.sku}')" class="w-full py-2 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold rounded-xl border border-purple-200 dark:border-purple-800/60 flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="layers" class="w-3.5 h-3.5"></i> Chi Tiết Lô Hàng
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
+
+window.openWhItemHistoryModal = async function(sku) {
+  const item = (window.gWhInventoryData || []).find(i => i.sku === sku) || { sku, name: sku, unit: 'Phần' };
+  const siteSelect = document.getElementById('whInvSiteSelect');
+  const site = siteSelect ? siteSelect.value : 'ALL';
+
+  document.getElementById('histItemSku').textContent = item.sku;
+  document.getElementById('histItemName').textContent = item.name || item.sku;
+  document.getElementById('histItemUnit').textContent = item.unit || 'Phần';
+  document.getElementById('histItemSite').textContent = site === 'ALL' ? 'Toàn Hệ Thống' : site;
+
+  const modal = document.getElementById('modalWhItemHistory');
+  if (modal) modal.classList.remove('hidden');
+
+  const tbody = document.getElementById('whHistTableBody');
+  const mob = document.getElementById('whHistMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-gray-400">Đang truy xuất thẻ kho từ hệ thống...</td></tr>';
+  if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Đang truy xuất thẻ kho...</div>';
+
+  try {
+    const res = await fetch(`/api/wh/item-history?sku=${encodeURIComponent(sku)}&site=${encodeURIComponent(site)}&nocache=1`);
+    const json = await res.json();
+    if (json.success) {
+      window.gWhActiveHistory = json.data;
+      const hist = json.data.history || [];
+
+      document.getElementById('histTotalIn').textContent = fmtNum(json.data.total_in || 0);
+      document.getElementById('histTotalOut').textContent = fmtNum(json.data.total_out || 0);
+      document.getElementById('histRowCount').textContent = fmtNum(hist.length);
+
+      if (!hist.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-gray-400">Chưa ghi nhận giao dịch xuất nhập nào cho mã hàng này tại điểm đã chọn.</td></tr>';
+        if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Chưa ghi nhận giao dịch xuất nhập nào.</div>';
+        return;
+      }
 
       if (tbody) {
-        tbody.innerHTML = json.data.map(r => `
-          <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-            <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.sku}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.item_name}</td>
-            <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.supplier_name}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${fmtVND(r.contract_price)}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${fmtVND(r.actual_price)}</td>
-            <td class="p-3 text-right tabular-nums font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = hist.map(h => {
+          const qtyIn = parseFloat(h.qty_in || 0);
+          const qtyOut = parseFloat(h.qty_out || 0);
+
+          let badgeColor = 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+          if (h.trans_type === 'NHAP_KHO') badgeColor = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200';
+          else if (h.trans_type === 'XUAT_HUY') badgeColor = 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200';
+          else if (h.trans_type === 'DIEU_CHUYEN') badgeColor = 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200';
+          else if (h.trans_type === 'XUAT_KHO') badgeColor = 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200';
+
+          const docDateDisp = h.doc_date ? String(h.doc_date).split('T')[0] : '—';
+
+          return `
+            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+              <td class="p-2.5 text-center whitespace-nowrap font-mono tabular-nums text-gray-600 dark:text-gray-300">${docDateDisp}</td>
+              <td class="p-2.5 whitespace-nowrap font-mono font-semibold text-gray-900 dark:text-white">${h.doc_no || '—'}</td>
+              <td class="p-2.5 whitespace-nowrap">
+                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold ${badgeColor}">${h.trans_name || h.trans_type}</span>
+              </td>
+              <td class="p-2.5 whitespace-nowrap font-mono text-[11px] text-gray-600 dark:text-gray-300">
+                ${h.batch_code ? `<b class="text-purple-600 dark:text-purple-400">${h.batch_code}</b>` : '—'}
+                ${h.exp_date ? `<span class="text-gray-400 block text-[10px]">HSD: ${String(h.exp_date).split('T')[0]}</span>` : ''}
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                ${qtyIn > 0 ? `+${fmtNum(qtyIn)}` : '—'}
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+                ${qtyOut > 0 ? `-${fmtNum(qtyOut)}` : '—'}
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono text-gray-600 dark:text-gray-300 tabular-nums">
+                ${fmtVND(h.unit_price)}
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono font-semibold text-gray-900 dark:text-white tabular-nums">
+                ${fmtVND(h.amount)}
+              </td>
+              <td class="p-2.5 whitespace-nowrap text-gray-700 dark:text-gray-300 max-w-[150px] truncate" title="${h.partner_name || ''}">
+                ${h.partner_name || '—'}
+              </td>
+              <td class="p-2.5 text-gray-500 dark:text-gray-400 max-w-[200px] truncate" title="${h.notes || ''}">
+                ${h.notes || '—'}
+              </td>
+            </tr>
+          `;
+        }).join('');
       }
 
       if (mob) {
-        mob.innerHTML = json.data.map(r => `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
-                <div class="text-[10.5px] tabular-nums text-gray-400">SKU: ${r.sku} • NCC: ${r.supplier_name}</div>
+        mob.innerHTML = hist.map(h => {
+          const qtyIn = parseFloat(h.qty_in || 0);
+          const qtyOut = parseFloat(h.qty_out || 0);
+          const docDateDisp = h.doc_date ? String(h.doc_date).split('T')[0] : '—';
+
+          return `
+            <div class="bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <div class="font-mono font-bold text-gray-900 dark:text-white">${h.doc_no || '—'}</div>
+                <span class="text-[10px] text-gray-400 font-mono">${docDateDisp}</span>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.variance < 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-700 dark:text-gray-300">${h.trans_name || h.trans_type}</span>
+                <span class="font-mono font-bold ${qtyIn > 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                  ${qtyIn > 0 ? `+${fmtNum(qtyIn)}` : `-${fmtNum(qtyOut)}`} ${item.unit || ''}
+                </span>
+              </div>
+              ${h.batch_code ? `<div class="text-[11px] text-purple-600 dark:text-purple-400 font-mono">Lô: <b>${h.batch_code}</b> ${h.exp_date ? '• HSD: ' + String(h.exp_date).split('T')[0] : ''}</div>` : ''}
+              ${h.partner_name ? `<div class="text-[10.5px] text-gray-500">Đối tác: ${h.partner_name}</div>` : ''}
+              ${h.notes ? `<div class="text-[10.5px] text-gray-400 italic">${h.notes}</div>` : ''}
             </div>
-            <div class="grid grid-cols-3 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Giá HĐ: <br><b class="tabular-nums text-gray-900 dark:text-white">${fmtVND(r.contract_price)}</b></div>
-              <div>Giá thực: <br><b class="tabular-nums text-gray-900 dark:text-white">${fmtVND(r.actual_price)}</b></div>
-              <div>Chênh lệch: <br><b class="tabular-nums font-bold ${r.variance < 0 ? 'text-rose-600' : 'text-emerald-600'}">${fmtVND(r.variance)}</b></div>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
+    } else {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-rose-500">Lỗi: ${json.error}</td></tr>`;
     }
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error('openWhItemHistoryModal error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-rose-500">Lỗi kết nối: ${err.message}</td></tr>`;
   }
 };
+
+window.openWhItemBatchesModal = async function(sku) {
+  const item = (window.gWhInventoryData || []).find(i => i.sku === sku) || { sku, name: sku, unit: 'Phần' };
+  const siteSelect = document.getElementById('whInvSiteSelect');
+  const site = siteSelect ? siteSelect.value : 'ALL';
+
+  document.getElementById('batchItemSku').textContent = item.sku;
+  document.getElementById('batchItemName').textContent = item.name || item.sku;
+  document.getElementById('batchItemUnit').textContent = item.unit || 'Phần';
+  document.getElementById('batchItemSite').textContent = site === 'ALL' ? 'Toàn Hệ Thống' : site;
+
+  const modal = document.getElementById('modalWhItemBatches');
+  if (modal) modal.classList.remove('hidden');
+
+  const tbody = document.getElementById('whBatchesTableBody');
+  const mob = document.getElementById('whBatchesMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400">Đang truy vấn danh sách lô date FEFO...</td></tr>';
+  if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Đang truy vấn lô date...</div>';
+
+  try {
+    const res = await fetch(`/api/wh/item-batches?sku=${encodeURIComponent(sku)}&site=${encodeURIComponent(site)}&nocache=1`);
+    const json = await res.json();
+    if (json.success) {
+      window.gWhActiveBatches = json.data;
+      const batches = json.data.batches || [];
+
+      let safeCount = 0;
+      let warnCount = 0;
+      batches.forEach(b => {
+        if (b.status === 'GOOD') safeCount++;
+        else warnCount++;
+      });
+
+      document.getElementById('batchTotalCount').textContent = fmtNum(batches.length);
+      document.getElementById('batchSafeCount').textContent = fmtNum(safeCount);
+      document.getElementById('batchWarnCount').textContent = fmtNum(warnCount);
+
+      if (!batches.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400">Chưa có lô hàng date riêng biệt nào được ghi nhận cho mã này (đang quản lý tồn gộp theo site).</td></tr>';
+        if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Chưa có lô hàng date riêng biệt.</div>';
+        return;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = batches.map(b => {
+          let badgeStatus = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200';
+          let statusText = 'Còn hạn an toàn';
+          if (b.status === 'EXPIRED') {
+            badgeStatus = 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200';
+            statusText = 'Đã hết hạn';
+          } else if (b.status === 'NEAR_EXPIRY') {
+            badgeStatus = 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200';
+            statusText = 'Cận date (≤ 30 ngày)';
+          }
+
+          const expDisp = b.exp_date ? String(b.exp_date).split('T')[0] : '—';
+          const daysLeftDisp = b.days_left !== 999 ? `${b.days_left} ngày` : '—';
+
+          return `
+            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+              <td class="p-2.5 whitespace-nowrap font-mono font-bold text-purple-700 dark:text-purple-400">${b.batch_code || 'LÔ-CHUNG'}</td>
+              <td class="p-2.5 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                <span>${b.site_code || ''}</span> • <span class="text-gray-400">${b.storage_loc || 'Kệ Bếp'}</span>
+              </td>
+              <td class="p-2.5 text-center whitespace-nowrap font-mono font-semibold text-gray-800 dark:text-gray-200 tabular-nums">${expDisp}</td>
+              <td class="p-2.5 text-center whitespace-nowrap font-mono tabular-nums font-semibold ${
+                b.status === 'EXPIRED' ? 'text-rose-600' : (b.status === 'NEAR_EXPIRY' ? 'text-amber-600' : 'text-emerald-600')
+              }">
+                ${daysLeftDisp}
+              </td>
+              <td class="p-2.5 text-center whitespace-nowrap">
+                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold ${badgeStatus}">${statusText}</span>
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono text-gray-600 dark:text-gray-300 tabular-nums">
+                ${fmtNum(b.initial_qty)}
+              </td>
+              <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-blue-700 dark:text-blue-400 tabular-nums">
+                ${fmtNum(b.current_qty)}
+              </td>
+              <td class="p-2.5 whitespace-nowrap font-mono text-gray-500 text-[11px]">
+                ${b.receipt_code ? `<span class="text-brand-600 font-semibold">${b.receipt_code}</span>` : '—'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (mob) {
+        mob.innerHTML = batches.map(b => {
+          const expDisp = b.exp_date ? String(b.exp_date).split('T')[0] : '—';
+          return `
+            <div class="bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-bold text-purple-700 dark:text-purple-400">Lô: ${b.batch_code || 'LÔ-CHUNG'}</span>
+                <span class="font-mono font-semibold text-[11px] ${b.status === 'EXPIRED' ? 'text-rose-600' : (b.status === 'NEAR_EXPIRY' ? 'text-amber-600' : 'text-emerald-600')}">
+                  ${b.days_left !== 999 ? `Còn ${b.days_left} ngày` : ''}
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] text-gray-600 dark:text-gray-400">
+                <div>Hạn dùng: <b class="font-mono text-gray-900 dark:text-white">${expDisp}</b></div>
+                <div>Vị trí: <b class="text-gray-900 dark:text-white">${b.storage_loc || 'Kệ Bếp'}</b></div>
+                <div>SL Nhập: <b class="font-mono text-gray-900 dark:text-white">${fmtNum(b.initial_qty)}</b></div>
+                <div>SL Tồn: <b class="font-mono font-bold text-blue-600 dark:text-blue-400">${fmtNum(b.current_qty)}</b></div>
+              </div>
+              ${b.receipt_code ? `<div class="text-[10.5px] text-gray-400">Chứng từ: ${b.receipt_code}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+    } else {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500">Lỗi: ${json.error}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('openWhItemBatchesModal error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500">Lỗi kết nối: ${err.message}</td></tr>`;
+  }
+};
+
+window.exportWhInventoryToExcel = function() {
+  const list = window.gWhFilteredInventory || window.gWhInventoryData || [];
+  if (!list.length) {
+    showToast('Không có dữ liệu tồn kho để xuất Excel!');
+    return;
+  }
+
+  const site = document.getElementById('whInvSiteSelect')?.value || 'ALL';
+  const headers = [
+    'STT',
+    'Mã SKU',
+    'Tên Mặt Hàng',
+    'Nhóm Ngành Hàng',
+    'Đơn Vị Tính',
+    'Số Lượng Đã Nhập',
+    'Số Lượng Tồn Sổ Sách',
+    'Đơn Giá Chuẩn (VNĐ)',
+    'Tổng Giá Trị Tồn (VNĐ)',
+    'Số Lô Quản Lý',
+    'Ngày Nhập Gần Nhất',
+    'Ngày Kiểm Kê Gần Nhất'
+  ];
+
+  const dataRows = list.map((r, idx) => [
+    idx + 1,
+    r.sku || '',
+    r.name || '',
+    r.category || '',
+    r.unit || '',
+    parseFloat(r.receipt_qty || 0),
+    parseFloat(r.book_qty || 0),
+    parseFloat(r.unit_price || 0),
+    parseFloat(r.total_value || 0),
+    parseInt(r.batch_count || 0, 10),
+    r.last_receipt_date ? String(r.last_receipt_date).split('T')[0] : '',
+    r.last_count_date ? String(r.last_count_date).split('T')[0] : ''
+  ]);
+
+  const numCols = [0, 5, 6, 7, 8, 9];
+  const codeCols = [1, 10, 11];
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const fileName = `Ton_Kho_WMS_${site}_${today}.xlsx`;
+
+  if (typeof exportStyledExcel === 'function') {
+    exportStyledExcel(fileName, 'TonKhoWMS', headers, dataRows, numCols, codeCols);
+    showToast(`Đã xuất báo cáo tồn kho ${site} thành công!`);
+  } else {
+    showToast('Lỗi: Thư viện xuất Excel chưa sẵn sàng');
+  }
+};
+
+window.exportWhItemHistoryToExcel = function() {
+  if (!window.gWhActiveHistory || !window.gWhActiveHistory.history) {
+    showToast('Chưa có dữ liệu thẻ kho để xuất Excel!');
+    return;
+  }
+
+  const data = window.gWhActiveHistory;
+  const hist = data.history || [];
+  if (!hist.length) {
+    showToast('Không có phát sinh giao dịch nào để xuất Excel!');
+    return;
+  }
+
+  const headers = [
+    'STT',
+    'Ngày Chứng Từ',
+    'Số Chứng Từ',
+    'Loại Nghiệp Vụ',
+    'Mã Lô',
+    'Hạn Dùng (HSD)',
+    'Số Lượng Nhập (+)',
+    'Số Lượng Xuất (-)',
+    'Đơn Giá (VNĐ)',
+    'Thành Tiền (VNĐ)',
+    'Đối Tác / Nhà Cung Cấp',
+    'Ghi Chú / Diễn Giải'
+  ];
+
+  const dataRows = hist.map((h, idx) => [
+    idx + 1,
+    h.doc_date ? String(h.doc_date).split('T')[0] : '',
+    h.doc_no || '',
+    h.trans_name || h.trans_type || '',
+    h.batch_code || '',
+    h.exp_date ? String(h.exp_date).split('T')[0] : '',
+    parseFloat(h.qty_in || 0),
+    parseFloat(h.qty_out || 0),
+    parseFloat(h.unit_price || 0),
+    parseFloat(h.amount || 0),
+    h.partner_name || '',
+    h.notes || ''
+  ]);
+
+  const numCols = [0, 6, 7, 8, 9];
+  const codeCols = [1, 2, 4, 5];
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const fileName = `The_Kho_${data.sku}_${data.site}_${today}.xlsx`;
+
+  if (typeof exportStyledExcel === 'function') {
+    exportStyledExcel(fileName, 'TheKho', headers, dataRows, numCols, codeCols);
+    showToast(`Đã xuất thẻ kho mã ${data.sku} thành công!`);
+  } else {
+    showToast('Lỗi: Thư viện xuất Excel chưa sẵn sàng');
+  }
+};
+
+// Aliases for compatibility
+window.loadPoSap = window.loadWhInventory;
 
 // 8. Upgraded loadHistory (Desktop Table + Mobile Cards)
 window.renderHsOrdersList = function(items) {
@@ -12815,7 +13632,7 @@ const FEATURE_TITLES = {
   'wh-stock': { name: 'Hạn Dùng & Xuất FEFO', role: 'KHO_TRUONG', desc: 'Kiểm soát hạn dùng, lô date và giá trị tồn kho tổng' },
   'wh-reorder': { name: 'Cảnh Báo Tồn ROP', role: 'KHO_TRUONG', desc: 'Tính toán tồn an toàn và cảnh báo thiếu hàng tự động' },
   'wh-leadtime': { name: 'Lead Time & NCC', role: 'KHO_TRUONG', desc: 'Đánh giá độ trễ giao hàng của từng nhà cung cấp' },
-  'wh-posap': { name: 'Đơn Hàng PO SAP', role: 'KHO_TRUONG', desc: 'Đồng bộ đơn mua nguyên vật liệu từ SAP ERP' },
+  'wh-posap': { name: 'Tồn Kho & Quản Lý Lô', role: 'KHO_TRUONG', desc: 'Số lượng các mặt hàng đã nhập kho, thẻ kho xuất nhập và quản lý lô hàng' },
 
   // Nhóm 4: Cổng Thông Tin & Đặt Hàng
   'portal-voucher': { name: 'Tạo & Duyệt Chứng Từ', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
@@ -13117,7 +13934,7 @@ window.openUserProfileModal = function() {
       permSummaryEl.textContent = 'Quản lý điểm bán: Xem tồn kho ma trận, kiểm kê hằng ngày, tạo phiếu nhập hàng NCC, lập biên bản hủy hàng & báo cáo suất ăn.';
       if (reqBtn) reqBtn.classList.remove('hidden');
     } else if (gCurrentUser.role === 'KHO_TRUONG') {
-      permSummaryEl.textContent = 'Quản lý kho WMS: Theo dõi hạn dùng FEFO kho gia vị tổng, cảnh báo đặt hàng ROP, lead time NCC và PO SAP.';
+      permSummaryEl.textContent = 'Quản lý kho WMS: Theo dõi hạn dùng FEFO kho gia vị tổng, cảnh báo đặt hàng ROP, lead time NCC, tồn kho thực tế và quản lý lô hàng.';
       if (reqBtn) reqBtn.classList.remove('hidden');
     } else if (gCurrentUser.role === 'KE_TOAN') {
       permSummaryEl.textContent = 'Kế toán kiểm soát: Báo cáo P&L chuỗi 14 điểm, doanh thu bán hàng POS, chứng từ & hóa đơn thuế.';
@@ -13514,18 +14331,17 @@ function applyUserSessionToUI() {
 window.canAccessTab = function(tabId) {
   if (!gCurrentUser) return false;
 
-  // 1. Single Source of Truth: Nếu có permissions object từ CSDL D1 Backend
-  if (gCurrentUser.permissions && typeof gCurrentUser.permissions === 'object') {
+  // ADMIN luôn có toàn quyền quản trị tất cả các chức năng
+  if (gCurrentUser.role === 'ADMIN') return true;
+
+  // 1. Single Source of Truth: Nếu có permissions object từ CSDL Backend
+  if (gCurrentUser.permissions && typeof gCurrentUser.permissions === 'object' && Object.keys(gCurrentUser.permissions).length > 0) {
     const p = gCurrentUser.permissions[tabId];
     if (p !== undefined) {
       return Boolean(p.canView);
     }
-    // Nếu trong permissions object đã có dữ liệu nhưng tabId này không được cấp quyền -> Chặn & Ẩn
     return false;
   }
-
-  // 2. Fallback tạm thời chỉ khi permissions chưa kịp load xong từ backend
-  if (gCurrentUser.role === 'ADMIN') return true;
 
   const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
   if (financeTabs.includes(tabId)) return false;
@@ -14101,7 +14917,7 @@ window.dangXuatAdmin = function() {
 const APP_SYSTEM_ROLES = [
   { code: 'ADMIN', name: 'Ban Quản Trị (ADMIN)', desc: 'Toàn quyền quản trị 20/20 chức năng hệ thống', color: 'rose', icon: 'shield-alert' },
   { code: 'BEP_TRUONG', name: 'Bếp Trưởng / Quản Lý Điểm', desc: 'Kho bếp, Kiểm kê, Nhập hủy hàng, Suất ăn', color: 'blue', icon: 'chef-hat' },
-  { code: 'KHO_TRUONG', name: 'Quản Lý Kho WMS', desc: 'Kho FEFO, Định mức ROP, PO SAP, Tồn kho chuỗi', color: 'amber', icon: 'warehouse' },
+  { code: 'KHO_TRUONG', name: 'Quản Lý Kho WMS', desc: 'Kho FEFO, Định mức ROP, Tồn kho thực tế, Thẻ kho & Lô hàng', color: 'amber', icon: 'warehouse' },
   { code: 'KE_TOAN', name: 'Kế Toán Kiểm Soát', desc: 'Báo cáo P&L, Doanh thu POS, Chứng từ thu chi', color: 'emerald', icon: 'calculator' },
   { code: 'NHAN_VIEN', name: 'Nhân Viên Vận Hành', desc: 'Nhập kiểm kê hằng ngày & Báo cáo suất ăn', color: 'gray', icon: 'user' }
 ];

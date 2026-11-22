@@ -1444,6 +1444,347 @@ export default {
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
 
+      // 1.9 GET /api/wh/inventory - Báo cáo số lượng mặt hàng đã nhập kho & tồn kho WMS
+      if (pathname === '/api/wh/inventory' && request.method === 'GET') {
+        const siteParam = (searchParams.get('site') || searchParams.get('branch') || 'ALL').trim().toUpperCase();
+        const isPg = db.isPg(env);
+        let results = [];
+
+        if (isPg) {
+          if (siteParam === 'ALL') {
+            const q = `
+              WITH all_batches AS (
+                SELECT sku, COUNT(DISTINCT batch_code) as batch_count FROM inventory_batches GROUP BY sku
+              ),
+              all_rec_batches AS (
+                SELECT l.item_code as sku, COUNT(DISTINCT l.batch_code) as batch_count, MAX(r.receipt_date) as last_receipt_date
+                FROM fnb_stock_receipt_lines l
+                JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+                WHERE l.batch_code IS NOT NULL AND l.batch_code != ''
+                GROUP BY l.item_code
+              )
+              SELECT 
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, fsi.name, i.name, b.item_code) as name,
+                COALESCE(d.nhom_hang, p.merch_category, fsi.item_group, i.category, 'Chưa phân loại') as category,
+                COALESCE(d.entry_unit, p.order_unit, fsi.unit, i.unit, 'Phần') as unit,
+                'ALL' as site_code,
+                ROUND(SUM(b.opening_qty)::numeric, 1) as opening_qty,
+                ROUND(SUM(b.receipt_qty)::numeric, 1) as receipt_qty,
+                ROUND(SUM(b.sales_bom_qty)::numeric, 1) as sales_bom_qty,
+                ROUND(SUM(b.waste_qty)::numeric, 1) as waste_qty,
+                ROUND(SUM(b.book_qty)::numeric, 1) as book_qty,
+                ROUND(SUM(b.total_value)::numeric, 0) as total_value,
+                ROUND((CASE WHEN SUM(b.book_qty) > 0 THEN SUM(b.total_value) / SUM(b.book_qty) ELSE COALESCE(MAX(p.net_price), MAX(i.standard_cost_sap), 0) END)::numeric, 0) as unit_price,
+                COALESCE(MAX(ab.batch_count), MAX(arb.batch_count), 0) as batch_count,
+                MAX(arb.last_receipt_date)::text as last_receipt_date,
+                MAX(b.last_count_date)::text as last_count_date
+              FROM fnb_stock_balances b
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit 
+                FROM dim_article_stock GROUP BY material
+              ) d ON b.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+                FROM sap_po_items GROUP BY article
+              ) p ON b.item_code = p.article
+              LEFT JOIN fnb_stock_items fsi ON b.item_code = fsi.code
+              LEFT JOIN items i ON b.item_code = i.sku
+              LEFT JOIN all_batches ab ON b.item_code = ab.sku
+              LEFT JOIN all_rec_batches arb ON b.item_code = arb.sku
+              GROUP BY b.item_code, d.material_desc, p.article_desc, fsi.name, i.name, d.nhom_hang, p.merch_category, fsi.item_group, i.category, d.entry_unit, p.order_unit, fsi.unit, i.unit
+              ORDER BY receipt_qty DESC, book_qty DESC;
+            `;
+            const res = await db.query(env, q);
+            results = res.rows || [];
+          } else {
+            const q = `
+              WITH site_batches AS (
+                SELECT sku, UPPER(branch_id) as branch_code, COUNT(DISTINCT batch_code) as batch_count
+                FROM inventory_batches
+                WHERE UPPER(branch_id) = UPPER($1)
+                GROUP BY sku, UPPER(branch_id)
+              ),
+              rec_batches AS (
+                SELECT l.item_code as sku, UPPER(r.site_code) as site_code, COUNT(DISTINCT l.batch_code) as batch_count, MAX(r.receipt_date) as last_receipt_date
+                FROM fnb_stock_receipt_lines l
+                JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+                WHERE l.batch_code IS NOT NULL AND l.batch_code != '' AND UPPER(r.site_code) = UPPER($1)
+                GROUP BY l.item_code, UPPER(r.site_code)
+              )
+              SELECT 
+                b.item_code as sku,
+                COALESCE(d.material_desc, p.article_desc, fsi.name, i.name, b.item_code) as name,
+                COALESCE(d.nhom_hang, p.merch_category, fsi.item_group, i.category, 'Chưa phân loại') as category,
+                COALESCE(d.entry_unit, p.order_unit, fsi.unit, i.unit, 'Phần') as unit,
+                b.site_code,
+                ROUND(b.opening_qty::numeric, 1) as opening_qty,
+                ROUND(b.receipt_qty::numeric, 1) as receipt_qty,
+                ROUND(b.sales_bom_qty::numeric, 1) as sales_bom_qty,
+                ROUND(b.waste_qty::numeric, 1) as waste_qty,
+                ROUND(b.book_qty::numeric, 1) as book_qty,
+                ROUND(b.total_value::numeric, 0) as total_value,
+                ROUND((CASE WHEN b.book_qty > 0 THEN b.total_value / b.book_qty ELSE COALESCE(p.net_price, i.standard_cost_sap, 0) END)::numeric, 0) as unit_price,
+                COALESCE(sb.batch_count, rb.batch_count, 0) as batch_count,
+                rb.last_receipt_date::text as last_receipt_date,
+                b.last_count_date::text as last_count_date
+              FROM fnb_stock_balances b
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit 
+                FROM dim_article_stock GROUP BY material
+              ) d ON b.item_code = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price 
+                FROM sap_po_items GROUP BY article
+              ) p ON b.item_code = p.article
+              LEFT JOIN fnb_stock_items fsi ON b.item_code = fsi.code
+              LEFT JOIN items i ON b.item_code = i.sku
+              LEFT JOIN site_batches sb ON b.item_code = sb.sku AND UPPER(b.site_code) = sb.branch_code
+              LEFT JOIN rec_batches rb ON b.item_code = rb.sku AND UPPER(b.site_code) = rb.site_code
+              WHERE UPPER(b.site_code) = UPPER($1)
+              ORDER BY receipt_qty DESC, book_qty DESC;
+            `;
+            const res = await db.query(env, q, [siteParam]);
+            results = res.rows || [];
+          }
+        } else {
+          // D1 Fallback
+          const q = `
+            SELECT 
+              b.item_code as sku,
+              b.item_code as name,
+              'Chưa phân loại' as category,
+              'Phần' as unit,
+              b.site_code,
+              ROUND(b.opening_qty, 1) as opening_qty,
+              ROUND(b.receipt_qty, 1) as receipt_qty,
+              ROUND(b.sales_bom_qty, 1) as sales_bom_qty,
+              ROUND(b.waste_qty, 1) as waste_qty,
+              ROUND(b.book_qty, 1) as book_qty,
+              ROUND(b.total_value, 0) as total_value,
+              0 as unit_price,
+              0 as batch_count,
+              null as last_receipt_date,
+              b.last_count_date
+            FROM fnb_stock_balances b
+            ${siteParam === 'ALL' ? '' : 'WHERE UPPER(b.site_code) = ?'}
+            ORDER BY b.receipt_qty DESC;
+          `;
+          const res = await db.query(env, q, siteParam === 'ALL' ? [] : [siteParam]);
+          results = res.rows || [];
+        }
+
+        return new Response(JSON.stringify({ success: true, data: results, site: siteParam }), { headers: corsHeaders });
+      }
+
+      // 1.10 GET /api/wh/item-history - Thẻ kho: Lịch sử xuất nhập của mã hàng
+      if (pathname === '/api/wh/item-history' && request.method === 'GET') {
+        const sku = (searchParams.get('sku') || '').trim();
+        const siteParam = (searchParams.get('site') || searchParams.get('branch') || 'ALL').trim().toUpperCase();
+        if (!sku) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã SKU' }), { headers: corsHeaders });
+        }
+
+        const isPg = db.isPg(env);
+        let rows = [];
+
+        if (isPg) {
+          const q = `
+            WITH raw_history AS (
+              SELECT 
+                r.receipt_date::date as doc_date,
+                r.receipt_code as doc_no,
+                'NHAP_KHO' as trans_type,
+                CASE 
+                  WHEN r.supplier ILIKE '%bếp trung tâm%' THEN 'Nhập từ Bếp Trung Tâm'
+                  ELSE 'Nhập mua hàng NCC'
+                END as trans_name,
+                r.site_code,
+                l.batch_code,
+                l.exp_date::text as exp_date,
+                l.qty::numeric as qty_in,
+                0::numeric as qty_out,
+                l.unit_price::numeric as unit_price,
+                ROUND((l.qty * l.unit_price)::numeric, 0) as amount,
+                r.supplier as partner_name,
+                COALESCE(l.note, r.notes, '') as notes,
+                r.created_at as sort_time
+              FROM fnb_stock_receipt_lines l
+              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+              WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(r.site_code) = UPPER($2))
+
+              UNION ALL
+
+              SELECT 
+                w.waste_date::date as doc_date,
+                w.waste_code as doc_no,
+                'XUAT_HUY' as trans_type,
+                'Xuất hủy hàng hỏng/hết hạn' as trans_name,
+                w.site_code,
+                null as batch_code,
+                null as exp_date,
+                0::numeric as qty_in,
+                l.qty::numeric as qty_out,
+                l.unit_price::numeric as unit_price,
+                ROUND((l.qty * l.unit_price)::numeric, 0) as amount,
+                w.created_by as partner_name,
+                COALESCE(l.reason_detail, w.notes, '') as notes,
+                w.created_at as sort_time
+              FROM fnb_stock_waste_lines l
+              JOIN fnb_stock_wastes w ON l.waste_id = w.id
+              WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(w.site_code) = UPPER($2))
+
+              UNION ALL
+
+              SELECT 
+                m.posting_date::date as doc_date,
+                m.mat_doc as doc_no,
+                CASE 
+                  WHEN m.mov_type IN ('101', '102', '561') THEN 'NHAP_KHO'
+                  WHEN m.mov_type IN ('551', '552') THEN 'XUAT_HUY'
+                  WHEN m.mov_type IN ('351', '352', '309') THEN 'DIEU_CHUYEN'
+                  ELSE 'XUAT_KHO'
+                END as trans_type,
+                COALESCE(m.mov_text_vi, m.mov_text_sap, 'Chứng từ SAP') as trans_name,
+                m.site as site_code,
+                null as batch_code,
+                null as exp_date,
+                (CASE WHEN m.quantity > 0 THEN m.quantity ELSE 0 END)::numeric as qty_in,
+                (CASE WHEN m.quantity < 0 THEN ABS(m.quantity) ELSE 0 END)::numeric as qty_out,
+                ROUND((CASE WHEN m.quantity != 0 THEN ABS(m.amount_lc / m.quantity) ELSE 0 END)::numeric, 0) as unit_price,
+                ROUND(ABS(m.amount_lc)::numeric, 0) as amount,
+                COALESCE(m.purch_order, m.order_no, m.sales_order, '') as partner_name,
+                COALESCE(m.doc_header_text, '') as notes,
+                m.posting_date::timestamp as sort_time
+              FROM mb51_material_docs m
+              WHERE m.material = $1 AND ($2 = 'ALL' OR UPPER(m.site) = UPPER($2))
+            )
+            SELECT * FROM raw_history
+            ORDER BY doc_date DESC, sort_time DESC
+            LIMIT 100;
+          `;
+          const res = await db.query(env, q, [sku, siteParam]);
+          rows = res.rows || [];
+        }
+
+        let totalIn = 0;
+        let totalOut = 0;
+        for (const r of rows) {
+          totalIn += parseFloat(r.qty_in || 0);
+          totalOut += parseFloat(r.qty_out || 0);
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            sku,
+            site: siteParam,
+            total_in: Math.round(totalIn * 10) / 10,
+            total_out: Math.round(totalOut * 10) / 10,
+            history: rows
+          }
+        }), { headers: corsHeaders });
+      }
+
+      // 1.11 GET /api/wh/item-batches - Chi tiết các lô hàng đã nhập của mã hàng
+      if (pathname === '/api/wh/item-batches' && request.method === 'GET') {
+        const sku = (searchParams.get('sku') || '').trim();
+        const siteParam = (searchParams.get('site') || searchParams.get('branch') || 'ALL').trim().toUpperCase();
+        if (!sku) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã SKU' }), { headers: corsHeaders });
+        }
+
+        const isPg = db.isPg(env);
+        let rows = [];
+
+        if (isPg) {
+          const q = `
+            WITH raw_batches AS (
+              SELECT 
+                b.id::text,
+                b.sku,
+                b.batch_code,
+                UPPER(b.branch_id) as site_code,
+                b.mfg_date,
+                b.exp_date,
+                b.qty as current_qty,
+                b.qty as initial_qty,
+                COALESCE(b.storage_loc, 'Kệ Bếp') as storage_loc,
+                'inventory_batches' as source,
+                null as receipt_code,
+                null as supplier,
+                b.created_at
+              FROM inventory_batches b
+              WHERE b.sku = $1 AND ($2 = 'ALL' OR UPPER(b.branch_id) = UPPER($2))
+
+              UNION ALL
+
+              SELECT 
+                'rc_' || l.id as id,
+                l.item_code as sku,
+                l.batch_code,
+                UPPER(r.site_code) as site_code,
+                l.mfg_date::text as mfg_date,
+                l.exp_date::text as exp_date,
+                l.qty as current_qty,
+                l.qty as initial_qty,
+                'Kệ Bếp' as storage_loc,
+                'fnb_stock_receipts' as source,
+                r.receipt_code,
+                r.supplier,
+                r.created_at
+              FROM fnb_stock_receipt_lines l
+              JOIN fnb_stock_receipts r ON l.receipt_id = r.id
+              WHERE l.item_code = $1 
+                AND l.batch_code IS NOT NULL AND l.batch_code != ''
+                AND ($2 = 'ALL' OR UPPER(r.site_code) = UPPER($2))
+                AND NOT EXISTS (
+                  SELECT 1 FROM inventory_batches ib 
+                  WHERE ib.sku = l.item_code 
+                    AND UPPER(ib.branch_id) = UPPER(r.site_code) 
+                    AND ib.batch_code = l.batch_code
+                )
+            )
+            SELECT 
+              id,
+              sku,
+              batch_code,
+              site_code,
+              mfg_date,
+              exp_date,
+              current_qty,
+              initial_qty,
+              storage_loc,
+              receipt_code,
+              supplier,
+              CASE 
+                WHEN exp_date IS NOT NULL AND exp_date != '' THEN (exp_date::date - CURRENT_DATE)
+                ELSE 999
+              END as days_left,
+              CASE 
+                WHEN exp_date IS NULL OR exp_date = '' THEN 'UNKNOWN'
+                WHEN (exp_date::date - CURRENT_DATE) < 0 THEN 'EXPIRED'
+                WHEN (exp_date::date - CURRENT_DATE) <= 30 THEN 'NEAR_EXPIRY'
+                ELSE 'GOOD'
+              END as status,
+              created_at
+            FROM raw_batches
+            ORDER BY exp_date ASC NULLS LAST;
+          `;
+          const res = await db.query(env, q, [sku, siteParam]);
+          rows = res.rows || [];
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: {
+            sku,
+            site: siteParam,
+            batches: rows
+          }
+        }), { headers: corsHeaders });
+      }
+
       // ======================================================================
       // PHÂN HỆ 2: VẬT TƯ, ĐỊNH MỨC SITE & CHỨNG TỪ GIAO NHẬN (PORTAL)
       // ======================================================================
