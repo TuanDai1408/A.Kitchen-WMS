@@ -326,28 +326,42 @@ h1.page-title {
   font-weight: 600;
 }
 
-/* Số KPI: 26–28px font-semibold */
+/* Số KPI: 26–28px font-semibold (dùng chữ số tự nhiên của Estedad, KHÔNG tnum) */
 .kpi-value,
 .kpi-stat,
 .stat-value,
 .kpi-card-hero-num,
 .kpi-card-standard-num,
-.kpi-card-compact-num {
+.kpi-card-compact-num,
+.kpi-value-hero,
+.kpi-value-compact {
   font-size: 27px !important;
   font-weight: 600 !important;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
 }
 
-/* Số tiền, số lượng, phần trăm: tabular-nums (Estedad có tnum) */
-.tabular-nums,
-.num,
-.font-mono,
-.pos-mono,
-.font-receipt,
-[data-num] {
+/* Quy ước số & mã định danh (Design System Phase 1) */
+.num {
+  font-family: "Inter", var(--font-sans);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
+} /* số tiền, số lượng, %, ngày trong cột bảng */
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-feature-settings: normal;
+} /* mã chứng từ, SKU, mã điểm bán */
+
+/* Lưới an toàn: vô hiệu hóa tnum trên 320 chỗ tabular-nums cũ chưa chuyển sang .num */
+.tabular-nums:not(.num) {
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
 }
 
 /* ==========================================================================
@@ -524,8 +538,8 @@ h1.page-title {
 
 .kpi-value {
   @apply text-2xl font-semibold tracking-tight text-gray-900;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
 }
 :is(.dark *) .kpi-value,
 .dark .kpi-value {
@@ -534,8 +548,8 @@ h1.page-title {
 
 .kpi-value-compact {
   @apply text-xl font-semibold tracking-tight text-gray-900;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
 }
 :is(.dark *) .kpi-value-compact,
 .dark .kpi-value-compact {
@@ -544,8 +558,8 @@ h1.page-title {
 
 .kpi-value-hero {
   @apply text-3xl font-semibold tracking-tight text-gray-900;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
 }
 :is(.dark *) .kpi-value-hero,
 .dark .kpi-value-hero {
@@ -631,7 +645,7 @@ h1.page-title {
 .pos-mono,
 .font-receipt {
   font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
-  font-feature-settings: 'tnum' 1;
+  font-feature-settings: normal;
 }
 
 [x-cloak] {

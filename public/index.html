@@ -6754,6 +6754,25 @@
       return guiBaoCao();
     }
 
+    window.fmtDate = function(val) {
+      if (!val || val === '—' || val === 'null' || val === 'undefined') return '—';
+      const s = String(val).trim();
+      if (!s) return '—';
+      const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (m) {
+        const [, y, mth, d] = m;
+        return `${d.padStart(2, '0')}/${mth.padStart(2, '0')}/${y}`;
+      }
+      const dObj = new Date(s);
+      if (!isNaN(dObj.getTime())) {
+        const d = String(dObj.getDate()).padStart(2, '0');
+        const mth = String(dObj.getMonth() + 1).padStart(2, '0');
+        const y = dObj.getFullYear();
+        return `${d}/${mth}/${y}`;
+      }
+      return s;
+    };
+
     async function searchVouchers() {
       const site = document.getElementById('scSite').value;
       const loai = document.getElementById('scLoai').value;
@@ -6765,11 +6784,11 @@
         if (json.success && json.data.length) {
           tbody.innerHTML = json.data.map(r => `
             <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-              <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${r.maCT}</td>
+              <td class="p-3"><span class="code text-brand-600 dark:text-brand-400">${r.maCT}</span></td>
               <td class="p-3">${r.site}</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800/80 tabular-nums text-[11px]">${r.loaiHoaDon}</span></td>
-              <td class="p-3 tabular-nums">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
-              <td class="p-3 tabular-nums">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800/80 text-[11px] whitespace-nowrap">${r.loaiHoaDon}</span></td>
+              <td class="p-3 text-center"><span class="num whitespace-nowrap">${fmtDate(r.ngayXuat)}</span></td>
+              <td class="p-3 text-center"><span class="num whitespace-nowrap">${fmtDate(r.ngayNhan)}</span></td>
               <td class="p-3 font-bold">${r.nhaCungCap || '—'}</td>
               <td class="p-3">${r.nguoiNhap}</td>
               <td class="p-3 text-center">${r.soFile ? `📎 ${r.soFile}` : '—'}</td>
@@ -9831,15 +9850,15 @@ window.searchVouchers = async function() {
     if (tbody) {
       tbody.innerHTML = items.map(r => `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3 tabular-nums font-bold text-brand-500 dark:text-brand-400">${r.maCT}</td>
+          <td class="p-3"><span class="code text-brand-600 dark:text-brand-400 font-semibold">${r.maCT}</span></td>
           <td class="p-3 text-gray-900 dark:text-gray-100 font-medium">${r.site}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 tabular-nums text-[11px] border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span></td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.ngayXuat ? r.ngayXuat.split(' ')[0] : '—'}</td>
-          <td class="p-3 tabular-nums text-gray-600 dark:text-gray-300">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[11px] whitespace-nowrap border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span></td>
+          <td class="p-3 text-gray-600 dark:text-gray-300"><span class="num whitespace-nowrap">${fmtDate(r.ngayXuat)}</span></td>
+          <td class="p-3 text-gray-600 dark:text-gray-300"><span class="num whitespace-nowrap">${fmtDate(r.ngayNhan)}</span></td>
           <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.nhaCungCap || '—'}</td>
           <td class="p-3 text-gray-600 dark:text-gray-300">${r.nguoiNhap}</td>
           <td class="p-3 text-center">
-            ${r.soFile ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">📎 ${r.soFile} file</span>` : '<span class="text-gray-400 text-xs">—</span>'}
+            ${r.soFile ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 whitespace-nowrap">📎 ${r.soFile} file</span>` : '<span class="text-gray-400 text-xs">—</span>'}
           </td>
           <td class="p-3 text-right">
             <button onclick="viewVoucherDetail('${r.maCT}')" class="px-3 py-1 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all shadow-2xs">
@@ -9855,15 +9874,15 @@ window.searchVouchers = async function() {
       mobContainer.innerHTML = items.map(r => `
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="tabular-nums font-bold text-xs text-brand-500 dark:text-brand-400">${r.maCT}</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">${r.loaiHoaDon}</span>
+            <span class="code text-xs text-brand-600 dark:text-brand-400 font-semibold">${r.maCT}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 whitespace-nowrap">${r.loaiHoaDon}</span>
           </div>
           <div class="font-bold text-xs text-gray-900 dark:text-white leading-snug">${r.site}</div>
           <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 text-gray-600 dark:text-gray-400">
-            <div>Ngày nhận: <b class="tabular-nums text-gray-900 dark:text-white">${r.ngayNhan ? r.ngayNhan.split(' ')[0] : '—'}</b></div>
+            <div>Ngày nhận: <b class="num text-gray-900 dark:text-white whitespace-nowrap">${fmtDate(r.ngayNhan)}</b></div>
             <div>NCC: <b class="text-gray-900 dark:text-white truncate block">${r.nhaCungCap || '—'}</b></div>
             <div>Người nhập: <b class="text-gray-900 dark:text-white">${r.nguoiNhap}</b></div>
-            <div>Đính kèm: <b class="${r.soFile ? 'text-rose-600 dark:text-rose-400' : 'text-gray-400'}">${r.soFile ? `📎 ${r.soFile} file` : 'Không có'}</b></div>
+            <div>Đính kèm: <b class="${r.soFile ? 'text-rose-600 dark:text-rose-400' : 'text-gray-400'} whitespace-nowrap">${r.soFile ? `📎 ${r.soFile} file` : 'Không có'}</b></div>
           </div>
           <button onclick="viewVoucherDetail('${r.maCT}')" class="w-full py-2 bg-gray-100 hover:bg-brand-500 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-500 rounded-xl font-bold text-xs text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
             <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-500"></i> Xem Chi Tiết &amp; Ảnh Đính Kèm
