@@ -4368,8 +4368,9 @@
                 <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-brand-500"></i>
                 <span>Hàng Nhập Vào Phiếu (<span id="manualSelectedCountText" class="font-mono text-emerald-600">0</span>)</span>
               </div>
-              <button onclick="clearAllManualReceiptLines()" id="btnClearAllManualLines" class="text-xs text-rose-500 hover:text-rose-700 hover:underline font-semibold hidden">
-                Xóa tất cả
+              <button type="button" onclick="confirmClearAllManualReceiptLines()" id="btnClearAllManualLines" class="text-xs text-rose-500 hover:text-rose-700 hover:underline font-semibold hidden flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span>Xóa tất cả</span>
               </button>
             </div>
 
@@ -4381,7 +4382,7 @@
             </div>
 
             <!-- Lines Table -->
-            <div id="manualLinesTableWrapper" class="hidden lg:block overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
+            <div id="manualLinesTableWrapper" class="hidden overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
               <table class="data-table">
                 <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 text-xs">
                   <tr>
@@ -4402,7 +4403,7 @@
             </div>
 
             <!-- Native Mobile Card View for Manual Receipt Lines -->
-            <div id="manualLinesMobileCards" class="block lg:hidden space-y-3 max-h-[360px] overflow-y-auto"></div>
+            <div id="manualLinesMobileCards" class="hidden space-y-3 max-h-[360px] overflow-y-auto"></div>
           </div>
         </div>
 
@@ -4433,9 +4434,35 @@
         <button type="button" onclick="closeManualReceiptModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           Hủy Bỏ
         </button>
-        <button type="button" onclick="submitManualReceipt()" id="btnSubmitManualReceipt" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-theme-xs active:translate-y-px">
+                <button type="button" onclick="submitManualReceipt()" id="btnSubmitManualReceipt" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-theme-xs active:translate-y-px">
           <i data-lucide="check-circle-2" class="w-4 h-4"></i>
           <span>Xác Nhận &amp; Nhập Kho</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XÁC NHẬN XÓA TẤT CẢ MẶT HÀNG TRONG PHIẾU NHẬP THỦ CÔNG -->
+  <div id="modalConfirmClearManualLines" style="z-index: 100005;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeConfirmClearManualLinesModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
+      <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa tất cả mặt hàng?</h4>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+            Bạn có chắc chắn muốn xóa toàn bộ <b id="confirmClearManualCountText" class="text-rose-600 font-mono font-bold">0</b> mặt hàng đã thêm vào phiếu nhập thủ công này không? Thao tác này sẽ làm trống danh sách hàng nhập.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
+        <button type="button" onclick="closeConfirmClearManualLinesModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Hủy bỏ
+        </button>
+        <button type="button" onclick="executeClearAllManualReceiptLines()" id="btnExecuteClearAllManual" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-theme-xs transition-colors">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <span>Xác nhận xóa</span>
         </button>
       </div>
     </div>
@@ -12498,6 +12525,23 @@ window.loadFnbPoList = async function(siteCodeArg) {
   }
 };
 
+function formatReceiptDateYMD(val) {
+  if (!val || val === '—') return '—';
+  const str = String(val).trim();
+  const m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, '0');
+      const da = String(d.getDate()).padStart(2, '0');
+      return `${y}-${mo}-${da}`;
+    }
+  } catch(e) {}
+  return str.slice(0, 10);
+}
+
 function renderFnbPoTable(query = '') {
   const tbody = document.getElementById('fnbPoTableBody');
   const mob = document.getElementById('fnbPoMobileCards');
@@ -12556,8 +12600,8 @@ function renderFnbPoTable(query = '') {
             <td class="py-3 px-4">
               <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(po.po_number)}</span>
             </td>
-            <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300 text-xs">
-              ${escapeHtml(po.doc_date || '—')}
+            <td class="py-3 px-3 tabular-nums font-mono text-gray-600 dark:text-gray-300 text-xs">
+              ${escapeHtml(formatReceiptDateYMD(po.doc_date))}
             </td>
             <td class="py-3 px-4">
               <div class="flex items-center gap-1">
@@ -12607,7 +12651,7 @@ function renderFnbPoTable(query = '') {
               <div>
                 <span class="text-xs px-2 py-0.5 rounded-full font-bold ${isBTT ? 'bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300' : 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300'}">${isBTT ? 'BẾP TRUNG TÂM' : 'NCC NGOÀI'}</span>
                 <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-1">${escapeHtml(po.supplier_name || 'Bếp Trung Tâm Siba')}</h4>
-                <div class="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold mt-0.5">PO: ${escapeHtml(po.po_number)} • ${escapeHtml(po.doc_date || '—')}</div>
+                <div class="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold mt-0.5">PO: ${escapeHtml(po.po_number)} • ${escapeHtml(formatReceiptDateYMD(po.doc_date))}</div>
               </div>
               <div class="text-right">
                 <span class="text-xs font-bold ${isCompleted ? 'text-emerald-600' : 'text-amber-600'} block">${isCompleted ? 'Đã Nhập' : 'Chờ Nhập'}</span>
@@ -13238,7 +13282,7 @@ window.loadFnbReceiptsHistory = async function(siteCodeArg) {
             <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
               <td class="py-3 px-4 font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</td>
               <td class="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(r.site_code)}</td>
-              <td class="py-3 px-3 tabular-nums text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(r.receipt_date)}</td>
+              <td class="py-3 px-3 tabular-nums font-mono text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(formatReceiptDateYMD(r.receipt_date))}</td>
               <td class="py-3 px-4 font-medium text-gray-900 dark:text-white text-xs">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</td>
               <td class="py-3 px-3 font-mono font-medium text-gray-600 dark:text-gray-400 text-xs">${escapeHtml(r.invoice_no || '—')}</td>
               <td class="py-3 px-4 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
@@ -13263,7 +13307,7 @@ window.loadFnbReceiptsHistory = async function(siteCodeArg) {
                 <div>
                   <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</span>
                   <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</h4>
-                  <div class="text-xs text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(r.receipt_date)} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
+                  <div class="text-xs text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(formatReceiptDateYMD(r.receipt_date))} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
                 </div>
                 <div class="text-right">
                   <span class="font-bold text-xs text-gray-900 dark:text-white tabular-nums block">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</span>
@@ -13575,18 +13619,36 @@ window.renderManualReceiptLinesTable = function() {
 
   if (!lines.length) {
     if (emptyState) emptyState.classList.remove('hidden');
-    if (tableWrapper) tableWrapper.classList.add('hidden');
-    if (mobWrapper) mobWrapper.classList.add('hidden');
-    if (btnClear) btnClear.classList.add('hidden');
+    if (tableWrapper) {
+      tableWrapper.classList.add('hidden');
+      tableWrapper.classList.remove('lg:block');
+    }
+    if (mobWrapper) {
+      mobWrapper.classList.add('hidden');
+      mobWrapper.classList.remove('block');
+    }
+    if (btnClear) {
+      btnClear.classList.add('hidden');
+      btnClear.classList.remove('flex');
+    }
     if (kpiQty) kpiQty.textContent = '0';
     if (kpiAmount) kpiAmount.textContent = '0 đ';
     return;
   }
 
   if (emptyState) emptyState.classList.add('hidden');
-  if (tableWrapper) tableWrapper.classList.remove('hidden');
-  if (mobWrapper) mobWrapper.classList.remove('hidden');
-  if (btnClear) btnClear.classList.remove('hidden');
+  if (tableWrapper) {
+    tableWrapper.classList.remove('hidden');
+    tableWrapper.classList.add('lg:block');
+  }
+  if (mobWrapper) {
+    mobWrapper.classList.remove('hidden');
+    mobWrapper.classList.add('block');
+  }
+  if (btnClear) {
+    btnClear.classList.remove('hidden');
+    btnClear.classList.add('flex');
+  }
 
   let grandQty = 0;
   let grandTotal = 0;
@@ -13639,7 +13701,7 @@ window.renderManualReceiptLinesTable = function() {
                    class="w-20 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
           <td class="py-2 px-2 text-center">
-            <button onclick="removeManualLine(${idx})" class="p-1 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
+            <button type="button" onclick="removeManualReceiptLine(${idx})" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa mặt hàng này">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </td>
@@ -13662,7 +13724,7 @@ window.renderManualReceiptLinesTable = function() {
               </div>
               <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${escapeHtml(item.item_name)}</div>
             </div>
-            <button onclick="removeManualLine(${idx})" class="p-1 rounded text-gray-400 hover:text-rose-500 transition-colors" title="Xóa dòng">
+            <button type="button" onclick="removeManualReceiptLine(${idx})" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa mặt hàng này">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -13774,19 +13836,49 @@ window.onManualLineLocChange = function(idx, val) {
 };
 
 window.removeManualReceiptLine = function(idx) {
-  if (!window.gManualReceiptLines) return;
+  if (!window.gManualReceiptLines || !window.gManualReceiptLines[idx]) return;
+  const removedItem = window.gManualReceiptLines[idx];
   window.gManualReceiptLines.splice(idx, 1);
   renderManualReceiptLinesTable();
-  filterManualCatalogList();
+  if (typeof filterManualCatalogList === 'function') filterManualCatalogList();
+  if (typeof showToast === 'function') {
+    showToast('Đã xóa "' + (removedItem.item_name || removedItem.item_code) + '" khỏi phiếu nhập', 'info');
+  }
+};
+window.removeManualLine = window.removeManualReceiptLine;
+
+window.confirmClearAllManualReceiptLines = function() {
+  const lines = window.gManualReceiptLines || [];
+  if (!lines.length) {
+    if (typeof showToast === 'function') showToast('Phiếu nhập hiện tại chưa có mặt hàng nào để xóa.', 'info');
+    return;
+  }
+  const countEl = document.getElementById('confirmClearManualCountText');
+  if (countEl) countEl.textContent = lines.length;
+  const modal = document.getElementById('modalConfirmClearManualLines');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
 };
 
-window.clearAllManualReceiptLines = function() {
-  if (!window.gManualReceiptLines || !window.gManualReceiptLines.length) return;
-  if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ các mặt hàng trong phiếu nhập này?')) return;
-  window.gManualReceiptLines = [];
-  renderManualReceiptLinesTable();
-  filterManualCatalogList();
+window.closeConfirmClearManualLinesModal = function() {
+  const modal = document.getElementById('modalConfirmClearManualLines');
+  if (modal) modal.classList.add('hidden');
 };
+
+window.executeClearAllManualReceiptLines = function() {
+  const count = (window.gManualReceiptLines || []).length;
+  window.gManualReceiptLines = [];
+  closeConfirmClearManualLinesModal();
+  renderManualReceiptLinesTable();
+  if (typeof filterManualCatalogList === 'function') filterManualCatalogList();
+  if (typeof showToast === 'function') {
+    showToast('Đã xóa toàn bộ ' + count + ' mặt hàng khỏi phiếu nhập.', 'success');
+  }
+};
+
+window.clearAllManualReceiptLines = window.confirmClearAllManualReceiptLines;
 
 window.submitManualReceipt = async function() {
   const lines = window.gManualReceiptLines || [];

@@ -4490,7 +4490,26 @@ export default {
                ORDER BY MAX(doc_date) DESC, po_number DESC
                LIMIT 100`;
         const { rows } = await db.query(env, q, params);
-        return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
+        const formattedRows = (rows || []).map(r => {
+          let dStr = r.doc_date;
+          if (dStr) {
+            if (typeof dStr === 'string') {
+              const m = dStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+              if (m) dStr = `${m[1]}-${m[2]}-${m[3]}`;
+              else dStr = dStr.slice(0, 10);
+            } else if (dStr instanceof Date && !isNaN(dStr.getTime())) {
+              const y = dStr.getFullYear();
+              const mo = String(dStr.getMonth() + 1).padStart(2, '0');
+              const da = String(dStr.getDate()).padStart(2, '0');
+              dStr = `${y}-${mo}-${da}`;
+            }
+          }
+          return {
+            ...r,
+            doc_date: dStr || ''
+          };
+        });
+        return new Response(JSON.stringify({ success: true, data: formattedRows }), { headers: corsHeaders });
       }
 
       if (pathname === '/api/fnb/po-details' || pathname === '/fnb/po-details') {
