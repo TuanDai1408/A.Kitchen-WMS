@@ -2375,6 +2375,73 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maCT } }), { headers: corsHeaders });
       }
 
+      // 2.7.2 PUT /api/voucher - Cập nhật chứng từ
+      if (pathname === '/api/voucher' && request.method === 'PUT') {
+        const body = await request.json();
+        const { maCT, site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu } = body;
+        if (!maCT) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã chứng từ cần cập nhật' }), { status: 400, headers: corsHeaders });
+        }
+
+        const existing = await db.queryOne(env, `SELECT voucher_code FROM chung_tu WHERE voucher_code = ?`, [maCT]);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ trong hệ thống' }), { status: 404, headers: corsHeaders });
+        }
+
+        await db.query(env, `
+          UPDATE chung_tu SET
+            site_name = COALESCE(?, site_name),
+            invoice_type = COALESCE(?, invoice_type),
+            invoice_date = COALESCE(?, invoice_date),
+            receive_date = COALESCE(?, receive_date),
+            supplier_name = ?,
+            deliverer_name = ?,
+            receiver_name = ?,
+            note = ?
+          WHERE voucher_code = ?
+        `, [
+          site || null,
+          loaiHoaDon || null,
+          ngayXuat || null,
+          ngayNhan || null,
+          nhaCungCap !== undefined ? nhaCungCap : '',
+          nguoiGiao !== undefined ? nguoiGiao : '',
+          nguoiNhan !== undefined ? nguoiNhan : '',
+          ghiChu !== undefined ? ghiChu : '',
+          maCT
+        ]);
+
+        invalidateMemoryCache('/api/vouchers');
+        return new Response(JSON.stringify({ success: true, message: 'Đã cập nhật chứng từ thành công', data: { maCT } }), { headers: corsHeaders });
+      }
+
+      // 2.7.3 DELETE /api/voucher - Xóa chứng từ
+      if (pathname === '/api/voucher' && request.method === 'DELETE') {
+        let maCT = searchParams.get('maCT');
+        if (!maCT) {
+          try {
+            const body = await request.json();
+            maCT = body.maCT;
+          } catch(e) {}
+        }
+        if (!maCT) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã chứng từ cần xóa' }), { status: 400, headers: corsHeaders });
+        }
+
+        const existing = await db.queryOne(env, `SELECT voucher_code FROM chung_tu WHERE voucher_code = ?`, [maCT]);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ trong hệ thống' }), { status: 404, headers: corsHeaders });
+        }
+
+        await db.withTransaction(env, async (tx) => {
+          await tx.exec(`DELETE FROM chung_tu_file WHERE voucher_code = ?`, [maCT]);
+          await tx.exec(`DELETE FROM chung_tu WHERE voucher_code = ?`, [maCT]);
+        });
+
+        invalidateMemoryCache('/api/vouchers');
+        return new Response(JSON.stringify({ success: true, message: 'Đã xóa chứng từ thành công', data: { maCT } }), { headers: corsHeaders });
+      }
+
       // 2.7.1 POST /api/vouchers/import - Nhập hàng loạt từ Excel
       if (pathname === '/api/vouchers/import' && request.method === 'POST') {
         const body = await request.json();
