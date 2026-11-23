@@ -2423,7 +2423,10 @@
         <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Cảnh báo tồn ROP</h1>
+            <div class="flex items-center gap-2.5">
+              <h1 class="page-title">Cảnh báo tồn ROP</h1>
+              <span id="whRopCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">K001</span>
+            </div>
             <p class="page-subtitle">Công thức tính tự động: <code>ROP = (Mức tiêu thụ/ngày × Lead time) + Tồn an toàn</code></p>
           </div>
           <button onclick="downloadRopExcel()" class="btn btn-secondary">
@@ -5833,6 +5836,8 @@
       if (fnbBadge) fnbBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
       const whBadge = document.getElementById('whInvCurrentSiteBadge');
       if (whBadge) whBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      const ropBadge = document.getElementById('whRopCurrentSiteBadge');
+      if (ropBadge) ropBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
 
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
@@ -6051,29 +6056,8 @@
     // WMS: ROP, LEAD TIME & PO SAP
     // ========================================================================
     async function loadReorderROP() {
-      try {
-        const res = await fetch(`/api/reorder?branch=${App.currentBranch}`);
-        const json = await res.json();
-        if (json.success) {
-          App.ropItems = json.data;
-          const tbody = document.getElementById('ropTableBody');
-          tbody.innerHTML = App.ropItems.map(r => `
-            <tr class="hover:bg-gray-50 dark:bg-gray-900/50">
-              <td class="p-3 tabular-nums font-bold text-gray-700 dark:text-gray-200">${r.sku}</td>
-              <td class="p-3 font-bold text-gray-900 dark:text-white">${r.item_name}</td>
-              <td class="p-3 text-right tabular-nums">${r.daily_usage} ${r.unit}</td>
-              <td class="p-3 text-right tabular-nums">${r.lead_time_hours}h</td>
-              <td class="p-3 text-right tabular-nums">${r.safety_stock}</td>
-              <td class="p-3 text-right tabular-nums font-bold">${r.current_stock}</td>
-              <td class="p-3 text-right tabular-nums font-bold text-amber-700">${r.rop_threshold}</td>
-              <td class="p-3 text-right tabular-nums font-bold ${r.suggested_order_qty > 0 ? 'text-rose-600 text-sm' : 'text-gray-400 dark:text-gray-500'}">
-                ${r.suggested_order_qty > 0 ? `+${r.suggested_order_qty} ${r.unit}` : '0'}
-              </td>
-            </tr>
-          `).join('');
-        }
-      } catch (e) {
-        console.error(e);
+      if (typeof window.loadReorderROP === 'function') {
+        return window.loadReorderROP();
       }
     }
 
@@ -7585,9 +7569,33 @@
     }
 
     function downloadRopExcel() {
-      const headers = ['Mã SKU', 'Tên Gia Vị', 'Tiêu Thụ/Ngày', 'Lead Time (h)', 'Tồn An Toàn', 'Tồn Hiện Tại', 'Ngưỡng ROP', 'Đề Xuất Đặt'];
-      const rows = App.ropItems.map(r => [r.sku, r.item_name, r.daily_usage, r.lead_time_hours, r.safety_stock, r.current_stock, r.rop_threshold, r.suggested_order_qty]);
-      exportStyledExcel('De_Xuat_Dat_Hang_ROP.xlsx', 'ROP', headers, rows, [2, 3, 4, 5, 6, 7], [0]);
+      const headers = ['Mã SKU', 'Tên Gia Vị / Mặt Hàng', 'ĐVT', 'Tiêu Thụ/Ngày', 'Lead Time (ngày)', 'Tồn An Toàn', 'Tồn Hiện Tại', 'Ngưỡng ROP', 'Đề Xuất Đặt', 'Trạng Thái'];
+      const rows = (App.ropItems || []).map(r => {
+        const sku = r.sku || '';
+        const itemName = r.item_name || sku;
+        const unit = r.unit || r.uom || 'Phần';
+        const dailyUsage = parseFloat(r.daily_usage !== undefined ? r.daily_usage : 10);
+        const leadTimeDays = r.lead_time_days !== undefined ? parseFloat(r.lead_time_days) : (r.lead_time_hours ? Math.round(parseFloat(r.lead_time_hours) / 24) : 2);
+        const safetyStock = parseFloat(r.safety_stock !== undefined ? r.safety_stock : 5);
+        const currentStock = parseFloat(r.current_stock !== undefined ? r.current_stock : 0);
+        const rop = parseFloat(r.rop !== undefined ? r.rop : (r.rop_threshold !== undefined ? r.rop_threshold : 25));
+        const suggestedOrder = parseFloat(r.suggested_order !== undefined ? r.suggested_order : (r.suggested_order_qty !== undefined ? r.suggested_order_qty : (currentStock < rop ? Math.max(0, 35 - currentStock) : 0)));
+        const status = r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
+
+        return [
+          sku,
+          itemName,
+          unit,
+          dailyUsage,
+          leadTimeDays,
+          safetyStock,
+          currentStock,
+          rop,
+          suggestedOrder,
+          status
+        ];
+      });
+      exportStyledExcel('De_Xuat_Dat_Hang_ROP.xlsx', 'ROP', headers, rows, [3, 4, 5, 6, 7, 8], [0]);
     }
 
     // [exportAuditExcel defined in Portal Audit section above]
@@ -10384,54 +10392,114 @@ window.renderFefoRows = function(items) {
 
 // 5. Upgraded loadReorderROP (Desktop Table + Mobile Cards)
 window.loadReorderROP = async function() {
+  const globalSaved = localStorage.getItem('orbit_user_site');
+  const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+  let activeSite = globalSaved || globalSel || appBranch || 'K001';
+  if (activeSite === 'ALL' || activeSite === 'all') activeSite = 'K001';
+  activeSite = activeSite.toUpperCase();
+
+  // Sync badge
+  const ropBadge = document.getElementById('whRopCurrentSiteBadge');
+  if (ropBadge) {
+    const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
+    const siteObj = sites.find(s => s.code.toUpperCase() === activeSite.toUpperCase());
+    ropBadge.textContent = siteObj ? (siteObj.code + ' – ' + (siteObj.ten || siteObj.name)) : activeSite;
+  }
+
+  const tbody = document.getElementById('ropTableBody');
+  const mob = document.getElementById('ropMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-gray-400">Đang tính toán ngưỡng an toàn ROP...</td></tr>';
+  if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Đang tính toán ngưỡng an toàn ROP...</div>';
+
   try {
-    const res = await fetch(`/api/reorder?branch=${App.currentBranch}`);
+    const res = await fetch('/api/reorder?site=' + encodeURIComponent(activeSite) + '&branch=' + encodeURIComponent(activeSite) + '&nocache=1');
     const json = await res.json();
     if (json.success) {
-      App.ropItems = json.data;
-      const tbody = document.getElementById('ropTableBody');
-      const mob = document.getElementById('ropMobileCards');
+      App.ropItems = json.data || [];
+
+      if (!App.ropItems.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-emerald-600 dark:text-emerald-400 font-medium">Tất cả mặt hàng tại điểm kho này đều đạt ngưỡng tồn an toàn (Không cần đặt thêm).</td></tr>';
+        if (mob) mob.innerHTML = '<div class="p-6 text-center text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800">Tất cả mặt hàng tại điểm kho này đều đạt ngưỡng tồn an toàn.</div>';
+        return;
+      }
 
       if (tbody) {
-        tbody.innerHTML = App.ropItems.map(r => `
-          <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-            <td class="p-3 tabular-nums font-bold text-gray-900 dark:text-white">${r.sku}</td>
-            <td class="p-3 font-bold text-gray-800 dark:text-gray-200">${r.item_name}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.daily_usage}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.lead_time_days}</td>
-            <td class="p-3 text-right tabular-nums text-gray-600 dark:text-gray-300">${r.safety_stock}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-amber-600">${r.rop}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">${r.current_stock}</td>
-            <td class="p-3 text-right tabular-nums font-bold text-brand-500 dark:text-brand-400">${r.suggested_order}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = App.ropItems.map(r => {
+          const sku = r.sku || '';
+          const itemName = r.item_name || sku;
+          const unit = r.unit || r.uom || 'Phần';
+          const dailyUsage = parseFloat(r.daily_usage !== undefined ? r.daily_usage : 10);
+          const leadTimeDays = r.lead_time_days !== undefined ? parseFloat(r.lead_time_days) : (r.lead_time_hours ? Math.round(parseFloat(r.lead_time_hours) / 24) : 2);
+          const safetyStock = parseFloat(r.safety_stock !== undefined ? r.safety_stock : 5);
+          const currentStock = parseFloat(r.current_stock !== undefined ? r.current_stock : 0);
+          const rop = parseFloat(r.rop !== undefined ? r.rop : (r.rop_threshold !== undefined ? r.rop_threshold : 25));
+          const suggestedOrder = parseFloat(r.suggested_order !== undefined ? r.suggested_order : (r.suggested_order_qty !== undefined ? r.suggested_order_qty : (currentStock < rop ? Math.max(0, 35 - currentStock) : 0)));
+          const status = r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
+
+          const statusBadgeClass = status === 'HẾT HÀNG' 
+            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold'
+            : (status === 'CẦN ĐẶT'
+              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-bold animate-pulse'
+              : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold');
+
+          return '<tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">' +
+            '<td class="p-3 text-center font-mono tabular-nums font-bold text-gray-800 dark:text-gray-200 text-xs">' + sku + '</td>' +
+            '<td class="p-3 font-semibold text-gray-900 dark:text-white text-xs">' + itemName + '</td>' +
+            '<td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">' + dailyUsage + ' <span class="text-[11px] text-gray-400 font-sans">' + unit + '</span></td>' +
+            '<td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">' + leadTimeDays + ' ngày</td>' +
+            '<td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">' + safetyStock + ' <span class="text-[11px] text-gray-400 font-sans">' + unit + '</span></td>' +
+            '<td class="p-3 text-right font-mono tabular-nums font-bold ' + (currentStock <= 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white') + ' text-xs">' + currentStock + ' <span class="text-[11px] text-gray-400 font-sans">' + unit + '</span></td>' +
+            '<td class="p-3 text-right font-mono tabular-nums font-bold text-amber-600 dark:text-amber-400 text-xs">' + rop + ' <span class="text-[11px] text-amber-600/70 font-sans">' + unit + '</span></td>' +
+            '<td class="p-3 text-right font-mono tabular-nums font-bold ' + (suggestedOrder > 0 ? 'text-brand-600 dark:text-brand-400' : 'text-gray-400') + ' text-xs">' + (suggestedOrder > 0 ? '+' + suggestedOrder : '0') + ' <span class="text-[11px] text-gray-400 font-sans">' + unit + '</span></td>' +
+            '<td class="p-3 text-center">' +
+              '<span class="px-2.5 py-0.5 rounded-full text-[11px] ' + statusBadgeClass + '">' + status + '</span>' +
+            '</td>' +
+          '</tr>';
+        }).join('');
       }
 
       if (mob) {
-        mob.innerHTML = App.ropItems.map(r => `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-xs text-gray-900 dark:text-white">${r.item_name}</div>
-                <div class="text-xs tabular-nums text-gray-400">SKU: ${r.sku}</div>
-              </div>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${r.status === 'CẦN ĐẶT' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200'}">${r.status}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
-              <div>Tồn hiện tại: <b class="tabular-nums text-gray-900 dark:text-white">${r.current_stock} ${r.uom}</b></div>
-              <div>Điểm ROP: <b class="tabular-nums text-amber-600">${r.rop} ${r.uom}</b></div>
-              <div>Lead time: <b class="tabular-nums text-gray-900 dark:text-white">${r.lead_time_days} ngày</b></div>
-              <div>Đề xuất đặt: <b class="tabular-nums font-semibold text-sm text-brand-500 dark:text-brand-400">${r.suggested_order} ${r.uom}</b></div>
-            </div>
-          </div>
-        `).join('');
+        mob.innerHTML = App.ropItems.map(r => {
+          const sku = r.sku || '';
+          const itemName = r.item_name || sku;
+          const unit = r.unit || r.uom || 'Phần';
+          const leadTimeDays = r.lead_time_days !== undefined ? parseFloat(r.lead_time_days) : (r.lead_time_hours ? Math.round(parseFloat(r.lead_time_hours) / 24) : 2);
+          const currentStock = parseFloat(r.current_stock !== undefined ? r.current_stock : 0);
+          const rop = parseFloat(r.rop !== undefined ? r.rop : (r.rop_threshold !== undefined ? r.rop_threshold : 25));
+          const suggestedOrder = parseFloat(r.suggested_order !== undefined ? r.suggested_order : (r.suggested_order_qty !== undefined ? r.suggested_order_qty : (currentStock < rop ? Math.max(0, 35 - currentStock) : 0)));
+          const status = r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
+
+          const statusBadgeClass = status === 'HẾT HÀNG' 
+            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200'
+            : (status === 'CẦN ĐẶT'
+              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200'
+              : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200');
+
+          return '<div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">' +
+            '<div class="flex items-center justify-between">' +
+              '<div>' +
+                '<div class="font-semibold text-xs text-gray-900 dark:text-white">' + itemName + '</div>' +
+                '<div class="text-[11px] font-mono text-gray-400 mt-0.5">SKU: ' + sku + '</div>' +
+              '</div>' +
+              '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ' + statusBadgeClass + '">' + status + '</span>' +
+            '</div>' +
+            '<div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">' +
+              '<div>Tồn hiện tại: <b class="font-mono tabular-nums text-gray-900 dark:text-white">' + currentStock + ' ' + unit + '</b></div>' +
+              '<div>Điểm ROP: <b class="font-mono tabular-nums text-amber-600 dark:text-amber-400">' + rop + ' ' + unit + '</b></div>' +
+              '<div>Lead time: <b class="font-mono tabular-nums text-gray-900 dark:text-white">' + leadTimeDays + ' ngày</b></div>' +
+              '<div>Đề xuất đặt: <b class="font-mono tabular-nums font-semibold text-sm ' + (suggestedOrder > 0 ? 'text-brand-600 dark:text-brand-400' : 'text-gray-500') + '">' + (suggestedOrder > 0 ? '+' + suggestedOrder : 0) + ' ' + unit + '</b></div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
       }
+    } else {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-rose-500">Lỗi tải dữ liệu: ' + (json.error || 'Không xác định') + '</td></tr>';
+      if (mob) mob.innerHTML = '<div class="p-6 text-center text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-2xl">Lỗi: ' + (json.error || 'Không xác định') + '</div>';
     }
   } catch (e) {
-    console.error(e);
+    console.error('loadReorderROP error:', e);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-rose-500">Lỗi kết nối: ' + e.message + '</td></tr>';
   }
 };
 

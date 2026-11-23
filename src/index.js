@@ -1267,7 +1267,7 @@ export default {
 
       // 1.6 GET /api/reorder - Cảnh báo đặt hàng ROP từ fnb_stock_balances
       if (pathname === '/api/reorder' && request.method === 'GET') {
-        const branchParam = searchParams.get('branch') || '';
+        const branchParam = searchParams.get('site') || searchParams.get('branch') || '';
         const branchCode = (!branchParam || branchParam.toLowerCase() === 'all') ? 'ALL' : branchParam.toUpperCase();
 
         const isPg = db.isPg(env);
@@ -1279,18 +1279,31 @@ export default {
               b.item_code as sku,
               COALESCE(d.material_desc, p.article_desc, b.item_code) as item_name,
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
+              COALESCE(d.entry_unit, p.order_unit, 'Phần') as uom,
               COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
               10.0 as daily_usage,
               48.0 as lead_time_hours,
+              2.0 as lead_time_days,
               5.0 as safety_stock,
               COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
               ROUND(SUM(b.book_qty)::numeric, 1) as current_stock,
               25.0 as rop_threshold,
+              25.0 as rop,
               CASE 
                 WHEN SUM(b.book_qty) < 25.0 
                 THEN ROUND((35.0 - SUM(b.book_qty))::numeric, 0)
                 ELSE 0
-              END as suggested_order_qty
+              END as suggested_order_qty,
+              CASE 
+                WHEN SUM(b.book_qty) < 25.0 
+                THEN ROUND((35.0 - SUM(b.book_qty))::numeric, 0)
+                ELSE 0
+              END as suggested_order,
+              CASE 
+                WHEN SUM(b.book_qty) <= 0 THEN 'HẾT HÀNG'
+                WHEN SUM(b.book_qty) < 25.0 THEN 'CẦN ĐẶT'
+                ELSE 'AN TOÀN'
+              END as status
             FROM fnb_stock_balances b
             LEFT JOIN (
               SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price 
@@ -1316,18 +1329,31 @@ export default {
               b.item_code as sku,
               COALESCE(d.material_desc, p.article_desc, b.item_code) as item_name,
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
+              COALESCE(d.entry_unit, p.order_unit, 'Phần') as uom,
               COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
               10.0 as daily_usage,
               48.0 as lead_time_hours,
+              2.0 as lead_time_days,
               5.0 as safety_stock,
               COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
               ROUND(SUM(b.book_qty), 1) as current_stock,
               25.0 as rop_threshold,
+              25.0 as rop,
               CASE 
                 WHEN SUM(b.book_qty) < 25.0 
                 THEN ROUND(35.0 - SUM(b.book_qty), 0)
                 ELSE 0
-              END as suggested_order_qty
+              END as suggested_order_qty,
+              CASE 
+                WHEN SUM(b.book_qty) < 25.0 
+                THEN ROUND(35.0 - SUM(b.book_qty), 0)
+                ELSE 0
+              END as suggested_order,
+              CASE 
+                WHEN SUM(b.book_qty) <= 0 THEN 'HẾT HÀNG'
+                WHEN SUM(b.book_qty) < 25.0 THEN 'CẦN ĐẶT'
+                ELSE 'AN TOÀN'
+              END as status
             FROM fnb_stock_balances b
             LEFT JOIN (SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit FROM dim_article_stock GROUP BY material) d ON b.item_code = d.material
             LEFT JOIN (SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
