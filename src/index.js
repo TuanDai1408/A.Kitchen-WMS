@@ -225,6 +225,59 @@ async function autoCleanDemoData(env) {
       DELETE FROM don_hang 
       WHERE ordered_by LIKE '%test%' OR ordered_by LIKE '%demo%' OR ordered_by LIKE '%sibafood.vn%'
     `).catch(() => {});
+
+    // 4. Xóa các mã hàng test (HB%, VT%, TH%,...) và phiếu kiểm kê/hủy/nhập demo
+    await db.exec(env, `
+      DELETE FROM chung_tu_file 
+      WHERE voucher_code IN ('CT-20261117-012453-K001', 'CT-20261117-012625-K001')
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM chung_tu 
+      WHERE voucher_code IN ('CT-20261117-012453-K001', 'CT-20261117-012625-K001')
+         OR supplier_name ILIKE '%TEST%' 
+         OR note ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_count_lines 
+      WHERE item_code ~ '^[A-Z]{2}-\\d+' OR item_code ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_counts 
+      WHERE id IN ('1', '2', '3') OR count_code ILIKE '%TEST%' OR notes ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_waste_lines 
+      WHERE item_code ~ '^[A-Z]{2}-\\d+' OR item_code ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_wastes 
+      WHERE id IN ('1', '2', '3') OR waste_code ILIKE '%TEST%' OR notes ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_receipt_lines 
+      WHERE item_code ~ '^[A-Z]{2}-\\d+' OR item_code ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_receipts 
+      WHERE id IN ('1', '2', '3', '4') OR receipt_code ILIKE '%TEST%' OR supplier ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_balances 
+      WHERE item_code ~ '^[A-Z]{2}-\\d+' OR item_code ILIKE '%TEST%'
+    `).catch(() => {});
+
+    await db.exec(env, `
+      DELETE FROM fnb_stock_items 
+      WHERE code ~ '^[A-Z]{2}-\\d+' OR code ILIKE '%TEST%' OR name ILIKE '%TEST%'
+    `).catch(() => {});
   } catch (err) {
     console.error('autoCleanDemoData error:', err);
   }
