@@ -1773,12 +1773,7 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-          <div class="field flex-1 min-w-[180px]">
-            <label class="field-label">Điểm bán</label>
-            <select id="fnbCountSiteSelect" onchange="onFnbCountSiteChange()" class="select">
-              <option value="K001">K001 - Bếp Q7</option>
-            </select>
-          </div>
+          <select id="fnbCountSiteSelect" onchange="onFnbCountSiteChange()" class="hidden"></select>
           <div class="field flex-1 min-w-[170px]">
             <label class="field-label">Chênh lệch</label>
             <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="select">
@@ -2518,7 +2513,10 @@
         <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Tồn kho</h1>
+            <div class="flex items-center gap-2.5">
+              <h1 class="page-title">Tồn kho</h1>
+              <span id="whInvCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">K001</span>
+            </div>
             <p class="page-subtitle">Theo dõi số lượng hàng hóa đã nhập kho, tồn kho thực tế, tra cứu thẻ kho và chi tiết các lô hàng</p>
           </div>
           <div class="flex items-center gap-2">
@@ -2548,12 +2546,7 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-          <div class="field flex-1 min-w-[200px]">
-            <label class="field-label">Điểm bán / Điểm kho</label>
-            <select id="whInvSiteSelect" onchange="loadWhInventory()" class="select">
-              <option value="ALL">Toàn hệ thống (Tất cả điểm)</option>
-            </select>
-          </div>
+          <select id="whInvSiteSelect" onchange="loadWhInventory()" class="hidden"></select>
           <div class="field flex-1 min-w-[220px]">
             <label class="field-label">Tìm kiếm vật tư</label>
             <div class="relative">
@@ -2701,12 +2694,7 @@
         <div id="whInvReceiptsView" class="space-y-4 hidden">
           <!-- Filter & Action Bar for Received Orders -->
           <div class="filter-bar">
-            <div class="field flex-1 min-w-[200px]">
-              <label class="field-label">Điểm nhận hàng</label>
-              <select id="whReceivedOrdersSiteFilter" onchange="filterWhReceivedOrdersTable()" class="select">
-                <option value="ALL">Toàn hệ thống (Tất cả điểm)</option>
-              </select>
-            </div>
+            <select id="whReceivedOrdersSiteFilter" onchange="filterWhReceivedOrdersTable()" class="hidden"></select>
             <div class="field flex-1 min-w-[220px]">
               <label class="field-label">Tìm kiếm đơn hàng / Phiếu nhập</label>
               <div class="relative">
@@ -5808,22 +5796,44 @@
         branchSel.value = code;
       }
 
-      // 2b. Sync F&B Site Selectors across Stock, Counts, Receipts, Waste
-      if (code && code !== 'ALL') {
-        const fnbSelectIds = ['fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
-        fnbSelectIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            if (el.options) if (el.options) if (el.options) if (el.options) if (el.options) for (let opt of el.options) {
-              if (opt.value.toUpperCase() === code.toUpperCase()) {
+      // 2b. Sync Site Selectors across Stock, Counts, Receipts, Waste, Wh-Inventory, Wh-ReceivedOrders
+      const targetSite = (code && code !== 'ALL') ? code : (localStorage.getItem('orbit_user_site') || 'K001');
+      const allSiteSelectIds = [
+        'fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 
+        'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite',
+        'whInvSiteSelect', 'whReceivedOrdersSiteFilter'
+      ];
+      allSiteSelectIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (el.options && el.options.length > 0) {
+            let matched = false;
+            for (let opt of el.options) {
+              if (opt.value.toUpperCase() === targetSite.toUpperCase()) {
                 el.value = opt.value;
+                matched = true;
                 break;
               }
             }
+            if (!matched && targetSite) {
+              const opt = new Option(targetSite, targetSite);
+              el.add(opt);
+              el.value = targetSite;
+            }
+          } else {
+            el.innerHTML = `<option value="${targetSite}" selected>${targetSite}</option>`;
+            el.value = targetSite;
           }
-        });
-        if (typeof gFnbStockFilter !== 'undefined') gFnbStockFilter.site = code.toUpperCase();
-      }
+        }
+      });
+      if (typeof gFnbStockFilter !== 'undefined') gFnbStockFilter.site = targetSite.toUpperCase();
+
+      // Sync site badges in page headers
+      const fnbBadge = document.getElementById('fnbCountCurrentSiteBadge');
+      if (fnbBadge) fnbBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      const whBadge = document.getElementById('whInvCurrentSiteBadge');
+      if (whBadge) whBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
         el.textContent = region;
@@ -5863,6 +5873,7 @@
         if (typeof loadAudit === 'function') loadAudit();
         if (typeof loadLeadTime === 'function') loadLeadTime();
         if (typeof loadWhInventory === 'function') loadWhInventory();
+        if (typeof loadWhReceivedOrders === 'function') loadWhReceivedOrders();
         else if (typeof loadPoSap === 'function') loadPoSap();
       } catch (e) {
         console.warn('Reload notice:', e);
@@ -10559,18 +10570,30 @@ window.gWhActiveBatches = null;
 
 window.loadWhInventory = async function() {
   const siteSelect = document.getElementById('whInvSiteSelect');
-  if (siteSelect && (!siteSelect.options || siteSelect.options.length <= 1)) {
-    const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
-    siteSelect.innerHTML = '<option value="ALL">Toàn Hệ Thống (Tất cả điểm)</option>' +
-      sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
-    
-    const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'K001');
-    if (saved && Array.from(siteSelect.options).some(o => o.value.toUpperCase() === saved.toUpperCase())) {
-      siteSelect.value = saved.toUpperCase();
+  const globalSaved = localStorage.getItem('orbit_user_site');
+  const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+  let activeSite = globalSaved || globalSel || appBranch || (siteSelect ? siteSelect.value : null) || 'K001';
+  if (activeSite === 'ALL' || activeSite === 'all') activeSite = 'K001';
+  activeSite = activeSite.toUpperCase();
+
+  if (siteSelect) {
+    if (!siteSelect.options || siteSelect.options.length <= 1) {
+      const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
+      siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
     }
+    siteSelect.value = activeSite;
   }
 
-  const site = siteSelect ? siteSelect.value : 'ALL';
+  // Sync badge
+  const curBadge = document.getElementById('whInvCurrentSiteBadge');
+  if (curBadge) {
+    const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
+    const siteObj = sites.find(s => s.code.toUpperCase() === activeSite.toUpperCase());
+    curBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : activeSite;
+  }
+
+  const site = activeSite;
   const tbody = document.getElementById('whInventoryTableBody');
   const mob = document.getElementById('whInventoryMobileCards');
   if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Đang tải dữ liệu tồn kho WMS...</td></tr>';
@@ -11909,7 +11932,7 @@ function getActiveFnbCountSite() {
   const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
   const sel = document.getElementById('fnbCountSiteSelect')?.value;
 
-  let siteCode = sel || localSaved || globalSel || appBranch || 'K001';
+  let siteCode = localSaved || globalSel || appBranch || sel || 'K001';
   if (siteCode === 'ALL' || siteCode === 'all') siteCode = 'K001';
   return siteCode.toUpperCase();
 }
@@ -11930,7 +11953,7 @@ async function loadFnbCounts() {
   const siteObj = sites.find(s => s.code.toUpperCase() === siteCode.toUpperCase());
   const siteName = siteObj ? (siteObj.ten || siteObj.name) : siteCode;
   const badgeEl = document.getElementById('fnbCountCurrentSiteBadge');
-  if (badgeEl) badgeEl.textContent = siteName;
+  if (badgeEl) badgeEl.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : siteCode;
 
   // Sync default date
   const dp = document.getElementById('fnbCountDatePicker');
@@ -16811,11 +16834,10 @@ window.populateWhReceivedOrdersSiteFilter = function() {
   if (siteSelect.options && siteSelect.options.length > 1) return;
 
   const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
-  siteSelect.innerHTML = '<option value="ALL">Toàn Hệ Thống (Tất cả điểm)</option>' +
-    sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
+  siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
 
-  const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'ALL');
-  if (saved && Array.from(siteSelect.options).some(o => o.value.toUpperCase() === saved.toUpperCase())) {
+  const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'K001');
+  if (saved) {
     siteSelect.value = saved.toUpperCase();
   }
 };
@@ -16823,8 +16845,18 @@ window.populateWhReceivedOrdersSiteFilter = function() {
 window.loadWhReceivedOrders = async function() {
   populateWhReceivedOrdersSiteFilter();
   const siteSelect = document.getElementById('whReceivedOrdersSiteFilter');
-  const site = siteSelect ? siteSelect.value : 'ALL';
+  const globalSaved = localStorage.getItem('orbit_user_site');
+  const globalSel = document.getElementById('globalBranchSelect')?.value;
+  const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
+  let activeSite = globalSaved || globalSel || appBranch || (siteSelect ? siteSelect.value : null) || 'K001';
+  if (activeSite === 'ALL' || activeSite === 'all') activeSite = 'K001';
+  activeSite = activeSite.toUpperCase();
 
+  if (siteSelect) {
+    siteSelect.value = activeSite;
+  }
+
+  const site = activeSite;
   const tbody = document.getElementById('whReceivedOrdersTableBody');
   const mob = document.getElementById('whReceivedOrdersMobileCards');
   if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Đang tải danh sách đơn hàng đã nhập kho...</td></tr>';
