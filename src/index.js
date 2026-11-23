@@ -2293,6 +2293,106 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Đã xóa đơn hàng thành công', data: { orderCode: code } }), { headers: corsHeaders });
       }
 
+      // 2.3.3 POST /api/order-journey - Xác thực & Cập nhật tiến độ hành trình đơn hàng (RBAC Admin/Kho trưởng)
+      if ((pathname === '/api/order-journey' || pathname === '/api/order-step') && request.method === 'POST') {
+        const body = await request.json();
+        const { orderCode, maDon, step, buoc, stepName, tenBuoc, status, trangThai, note, ghiChu, actor, nguoiXuLy, orderStatus } = body;
+        const code = (orderCode || maDon || '').trim();
+        const numStep = Number(step || buoc);
+        const nameStep = (stepName || tenBuoc || '').trim();
+        const stepStatus = (status || trangThai || 'Hoàn thành').trim();
+        const actorName = (actor || nguoiXuLy || 'Admin').trim();
+        const stepNote = (note || ghiChu || '').trim();
+
+        if (!code) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã đơn hàng' }), { status: 400, headers: corsHeaders });
+        }
+        if (!numStep || numStep < 1 || numStep > 7) {
+          return new Response(JSON.stringify({ success: false, error: 'Bước quy trình không hợp lệ (phải từ 1 đến 7)' }), { status: 400, headers: corsHeaders });
+        }
+
+        const existing = await db.queryOne(env, `SELECT order_code, site_name, order_date, status FROM don_hang WHERE order_code = ? LIMIT 1`, [code]);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy đơn hàng trong hệ thống' }), { status: 404, headers: corsHeaders });
+        }
+
+        const nowStr = new Date().toISOString();
+
+        // 7 bước chuẩn trong quy trình đặt hàng
+        const stepDefaultNames = {
+          1: 'Quản lý site đặt hàng',
+          2: 'Admin tiếp nhận đơn hàng',
+          3: 'Chuyển bộ phận Trưởng Kho',
+          4: 'Kho mail cho PMH',
+          5: 'PMH tiếp nhận & đặt hàng',
+          6: 'Vận chuyển về kho',
+          7: 'Kho giao về các site'
+        };
+
+        const resolvedStepName = nameStep || stepDefaultNames[numStep] || `Bước ${numStep}`;
+
+        const stepToOrderStatus = {
+          1: 'Đã xuất phiếu',
+          2: 'Admin đã tiếp nhận',
+          3: 'Đang xử lý: Chuyển bộ phận Trưởng Kho',
+          4: 'Kho đã mail PMH',
+          5: 'PMH tiếp nhận & đặt hàng',
+          6: 'Vận chuyển về kho',
+          7: 'Đã giao về site'
+        };
+        const newOrderStatus = orderStatus || stepToOrderStatus[numStep] || existing.status;
+
+        await db.withTransaction(env, async (tx) => {
+          const existingStep = await tx.queryOne(`SELECT step FROM quy_trinh_don WHERE order_code = ? AND step = ? LIMIT 1`, [code, numStep]);
+          if (existingStep) {
+            await tx.exec(`
+              UPDATE quy_trinh_don
+              SET step_name = ?, status = ?, action_time = ?, actor = ?, note = ?
+              WHERE order_code = ? AND step = ?
+            `, [resolvedStepName, stepStatus, nowStr, actorName, stepNote, code, numStep]);
+          } else {
+            await tx.exec(`
+              INSERT INTO quy_trinh_don (
+                order_code, step, step_name, status, action_time, actor, note
+              ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            `, [code, numStep, resolvedStepName, stepStatus, nowStr, actorName, stepNote]);
+          }
+
+          // Cập nhật trạng thái tổng quan trong don_hang
+          await tx.exec(`UPDATE don_hang SET status = ? WHERE order_code = ?`, [newOrderStatus, code]);
+        });
+
+        invalidateMemoryCache('/api/orders');
+        invalidateMemoryCache('/api/order-detail');
+        invalidateMemoryCache('/api/quota');
+        invalidateMemoryCache('/api/dashboard-summary');
+
+        // Lấy timeline cập nhật
+        const { rows: updatedTimeline } = await db.query(env, `
+          SELECT step as buoc, step_name as tenBuoc, status as trangThai, action_time as thoiGian, actor as nguoiXuLy, note as ghiChu
+          FROM quy_trinh_don WHERE order_code = ? ORDER BY step ASC, action_time ASC
+        `, [code]);
+
+        return new Response(JSON.stringify({
+          success: true,
+          message: `Đã xác thực thành công Bước ${numStep}: ${resolvedStepName}`,
+          data: {
+            orderCode: code,
+            currentStep: numStep,
+            currentStepName: resolvedStepName,
+            orderStatus: newOrderStatus,
+            timeline: (updatedTimeline || []).map(t => ({
+              buoc: t.buoc,
+              tenBuoc: t.tenBuoc ?? t.tenbuoc,
+              trangThai: t.trangThai ?? t.trangthai,
+              thoiGian: t.thoiGian ?? t.thoigian,
+              nguoiXuLy: t.nguoiXuLy ?? t.nguoixuly,
+              ghiChu: t.ghiChu ?? t.ghichu
+            }))
+          }
+        }), { headers: corsHeaders });
+      }
+
       // 2.4 GET /api/orders
       if (pathname === '/api/orders' && request.method === 'GET') {
         const site = searchParams.get('site') || '';
@@ -2310,7 +2410,9 @@ export default {
             dh.status as trangThai,
             COUNT(dh.id) as soDong,
             SUM(dh.order_qty) as tongSL,
-            SUM(dh.order_qty * COALESCE(nvl.unit_price, 0)) as tongTien
+            SUM(dh.order_qty * COALESCE(nvl.unit_price, 0)) as tongTien,
+            (SELECT MAX(qtd.step) FROM quy_trinh_don qtd WHERE qtd.order_code = dh.order_code) as currentStep,
+            (SELECT qtd.step_name FROM quy_trinh_don qtd WHERE qtd.order_code = dh.order_code ORDER BY qtd.step DESC, qtd.action_time DESC LIMIT 1) as currentStepName
           FROM don_hang dh
           LEFT JOIN nvl_items nvl ON dh.item_code = nvl.item_code
         `;
@@ -2342,7 +2444,9 @@ export default {
           trangThai: r.trangThai ?? r.trangthai,
           soDong: Number(r.soDong ?? r.sodong ?? 0),
           tongSL: Number(r.tongSL ?? r.tongsl ?? 0),
-          tongTien: Number(r.tongTien ?? r.tongtien ?? 0)
+          tongTien: Number(r.tongTien ?? r.tongtien ?? 0),
+          currentStep: Number(r.currentStep ?? r.currentstep ?? 1),
+          currentStepName: r.currentStepName ?? r.currentstepname ?? ''
         }));
         return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx);
       }
