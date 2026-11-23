@@ -2990,101 +2990,119 @@
           </div>
         </div>
 
-        <!-- TailAdmin Unified KPI Grid: Portal Order Budget Strip -->
-        <div class="kpi-grid mb-6">
-          <!-- Card 1: Ngân Sách Tháng -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div>
-                <span class="kpi-label">Ngân Sách Tháng</span>
-                <p class="kpi-sub mt-0.5" id="kpiSubSite">—</p>
-              </div>
-              <div class="kpi-icon"><i data-lucide="wallet" class="size-5"></i></div>
-            </div>
-            <div class="kpi-body">
-              <div class="flex items-baseline">
-                <span class="kpi-value" id="kpiNganSach" title="—">—</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral">
-                  <span>Hạn mức</span>
-                </span>
-                <span class="kpi-sub">Định mức tháng</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 2: Đã Đặt Lũy Kế -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div>
-                <span class="kpi-label">Đã Đặt Lũy Kế</span>
-                <p class="kpi-sub mt-0.5">Các đơn trước trong tháng</p>
-              </div>
-              <div class="kpi-icon-warning"><i data-lucide="clock" class="size-5"></i></div>
-            </div>
-            <div class="kpi-body">
-              <div class="flex items-baseline">
-                <span class="kpi-value" id="kpiDaDat" title="—">—</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral">
-                  <span>Đã duyệt</span>
-                </span>
-                <span class="kpi-sub">Lũy kế tháng</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3: Còn Lại (Khả Dụng) -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div>
-                <span class="kpi-label">Còn Lại (Khả Dụng)</span>
-                <p class="kpi-sub mt-0.5" id="kpiDangNhapSub">Đang nhập: —</p>
-              </div>
-              <div class="kpi-icon"><i data-lucide="check-circle" class="size-5"></i></div>
-            </div>
-            <div class="kpi-body">
-              <div class="flex items-baseline">
-                <span class="kpi-value" id="kpiConLai" title="—">—</span>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral" id="kpiConLaiDelta"><span>Khả dụng</span></span>
-                <span class="kpi-sub">Có thể đặt thêm</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 4: Tỷ Lệ Sử Dụng & Progress -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <div>
-                <span class="kpi-label">Tỷ Lệ Ngân Sách</span>
-                <p class="kpi-sub mt-0.5" id="budNote">Chờ chọn điểm bán</p>
-              </div>
-              <div class="kpi-icon-accent"><i data-lucide="pie-chart" class="size-5"></i></div>
-            </div>
-            <div class="kpi-body">
-              <div class="flex items-baseline justify-between">
-                <span class="kpi-value" id="kpiTyLe">—</span>
-                <span class="text-xs text-gray-500">
-                  <span id="budUsed" class="font-medium text-gray-700 dark:text-gray-300">—</span> / <span id="budTotal">—</span>
-                </span>
-              </div>
-              <div class="kpi-progress-track">
-                <div id="budFill" class="kpi-progress-bar" style="width: 0%;"></div>
-              </div>
-              <div class="kpi-footer">
-                <span class="kpi-delta-neutral" id="budBadge">
-                  <span>Tiến độ</span>
-                </span>
-                <span class="kpi-sub">Hạn mức chi tiêu</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
+                <!-- Modern TailAdmin KPI Grid: Portal Order Budget Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <!-- Card 1: Ngân Sách Tháng -->
+          <div class="relative overflow-hidden rounded-2xl border border-gray-200/90 dark:border-gray-800/80 bg-white dark:bg-gray-900/90 p-4 sm:p-5 shadow-theme-xs hover:shadow-theme-sm transition-all duration-200 flex flex-col justify-between group">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ngân Sách Tháng</span>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5 font-medium" id="kpiSubSite" title="Điểm bán phụ trách">—</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center shrink-0 shadow-xs">
+                <i data-lucide="wallet" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-baseline">
+                <span class="text-xl sm:text-2xl font-bold font-mono text-gray-900 dark:text-white tabular-nums tracking-tight num" id="kpiNganSach" title="—">—</span>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  <span>Hạn mức</span>
+                </span>
+                <span class="text-gray-400 dark:text-gray-500 text-[11px]">Định mức được cấp</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Đã Đặt Lũy Kế -->
+          <div class="relative overflow-hidden rounded-2xl border border-gray-200/90 dark:border-gray-800/80 bg-white dark:bg-gray-900/90 p-4 sm:p-5 shadow-theme-xs hover:shadow-theme-sm transition-all duration-200 flex flex-col justify-between group">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400"></div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Đã Đặt Lũy Kế</span>
+                <p class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">Các đơn trong tháng</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/40 flex items-center justify-center shrink-0 shadow-xs">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-baseline">
+                <span class="text-xl sm:text-2xl font-bold font-mono text-gray-900 dark:text-white tabular-nums tracking-tight num" id="kpiDaDat" title="—">—</span>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
+                  <i data-lucide="clock" class="w-3 h-3"></i>
+                  <span>Đã duyệt</span>
+                </span>
+                <span class="text-gray-400 dark:text-gray-500 text-[11px]">Lũy kế theo kỳ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Còn Lại (Khả Dụng) -->
+          <div class="relative overflow-hidden rounded-2xl border border-gray-200/90 dark:border-gray-800/80 bg-white dark:bg-gray-900/90 p-4 sm:p-5 shadow-theme-xs hover:shadow-theme-sm transition-all duration-200 flex flex-col justify-between group">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-indigo-500"></div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Còn Lại (Khả Dụng)</span>
+                <p class="text-xs font-medium text-brand-600 dark:text-brand-400 truncate mt-0.5" id="kpiDangNhapSub">Đang nhập: 0 đ</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/40 flex items-center justify-center shrink-0 shadow-xs">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-baseline">
+                <span class="text-xl sm:text-2xl font-bold font-mono text-gray-900 dark:text-white tabular-nums tracking-tight num" id="kpiConLai" title="—">—</span>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50" id="kpiConLaiDelta">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  <span>Khả dụng</span>
+                </span>
+                <span class="text-gray-400 dark:text-gray-500 text-[11px]">Hạn mức còn lại</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Tỷ Lệ Sử Dụng & Progress -->
+          <div class="relative overflow-hidden rounded-2xl border border-gray-200/90 dark:border-gray-800/80 bg-white dark:bg-gray-900/90 p-4 sm:p-5 shadow-theme-xs hover:shadow-theme-sm transition-all duration-200 flex flex-col justify-between group">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tỷ Lệ Ngân Sách</span>
+                <p class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5" id="budNote">Hạn mức chi tiêu</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/40 flex items-center justify-center shrink-0 shadow-xs">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <div class="mt-3 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <span class="text-xl sm:text-2xl font-bold font-mono text-gray-900 dark:text-white tabular-nums tracking-tight num" id="kpiTyLe">—</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400 font-mono tabular-nums">
+                  <span id="budUsed" class="font-bold text-gray-700 dark:text-gray-300">—</span> / <span id="budTotal">—</span>
+                </span>
+              </div>
+              <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden p-0.5 border border-gray-100 dark:border-gray-800">
+                <div id="budFill" class="h-full rounded-full bg-indigo-500 transition-all duration-300" style="width: 0%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-1.5 border-t border-gray-100 dark:border-gray-800/60">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50" id="budBadge">
+                  <i data-lucide="activity" class="w-3 h-3"></i>
+                  <span>Tiến độ</span>
+                </span>
+                <span class="text-gray-400 dark:text-gray-500 text-[11px]">Hạn mức chi tiêu</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Material Table Card -->
         <div class="table-card p-5 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 gap-3">
@@ -5795,6 +5813,12 @@
       lucide.createIcons();
     }
 
+    window.onGlobalMonthChange = function(val) {
+  const orderMonthEl = document.getElementById('orderMonth');
+  if (orderMonthEl) orderMonthEl.value = val;
+  if (typeof loadQuota === 'function') loadQuota();
+};
+
     function onGlobalBranchChange(code) {
       if (!code) code = 'ALL';
       App.currentBranch = code.toLowerCase();
@@ -6109,26 +6133,23 @@
     // PORTAL: ĐẶT HÀNG VẬT TƯ (THEO ĐỊNH MỨC SITE)
     // ========================================================================
     async function loadQuota() {
-      // 1. Resolve site name with multi-tier fallback
-      let site = document.getElementById('orderSite')?.value;
-      if (!site) {
-        const savedCode = localStorage.getItem('orbit_user_site') || 'K001';
-        const sites = getAppSitesList();
-        const found = sites.find(s => s.code.toLowerCase() === savedCode.toLowerCase());
-        site = found ? (found.ten || found.name) : 'K001 - Bếp Ăn ĐH Hùng Vương';
-        const sel = document.getElementById('orderSite');
-        if (sel) {
-          sel.innerHTML = `<option value="${site}">${site}</option>`;
-          sel.value = site;
-        }
+      // 1. Resolve site name dynamically from user's current site
+      const savedCode = localStorage.getItem('orbit_user_site') || (window.gCurrentUser && window.gCurrentUser.assignedSite) || 'K001';
+      const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []) || App.siteObjs || [];
+      const found = sites.find(s => (s.code || '').toLowerCase() === savedCode.toLowerCase());
+      const site = found ? (found.ten || found.name) : (document.getElementById('orderSite')?.value || savedCode);
+      const sel = document.getElementById('orderSite');
+      if (sel) {
+        sel.innerHTML = `<option value="${site}">${site}</option>`;
+        sel.value = site;
       }
       if (!site) return;
 
-      // 2. Default Month to current Month if empty
+      // 2. Default Month to globalMonthPicker or current Month if empty
+      const globalMonth = document.getElementById('globalMonthPicker')?.value;
       let monthInput = document.getElementById('orderMonth')?.value;
-      if (!monthInput) {
-        const now = new Date();
-        monthInput = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthInput || (globalMonth && monthInput !== globalMonth)) {
+        monthInput = globalMonth || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         const mEl = document.getElementById('orderMonth');
         if (mEl) mEl.value = monthInput;
       }
@@ -6141,7 +6162,7 @@
 
       showLoading('Tải danh sách vật tư theo Site...');
       try {
-        const res = await fetch(`/api/quota?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
+        const res = await fetch(`/api/quota?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}&refresh=true`);
         const json = await res.json();
         if (json.success) {
           App.items = json.data.items || [];
@@ -6151,14 +6172,21 @@
             kpiNs.textContent = fmtVND(json.data.nganSach);
             kpiNs.title = fmtVND(json.data.nganSach);
           }
-          document.getElementById('kpiSubSite').textContent = json.data.site || site;
+          const subSiteEl = document.getElementById('kpiSubSite');
+          if (subSiteEl) {
+            subSiteEl.textContent = json.data.site || site;
+            subSiteEl.title = json.data.site || site;
+          }
           const kpiDd = document.getElementById('kpiDaDat');
           if (kpiDd) {
             kpiDd.dataset.raw = json.data.tienDaDat;
             kpiDd.textContent = fmtVND(json.data.tienDaDat);
             kpiDd.title = fmtVND(json.data.tienDaDat);
           }
-          document.getElementById('budTotal').textContent = fmtVND(json.data.nganSach);
+          const budTotalEl = document.getElementById('budTotal');
+          if (budTotalEl) {
+            budTotalEl.textContent = fmtVND(json.data.nganSach);
+          }
 
           const types = Array.from(new Set(App.items.map(i => i.tenLoai).filter(Boolean)));
           const fLoaiEl = document.getElementById('fLoai');
@@ -6169,6 +6197,7 @@
 
           renderOrderTable();
           calcBudget(json.data.nganSach, json.data.tienDaDat);
+          if (window.lucide) lucide.createIcons();
         } else {
           showToast('Lỗi tải định mức: ' + (json.error || ''));
         }
@@ -6305,14 +6334,14 @@
       const elNganSach = document.getElementById('kpiNganSach');
       const elDaDat = document.getElementById('kpiDaDat');
 
-      const nganSach = forcedBudget !== undefined ? forcedBudget : (
+      const nganSach = forcedBudget !== undefined ? Number(forcedBudget) : (
         Number(elNganSach?.dataset?.raw) || Number((elNganSach?.textContent || '').replace(/[^\d]/g, '')) || 0
       );
-      const daDat = forcedDaDat !== undefined ? forcedDaDat : (
+      const daDat = forcedDaDat !== undefined ? Number(forcedDaDat) : (
         Number(elDaDat?.dataset?.raw) || Number((elDaDat?.textContent || '').replace(/[^\d]/g, '')) || 0
       );
 
-      const dangNhap = App.items.reduce((sum, it) => sum + ((it.soLuongDat || 0) * (it.donGia || 0)), 0);
+      const dangNhap = (App.items || []).reduce((sum, it) => sum + ((it.soLuongDat || 0) * (it.donGia || 0)), 0);
       const tongDung = daDat + dangNhap;
       const conLai = nganSach - tongDung;
       const pct = nganSach > 0 ? Math.round((tongDung / nganSach) * 100) : 0;
@@ -6322,6 +6351,13 @@
         conLaiEl.dataset.raw = conLai;
         conLaiEl.textContent = fmtVND(conLai);
         conLaiEl.title = fmtVND(conLai);
+        if (conLai < 0) {
+          conLaiEl.classList.remove('text-gray-900', 'dark:text-white');
+          conLaiEl.classList.add('text-rose-600', 'dark:text-rose-400');
+        } else {
+          conLaiEl.classList.remove('text-rose-600', 'dark:text-rose-400');
+          conLaiEl.classList.add('text-gray-900', 'dark:text-white');
+        }
       }
       const dangNhapEl = document.getElementById('kpiDangNhapSub');
       if (dangNhapEl) dangNhapEl.textContent = 'Đang nhập: ' + fmtVND(dangNhap);
@@ -6329,16 +6365,25 @@
       const conLaiDelta = document.getElementById('kpiConLaiDelta');
       if (conLaiDelta) {
         if (conLai < 0) {
-          conLaiDelta.className = 'kpi-delta-bad';
-          conLaiDelta.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Âm hạn mức</span>`;
+          conLaiDelta.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/50';
+          conLaiDelta.innerHTML = `<svg class="w-3 h-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Âm hạn mức</span>`;
         } else {
-          conLaiDelta.className = 'kpi-delta-good';
-          conLaiDelta.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>Khả dụng</span>`;
+          conLaiDelta.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50';
+          conLaiDelta.innerHTML = `<svg class="w-3 h-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>Khả dụng</span>`;
         }
       }
 
       const tyLeEl = document.getElementById('kpiTyLe');
-      if (tyLeEl) tyLeEl.textContent = pct + '%';
+      if (tyLeEl) {
+        tyLeEl.textContent = pct + '%';
+        if (pct > 100) {
+          tyLeEl.className = 'text-xl sm:text-2xl font-bold font-mono text-rose-600 dark:text-rose-400 tabular-nums tracking-tight num';
+        } else if (pct > 80) {
+          tyLeEl.className = 'text-xl sm:text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums tracking-tight num';
+        } else {
+          tyLeEl.className = 'text-xl sm:text-2xl font-bold font-mono text-gray-900 dark:text-white tabular-nums tracking-tight num';
+        }
+      }
       const budUsedEl = document.getElementById('budUsed');
       if (budUsedEl) budUsedEl.textContent = fmtVND(tongDung);
 
@@ -6348,24 +6393,24 @@
       if (fill) {
         fill.style.width = Math.min(pct, 100) + '%';
         if (pct > 100) {
-          fill.className = 'kpi-progress-bar-error';
+          fill.className = 'h-full rounded-full bg-rose-500 transition-all duration-300';
           if (budBadge) {
-            budBadge.className = 'kpi-delta-bad';
-            budBadge.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Vượt ${pct - 100}%</span>`;
+            budBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/50';
+            budBadge.innerHTML = `<svg class="w-3 h-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg><span>Vượt ${pct - 100}%</span>`;
           }
-          if (budNote) budNote.innerHTML = `<span class="text-error-600 dark:text-error-400 font-semibold">⚠️ Vượt định mức ${pct - 100}%! Cần giải trình.</span>`;
+          if (budNote) budNote.innerHTML = `<span class="text-rose-600 dark:text-rose-400 font-semibold">⚠️ Vượt định mức ${pct - 100}%! Cần giải trình.</span>`;
         } else if (pct > 80) {
-          fill.className = 'h-full rounded-full bg-warning-500 transition-all duration-300 dark:bg-warning-500';
+          fill.className = 'h-full rounded-full bg-amber-500 transition-all duration-300';
           if (budBadge) {
-            budBadge.className = 'kpi-delta-neutral';
+            budBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50';
             budBadge.innerHTML = `<span>Gần chạm trần</span>`;
           }
-          if (budNote) budNote.textContent = `Đã sử dụng ${pct}% ngân sách. Gần chạm mức giới hạn.`;
+          if (budNote) budNote.textContent = `Đã dùng ${pct}% ngân sách. Gần chạm mức giới hạn.`;
         } else {
-          fill.className = 'kpi-progress-bar';
+          fill.className = 'h-full rounded-full bg-indigo-500 transition-all duration-300';
           if (budBadge) {
-            budBadge.className = 'kpi-delta-good';
-            budBadge.innerHTML = `<svg class="size-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>An toàn</span>`;
+            budBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50';
+            budBadge.innerHTML = `<svg class="w-3 h-3 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg><span>An toàn</span>`;
           }
           if (budNote) budNote.textContent = `Ngân sách an toàn (${pct}%).`;
         }

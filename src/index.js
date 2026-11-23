@@ -2056,7 +2056,7 @@ export default {
           SELECT * FROM sites WHERE site_name = ? OR site_code = ? OR name = ? LIMIT 1
         `, [site, siteCode, site]);
 
-        const nganSach = siteRow ? (siteRow.budget_limit || 0) : 0;
+        const nganSach = siteRow ? (Number(siteRow.budget_limit) || 0) : 0;
         const region = siteRow ? siteRow.region : '';
 
         // Query accumulated orders with flexible site and month matching
@@ -2079,8 +2079,8 @@ export default {
         const daDatMap = {};
         let tienDaDat = 0;
         for (const r of (daDatRows || [])) {
-          daDatMap[r.item_code] = r.total_sl || 0;
-          tienDaDat += r.total_tien || 0;
+          daDatMap[r.item_code] = Number(r.total_sl) || 0;
+          tienDaDat += Number(r.total_tien) || 0;
         }
 
         // Query NVL items with region preference, fallback to all if region empty
@@ -2105,18 +2105,18 @@ export default {
         `, [site, `%${siteCode}%`, thang, normMonth]);
         const dmMap = {};
         for (const dm of (dmList || [])) {
-          dmMap[dm.item_code] = dm.quota_qty || 0;
+          dmMap[dm.item_code] = Number(dm.quota_qty) || 0;
         }
 
         const items = (nvlList || []).map(item => ({
           maHang: item.item_code,
           tenSP: item.name,
           dvt: item.unit,
-          donGia: item.unit_price || 0,
+          donGia: Number(item.unit_price) || 0,
           tenLoai: item.type_name || '',
           vungMien: item.region || '',
-          daDat: daDatMap[item.item_code] || 0,
-          dinhMucSL: dmMap[item.item_code] || null
+          daDat: Number(daDatMap[item.item_code]) || 0,
+          dinhMucSL: dmMap[item.item_code] != null ? Number(dmMap[item.item_code]) : null
         }));
 
         const quotaResponseData = {
