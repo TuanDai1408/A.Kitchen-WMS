@@ -3155,7 +3155,10 @@
 <section id="portal-history" class="tab-panel space-y-5">
         <div class="page-header">
           <div>
-            <h1 class="page-title">Lịch sử đặt hàng</h1>
+            <div class="flex items-center gap-2.5">
+              <h1 class="page-title">Lịch sử đặt hàng</h1>
+              <span id="hsCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">Tất cả điểm bán</span>
+            </div>
             <p class="page-subtitle">Theo dõi tiến độ duyệt, giao nhận và tổng giá trị các đơn đặt hàng</p>
           </div>
         </div>
@@ -6006,6 +6009,8 @@
       if (whBadge) whBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
       const ropBadge = document.getElementById('whRopCurrentSiteBadge');
       if (ropBadge) ropBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      const hsBadge = document.getElementById('hsCurrentSiteBadge');
+      if (hsBadge) hsBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
 
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
@@ -6021,7 +6026,7 @@
       });
 
       // 4. Update hidden selects for data fetching in all tabs
-      const fullTen = siteObj ? (siteObj.ten || siteObj.name) : '';
+      const fullTen = siteObj ? `${siteObj.code} - ${siteObj.ten || siteObj.name}` : (code !== 'ALL' ? code : '');
       ['order', 'ct', 'bc', 'sc', 'hs', 'kk'].forEach(prefix => {
         const sel = document.getElementById(prefix + 'Site');
         if (sel) {
@@ -6047,6 +6052,8 @@
         if (typeof loadLeadTime === 'function') loadLeadTime();
         if (typeof loadWhInventory === 'function') loadWhInventory();
         if (typeof loadWhReceivedOrders === 'function') loadWhReceivedOrders();
+        if (typeof window.loadHistory === 'function') window.loadHistory();
+        if (typeof window.searchVouchers === 'function') window.searchVouchers();
         else if (typeof loadPoSap === 'function') loadPoSap();
       } catch (e) {
         console.warn('Reload notice:', e);
@@ -7176,6 +7183,9 @@
     }
 
     async function loadHistory() {
+      if (typeof window.loadHistory === "function") {
+        return window.loadHistory();
+      }
       const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
       const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
       let thang = '';
@@ -11837,7 +11847,39 @@ window.filterHsOrders = function(status) {
 };
 
 window.loadHistory = async function() {
-  const site = document.getElementById('hsSite') ? document.getElementById('hsSite').value : '';
+  const branchSel = document.getElementById('globalBranchSelect')?.value;
+  const user = (window.gCurrentUser || (typeof gCurrentUser !== 'undefined' ? gCurrentUser : null) || (typeof loadPersistedUser === 'function' ? loadPersistedUser() : null));
+  const userSite = user ? user.assignedSite : '';
+  const localSite = localStorage.getItem('orbit_user_site');
+  const hsSiteVal = document.getElementById('hsSite')?.value;
+
+  let site = '';
+  if (branchSel) {
+    site = (branchSel === 'ALL') ? '' : branchSel;
+  } else if (userSite) {
+    site = (userSite === 'ALL') ? '' : userSite;
+  } else if (localSite) {
+    site = (localSite === 'ALL') ? '' : localSite;
+  } else if (hsSiteVal) {
+    site = (hsSiteVal === 'ALL') ? '' : hsSiteVal;
+  }
+
+  // Update hsCurrentSiteBadge
+  const badge = document.getElementById('hsCurrentSiteBadge');
+  if (badge) {
+    if (site && site !== 'ALL') {
+      const sitesList = (typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : []) || [];
+      const sObj = sitesList.find(s => s.code.toUpperCase() === site.toUpperCase() || s.name === site || `${s.code} - ${s.name}` === site);
+      badge.textContent = sObj ? `${sObj.code} – ${sObj.ten || sObj.name}` : site;
+    } else {
+      badge.textContent = 'Tất cả điểm bán';
+    }
+    badge.classList.remove('hidden');
+  }
+
+  const hsSiteEl = document.getElementById('hsSite');
+  if (hsSiteEl) hsSiteEl.value = site;
+
   const monthInput = document.getElementById('hsMonth') ? document.getElementById('hsMonth').value : '';
   let thang = '';
   if (monthInput) {
@@ -11846,7 +11888,11 @@ window.loadHistory = async function() {
   }
   try {
     showLoading('Tải lịch sử đơn hàng...');
-    const res = await fetch(`/api/orders?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}`);
+    const url = `/api/orders?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}&_t=${Date.now()}`;
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const json = await res.json();
     if (!window.App) window.App = {};
     window.App.historyOrders = (json.success && json.data) ? json.data : [];
@@ -11854,7 +11900,7 @@ window.loadHistory = async function() {
     const currentFilter = document.getElementById('hsOrderStatusFilter')?.value || 'ALL';
     window.filterHsOrders(currentFilter);
   } catch (e) {
-    console.error(e);
+    console.error('loadHistory error:', e);
   } finally {
     hideLoading();
     if (window.lucide) lucide.createIcons();

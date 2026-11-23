@@ -2210,7 +2210,7 @@ export default {
         const conditions = [];
         const bindings = [];
 
-        if (site && site.trim()) {
+        if (site && site.trim() && site.toUpperCase() !== 'ALL') {
           conditions.push('(dh.site_name = ? OR dh.site_name LIKE ?)');
           bindings.push(site, `%${siteCode}%`);
         }
