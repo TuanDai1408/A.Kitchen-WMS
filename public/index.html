@@ -6004,13 +6004,13 @@
 
       // Sync site badges in page headers
       const fnbBadge = document.getElementById('fnbCountCurrentSiteBadge');
-      if (fnbBadge) fnbBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      if (fnbBadge) fnbBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
       const whBadge = document.getElementById('whInvCurrentSiteBadge');
-      if (whBadge) whBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      if (whBadge) whBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
       const ropBadge = document.getElementById('whRopCurrentSiteBadge');
-      if (ropBadge) ropBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : targetSite;
+      if (ropBadge) ropBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
       const hsBadge = document.getElementById('hsCurrentSiteBadge');
-      if (hsBadge) hsBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
+      if (hsBadge) hsBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
 
       // 3. Update all tab badges
       document.querySelectorAll('.global-tab-region-badge').forEach(el => {
@@ -6026,7 +6026,7 @@
       });
 
       // 4. Update hidden selects for data fetching in all tabs
-      const fullTen = siteObj ? `${siteObj.code} - ${siteObj.ten || siteObj.name}` : (code !== 'ALL' ? code : '');
+      const fullTen = siteObj ? (siteObj.ten || siteObj.name) : (code !== 'ALL' ? code : '');
       ['order', 'ct', 'bc', 'sc', 'hs', 'kk'].forEach(prefix => {
         const sel = document.getElementById(prefix + 'Site');
         if (sel) {
@@ -7096,7 +7096,7 @@
     };
 
     window.cellSite = function(code, name) {
-      const display = name ? `${code} - ${name}` : (code || '—');
+      const display = name || code || '—';
       return `<span class="text-gray-900 dark:text-white font-medium truncate block max-w-[140px]" title="${display}">${display}</span>`;
     };
 
@@ -10348,11 +10348,11 @@ window.openEditVoucherModal = async function(maCT) {
     if (siteSelect) {
       const sitesList = (typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : []) || [];
       siteSelect.innerHTML = sitesList.map(s => {
-        const val = s.name ? `${s.code} - ${s.name}` : (s.code || s);
+        const val = s.ten || s.name || s.code || s;
         const isSel = (v.site_name === val || v.site_name === s.name || v.site_name === s.code) ? 'selected' : '';
         return `<option value="${val}" ${isSel}>${val}</option>`;
       }).join('');
-      if (v.site_name && !sitesList.some(s => (s.name ? `${s.code} - ${s.name}` : s.code) === v.site_name)) {
+      if (v.site_name && !sitesList.some(s => (s.ten || s.name || s.code) === v.site_name)) {
         siteSelect.insertAdjacentHTML('afterbegin', `<option value="${v.site_name}" selected>${v.site_name}</option>`);
       }
     }
@@ -10946,7 +10946,7 @@ window.loadReorderROP = async function() {
   if (ropBadge) {
     const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
     const siteObj = sites.find(s => s.code.toUpperCase() === activeSite.toUpperCase());
-    ropBadge.textContent = siteObj ? (siteObj.code + ' – ' + (siteObj.ten || siteObj.name)) : activeSite;
+    ropBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : activeSite;
   }
 
   const tbody = document.getElementById('ropTableBody');
@@ -11190,7 +11190,7 @@ window.loadWhInventory = async function() {
   if (siteSelect) {
     if (!siteSelect.options || siteSelect.options.length <= 1) {
       const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
-      siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
+      siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.ten || s.name}</option>`).join('');
     }
     siteSelect.value = activeSite;
   }
@@ -11200,7 +11200,7 @@ window.loadWhInventory = async function() {
   if (curBadge) {
     const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
     const siteObj = sites.find(s => s.code.toUpperCase() === activeSite.toUpperCase());
-    curBadge.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : activeSite;
+    curBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : activeSite;
   }
 
   const site = activeSite;
@@ -11869,8 +11869,8 @@ window.loadHistory = async function() {
   if (badge) {
     if (site && site !== 'ALL') {
       const sitesList = (typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : []) || [];
-      const sObj = sitesList.find(s => s.code.toUpperCase() === site.toUpperCase() || s.name === site || `${s.code} - ${s.name}` === site);
-      badge.textContent = sObj ? `${sObj.code} – ${sObj.ten || sObj.name}` : site;
+      const sObj = sitesList.find(s => s.code.toUpperCase() === site.toUpperCase() || s.name === site || (s.ten && s.ten === site));
+      badge.textContent = sObj ? (sObj.ten || sObj.name) : site;
     } else {
       badge.textContent = 'Tất cả điểm bán';
     }
@@ -12396,7 +12396,7 @@ window.exportFnbStockExcel = function() {
     // Header row
     const headers = ['STT', 'Mã Hàng', 'Tên Hàng', 'Nhóm Hàng', 'ĐVT', 'Đơn Giá (đ)'];
     sites.forEach(s => {
-      headers.push(`${s.code} - ${s.name}`);
+      headers.push(s.ten || s.name || s.code);
     });
     
     // Prepare aoa
@@ -12556,8 +12556,8 @@ function initFnbSiteSelectors() {
     let opts = isFilter ? '<option value="all">Tất cả 14 điểm</option>' : '';
     const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : gFnbSitesList);
     sites.forEach(s => {
-      opts += `<option value="${s.code}">${s.code} - ${s.ten || s.name} (${s.region === 'Miền Nam' ? 'MN' : 'MB'})</option>`;
-        });
+      opts += `<option value="${s.code}">${s.ten || s.name} (${s.region === 'Miền Nam' ? 'MN' : 'MB'})</option>`;
+    });
     el.innerHTML = opts;
   });
 
@@ -12599,7 +12599,7 @@ async function loadFnbCounts() {
   const siteObj = sites.find(s => s.code.toUpperCase() === siteCode.toUpperCase());
   const siteName = siteObj ? (siteObj.ten || siteObj.name) : siteCode;
   const badgeEl = document.getElementById('fnbCountCurrentSiteBadge');
-  if (badgeEl) badgeEl.textContent = siteObj ? `${siteObj.code} – ${siteObj.ten || siteObj.name}` : siteCode;
+  if (badgeEl) badgeEl.textContent = siteName;
 
   // Sync default date
   const dp = document.getElementById('fnbCountDatePicker');
@@ -15337,7 +15337,7 @@ window.openCreateWasteModal = async function() {
   if (siteSel) {
     let opts = '';
     (typeof gFnbSitesList !== 'undefined' ? gFnbSitesList : []).forEach(s => {
-      opts += `<option value="${s.code}" ${s.code === siteCode ? 'selected' : ''}>${s.code} - ${s.name}</option>`;
+      opts += `<option value="${s.code}" ${s.code === siteCode ? 'selected' : ''}>${s.ten || s.name}</option>`;
     });
     siteSel.innerHTML = opts;
     siteSel.value = siteCode;
@@ -15623,8 +15623,8 @@ window.getAppSitesList = function() {
     App.siteObjs.forEach(s => {
       list.push({
         code: s.code,
-        name: s.ten || `${s.code} - ${s.name}`,
-        ten: s.ten,
+        name: s.ten || s.name || s.code,
+        ten: s.ten || s.name,
         region: s.vungMien || 'Miền Nam',
         desc: `${s.loai || 'Điểm Bán'} • ${s.name || ''}`,
         budget: s.budget || 0
@@ -17546,7 +17546,7 @@ window.populateWhReceivedOrdersSiteFilter = function() {
   if (siteSelect.options && siteSelect.options.length > 1) return;
 
   const sites = (typeof getAppSitesList === 'function') ? getAppSitesList() : [];
-  siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.code} - ${s.ten || s.name}</option>`).join('');
+  siteSelect.innerHTML = sites.map(s => `<option value="${s.code}">${s.ten || s.name}</option>`).join('');
 
   const saved = localStorage.getItem('orbit_user_site') || (typeof App !== 'undefined' && App.currentBranch ? App.currentBranch.toUpperCase() : 'K001');
   if (saved) {

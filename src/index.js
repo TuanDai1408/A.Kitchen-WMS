@@ -3452,7 +3452,7 @@ export default {
             const transSite = await db.queryOne(env, `
               SELECT ten_cua_hang FROM transactions WHERE ma_cua_hang = ? LIMIT 1
             `, [siteCode]);
-            siteName = transSite ? `${siteCode} - ${transSite.ten_cua_hang}` : (site || 'K001 - MN Bếp Ăn Đại Học Hùng Vương');
+            siteName = transSite ? transSite.ten_cua_hang : (site || 'K001 - MN Bếp Ăn Đại Học Hùng Vương');
           }
         }
 
