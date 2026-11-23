@@ -2570,8 +2570,11 @@
         <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Kiểm kê tồn kho hằng ngày</h1>
-            <p class="page-subtitle">Kiểm ngày nhóm trọng yếu (thịt, rau, gia vị), đối chiếu số liệu tồn sổ sách và hao hụt ca</p>
+            <div class="flex items-center gap-2.5">
+              <h1 class="page-title">Kiểm kê tồn kho hằng ngày</h1>
+              <span id="fnbCountCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">K001</span>
+            </div>
+            <p class="page-subtitle">Chỉ hiển thị các mặt hàng điểm bán đã nhập kho, đối chiếu số liệu tồn sổ sách và hao hụt ca</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <button onclick="exportCountSheetExcel()" class="btn btn-secondary">
@@ -2587,7 +2590,12 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-          <select id="fnbCountSiteSelect" class="hidden"><option value="K001">K001</option></select>
+          <div class="field flex-1 min-w-[180px]">
+            <label class="field-label">Điểm bán</label>
+            <select id="fnbCountSiteSelect" onchange="onFnbCountSiteChange()" class="select">
+              <option value="K001">K001 - Bếp Q7</option>
+            </select>
+          </div>
           <div class="field flex-1 min-w-[170px]">
             <label class="field-label">Chênh lệch</label>
             <select id="fnbCountStatusFilter" onchange="onFnbCountFilterChange()" class="select">
@@ -11550,7 +11558,7 @@ window.filterWhInventoryTable = function() {
       const batchCount = parseInt(r.batch_count || 0, 10);
 
       return `
-        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="data-card bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
           <div class="flex items-start justify-between gap-2">
             <div>
               <div class="flex items-center gap-2">
@@ -12691,12 +12699,13 @@ function initFnbSiteSelectors() {
   const selectors = ['fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite'];
   selectors.forEach(sid => {
     const el = document.getElementById(sid);
-    if (!el || el.options.length > 2) return;
+    if (!el || !el.options || el.options.length > 2) return;
     const isFilter = sid.includes('Filter');
     let opts = isFilter ? '<option value="all">Tất cả 14 điểm</option>' : '';
-    gFnbSitesList.forEach(s => {
-      opts += `<option value="${s.code}">${s.code} - ${s.name} (${s.region === 'Miền Nam' ? 'MN' : 'MB'})</option>`;
-    });
+    const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : gFnbSitesList);
+    sites.forEach(s => {
+      opts += `<option value="${s.code}">${s.code} - ${s.ten || s.name} (${s.region === 'Miền Nam' ? 'MN' : 'MB'})</option>`;
+        });
     el.innerHTML = opts;
   });
 
@@ -12715,18 +12724,23 @@ function getActiveFnbCountSite() {
   const localSaved = localStorage.getItem('orbit_user_site');
   const globalSel = document.getElementById('globalBranchSelect')?.value;
   const appBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch.toUpperCase() : null;
-  const hiddenSite = document.getElementById('fnbCountSiteSelect')?.value;
+  const sel = document.getElementById('fnbCountSiteSelect')?.value;
 
-  let siteCode = localSaved || globalSel || appBranch || hiddenSite || 'K001';
+  let siteCode = sel || localSaved || globalSel || appBranch || 'K001';
   if (siteCode === 'ALL' || siteCode === 'all') siteCode = 'K001';
   return siteCode.toUpperCase();
 }
 
 async function loadFnbCounts() {
   window.loadFnbCounts = loadFnbCounts;
+  if (typeof initFnbSiteSelectors === 'function') initFnbSiteSelectors();
+  window.loadFnbCounts = loadFnbCounts;
   const siteCode = getActiveFnbCountSite();
-  const hiddenSel = document.getElementById('fnbCountSiteSelect');
-  if (hiddenSel) hiddenSel.value = siteCode;
+  const siteSel = document.getElementById('fnbCountSiteSelect');
+  if (siteSel && siteSel.value !== siteCode) {
+    siteSel.value = siteCode;
+  }
+
 
   // Sync site badge in UI
   const sites = (typeof getAppSitesList === 'function' ? getAppSitesList() : []);
@@ -12831,8 +12845,16 @@ window.onFnbCountDateChange = function() {
 };
 
 window.onFnbCountSiteChange = function() {
+  const sel = document.getElementById('fnbCountSiteSelect');
+  if (sel && sel.value && sel.value !== 'all') {
+    try { localStorage.setItem('orbit_user_site', sel.value); } catch(e){}
+    const gb = document.getElementById('globalBranchSelect');
+    if (gb) gb.value = sel.value;
+  }
   loadFnbCounts();
 };
+
+
 
 window.toggleBlindCount = function(checked) {
   gFnbBlindCount = checked;
@@ -13008,7 +13030,7 @@ window.renderFnbCountsTable = function() {
         const diffVal = diff * (Number(item.unit_price) || 0);
 
         return `
-          <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
+          <div class="data-card bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">${escapeHtml(item.nhom_hang || item.item_group || 'Chưa phân loại')}</span>

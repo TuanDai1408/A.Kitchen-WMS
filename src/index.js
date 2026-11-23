@@ -4146,6 +4146,7 @@ export default {
           };
           binds = [siteCode, siteCode];
         } else {
+          // Mặc định & Kiểm kê hằng ngày: CHỈ LẤY CÁC MẶT HÀNG SITE ĐÓ ĐÃ NHẬP KHO
           query = {
             pg: `
               SELECT 
@@ -4171,11 +4172,15 @@ export default {
                 UNION
                 SELECT DISTINCT b2.item_code
                 FROM fnb_stock_balances b2
-                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0 OR b2.book_qty > 0)
                 UNION
-                SELECT DISTINCT material as item_code
-                FROM dim_article_stock
-                WHERE UPPER(site) = UPPER(?)
+                SELECT DISTINCT article as item_code
+                FROM sap_po_items
+                WHERE UPPER(site) = UPPER(?) AND (received_qty > 0 OR status = 'COMPLETED')
+                UNION
+                SELECT DISTINCT sku as item_code
+                FROM inventory_batches
+                WHERE UPPER(branch_id) = UPPER(?)
               ) sub
               LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON sub.item_code = p.article
@@ -4206,11 +4211,15 @@ export default {
                 UNION
                 SELECT DISTINCT b2.item_code
                 FROM fnb_stock_balances b2
-                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0)
+                WHERE UPPER(b2.site_code) = UPPER(?) AND (b2.receipt_qty > 0 OR b2.opening_qty > 0 OR b2.book_qty > 0)
                 UNION
-                SELECT DISTINCT material as item_code
-                FROM dim_article_stock
-                WHERE UPPER(site) = UPPER(?)
+                SELECT DISTINCT article as item_code
+                FROM sap_po_items
+                WHERE UPPER(site) = UPPER(?) AND (received_qty > 0 OR status = 'COMPLETED')
+                UNION
+                SELECT DISTINCT sku as item_code
+                FROM inventory_batches
+                WHERE UPPER(branch_id) = UPPER(?)
               ) sub
               LEFT JOIN dim_article_stock d ON sub.item_code = d.material AND UPPER(d.site) = UPPER(?)
               LEFT JOIN (SELECT article, article_desc, merch_category, order_unit, net_price FROM sap_po_items GROUP BY article) p ON sub.item_code = p.article
@@ -4218,7 +4227,7 @@ export default {
               LEFT JOIN fnb_stock_balances b ON sub.item_code = b.item_code AND UPPER(b.site_code) = UPPER(?)
             `
           };
-          binds = [siteCode, siteCode, siteCode, siteCode, siteCode];
+          binds = [siteCode, siteCode, siteCode, siteCode, siteCode, siteCode];
         }
         if (groupParam && groupParam !== 'all') {
           const filterSql = inStockOnly ? ' AND' : ' WHERE';
