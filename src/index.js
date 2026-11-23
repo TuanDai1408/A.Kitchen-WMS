@@ -2185,6 +2185,114 @@ export default {
         return new Response(JSON.stringify({ success: true, data: { maDon, soDong: validItems.length } }), { headers: corsHeaders });
       }
 
+      // 2.3.1 PUT /api/order - Chỉnh sửa đơn hàng (RBAC)
+      if ((pathname === '/api/order' || pathname === '/api/orders') && request.method === 'PUT') {
+        const body = await request.json();
+        const { orderCode, maDon, site, orderDate, ngayDat, orderedBy, nguoiDat, status, trangThai, month, thang, items, ghiChu, actor } = body;
+        const code = orderCode || maDon;
+        if (!code) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã đơn hàng cần cập nhật' }), { status: 400, headers: corsHeaders });
+        }
+
+        const existing = await db.queryOne(env, `SELECT order_code, site_name, order_date, ordered_by, applied_month, status FROM don_hang WHERE order_code = ? LIMIT 1`, [code]);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy đơn hàng trong hệ thống' }), { status: 404, headers: corsHeaders });
+        }
+
+        const newSite = site || existing.site_name;
+        const newDate = orderDate || ngayDat || existing.order_date;
+        const newOrderedBy = orderedBy || nguoiDat || existing.ordered_by;
+        const newStatus = status || trangThai || existing.status || 'Mới tạo';
+        const newMonth = month || thang || existing.applied_month;
+
+        await db.withTransaction(env, async (tx) => {
+          if (Array.isArray(items) && items.length > 0) {
+            const validItems = items.filter(it => (Number(it.soLuong ?? it.order_qty ?? it.qty) || 0) > 0);
+            if (validItems.length === 0) {
+              throw new Error('Đơn hàng phải có ít nhất 1 mặt hàng có số lượng > 0');
+            }
+
+            // Xóa các dòng cũ và chèn lại các dòng đã cập nhật
+            await tx.exec(`DELETE FROM don_hang WHERE order_code = ?`, [code]);
+
+            for (const it of validItems) {
+              const qty = Number(it.soLuong ?? it.order_qty ?? it.qty) || 0;
+              const luyKe = Number(it.luyKe ?? it.accumulated_qty ?? 0) || qty;
+              await tx.exec(`
+                INSERT INTO don_hang (
+                  order_code, order_date, site_name, ordered_by, applied_month,
+                  item_code, item_name, unit, order_qty, accumulated_qty,
+                  over_quota_note, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              `, [
+                code, newDate, newSite, newOrderedBy, newMonth,
+                it.maHang ?? it.item_code, it.tenSP ?? it.item_name, it.dvt ?? it.unit, qty, luyKe,
+                it.ghiChu ?? it.over_quota_note ?? ghiChu ?? '', newStatus
+              ]);
+            }
+          } else {
+            // Chỉ cập nhật thông tin chung nếu không truyền mảng items
+            await tx.exec(`
+              UPDATE don_hang SET
+                site_name = ?,
+                order_date = ?,
+                ordered_by = ?,
+                applied_month = ?,
+                status = ?
+              WHERE order_code = ?
+            `, [newSite, newDate, newOrderedBy, newMonth, newStatus, code]);
+          }
+
+          // Ghi nhận lịch sử chỉnh sửa vào quy_trinh_don
+          const nowStr = formatDate(new Date());
+          const maxStepRow = await tx.queryOne(`SELECT COALESCE(MAX(step), 1) as max_step FROM quy_trinh_don WHERE order_code = ?`, [code]).catch(() => ({ max_step: 1 }));
+          const nextStep = (Number(maxStepRow?.max_step) || 1) + 1;
+          await tx.exec(`
+            INSERT INTO quy_trinh_don (
+              order_code, step, step_name, status, action_time, actor, note
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          `, [code, nextStep, 'Chỉnh sửa đơn hàng', newStatus, nowStr, actor || newOrderedBy || 'Người quản lý', ghiChu || 'Cập nhật thông tin/mặt hàng đơn qua Portal']);
+        });
+
+        invalidateMemoryCache('/api/orders');
+        invalidateMemoryCache('/api/order-detail');
+        invalidateMemoryCache('/api/quota');
+        invalidateMemoryCache('/api/dashboard-summary');
+
+        return new Response(JSON.stringify({ success: true, message: 'Đã cập nhật đơn hàng thành công', data: { orderCode: code } }), { headers: corsHeaders });
+      }
+
+      // 2.3.2 DELETE /api/order - Xóa đơn hàng (RBAC)
+      if ((pathname === '/api/order' || pathname === '/api/orders') && request.method === 'DELETE') {
+        let code = searchParams.get('orderCode') || searchParams.get('maDon');
+        if (!code) {
+          try {
+            const body = await request.json();
+            code = body.orderCode || body.maDon;
+          } catch(e) {}
+        }
+        if (!code) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu mã đơn hàng cần xóa' }), { status: 400, headers: corsHeaders });
+        }
+
+        const existing = await db.queryOne(env, `SELECT order_code FROM don_hang WHERE order_code = ? LIMIT 1`, [code]);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy đơn hàng trong hệ thống' }), { status: 404, headers: corsHeaders });
+        }
+
+        await db.withTransaction(env, async (tx) => {
+          await tx.exec(`DELETE FROM quy_trinh_don WHERE order_code = ?`, [code]);
+          await tx.exec(`DELETE FROM don_hang WHERE order_code = ?`, [code]);
+        });
+
+        invalidateMemoryCache('/api/orders');
+        invalidateMemoryCache('/api/order-detail');
+        invalidateMemoryCache('/api/quota');
+        invalidateMemoryCache('/api/dashboard-summary');
+
+        return new Response(JSON.stringify({ success: true, message: 'Đã xóa đơn hàng thành công', data: { orderCode: code } }), { headers: corsHeaders });
+      }
+
       // 2.4 GET /api/orders
       if (pathname === '/api/orders' && request.method === 'GET') {
         const site = searchParams.get('site') || '';

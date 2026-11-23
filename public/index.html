@@ -4606,6 +4606,165 @@
     </div>
   </div>
 
+  <!-- MODAL XÁC NHẬN XÓA ĐƠN HÀNG (RBAC) -->
+  <div id="modalConfirmDeleteOrder" style="z-index: 100005;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteOrderModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
+      <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa đơn hàng?</h4>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+            Hành động này sẽ xóa vĩnh viễn đơn hàng <span id="confirmDeleteOrderCode" class="font-mono font-bold text-rose-600 dark:text-rose-400"></span> cùng toàn bộ mặt hàng và tiến trình liên quan khỏi CSDL. Thao tác không thể hoàn tác.
+          </p>
+        </div>
+      </div>
+
+      <div id="confirmDeleteOrderInfo" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 space-y-1.5 text-xs">
+        <span class="text-gray-400">Đang tải chi tiết đơn...</span>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+        <button type="button" onclick="closeDeleteOrderModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Hủy bỏ
+        </button>
+        <button type="button" id="btnExecuteDeleteOrder" onclick="executeDeleteOrder()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-theme-xs transition-colors">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <span>Xác nhận xóa đơn</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHỈNH SỬA ĐƠN HÀNG (RBAC) -->
+  <div id="modalEditOrder" style="z-index: 100004;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditOrderModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4 max-h-[94vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <i data-lucide="file-edit" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white">Chỉnh sửa đơn hàng</h3>
+            <p id="editOrderSubtitle" class="text-xs text-gray-500 font-mono"></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditOrderModal()" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 overflow-y-auto flex-1 pr-1 text-xs">
+        <input type="hidden" id="editOrderCode">
+        
+        <!-- Thông tin cơ bản đơn hàng -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Điểm bán / Site</label>
+            <select id="editOrderSite" class="select w-full"></select>
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày đặt hàng</label>
+            <input type="date" id="editOrderDate" class="input w-full">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Trạng thái duyệt</label>
+            <select id="editOrderStatus" class="select w-full font-semibold">
+              <option value="Mới tạo">Mới tạo</option>
+              <option value="Chờ duyệt">Chờ duyệt</option>
+              <option value="Đã duyệt">Đã duyệt</option>
+              <option value="Đang giao hàng">Đang giao hàng</option>
+              <option value="Đã nhận hàng">Đã nhận hàng</option>
+              <option value="Từ chối / Hủy">Từ chối / Hủy</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Người đặt hàng</label>
+            <input type="text" id="editOrderNguoiDat" placeholder="Tên người đặt..." class="input w-full">
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Tháng áp dụng định mức</label>
+            <input type="text" id="editOrderThang" placeholder="MM/YYYY (ví dụ: 11/2026)" class="input w-full font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ghi chú chỉnh sửa</label>
+          <input type="text" id="editOrderGhiChu" placeholder="Lý do hoặc ghi chú chỉnh sửa đơn..." class="input w-full">
+        </div>
+
+        <!-- Bảng danh sách mặt hàng đặt -->
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-sm text-gray-900 dark:text-white">Danh sách mặt hàng đặt (<span id="editOrderItemsCount" class="font-mono text-brand-600">0</span>)</span>
+            <div class="text-xs text-gray-500 font-mono">
+              Tổng tiền: <b id="editOrderTotalAmount" class="text-brand-600 dark:text-brand-400 font-bold text-sm">0 đ</b>
+            </div>
+          </div>
+
+          <!-- Desktop editable table -->
+          <div class="hidden sm:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 max-h-56">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-400 sticky top-0">
+                <tr>
+                  <th class="p-2.5 w-10 text-center font-semibold">STT</th>
+                  <th class="p-2.5 font-semibold">Mã hàng</th>
+                  <th class="p-2.5 font-semibold">Tên hàng hóa</th>
+                  <th class="p-2.5 font-semibold text-center w-16">ĐVT</th>
+                  <th class="p-2.5 font-semibold text-right w-24">Số lượng</th>
+                  <th class="p-2.5 font-semibold text-right w-24">Đơn giá</th>
+                  <th class="p-2.5 font-semibold text-right w-28">Thành tiền</th>
+                  <th class="p-2.5 w-10 text-center">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="editOrderItemsBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile editable items list -->
+          <div id="editOrderItemsMobile" class="block sm:hidden space-y-2 max-h-56 overflow-y-auto pr-0.5">
+          </div>
+
+          <!-- Thêm mặt hàng vào đơn -->
+          <div class="mt-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-dashed border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div class="flex-1">
+              <select id="editOrderAddSelect" class="select w-full text-xs">
+                <option value="">-- Chọn mặt hàng muốn thêm --</option>
+              </select>
+            </div>
+            <div class="w-full sm:w-24">
+              <input type="number" id="editOrderAddQty" min="0.1" step="0.5" placeholder="Số lượng" value="1" class="input w-full text-xs font-mono text-center">
+            </div>
+            <button type="button" onclick="addEditOrderItemLine()" class="btn btn-secondary text-xs shrink-0 flex items-center justify-center gap-1 py-2">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Thêm món</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 shrink-0">
+        <div class="text-xs text-gray-500">
+          Tổng SL: <b id="editOrderTotalQty" class="font-mono text-gray-900 dark:text-white">0</b> phần
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="closeEditOrderModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            Hủy bỏ
+          </button>
+          <button type="button" id="btnSaveEditOrder" onclick="saveEditOrder()" class="btn btn-primary text-xs flex items-center gap-1.5">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i>
+            <span>Lưu thay đổi</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
   <div id="createWasteModal" class="fixed inset-0 z-[120] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
@@ -7281,6 +7440,22 @@
                   `).join('')}
                 </div>
               </div>
+              ${((window.canEditOrders && window.canEditOrders(info)) || (window.canDeleteOrders && window.canDeleteOrders(info))) ? `
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-800">
+                  ${(window.canEditOrders && window.canEditOrders(info)) ? `
+                    <button onclick="closeGeneralModal(); openEditOrderModal('${info.order_code}')" class="btn btn-sm btn-secondary text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                      <span>Chỉnh sửa đơn</span>
+                    </button>
+                  ` : ''}
+                  ${(window.canDeleteOrders && window.canDeleteOrders(info)) ? `
+                    <button onclick="closeGeneralModal(); confirmDeleteOrder('${info.order_code}')" class="btn btn-sm btn-secondary text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                      <span>Xóa đơn hàng</span>
+                    </button>
+                  ` : ''}
+                </div>
+              ` : ''}
             </div>
           `;
           openGeneralModal(`Đơn hàng ${orderCode}`, html);
@@ -11768,7 +11943,7 @@ window.exportWhItemHistoryToExcel = function() {
 // Aliases for compatibility
 window.loadPoSap = window.loadWhInventory;
 
-// 8. Upgraded loadHistory (Desktop Table + Mobile Cards)
+// 8. Upgraded loadHistory (Desktop Table + Mobile Cards with RBAC Edit & Delete)
 window.renderHsOrdersList = function(items) {
   const tbody = document.getElementById('hsBody');
   const mob = document.getElementById('hsMobileCards');
@@ -11781,51 +11956,87 @@ window.renderHsOrdersList = function(items) {
 
   // Desktop Table
   if (tbody) {
-    tbody.innerHTML = items.map(o => `
-      <tr>
-        <td class="col-code">${cellCode(o.maDon)}</td>
-        <td class="col-date">${cellDate(o.ngayDat)}</td>
-        <td>${cellSite(o.site)}</td>
-        <td>${cellPerson(o.nguoiDat)}</td>
-        <td class="col-num">${o.soDong}</td>
-        <td class="col-num font-medium">${fmtNum(o.tongSL)}</td>
-        <td class="col-num font-semibold text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
-        <td class="col-badge">${cellBadge('neutral', o.trangThai || 'Mới tạo')}</td>
-        <td class="col-actions">
-          <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-sm btn-ghost" title="Xem chi tiết">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            <span>Xem</span>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = items.map(o => {
+      const canEdit = window.canEditOrders ? window.canEditOrders(o) : false;
+      const canDelete = window.canDeleteOrders ? window.canDeleteOrders(o) : false;
+      return `
+        <tr>
+          <td class="col-code">${cellCode(o.maDon)}</td>
+          <td class="col-date">${cellDate(o.ngayDat)}</td>
+          <td>${cellSite(o.site)}</td>
+          <td>${cellPerson(o.nguoiDat)}</td>
+          <td class="col-num">${o.soDong}</td>
+          <td class="col-num font-medium">${fmtNum(o.tongSL)}</td>
+          <td class="col-num font-semibold text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</td>
+          <td class="col-badge">${cellBadge('neutral', o.trangThai || 'Mới tạo')}</td>
+          <td class="col-actions">
+            <div class="flex items-center justify-end gap-1">
+              <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-sm btn-ghost text-gray-600 hover:text-brand-600 dark:text-gray-400" title="Xem chi tiết">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Xem</span>
+              </button>
+              ${canEdit ? `
+                <button onclick="openEditOrderModal('${o.maDon}')" class="btn btn-sm btn-ghost text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30" title="Chỉnh sửa đơn hàng">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                  <span>Sửa</span>
+                </button>
+              ` : ''}
+              ${canDelete ? `
+                <button onclick="confirmDeleteOrder('${o.maDon}')" class="btn btn-sm btn-ghost text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30" title="Xóa đơn hàng">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                  <span>Xóa</span>
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
-    // Mobile Cards
+  // Mobile Cards
   if (mob) {
-    mob.innerHTML = items.map(o => `
-      <div class="data-card space-y-3">
-        <div class="flex items-center justify-between gap-2">
-          ${cellCode(o.maDon)}
-          ${cellBadge('neutral', o.trangThai || 'Mới tạo')}
-        </div>
-        <div class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${o.site}</div>
-        <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-gray-800">
-          <div>Ngày đặt: <b class="num text-gray-900 dark:text-white whitespace-nowrap">${fmtDate(o.ngayDat)}</b></div>
-          <div>Người đặt: <b>${cellPerson(o.nguoiDat)}</b></div>
-          <div>Số mặt hàng: <b class="num text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
-          <div>Tổng SL: <b class="num text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
-          <div class="col-span-2 flex justify-between items-center pt-1.5 border-t border-gray-100 dark:border-gray-800">
-            <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
-            <span class="num font-semibold text-sm text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+    mob.innerHTML = items.map(o => {
+      const canEdit = window.canEditOrders ? window.canEditOrders(o) : false;
+      const canDelete = window.canDeleteOrders ? window.canDeleteOrders(o) : false;
+      return `
+        <div class="data-card space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            ${cellCode(o.maDon)}
+            ${cellBadge('neutral', o.trangThai || 'Mới tạo')}
+          </div>
+          <div class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${o.site}</div>
+          <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-gray-800">
+            <div>Ngày đặt: <b class="num text-gray-900 dark:text-white whitespace-nowrap">${fmtDate(o.ngayDat)}</b></div>
+            <div>Người đặt: <b>${cellPerson(o.nguoiDat)}</b></div>
+            <div>Số mặt hàng: <b class="num text-gray-900 dark:text-white">${o.soDong} dòng</b></div>
+            <div>Tổng SL: <b class="num text-gray-900 dark:text-white">${fmtNum(o.tongSL)}</b></div>
+            <div class="col-span-2 flex justify-between items-center pt-1.5 border-t border-gray-100 dark:border-gray-800">
+              <span class="text-gray-500 font-medium">Tổng giá trị đơn:</span>
+              <span class="num font-semibold text-sm text-brand-600 dark:text-brand-400">${fmtVND(o.tongTien)}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+            <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-secondary flex-1 text-xs py-2">
+              <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Chi tiết</span>
+            </button>
+            ${canEdit ? `
+              <button onclick="openEditOrderModal('${o.maDon}')" class="btn btn-secondary text-xs py-2 text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                <span>Sửa</span>
+              </button>
+            ` : ''}
+            ${canDelete ? `
+              <button onclick="confirmDeleteOrder('${o.maDon}')" class="btn btn-secondary text-xs py-2 text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                <span>Xóa</span>
+              </button>
+            ` : ''}
           </div>
         </div>
-        <button onclick="viewOrderDetail('${o.maDon}')" class="btn btn-secondary w-full">
-          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          <span>Xem chi tiết</span>
-        </button>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 };
 
@@ -11904,6 +12115,426 @@ window.loadHistory = async function() {
   } finally {
     hideLoading();
     if (window.lucide) lucide.createIcons();
+  }
+};
+
+// ========================================================================
+// ORDER RBAC & CRUD FUNCTIONS (SỬA & XÓA ĐƠN HÀNG)
+// ========================================================================
+window.canEditOrders = function(order) {
+  const user = (typeof getAppCurrentUser === 'function' ? getAppCurrentUser() : null) || window.gCurrentUser;
+  if (!user) return false;
+  if (user.role === 'ADMIN' || user.role === 'KHO_TRUONG') return true;
+  if (user.permissions && typeof user.permissions === 'object') {
+    const pHistory = user.permissions['portal-history'];
+    const pOrder = user.permissions['portal-order'];
+    if (pHistory && pHistory.canEdit !== undefined) return Boolean(pHistory.canEdit);
+    if (pOrder && pOrder.canEdit !== undefined) return Boolean(pOrder.canEdit);
+  }
+  if (user.role === 'BEP_TRUONG') {
+    if (!order) return true;
+    const st = (order.trangThai || order.status || '').toUpperCase();
+    return st.includes('MỚI') || st.includes('CHỜ') || st.includes('PENDING') || st === '';
+  }
+  return false;
+};
+
+window.canDeleteOrders = function(order) {
+  const user = (typeof getAppCurrentUser === 'function' ? getAppCurrentUser() : null) || window.gCurrentUser;
+  if (!user) return false;
+  if (user.role === 'ADMIN' || user.role === 'KHO_TRUONG') return true;
+  if (user.permissions && typeof user.permissions === 'object') {
+    const pHistory = user.permissions['portal-history'];
+    const pOrder = user.permissions['portal-order'];
+    if (pHistory && pHistory.canDelete !== undefined) return Boolean(pHistory.canDelete);
+    if (pOrder && pOrder.canDelete !== undefined) return Boolean(pOrder.canDelete);
+  }
+  if (user.role === 'BEP_TRUONG') {
+    if (!order) return true;
+    const st = (order.trangThai || order.status || '').toUpperCase();
+    return st.includes('MỚI') || st.includes('CHỜ') || st.includes('PENDING') || st === '';
+  }
+  return false;
+};
+
+window._editOrderItems = []; // Mảng chứa các dòng mặt hàng đang chỉnh sửa
+
+window.openEditOrderModal = async function(orderCode) {
+  if (!window.canEditOrders()) {
+    showToast('Tài khoản của bạn không có quyền chỉnh sửa đơn hàng', 'warning');
+    return;
+  }
+  showLoading('Đang tải thông tin đơn hàng...');
+  try {
+    const res = await fetch(`/api/order-detail?orderCode=${encodeURIComponent(orderCode)}&_t=${Date.now()}`);
+    const json = await res.json();
+    if (!json.success || !json.data) {
+      throw new Error(json.error || 'Không tải được chi tiết đơn hàng');
+    }
+
+    const { info, items } = json.data;
+
+    document.getElementById('editOrderCode').value = info.order_code || orderCode;
+    const subEl = document.getElementById('editOrderSubtitle');
+    if (subEl) subEl.textContent = `Mã đơn: ${info.order_code || orderCode}`;
+
+    // Populate sites select
+    const siteSelect = document.getElementById('editOrderSite');
+    if (siteSelect) {
+      const sitesList = (typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : []) || [];
+      siteSelect.innerHTML = sitesList.map(s => {
+        const val = s.ten || s.name || s.code || s;
+        const isSel = (info.site_name === val || info.site_name === s.name || info.site_name === s.code) ? 'selected' : '';
+        return `<option value="${val}" ${isSel}>${val}</option>`;
+      }).join('');
+      if (info.site_name && !sitesList.some(s => (s.ten || s.name || s.code) === info.site_name)) {
+        siteSelect.insertAdjacentHTML('afterbegin', `<option value="${info.site_name}" selected>${info.site_name}</option>`);
+      }
+    }
+
+    const dateEl = document.getElementById('editOrderDate');
+    if (dateEl) dateEl.value = (info.order_date || '').slice(0, 10);
+
+    const statusEl = document.getElementById('editOrderStatus');
+    if (statusEl) statusEl.value = info.status || 'Mới tạo';
+
+    const nguoiDatEl = document.getElementById('editOrderNguoiDat');
+    if (nguoiDatEl) nguoiDatEl.value = info.ordered_by || '';
+
+    const thangEl = document.getElementById('editOrderThang');
+    if (thangEl) thangEl.value = info.applied_month || '';
+
+    const ghiChuEl = document.getElementById('editOrderGhiChu');
+    if (ghiChuEl) ghiChuEl.value = '';
+
+    // Initialize items array
+    window._editOrderItems = (items || []).map(it => ({
+      maHang: it.maHang || it.item_code,
+      tenSP: it.tenSP || it.item_name,
+      dvt: it.dvt || it.unit || 'Phần',
+      soLuong: Number(it.soLuong ?? it.order_qty ?? 1),
+      donGia: Number(it.donGia ?? it.unit_price ?? 0),
+      thanhTien: Number(it.thanhTien ?? ((it.soLuong || 1) * (it.donGia || 0))),
+      ghiChu: it.ghiChu || ''
+    }));
+
+    // Populate available NVL items in #editOrderAddSelect
+    const addSel = document.getElementById('editOrderAddSelect');
+    if (addSel) {
+      let candidateItems = (window.App && window.App.items && window.App.items.length) ? window.App.items : [];
+      if (!candidateItems.length) {
+        try {
+          const qRes = await fetch(`/api/quota?site=${encodeURIComponent(info.site_name || 'K001')}&thang=${encodeURIComponent(info.applied_month || '')}`);
+          const qJson = await qRes.json();
+          if (qJson.success && qJson.data?.items) {
+            candidateItems = qJson.data.items;
+            if (window.App) window.App.items = candidateItems;
+          }
+        } catch(e) {}
+      }
+      addSel.innerHTML = '<option value="">-- Chọn mặt hàng muốn thêm --</option>' +
+        candidateItems.map(c => `
+          <option value="${escapeHtml(c.maHang || c.code)}" 
+                  data-name="${escapeHtml(c.tenHang || c.tenSP || c.name || '')}" 
+                  data-unit="${escapeHtml(c.dvt || c.unit || 'Phần')}" 
+                  data-price="${Number(c.donGia || c.price || 0)}">
+            [${escapeHtml(c.maHang || c.code)}] ${escapeHtml(c.tenHang || c.tenSP || c.name || '')} (${fmtVND(c.donGia || c.price || 0)}/${c.dvt || c.unit || ''})
+          </option>
+        `).join('');
+    }
+
+    renderEditOrderItems();
+
+    const modal = document.getElementById('modalEditOrder');
+    if (modal) modal.classList.remove('hidden');
+  } catch(err) {
+    console.error('openEditOrderModal error:', err);
+    showToast('Lỗi: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+    if (window.lucide) lucide.createIcons();
+  }
+};
+
+window.closeEditOrderModal = function() {
+  const modal = document.getElementById('modalEditOrder');
+  if (modal) modal.classList.add('hidden');
+  window._editOrderItems = [];
+};
+
+window.renderEditOrderItems = function() {
+  const tbody = document.getElementById('editOrderItemsBody');
+  const mob = document.getElementById('editOrderItemsMobile');
+  const items = window._editOrderItems || [];
+
+  if (tbody) {
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-gray-400">Chưa có mặt hàng nào. Vui lòng thêm mặt hàng bên dưới.</td></tr>';
+    } else {
+      tbody.innerHTML = items.map((it, idx) => `
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+          <td class="p-2.5 text-center text-gray-400 font-mono">${idx + 1}</td>
+          <td class="p-2.5 font-mono font-medium text-gray-900 dark:text-white">${escapeHtml(it.maHang)}</td>
+          <td class="p-2.5 font-medium text-gray-800 dark:text-gray-200">${escapeHtml(it.tenSP)}</td>
+          <td class="p-2.5 text-center text-gray-500">${escapeHtml(it.dvt)}</td>
+          <td class="p-2.5 text-right">
+            <input type="number" min="0.1" step="0.5" value="${it.soLuong}" 
+                   onchange="updateEditOrderItemQty(${idx}, this.value)" 
+                   class="w-20 px-2 py-1 text-right font-mono font-bold text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-brand-500">
+          </td>
+          <td class="p-2.5 text-right font-mono text-gray-500">${fmtVND(it.donGia)}</td>
+          <td class="p-2.5 text-right font-mono font-bold text-brand-600 dark:text-brand-400">${fmtVND(it.soLuong * it.donGia)}</td>
+          <td class="p-2.5 text-center">
+            <button type="button" onclick="removeEditOrderItemLine(${idx})" class="p-1 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors" title="Xóa dòng">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  if (mob) {
+    if (!items.length) {
+      mob.innerHTML = '<div class="p-4 text-center text-gray-400 bg-gray-50 dark:bg-gray-800/40 rounded-xl">Chưa có mặt hàng nào</div>';
+    } else {
+      mob.innerHTML = items.map((it, idx) => `
+        <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 space-y-2">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="font-bold text-gray-900 dark:text-white">${escapeHtml(it.tenSP)}</div>
+              <div class="font-mono text-[11px] text-gray-400">${escapeHtml(it.maHang)} · <span class="font-sans">${escapeHtml(it.dvt)}</span></div>
+            </div>
+            <button type="button" onclick="removeEditOrderItemLine(${idx})" class="p-1 text-rose-500 hover:text-rose-700">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-gray-200 dark:border-gray-700/60">
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-500">Số lượng:</span>
+              <input type="number" min="0.1" step="0.5" value="${it.soLuong}" 
+                     onchange="updateEditOrderItemQty(${idx}, this.value)" 
+                     class="w-16 px-1.5 py-0.5 text-center font-mono font-bold bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded">
+            </div>
+            <div class="text-right">
+              <div class="font-mono font-bold text-brand-600 dark:text-brand-400">${fmtVND(it.soLuong * it.donGia)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  recalcEditOrderTotals();
+};
+
+window.updateEditOrderItemQty = function(idx, val) {
+  const num = Math.max(0, Number(val) || 0);
+  if (window._editOrderItems && window._editOrderItems[idx]) {
+    window._editOrderItems[idx].soLuong = num;
+    window._editOrderItems[idx].thanhTien = num * (window._editOrderItems[idx].donGia || 0);
+    renderEditOrderItems();
+  }
+};
+
+window.removeEditOrderItemLine = function(idx) {
+  if (window._editOrderItems && window._editOrderItems.length > idx) {
+    window._editOrderItems.splice(idx, 1);
+    renderEditOrderItems();
+  }
+};
+
+window.addEditOrderItemLine = function() {
+  const sel = document.getElementById('editOrderAddSelect');
+  const qtyInput = document.getElementById('editOrderAddQty');
+  if (!sel || !sel.value) {
+    showToast('Vui lòng chọn một mặt hàng để thêm', 'warning');
+    return;
+  }
+  const code = sel.value;
+  const opt = sel.selectedOptions[0];
+  const name = opt.getAttribute('data-name') || code;
+  const unit = opt.getAttribute('data-unit') || 'Phần';
+  const price = Number(opt.getAttribute('data-price')) || 0;
+  const qty = Math.max(0.1, Number(qtyInput ? qtyInput.value : 1) || 1);
+
+  const existing = (window._editOrderItems || []).find(it => it.maHang === code);
+  if (existing) {
+    existing.soLuong += qty;
+    existing.thanhTien = existing.soLuong * existing.donGia;
+  } else {
+    window._editOrderItems.push({
+      maHang: code,
+      tenSP: name,
+      dvt: unit,
+      soLuong: qty,
+      donGia: price,
+      thanhTien: qty * price,
+      ghiChu: ''
+    });
+  }
+
+  sel.value = '';
+  if (qtyInput) qtyInput.value = 1;
+
+  renderEditOrderItems();
+};
+
+window.recalcEditOrderTotals = function() {
+  const items = window._editOrderItems || [];
+  let totalQty = 0;
+  let totalAmount = 0;
+  items.forEach(it => {
+    totalQty += Number(it.soLuong) || 0;
+    totalAmount += (Number(it.soLuong) || 0) * (Number(it.donGia) || 0);
+  });
+
+  const countEl = document.getElementById('editOrderItemsCount');
+  if (countEl) countEl.textContent = items.length;
+  const qtyEl = document.getElementById('editOrderTotalQty');
+  if (qtyEl) qtyEl.textContent = fmtNum(totalQty);
+  const amtEl = document.getElementById('editOrderTotalAmount');
+  if (amtEl) amtEl.textContent = fmtVND(totalAmount);
+};
+
+window.saveEditOrder = async function() {
+  if (!window.canEditOrders()) {
+    showToast('Tài khoản của bạn không có quyền chỉnh sửa đơn hàng', 'warning');
+    return;
+  }
+  const orderCode = document.getElementById('editOrderCode')?.value;
+  if (!orderCode) {
+    showToast('Thiếu mã đơn hàng', 'error');
+    return;
+  }
+
+  const site = document.getElementById('editOrderSite')?.value;
+  const orderDate = document.getElementById('editOrderDate')?.value;
+  const status = document.getElementById('editOrderStatus')?.value;
+  const orderedBy = document.getElementById('editOrderNguoiDat')?.value;
+  const month = document.getElementById('editOrderThang')?.value;
+  const ghiChu = document.getElementById('editOrderGhiChu')?.value;
+
+  const validItems = (window._editOrderItems || []).filter(it => (Number(it.soLuong) || 0) > 0);
+  if (!validItems.length) {
+    showToast('Đơn hàng phải có ít nhất 1 mặt hàng có số lượng > 0', 'warning');
+    return;
+  }
+
+  const currentUser = (typeof getAppCurrentUser === 'function' ? getAppCurrentUser() : null) || window.gCurrentUser;
+
+  showLoading('Đang lưu cập nhật đơn hàng...');
+  try {
+    const res = await fetch('/api/order', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderCode,
+        site,
+        orderDate,
+        status,
+        orderedBy,
+        month,
+        ghiChu,
+        actor: currentUser ? (currentUser.full_name || currentUser.email) : 'Người quản trị',
+        items: validItems
+      })
+    });
+    const json = await res.json();
+    if (!json.success) {
+      throw new Error(json.error || 'Cập nhật thất bại');
+    }
+
+    showToast(`Đã cập nhật đơn hàng ${orderCode} thành công!`, 'success');
+    closeEditOrderModal();
+    if (typeof window.loadHistory === 'function') {
+      window.loadHistory();
+    }
+  } catch(err) {
+    console.error('saveEditOrder error:', err);
+    showToast('Lỗi lưu đơn hàng: ' + err.message, 'error');
+  } finally {
+    hideLoading();
+  }
+};
+
+window.confirmDeleteOrder = async function(orderCode) {
+  if (!window.canDeleteOrders()) {
+    showToast('Tài khoản của bạn không có quyền xóa đơn hàng', 'warning');
+    return;
+  }
+  window._pendingDeleteOrderCode = orderCode;
+  const codeEl = document.getElementById('confirmDeleteOrderCode');
+  if (codeEl) codeEl.textContent = orderCode;
+
+  const infoEl = document.getElementById('confirmDeleteOrderInfo');
+  if (infoEl) infoEl.innerHTML = '<span class="text-gray-400">Đang tải chi tiết đơn...</span>';
+
+  const modal = document.getElementById('modalConfirmDeleteOrder');
+  if (modal) modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+
+  try {
+    const res = await fetch(`/api/order-detail?orderCode=${encodeURIComponent(orderCode)}&_t=${Date.now()}`);
+    const json = await res.json();
+    if (json.success && json.data && infoEl) {
+      const { info, items } = json.data;
+      const totalAmount = (items || []).reduce((acc, it) => acc + (Number(it.thanhTien) || 0), 0);
+      const totalQty = (items || []).reduce((acc, it) => acc + (Number(it.soLuong) || 0), 0);
+      infoEl.innerHTML = `
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div>Điểm bán: <b class="text-gray-900 dark:text-white truncate block">${info.site_name || '—'}</b></div>
+          <div>Ngày đặt: <b class="num font-medium text-gray-900 dark:text-white">${fmtDate(info.order_date)}</b></div>
+          <div>Người đặt: <b class="text-gray-900 dark:text-white truncate block">${info.ordered_by || '—'}</b></div>
+          <div>Trạng thái: <b class="text-brand-600 dark:text-brand-400">${info.status || 'Mới tạo'}</b></div>
+          <div class="col-span-2 pt-1 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <span>Mặt hàng: <b>${items.length} món (${fmtNum(totalQty)} SL)</b></span>
+            <span class="font-bold text-sm text-brand-600 dark:text-brand-400">${fmtVND(totalAmount)}</span>
+          </div>
+        </div>
+      `;
+    }
+  } catch(e) {}
+};
+
+window.closeDeleteOrderModal = function() {
+  const modal = document.getElementById('modalConfirmDeleteOrder');
+  if (modal) modal.classList.add('hidden');
+  window._pendingDeleteOrderCode = null;
+};
+
+window.executeDeleteOrder = async function() {
+  const orderCode = window._pendingDeleteOrderCode;
+  if (!orderCode) return;
+
+  if (!window.canDeleteOrders()) {
+    showToast('Tài khoản của bạn không có quyền xóa đơn hàng', 'warning');
+    closeDeleteOrderModal();
+    return;
+  }
+
+  showLoading('Đang xóa đơn hàng khỏi CSDL...');
+  try {
+    const res = await fetch(`/api/order?orderCode=${encodeURIComponent(orderCode)}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderCode })
+    });
+    const json = await res.json();
+    if (!json.success) {
+      throw new Error(json.error || 'Xóa thất bại');
+    }
+
+    showToast(`Đã xóa vĩnh viễn đơn hàng ${orderCode} thành công!`, 'success');
+    closeDeleteOrderModal();
+    if (typeof window.loadHistory === 'function') {
+      window.loadHistory();
+    }
+  } catch(err) {
+    console.error('executeDeleteOrder error:', err);
+    showToast('Lỗi xóa đơn: ' + err.message, 'error');
+  } finally {
+    hideLoading();
   }
 };
 
