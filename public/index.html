@@ -44,15 +44,11 @@
         try {
           if (rootEl && document.body.contains(rootEl)) {
             _origCreate({ root: rootEl });
-          } else {
-            var activeTab = document.querySelector('.tab-panel.active') || document.body;
+            return;
+          }
+          var activeTab = document.querySelector('.tab-panel.active') || document.body;
+          if (activeTab) {
             _origCreate({ root: activeTab });
-            var openModals = document.querySelectorAll('[id*="Modal"]:not(.hidden), [id^="modal"]:not(.hidden)');
-            openModals.forEach(function (m) {
-              if (m.offsetParent !== null || m.classList.contains('flex')) {
-                try { _origCreate({ root: m }); } catch (e) {}
-              }
-            });
           }
         } catch (err) {}
       }

@@ -39,7 +39,12 @@ export async function loadQuota(): Promise<void> {
     thang = `${parts[1]}/${parts[0]}`;
   }
 
-  if (typeof showLoading === 'function') showLoading('Tải danh sách vật tư theo Site...');
+  const hasExistingItems = getAppItems().length > 0;
+  const body = document.getElementById('dinhMucBody');
+  if (!hasExistingItems && body) {
+    body.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-gray-400"><div class="inline-flex items-center gap-2"><div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div><span>Đang tải định mức vật tư...</span></div></td></tr>';
+  }
+
   try {
     const res = await fetch(`/api/quota?site=${encodeURIComponent(site)}&thang=${encodeURIComponent(thang)}&refresh=true`);
     const json = await res.json();
@@ -85,7 +90,7 @@ export async function loadQuota(): Promise<void> {
   } catch (err: any) {
     if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + (err?.message || err));
   } finally {
-    if (typeof hideLoading === 'function') hideLoading();
+    // Background fetch complete
   }
 }
 
@@ -190,6 +195,6 @@ export async function submitOrder(): Promise<void> {
   } catch (err: any) {
     if (typeof showToast === 'function') showToast('Lỗi: ' + (err?.message || err));
   } finally {
-    if (typeof hideLoading === 'function') hideLoading();
+    // Background fetch complete
   }
 }

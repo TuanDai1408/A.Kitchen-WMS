@@ -142,7 +142,7 @@ export function updateMobileNavState(tabId: string): void {
 
   // 1. Direct match: Check if a visible bottom button is explicitly bound to this tab
   const directBtn = document.querySelector(`.mob-nav-btn[onclick*="'${tabId}'"]`);
-  if (directBtn && window.getComputedStyle(directBtn).display !== 'none' && !directBtn.classList.contains('hidden')) {
+  if (directBtn && !directBtn.classList.contains('hidden')) {
     directBtn.classList.remove('text-gray-400', 'dark:text-gray-500', 'font-medium');
     directBtn.classList.add('active', 'text-brand-500', 'dark:text-brand-400', 'font-bold');
     return;

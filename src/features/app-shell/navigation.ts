@@ -41,29 +41,55 @@ export let gFnbAllItems: any[] = [];
 export let gCurrentCountItems: any[] = [];
 export let gFnbBlindCount: boolean = false;
 
+let _activeTabPanel: HTMLElement | null = null;
+let _activeNavBtn: HTMLElement | null = null;
+
 export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean = false): void {
   if (tabId === 'fnb-stock') tabId = 'wh-dashboard';
 
-  // 1. Instant Synchronous Navigation Update (0ms latency, zero jank)
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
-    b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
-    const ic = b.querySelector('.menu-icon');
-    if (ic) {
-      ic.classList.remove('text-brand-500', 'dark:text-brand-400');
-      ic.classList.add('text-gray-500', 'dark:text-gray-400');
-    }
-  });
+  // 1. Instant Synchronous Navigation Update (< 0.5ms latency, zero jank)
+  if (!_activeTabPanel) {
+    _activeTabPanel = document.querySelector('.tab-panel.active');
+  }
+  if (_activeTabPanel) {
+    _activeTabPanel.classList.remove('active');
+  } else {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  }
 
   const target = document.getElementById(tabId);
   if (target) {
     target.classList.add('active');
+    _activeTabPanel = target;
   } else {
     const notFound = document.getElementById('tab-404');
-    if (notFound) notFound.classList.add('active');
+    if (notFound) {
+      notFound.classList.add('active');
+      _activeTabPanel = notFound;
+    }
   }
-  try { localStorage.setItem('orbit_active_tab', tabId); } catch (e) {}
+
+  // Active Nav Button Update
+  if (_activeNavBtn) {
+    _activeNavBtn.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'font-semibold', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+    _activeNavBtn.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+    const ic = _activeNavBtn.querySelector('.menu-icon');
+    if (ic) {
+      ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+      ic.classList.add('text-gray-500', 'dark:text-gray-400');
+    }
+  } else {
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'font-semibold', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+      b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+      const ic = b.querySelector('.menu-icon');
+      if (ic) {
+        ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+        ic.classList.add('text-gray-500', 'dark:text-gray-400');
+      }
+    });
+  }
+
   if (!btn) {
     btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`) as HTMLElement;
   }
@@ -75,7 +101,10 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
       ic.classList.add('text-brand-500', 'dark:text-brand-400');
       ic.classList.remove('text-gray-500', 'dark:text-gray-400');
     }
+    _activeNavBtn = btn;
   }
+
+  try { localStorage.setItem('orbit_active_tab', tabId); } catch (e) {}
 
   // Close mobile drawer on tab click (< 1280px)
   if (typeof window !== 'undefined' && window.innerWidth < 1280) {
@@ -88,43 +117,51 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
   const scroller = document.getElementById('mainScrollContainer') || document.querySelector('.overflow-y-auto');
   if (scroller) scroller.scrollTop = 0;
 
-  // 2. Load specific tab data with SWR memory cache (skip heavy re-fetching if loaded recently < 45s)
-  const shouldFetch = forceReload || shouldRefreshTab(tabId, 45000);
+  // 2. Decouple heavy tab data loading into next frame microtask
+  const shouldFetch = forceReload || shouldRefreshTab(tabId, 60000);
   if (shouldFetch) {
     markTabLoaded(tabId);
-    const w = typeof window !== 'undefined' ? (window as any) : {};
-
-    // Orbit Siba F&B Tab Hooks
-    if (tabId === 'fnb-chain' && typeof w.loadFnbChain === 'function') w.loadFnbChain();
-    if (tabId === 'fnb-pl' && typeof w.loadFnbPL === 'function') w.loadFnbPL();
-    if (tabId === 'fnb-pos' && typeof w.loadFnbPOS === 'function') w.loadFnbPOS();
-    if (tabId === 'fnb-stock' && typeof w.loadFnbStock === 'function') w.loadFnbStock();
-    if (tabId === 'fnb-counts' && typeof w.loadFnbCounts === 'function') w.loadFnbCounts();
-    if (tabId === 'fnb-receipts' && typeof w.loadFnbReceipts === 'function') w.loadFnbReceipts();
-    if (tabId === 'fnb-waste' && typeof w.loadFnbWaste === 'function') w.loadFnbWaste();
-    if (tabId === 'fnb-sites' && typeof w.loadFnbSites === 'function') w.loadFnbSites();
-    if (tabId === 'user-matrix' && typeof w.loadUserMatrix === 'function') w.loadUserMatrix();
-
-    if (tabId === 'wh-dashboard') {
+    requestAnimationFrame(() => {
       setTimeout(() => {
-        initTailadminCharts();
-        if (typeof w.loadDashboardSummary === 'function') w.loadDashboardSummary();
-      }, 15);
-    }
-    if (tabId === 'wh-stock' && typeof w.loadStockFEFO === 'function') w.loadStockFEFO();
-    if (tabId === 'wh-reorder' && typeof w.loadReorderROP === 'function') w.loadReorderROP();
-    if (tabId === 'wh-leadtime' && typeof w.loadLeadTime === 'function') w.loadLeadTime();
-    if (tabId === 'wh-posap') {
-      if (typeof w.loadWhInventory === 'function') w.loadWhInventory();
-      else if (typeof w.loadPoSap === 'function') w.loadPoSap();
-    }
-    if (tabId === 'portal-order' && typeof w.loadQuota === 'function') w.loadQuota();
-    if (tabId === 'portal-search' && typeof w.searchVouchers === 'function') w.searchVouchers();
-    if (tabId === 'portal-history' && typeof w.loadHistory === 'function') w.loadHistory();
-    if (tabId === 'portal-kiemke' && typeof w.loadAudit === 'function') w.loadAudit();
+        const w = typeof window !== 'undefined' ? (window as any) : {};
+
+        // Orbit Siba F&B Tab Hooks
+        if (tabId === 'fnb-chain' && typeof w.loadFnbChain === 'function') w.loadFnbChain();
+        if (tabId === 'fnb-pl' && typeof w.loadFnbPL === 'function') w.loadFnbPL();
+        if (tabId === 'fnb-pos' && typeof w.loadFnbPOS === 'function') w.loadFnbPOS();
+        if (tabId === 'fnb-stock' && typeof w.loadFnbStock === 'function') w.loadFnbStock();
+        if (tabId === 'fnb-counts' && typeof w.loadFnbCounts === 'function') w.loadFnbCounts();
+        if (tabId === 'fnb-receipts' && typeof w.loadFnbReceipts === 'function') w.loadFnbReceipts();
+        if (tabId === 'fnb-waste' && typeof w.loadFnbWaste === 'function') w.loadFnbWaste();
+        if (tabId === 'fnb-sites' && typeof w.loadFnbSites === 'function') w.loadFnbSites();
+        if (tabId === 'user-matrix' && typeof w.loadUserMatrix === 'function') w.loadUserMatrix();
+
+        if (tabId === 'wh-dashboard') {
+          initTailadminCharts();
+          if (typeof w.loadDashboardSummary === 'function') w.loadDashboardSummary();
+        }
+        if (tabId === 'wh-stock' && typeof w.loadStockFEFO === 'function') w.loadStockFEFO();
+        if (tabId === 'wh-reorder' && typeof w.loadReorderROP === 'function') w.loadReorderROP();
+        if (tabId === 'wh-leadtime' && typeof w.loadLeadTime === 'function') w.loadLeadTime();
+        if (tabId === 'wh-posap') {
+          if (typeof w.loadWhInventory === 'function') w.loadWhInventory();
+          else if (typeof w.loadPoSap === 'function') w.loadPoSap();
+        }
+        if (tabId === 'portal-order' && typeof w.loadQuota === 'function') w.loadQuota();
+        if (tabId === 'portal-search' && typeof w.searchVouchers === 'function') w.searchVouchers();
+        if (tabId === 'portal-history' && typeof w.loadHistory === 'function') w.loadHistory();
+        if (tabId === 'portal-kiemke' && typeof w.loadAudit === 'function') w.loadAudit();
+      }, 0);
+    });
   }
 
-  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+  // Scoped Lucide icon rendering on active tab only
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    requestAnimationFrame(() => {
+      const activeEl = document.getElementById(tabId);
+      if (activeEl) lucide.createIcons({ root: activeEl });
+    });
+  }
 }
 
 export function onGlobalMonthChange(val: string): void {

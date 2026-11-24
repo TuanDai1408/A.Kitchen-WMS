@@ -1601,6 +1601,7 @@ table tbody tr {
 }
 .tab-panel.active {
   display: block !important;
+  contain: layout paint style;
   animation: tabFadeIn 0.12s ease-out forwards;
 }
 
