@@ -1554,32 +1554,50 @@ textarea:not(.bg-transparent) {
   @apply !border-brand-600 !bg-brand-600 !text-white hover:!border-brand-700 hover:!bg-brand-700;
 }
 
-/* WMS Tab Panel Management with Hardware-Accelerated Smooth Transition */
+/* High-Performance Main Scroller */
+#mainScrollContainer {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* GPU Hardware-Accelerated Virtualized Rendering for Long Tables & Cards */
+.data-table tbody tr,
+table tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 48px;
+}
+
+#orderMobileCards > div,
+#fnbPoMobileCards > div,
+#whRecModalLinesMobileCards > div,
+#whHistMobileCards > div,
+#whBatchesMobileCards > div,
+#historyMobileCards > div,
+#kkMobileCards > div,
+#fnbCountMobileCards > div,
+#fnbWasteMobileCards > div {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 110px;
+}
+
+/* WMS Tab Panel Management with Lightweight GPU Opacity Fade */
 .tab-panel {
-  display: none;
+  display: none !important;
 }
 .tab-panel.active {
-  display: block;
-  animation: tabFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity, transform;
+  display: block !important;
+  animation: tabFadeIn 0.12s ease-out forwards;
 }
 
 @keyframes tabFadeIn {
   from {
-    opacity: 0.85;
-    transform: translateY(2px);
+    opacity: 0.92;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-/* View Transition API Smooth Native-Like Cross-Fade */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.16s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================

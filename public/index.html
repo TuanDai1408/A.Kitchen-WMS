@@ -412,7 +412,7 @@
 
 
   <!-- Main Container -->
-  <div class="relative flex flex-1 flex-col h-screen overflow-x-hidden overflow-y-auto min-w-0">
+  <div id="mainScrollContainer" class="relative flex flex-1 flex-col h-screen overflow-x-hidden overflow-y-auto min-w-0">
     
     <!-- Top Header Bar (100% TailAdmin Specification, Mobile-Optimized) -->
     <header class="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2.5 sm:px-4 md:px-6 dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs min-h-[56px] sm:min-h-[64px]">
@@ -6215,57 +6215,53 @@
     function switchTab(tabId, btn, forceReload = false) {
       if (tabId === 'fnb-stock') tabId = 'wh-dashboard';
 
-      const performDomSwitch = () => {
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => {
-          b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
-          b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
-          const ic = b.querySelector('.menu-icon');
-          if (ic) {
-            ic.classList.remove('text-brand-500', 'dark:text-brand-400');
-            ic.classList.add('text-gray-500', 'dark:text-gray-400');
-          }
-        });
+      // 1. Instant Synchronous Navigation Update (0ms latency, zero jank)
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
+        b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+        const ic = b.querySelector('.menu-icon');
+        if (ic) {
+          ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+          ic.classList.add('text-gray-500', 'dark:text-gray-400');
+        }
+      });
 
-        const target = document.getElementById(tabId);
-        if (target) {
-          target.classList.add('active');
-        } else {
-          const notFound = document.getElementById('tab-404');
-          if (notFound) notFound.classList.add('active');
-        }
-        try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
-        if (!btn) {
-          btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
-        }
-        if (btn) {
-          btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
-          btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
-          const ic = btn.querySelector('.menu-icon');
-          if (ic) {
-            ic.classList.add('text-brand-500', 'dark:text-brand-400');
-            ic.classList.remove('text-gray-500', 'dark:text-gray-400');
-          }
-        }
-
-        // Close mobile drawer on tab click (covers all responsive widths < 1280px)
-        if (window.innerWidth < 1280) {
-          closeSidebar();
-          if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
-        }
-        if (typeof updateMobileNavState === 'function') {
-          updateMobileNavState(tabId);
-        }
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      };
-
-      if (typeof document.startViewTransition === 'function') {
-        document.startViewTransition(performDomSwitch);
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.add('active');
       } else {
-        performDomSwitch();
+        const notFound = document.getElementById('tab-404');
+        if (notFound) notFound.classList.add('active');
+      }
+      try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
+      if (!btn) {
+        btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+      }
+      if (btn) {
+        btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+        btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+        const ic = btn.querySelector('.menu-icon');
+        if (ic) {
+          ic.classList.add('text-brand-500', 'dark:text-brand-400');
+          ic.classList.remove('text-gray-500', 'dark:text-gray-400');
+        }
       }
 
-      // Load specific tab data with SWR memory cache (skip heavy re-fetching if loaded recently < 45s)
+      // Close mobile drawer on tab click (covers all responsive widths < 1280px)
+      if (window.innerWidth < 1280) {
+        closeSidebar();
+        if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
+      }
+      if (typeof updateMobileNavState === 'function') {
+        updateMobileNavState(tabId);
+      }
+      
+      // Reset scroll position cleanly on the actual scroll container
+      const scroller = document.getElementById('mainScrollContainer') || document.querySelector('.overflow-y-auto');
+      if (scroller) scroller.scrollTop = 0;
+
+      // 2. Load specific tab data with SWR memory cache (skip heavy re-fetching if loaded recently < 45s)
       const shouldFetch = forceReload || (typeof window.shouldRefreshTab === 'function' ? window.shouldRefreshTab(tabId, 45000) : true);
       if (shouldFetch) {
         if (typeof window.markTabLoaded === 'function') window.markTabLoaded(tabId);
@@ -6281,7 +6277,12 @@
         if (tabId === 'fnb-sites') loadFnbSites();
         if (tabId === 'user-matrix') loadUserMatrix();
         
-        if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
+        if (tabId === 'wh-dashboard') { 
+          setTimeout(() => {
+            if (typeof initTailadminCharts === 'function') initTailadminCharts(); 
+            if (typeof loadDashboardSummary === 'function') loadDashboardSummary(); 
+          }, 15);
+        }
         if (tabId === 'wh-stock') loadStockFEFO();
         if (tabId === 'wh-reorder') loadReorderROP();
         if (tabId === 'wh-leadtime') loadLeadTime();
@@ -6729,71 +6730,81 @@
         return;
       }
 
-      // 1. Render Desktop Table Rows
+      const isDesktop = window.innerWidth >= 1024;
+
+      // 1. Render Desktop Table Rows (Only if on Desktop screen!)
       if (body) {
-        body.innerHTML = filtered.map(it => {
-          const sl = it.soLuongDat || '';
-          const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
-          return `
-            <tr>
-              <td class="col-code">${cellCode(it.maHang)}</td>
-              <td><span class="font-medium text-gray-900 dark:text-white">${it.tenSP}</span></td>
-              <td>${cellBadge('neutral', it.tenLoai || 'CCDC')}</td>
-              <td>${it.dvt || 'Cái'}</td>
-              <td class="col-num"><span class="num">${fmtVND(it.donGia)}</span></td>
-              <td class="col-num"><span class="num">${fmtNum(it.daDat)}</span></td>
-              <td class="col-num text-right">
-                <input type="number" min="0" value="${sl}" placeholder="0" class="input h-8 w-24 text-right num"
-                  oninput="onQtyChange('${it.maHang}', this.value)">
-              </td>
-              <td class="col-num font-semibold text-brand-600 dark:text-brand-400" id="subtotal-${it.maHang}">${fmtVND(thanhTien)}</td>
-            </tr>
-          `;
-        }).join('');
+        if (isDesktop) {
+          body.innerHTML = filtered.map(it => {
+            const sl = it.soLuongDat || '';
+            const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
+            return `
+              <tr>
+                <td class="col-code">${cellCode(it.maHang)}</td>
+                <td><span class="font-medium text-gray-900 dark:text-white">${it.tenSP}</span></td>
+                <td>${cellBadge('neutral', it.tenLoai || 'CCDC')}</td>
+                <td>${it.dvt || 'Cái'}</td>
+                <td class="col-num"><span class="num">${fmtVND(it.donGia)}</span></td>
+                <td class="col-num"><span class="num">${fmtNum(it.daDat)}</span></td>
+                <td class="col-num text-right">
+                  <input type="number" min="0" value="${sl}" placeholder="0" class="input h-8 w-24 text-right num"
+                    oninput="onQtyChange('${it.maHang}', this.value)">
+                </td>
+                <td class="col-num font-semibold text-brand-600 dark:text-brand-400" id="subtotal-${it.maHang}">${fmtVND(thanhTien)}</td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          body.innerHTML = '';
+        }
       }
 
-      // 2. Render Native Mobile Cards
+      // 2. Render Native Mobile Cards (Only if on Mobile screen!)
       if (mobileContainer) {
-        mobileContainer.innerHTML = filtered.map(it => {
-          const sl = it.soLuongDat || '';
-          const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
-          return `
-            <div class="data-card space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-1.5 mb-1 flex-wrap">
-                    ${cellCode(it.maHang)}
-                    ${cellBadge('neutral', it.tenLoai || 'CCDC')}
-                    <span class="text-xs text-gray-500">ĐVT: ${it.dvt || 'Cái'}</span>
+        if (!isDesktop) {
+          mobileContainer.innerHTML = filtered.map(it => {
+            const sl = it.soLuongDat || '';
+            const thanhTien = (it.soLuongDat || 0) * (it.donGia || 0);
+            return `
+              <div class="data-card space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                      ${cellCode(it.maHang)}
+                      ${cellBadge('neutral', it.tenLoai || 'CCDC')}
+                      <span class="text-xs text-gray-500">ĐVT: ${it.dvt || 'Cái'}</span>
+                    </div>
+                    <h4 class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${it.tenSP}</h4>
                   </div>
-                  <h4 class="font-medium text-sm text-gray-900 dark:text-white leading-snug">${it.tenSP}</h4>
                 </div>
-              </div>
 
-              <div class="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-400">
-                <div>
-                  <span class="text-xs text-gray-400">Đơn giá:</span>
-                  <div class="font-medium text-gray-800 dark:text-gray-200 num">${fmtVND(it.donGia)}</div>
-                </div>
-                <div>
-                  <span class="text-xs text-gray-400">Đã đặt lũy kế:</span>
-                  <div class="font-medium text-gray-800 dark:text-gray-200 num">${fmtNum(it.daDat)}</div>
-                </div>
-                <div class="col-span-2 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
-                  <div class="flex-1">
-                    <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">Số lượng đặt:</label>
-                    <input type="number" min="0" value="${sl}" placeholder="0" class="input h-10 w-full text-center num text-sm font-semibold"
-                      oninput="onQtyChange('${it.maHang}', this.value)">
+                <div class="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-400">
+                  <div>
+                    <span class="text-xs text-gray-400">Đơn giá:</span>
+                    <div class="font-medium text-gray-800 dark:text-gray-200 num">${fmtVND(it.donGia)}</div>
                   </div>
-                  <div class="text-right">
-                    <span class="text-xs text-gray-400">Thành tiền:</span>
-                    <div class="text-base font-semibold text-brand-600 dark:text-brand-400 num" id="mob-subtotal-${it.maHang}">${fmtVND(thanhTien)}</div>
+                  <div>
+                    <span class="text-xs text-gray-400">Đã đặt lũy kế:</span>
+                    <div class="font-medium text-gray-800 dark:text-gray-200 num">${fmtNum(it.daDat)}</div>
+                  </div>
+                  <div class="col-span-2 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+                    <div class="flex-1">
+                      <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">Số lượng đặt:</label>
+                      <input type="number" min="0" value="${sl}" placeholder="0" class="input h-10 w-full text-center num text-sm font-semibold"
+                        oninput="onQtyChange('${it.maHang}', this.value)">
+                    </div>
+                    <div class="text-right">
+                      <span class="text-xs text-gray-400">Thành tiền:</span>
+                      <div class="text-base font-semibold text-brand-600 dark:text-brand-400 num" id="mob-subtotal-${it.maHang}">${fmtVND(thanhTien)}</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          `;
-        }).join('');
+            `;
+          }).join('');
+        } else {
+          mobileContainer.innerHTML = '';
+        }
       }
       if (window.lucide) lucide.createIcons();
     }
