@@ -194,6 +194,10 @@ if (typeof window !== 'undefined') {
 
     setTimeout(() => {
       const w = window as any;
+      const curUser = w.gCurrentUser;
+      if (curUser && curUser.status === 'LOCKED') return;
+      if (typeof w.canAccessTab === 'function' && !w.canAccessTab('fnb-chain')) return;
+
       if (typeof w.loadFnbChain === 'function') w.loadFnbChain();
       updateMobileNavState('fnb-chain');
     }, 300);

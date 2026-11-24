@@ -184,19 +184,28 @@ if (typeof window !== 'undefined') {
       openGoogleAuthModal(true);
       return;
     }
+
+    // Nếu tài khoản bị KHÓA hoàn toàn
+    if (w.gCurrentUser.status === 'LOCKED') {
+      if (typeof _origSwitchTab === 'function') {
+        _origSwitchTab('tab-account-locked');
+      }
+      return;
+    }
+
+    // Nếu không có quyền truy cập tab
     if (!canAccessTab(tabId)) {
       if (typeof w.showToast === 'function') {
         w.showToast('Bạn không có quyền truy cập chức năng này', 'warning');
       }
       const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
-      if (firstAllowedBtn) {
-        const safeTabId = firstAllowedBtn.getAttribute('data-tab');
-        if (safeTabId && safeTabId !== tabId && typeof _origSwitchTab === 'function') {
-          _origSwitchTab(safeTabId);
-        }
+      const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'tab-403';
+      if (safeTabId && typeof _origSwitchTab === 'function') {
+        _origSwitchTab(safeTabId);
       }
       return;
     }
+
     if (typeof _origSwitchTab === 'function') {
       _origSwitchTab(tabId, btn, forceReload);
     }

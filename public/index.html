@@ -3813,6 +3813,58 @@
           <div id="kkMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
+      <!-- Tab 403: Không Có Quyền Truy Cập (TailAdmin Access Denied Pattern) -->
+      <section id="tab-403" class="tab-panel py-16 px-4 text-center">
+        <div class="mx-auto max-w-md rounded-2xl border border-amber-200 dark:border-amber-800/60 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 flex items-center justify-center shadow-xs">
+              <i data-lucide="shield-alert" class="w-7 h-7"></i>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 tabular-nums font-mono">Lỗi 403 • Chưa Được Phân Quyền</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="tab403Title">Không Có Quyền Truy Cập</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed" id="tab403Desc">
+              Tài khoản của bạn chưa được cấp quyền xem phân hệ này hoặc toàn bộ quyền truy cập đã bị thu hồi bởi Quản trị viên.
+            </p>
+          </div>
+          <div class="pt-2 flex items-center justify-center gap-2.5 flex-wrap">
+            <button onclick="openRequestAccessModal()" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-bold text-white shadow-theme-xs hover:bg-brand-600 active:translate-y-px transition-all">
+              <i data-lucide="key-round" class="w-4 h-4"></i>
+              Xin Cấp Quyền Truy Cập
+            </button>
+            <button onclick="dangXuatAdmin()" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-xs font-bold text-gray-700 dark:text-gray-300 shadow-xs hover:bg-gray-50 active:translate-y-px transition-all">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              Đổi Tài Khoản
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Account Locked: Tài Khoản Bị Khóa (TailAdmin Locked Pattern) -->
+      <section id="tab-account-locked" class="tab-panel py-16 px-4 text-center">
+        <div class="mx-auto max-w-md rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div class="w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/40 flex items-center justify-center shadow-xs">
+              <i data-lucide="lock" class="w-8 h-8"></i>
+            </div>
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-mono tracking-wide uppercase">Tài Khoản Đã Bị Khóa</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-gray-900 dark:text-white">Truy Cập Bị Vô Hiệu Hóa</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">
+              Tài khoản này đã bị tạm dừng hoạt động hoặc khóa hoàn toàn bởi Quản trị viên hệ thống. Toàn bộ chức năng và quyền xem dữ liệu đều bị ngừng phục vụ.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button onclick="dangXuatAdmin()" class="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-xs font-bold text-white shadow-theme-xs hover:bg-rose-700 active:translate-y-px transition-all">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              Đăng Xuất &amp; Đổi Tài Khoản
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Tab 404: Trang Không Tồn Tại (TailAdmin Error 404 Pattern) -->
       <section id="tab-404" class="tab-panel py-16 px-4 text-center">
         <div class="mx-auto max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">

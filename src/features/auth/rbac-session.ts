@@ -57,9 +57,21 @@ export async function syncCurrentUserPermissions(): Promise<void> {
 
   try {
     const res = await fetch(`/api/auth/me?email=${encodeURIComponent(curUser.email)}`);
-    const json = await res.json();
-    if (json.success && json.data && json.data.permissions) {
-      curUser.permissions = json.data.permissions;
+    const json = await res.json().catch(() => ({}));
+
+    // Nếu tài khoản bị khóa ở backend D1
+    if (res.status === 403 || json.isLocked || (json.data && json.data.user && json.data.user.status === 'LOCKED') || json.status === 'LOCKED') {
+      curUser.status = 'LOCKED';
+      curUser.permissions = {};
+      try { localStorage.setItem('orbit_user', JSON.stringify(curUser)); } catch (e) {}
+      saveAccountToList(curUser);
+      applyUserSessionToUI();
+      return;
+    }
+
+    if (json.success && json.data) {
+      curUser.status = (json.data.user && json.data.user.status) || json.data.status || 'ACTIVE';
+      curUser.permissions = json.data.permissions || {};
       curUser.role = json.data.role;
       curUser.roleName = json.data.roleName;
       if (json.data.user && json.data.user.fullName) curUser.fullName = json.data.user.fullName;
@@ -153,6 +165,60 @@ export function applyUserSessionToUI(): void {
     : `https://ui-avatars.com/api/?name=${getCleanInitials(curUser.fullName || curUser.email)}&background=465fff&color=fff&bold=true`;
   if (avImg) avImg.src = cleanAv;
   if (hdrAv) hdrAv.src = cleanAv;
+
+  // XỬ LÝ KHẨN CẤP: TÀI KHOẢN ĐÃ BỊ KHÓA HOÀN TOÀN
+  if (curUser.status === 'LOCKED') {
+    if (roleEl) {
+      roleEl.textContent = 'BỊ KHÓA';
+      roleEl.className = 'text-xs px-1.5 py-0.2 rounded font-semibold uppercase bg-rose-600 text-white';
+    }
+    if (hdrRole) {
+      hdrRole.textContent = 'BỊ KHÓA';
+      hdrRole.className = 'text-xs font-semibold text-rose-500 uppercase';
+    }
+
+    // Ẩn 100% menu điều hướng bên trái
+    document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
+      btn.classList.add('hidden');
+      (btn as HTMLElement).style.display = 'none';
+      const li = btn.closest('li');
+      if (li) {
+        li.classList.add('hidden');
+        li.style.display = 'none';
+      }
+    });
+    document.querySelectorAll('#sidebar .sidebar-category').forEach(cat => {
+      cat.classList.add('hidden');
+      (cat as HTMLElement).style.display = 'none';
+    });
+
+    // Ẩn menu mobile & các nút chuyển tab
+    document.querySelectorAll('.hub-item').forEach(item => {
+      item.classList.add('hidden');
+      (item as HTMLElement).style.display = 'none';
+    });
+    ['mobTab-fnb-chain', 'mobTab-wh-dashboard', 'mobTab-portal-voucher', 'mobTab-portal-baocao'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('hidden');
+        el.style.display = 'none';
+      }
+    });
+    const adminBtn = document.getElementById('adminPendingReqBtn');
+    if (adminBtn) adminBtn.classList.add('hidden');
+
+    // Chuyển hướng ngay lập tức về tab-account-locked
+    const switchFn = (window as any)._origSwitchTab || (window as any).switchTab;
+    if (typeof switchFn === 'function') {
+      switchFn('tab-account-locked');
+    } else {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      const lockedPanel = document.getElementById('tab-account-locked');
+      if (lockedPanel) lockedPanel.classList.add('active');
+    }
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    return;
+  }
 
   const roleStyles: Record<string, { bg: string; text: string }> = {
     ADMIN: { bg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300', text: 'text-rose-600 dark:text-rose-400' },
@@ -372,14 +438,19 @@ export function applyUserSessionToUI(): void {
     }
   });
 
-  // 6. Kiểm tra tab hiện tại: nếu bị khóa -> chuyển về tab an toàn
+  // 6. Kiểm tra tab hiện tại: nếu bị khóa -> chuyển về tab an toàn hoặc tab-403
   const curActivePanel = document.querySelector('.tab-panel.active');
   const curTabId = curActivePanel ? curActivePanel.id : (localStorage.getItem('orbit_active_tab') || 'fnb-chain');
   if (!canAccessTab(curTabId)) {
     const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
-    const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'wh-dashboard';
-    if (safeTabId && typeof (window as any)._origSwitchTab === 'function') {
-      (window as any)._origSwitchTab(safeTabId);
+    const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'tab-403';
+    const switchFn = (window as any)._origSwitchTab || (window as any).switchTab;
+    if (safeTabId && typeof switchFn === 'function') {
+      switchFn(safeTabId);
+    } else {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      const safePanel = document.getElementById(safeTabId || 'tab-403');
+      if (safePanel) safePanel.classList.add('active');
     }
   }
 
@@ -391,18 +462,40 @@ export function canAccessTab(tabId: string): boolean {
   const curUser = w.gCurrentUser || gCurrentUser;
   if (!curUser) return false;
 
-  // ADMIN luôn có toàn quyền quản trị
-  if (curUser.role === 'ADMIN') return true;
+  // Nếu tài khoản bị KHÓA hoàn toàn
+  if (curUser.status === 'LOCKED') {
+    return tabId === 'tab-account-locked';
+  }
 
-  // Single Source of Truth từ CSDL Backend
-  if (curUser.permissions && typeof curUser.permissions === 'object' && Object.keys(curUser.permissions).length > 0) {
-    const p = curUser.permissions[tabId];
-    if (p !== undefined) {
-      return Boolean(p.canView);
-    }
+  // Các trang hệ thống nội bộ
+  if (tabId === 'tab-403' || tabId === 'tab-404') {
+    return true;
+  }
+  if (tabId === 'tab-account-locked') {
     return false;
   }
 
+  // Single Source of Truth từ CSDL Backend D1
+  if (curUser.permissions && typeof curUser.permissions === 'object') {
+    const p = curUser.permissions[tabId];
+    if (p !== undefined) {
+      if (p.isRevoked === true || p.canView === false) {
+        return false;
+      }
+      return Boolean(p.canView);
+    }
+    // Đối với ADMIN: nếu quyền không bị revoked rõ ràng thì được phép truy cập
+    if (curUser.role === 'ADMIN') {
+      return true;
+    }
+    // Đối với các vai trò khác: nếu đã có ma trận permissions nhưng tab không có trong đó -> cấm
+    return false;
+  }
+
+  // ADMIN luôn có toàn quyền quản trị nếu chưa có ma trận permissions ghi đè
+  if (curUser.role === 'ADMIN') return true;
+
+  // Fallback theo vai trò mặc định (khi chưa cấu hình permissions cá nhân)
   const financeTabs = ['fnb-chain', 'fnb-pl', 'fnb-pos'];
   if (financeTabs.includes(tabId)) return false;
 

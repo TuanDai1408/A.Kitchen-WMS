@@ -45,6 +45,7 @@ export function saveAccountToList(user: UserAccount | null): void {
     role: user.role || 'NHAN_VIEN',
     roleName: user.roleName || 'Nhân Viên Vận Hành',
     badgeColor: user.badgeColor || 'gray',
+    status: user.status || 'ACTIVE',
     permissions: user.permissions || null,
     assignedSite: user.assignedSite || localStorage.getItem('orbit_user_site') || 'K001',
     lastLogin: Date.now()
@@ -80,6 +81,14 @@ export async function switchToSavedAccount(email: string): Promise<void> {
   const acc = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
   if (!acc) return;
 
+  // Kiểm tra trạng thái lưu trữ cục bộ
+  if (acc.status === 'LOCKED') {
+    if (typeof showToast === 'function') {
+      showToast(`Tài khoản ${acc.email} đã bị khóa bởi Quản trị viên! Không thể đăng nhập.`, 'error');
+    }
+    return;
+  }
+
   try {
     if (typeof showLoading === 'function') showLoading(`Đang chuyển sang ${acc.fullName}...`);
     const res = await fetch('/api/auth/google', {
@@ -87,7 +96,18 @@ export async function switchToSavedAccount(email: string): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: acc.email })
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
+
+    // Nếu backend phản hồi tài khoản bị khóa (HTTP 403 / isLocked)
+    if (res.status === 403 || json.isLocked || (json.data && json.data.status === 'LOCKED')) {
+      acc.status = 'LOCKED';
+      saveAccountToList(acc as any);
+      if (typeof showToast === 'function') {
+        showToast(`Tài khoản ${acc.email} đã bị khóa bởi Quản trị viên!`, 'error');
+      }
+      return;
+    }
+
     if (!json.success) throw new Error(json.error || 'Lỗi đăng nhập');
 
     gCurrentUser = json.data;
@@ -119,6 +139,15 @@ export async function switchToSavedAccount(email: string): Promise<void> {
     }
   } catch (err: any) {
     console.error('switchToSavedAccount error:', err);
+    if (err.message && (err.message.includes('khóa') || err.message.includes('LOCKED') || err.message.includes('403'))) {
+      if (typeof showToast === 'function') showToast(err.message, 'error');
+      return;
+    }
+    // Chỉ fallback offline nếu acc không bị khóa
+    if (acc.status === 'LOCKED') {
+      if (typeof showToast === 'function') showToast(`Tài khoản ${acc.email} đã bị khóa.`, 'error');
+      return;
+    }
     gCurrentUser = acc;
     if (typeof window !== 'undefined') (window as any).gCurrentUser = gCurrentUser;
     localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));

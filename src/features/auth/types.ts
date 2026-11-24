@@ -11,8 +11,9 @@ export interface UserAccount {
   role: string;
   roleName?: string;
   badgeColor?: string;
+  status?: 'ACTIVE' | 'LOCKED' | string;
   assignedSite?: string;
-  permissions?: Record<string, { canView?: boolean; canEdit?: boolean; canDelete?: boolean }> | null;
+  permissions?: Record<string, { canView?: boolean; canEdit?: boolean; canDelete?: boolean; isRevoked?: boolean }> | null;
   approvedRoles?: string[];
   lastLogin?: number;
 }
@@ -25,7 +26,8 @@ export interface AuthSavedAccount {
   role: string;
   roleName: string;
   badgeColor: string;
-  permissions?: Record<string, { canView?: boolean; canEdit?: boolean; canDelete?: boolean }> | null;
+  status?: 'ACTIVE' | 'LOCKED' | string;
+  permissions?: Record<string, { canView?: boolean; canEdit?: boolean; canDelete?: boolean; isRevoked?: boolean }> | null;
   assignedSite: string;
   lastLogin: number;
 }

@@ -365,6 +365,14 @@ const ALL_SYSTEM_FEATURES = [
 async function buildUserPermissions(env, user) {
   const permissions = {};
 
+  // NẾU TÀI KHOẢN BỊ KHÓA -> TẤT CẢ QUYỀN ĐỀU BỊ CẮT TUYỆT ĐỐI
+  if (user.status === 'LOCKED') {
+    ALL_SYSTEM_FEATURES.forEach(f => {
+      permissions[f] = { canView: false, canCreate: false, canEdit: false, canDelete: false, isRevoked: true };
+    });
+    return permissions;
+  }
+
   // 1. Khởi tạo quyền mặc định theo vai trò (Role Defaults)
   if (user.role_code === 'ADMIN') {
     ALL_SYSTEM_FEATURES.forEach(f => {
@@ -502,8 +510,8 @@ async function buildUserPermissions(env, user) {
     }
   }
 
-  // 4. Bảo vệ an toàn: Owner hệ thống luôn có quyền quản lý phân quyền (user-matrix)
-  if (user.email === 'trantuandai2508@gmail.com') {
+  // 4. Bảo vệ an toàn: Owner hệ thống luôn có quyền quản lý phân quyền (user-matrix) khi không bị khóa
+  if (user.email === 'trantuandai2508@gmail.com' && user.status !== 'LOCKED') {
     permissions['user-matrix'] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
 
@@ -2898,12 +2906,32 @@ export default {
           let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
           if (!user) {
             // Nếu chưa có trong DB nhưng là Owner
-            if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
+            if (email === 'trantuandai2508@gmail.com') {
               user = { id: 1, email, full_name: 'Trần Tuấn Đại', role_code: 'ADMIN', status: 'ACTIVE' };
             } else {
               return new Response(JSON.stringify({ success: false, error: 'User không tồn tại' }), { status: 404, headers: corsHeaders });
             }
           }
+
+          // NẾU TÀI KHOẢN ĐÃ BỊ KHÓA -> CHẶN TUYỆT ĐỐI KHÔNG TRẢ VỀ QUYỀN
+          if (user.status === 'LOCKED') {
+            return new Response(JSON.stringify({
+              success: false,
+              isLocked: true,
+              error: 'Tài khoản của bạn đã bị khóa bởi Quản trị viên. Bạn không có quyền truy cập hệ thống.',
+              data: {
+                user: {
+                  id: user.id,
+                  email: user.email,
+                  fullName: repairAtobMojibake(user.full_name),
+                  role: user.role_code,
+                  status: 'LOCKED'
+                },
+                permissions: {}
+              }
+            }), { status: 403, headers: corsHeaders });
+          }
+
           const permissions = await buildUserPermissions(env, user);
           const roleInfo = await db.queryOne(env, `SELECT * FROM app_roles WHERE role_code = ? LIMIT 1`, [user.role_code]).catch(() => null);
 
@@ -3015,6 +3043,15 @@ export default {
               user.full_name = repaired;
               await db.exec(env, `UPDATE app_users SET full_name = ? WHERE id = ?`, [repaired, user.id]).catch(() => {});
             }
+          }
+
+          // NẾU TÀI KHOẢN ĐÃ BỊ KHÓA -> CHẶN ĐĂNG NHẬP GOOGLE
+          if (user && user.status === 'LOCKED') {
+            return new Response(JSON.stringify({
+              success: false,
+              isLocked: true,
+              error: 'Tài khoản Google này (' + email + ') đã bị khóa bởi Quản trị viên. Bạn không thể đăng nhập.'
+            }), { status: 403, headers: corsHeaders });
           }
 
           if (!user) {
@@ -3397,6 +3434,7 @@ export default {
 
         if (action === 'RESET') {
           await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ? AND feature_code = ?`, [userEmail, featureCode]);
+          invalidateMemoryCache('auth_me_');
           return new Response(JSON.stringify({ success: true, message: 'Đã khôi phục quyền mặc định theo vai trò' }), { headers: corsHeaders });
         }
 
@@ -3424,6 +3462,7 @@ export default {
                  updated_at = now()`
         }, [userEmail, featureCode, canView, canCreate, canEdit, canDelete]);
 
+        invalidateMemoryCache('auth_me_');
         return new Response(JSON.stringify({
           success: true,
           message: action === 'GRANT' ? `Đã CẤP quyền ${featureCode} cho ${userEmail}` : `Đã CẮT quyền ${featureCode} của ${userEmail}`
@@ -3435,6 +3474,7 @@ export default {
         const { userEmail } = await request.json();
         if (!userEmail) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail' }), { status: 400, headers: corsHeaders });
         await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
+        invalidateMemoryCache('auth_me_');
         return new Response(JSON.stringify({ success: true, message: `Đã khôi phục toàn bộ quyền của ${userEmail} về vai trò gốc` }), { headers: corsHeaders });
       }
 
@@ -3446,6 +3486,7 @@ export default {
         if (resetPermissions) {
           await db.exec(env, `DELETE FROM user_permissions WHERE user_email = ?`, [userEmail]);
         }
+        invalidateMemoryCache('auth_me_');
         return new Response(JSON.stringify({ success: true, message: `Đã cập nhật vai trò ${roleCode} cho ${userEmail}` }), { headers: corsHeaders });
       }
 
@@ -3454,6 +3495,7 @@ export default {
         const { userEmail, status } = await request.json(); // 'ACTIVE' or 'LOCKED'
         if (!userEmail || !status) return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin' }), { status: 400, headers: corsHeaders });
         await db.exec(env, `UPDATE app_users SET status = ? WHERE email = ?`, [status, userEmail]);
+        invalidateMemoryCache('auth_me_');
         return new Response(JSON.stringify({ success: true, message: `Đã ${status === 'ACTIVE' ? 'mở khóa' : 'khóa'} tài khoản ${userEmail}` }), { headers: corsHeaders });
       }
 

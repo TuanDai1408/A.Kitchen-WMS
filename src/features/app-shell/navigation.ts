@@ -47,6 +47,27 @@ let _activeNavBtn: HTMLElement | null = null;
 export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean = false): void {
   if (tabId === 'fnb-stock') tabId = 'wh-dashboard';
 
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  let curUser = w.gCurrentUser;
+  if (!curUser && typeof w.loadPersistedUser === 'function') {
+    curUser = w.loadPersistedUser();
+    w.gCurrentUser = curUser;
+  }
+
+  // 1. Kiểm tra tài khoản bị KHÓA hoàn toàn
+  if (curUser && curUser.status === 'LOCKED') {
+    tabId = 'tab-account-locked';
+  } else if (tabId !== 'tab-403' && tabId !== 'tab-404' && tabId !== 'tab-account-locked') {
+    if (typeof w.canAccessTab === 'function' && !w.canAccessTab(tabId)) {
+      if (typeof w.showToast === 'function') {
+        w.showToast('Bạn không có quyền truy cập chức năng này', 'warning');
+      }
+      const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
+      const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'tab-403';
+      tabId = safeTabId || 'tab-403';
+    }
+  }
+
   // 1. Instant Synchronous Navigation Update (< 0.5ms latency, zero jank)
   if (!_activeTabPanel) {
     _activeTabPanel = document.querySelector('.tab-panel.active');
@@ -118,7 +139,8 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
   if (scroller) scroller.scrollTop = 0;
 
   // 2. Decouple heavy tab data loading into next frame microtask
-  const shouldFetch = forceReload || shouldRefreshTab(tabId, 60000);
+  const isSystemNoticeTab = tabId === 'tab-403' || tabId === 'tab-404' || tabId === 'tab-account-locked';
+  const shouldFetch = !isSystemNoticeTab && (forceReload || shouldRefreshTab(tabId, 60000));
   if (shouldFetch) {
     markTabLoaded(tabId);
     requestAnimationFrame(() => {
