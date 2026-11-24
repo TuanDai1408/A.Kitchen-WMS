@@ -18,5 +18,6 @@ export * from '@/features/wh-inventory';
 export * from '@/features/chain';
 export * from '@/features/portal';
 export * from '@/features/rbac';
+export * from '@/features/auth';
 
 console.log('A.Kitchen WMS TypeScript Core v1.0 initialized.');
