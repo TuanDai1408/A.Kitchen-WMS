@@ -192,13 +192,13 @@ export function initTailadminCharts(): void {
 
 export function changeTrendPeriod(period: TrendPeriod | string, btn?: HTMLElement): void {
   document.querySelectorAll('.trend-btn').forEach(b => {
-    b.classList.remove('active', 'bg-white', 'text-gray-800', 'shadow-xs', 'dark:bg-white/10', 'dark:text-white');
+    b.classList.remove('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-xs', 'bg-white', 'text-gray-800', 'dark:bg-white/10', 'dark:text-white');
     b.classList.add('text-gray-500', 'dark:text-gray-400');
   });
 
   if (btn) {
-    btn.classList.add('active', 'bg-white', 'text-gray-800', 'shadow-xs', 'dark:bg-white/10', 'dark:text-white');
-    btn.classList.remove('text-gray-500', 'dark:text-gray-400');
+    btn.classList.add('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-xs');
+    btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'bg-white', 'dark:bg-white/10');
   }
 
   if (!chartValueTrend) return;

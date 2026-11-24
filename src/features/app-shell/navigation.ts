@@ -71,20 +71,20 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
 
   // Active Nav Button Update
   if (_activeNavBtn) {
-    _activeNavBtn.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'font-semibold', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+    _activeNavBtn.classList.remove('active', 'menu-item-active', 'bg-brand-500', 'bg-brand-600', 'bg-brand-50', 'text-brand-700', 'text-white', 'font-semibold', 'shadow-xs', 'dark:bg-brand-500', 'dark:bg-brand-500/15', 'dark:text-white', 'dark:text-brand-400');
     _activeNavBtn.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
     const ic = _activeNavBtn.querySelector('.menu-icon');
     if (ic) {
-      ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+      ic.classList.remove('text-white', 'text-brand-500', 'dark:text-brand-400');
       ic.classList.add('text-gray-500', 'dark:text-gray-400');
     }
   } else {
     document.querySelectorAll('.nav-btn').forEach(b => {
-      b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'font-semibold', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+      b.classList.remove('active', 'menu-item-active', 'bg-brand-500', 'bg-brand-600', 'bg-brand-50', 'text-brand-700', 'text-white', 'font-semibold', 'shadow-xs', 'dark:bg-brand-500', 'dark:bg-brand-500/15', 'dark:text-white', 'dark:text-brand-400');
       b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
       const ic = b.querySelector('.menu-icon');
       if (ic) {
-        ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+        ic.classList.remove('text-white', 'text-brand-500', 'dark:text-brand-400');
         ic.classList.add('text-gray-500', 'dark:text-gray-400');
       }
     });
@@ -94,12 +94,12 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
     btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`) as HTMLElement;
   }
   if (btn) {
-    btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
-    btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+    btn.classList.add('active', 'menu-item-active', 'bg-brand-500', 'text-white', 'font-semibold', 'shadow-xs', 'dark:bg-brand-500', 'dark:text-white');
+    btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-100');
     const ic = btn.querySelector('.menu-icon');
     if (ic) {
-      ic.classList.add('text-brand-500', 'dark:text-brand-400');
-      ic.classList.remove('text-gray-500', 'dark:text-gray-400');
+      ic.classList.add('text-white');
+      ic.classList.remove('text-gray-500', 'dark:text-gray-400', 'text-brand-500', 'dark:text-brand-400');
     }
     _activeNavBtn = btn;
   }

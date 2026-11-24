@@ -977,15 +977,45 @@ html {
 }
 .nav-btn.menu-item.menu-item-active,
 .nav-btn.menu-item.active {
-  background-color: #f0fdf4;
-  color: #15803d; /* text-brand-700 */
+  background-color: #19723c !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1) !important;
+}
+.nav-btn.menu-item.menu-item-active .menu-icon,
+.nav-btn.menu-item.active .menu-icon {
+  color: #ffffff !important;
 }
 :is(.dark *) .nav-btn.menu-item.menu-item-active,
 :is(.dark *) .nav-btn.menu-item.active,
 .dark .nav-btn.menu-item.menu-item-active,
 .dark .nav-btn.menu-item.active {
-  background-color: rgba(25, 114, 60, 0.15);
-  color: #4ade80; /* text-brand-400 */
+  background-color: #15803d !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+:is(.dark *) .nav-btn.menu-item.menu-item-active .menu-icon,
+:is(.dark *) .nav-btn.menu-item.active .menu-icon,
+.dark .nav-btn.menu-item.menu-item-active .menu-icon,
+.dark .nav-btn.menu-item.active .menu-icon {
+  color: #ffffff !important;
+}
+
+/* Tab button / Trend button khi được chọn (Đậm nổi bật, thay thế màu trắng) */
+.trend-btn.active {
+  background-color: #19723c !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-color: #19723c !important;
+  box-shadow: 0 1px 2px rgba(25, 114, 60, 0.25) !important;
+}
+:is(.dark *) .trend-btn.active,
+.dark .trend-btn.active {
+  background-color: #15803d !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-color: #15803d !important;
 }
 
 /* ==========================================================================
@@ -1281,15 +1311,15 @@ html {
 }
 
 @utility menu-item-active {
-  @apply bg-brand-50 text-brand-700 font-medium dark:bg-brand-500/[0.15] dark:text-brand-300;
+  @apply bg-brand-500 text-white font-semibold shadow-xs dark:bg-brand-600 dark:text-white;
 }
 
 @utility menu-item-inactive {
-  @apply text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
+  @apply text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white;
 }
 
 @utility menu-item-icon-active {
-  @apply text-brand-600 dark:text-brand-400;
+  @apply text-white dark:text-white;
 }
 
 @utility menu-item-icon-inactive {
@@ -1478,33 +1508,23 @@ textarea:not(.bg-transparent) {
   cursor: pointer;
 }
 
+/* Sidebar Menu: Cố định 290px, loại bỏ hoàn toàn tính năng tự co giãn khi hover chuột */
+aside#sidebar,
+aside.sidebar,
+.sidebar,
+.sidebar-static {
+  width: 18.125rem !important; /* 290px */
+  min-width: 18.125rem !important;
+  max-width: 18.125rem !important;
+}
+
 @media (min-width: 1280px) {
-  .sidebar:not(.sidebar-static):hover {
-    width: 290px;
-  }
-  .sidebar:not(.sidebar-static):hover .logo {
-    display: block;
-  }
-  .sidebar:not(.sidebar-static):hover .logo-icon {
-    display: none;
-  }
-  .sidebar:not(.sidebar-static):hover .sidebar-header {
-    justify-content: space-between;
-  }
-  .sidebar:not(.sidebar-static):hover .menu-item-text {
-    display: inline;
-  }
-  .sidebar:not(.sidebar-static):hover .menu-item-arrow {
-    display: block;
-  }
-  .sidebar:not(.sidebar-static):hover .menu-dropdown {
-    display: flex;
-  }
   aside.sidebar,
   .sidebar,
   .sidebar-static {
     --tw-translate-x: 0 !important;
     translate: 0 0 !important;
+    margin-left: 0;
   }
 }
 

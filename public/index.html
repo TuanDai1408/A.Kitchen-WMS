@@ -141,7 +141,7 @@
     <!-- =====================================================================
        TAILADMIN EXACT SPECIFICATION SIDEBAR (Width: w-72.5 / 290px, Dark: dark:bg-black)
        ===================================================================== -->
-  <aside id="sidebar" class="sidebar fixed top-0 left-0 z-40 xl:z-auto flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-all duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
+  <aside id="sidebar" class="sidebar sidebar-static fixed top-0 left-0 z-40 xl:z-auto flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-transform duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
     
     <!-- SIDEBAR HEADER (A.Kitchen Brand Exact Specification) -->
     <div class="sidebar-header flex items-center justify-between gap-2 pt-5 pb-5">
@@ -173,9 +173,9 @@
           </div>
           <ul class="mb-4 flex flex-col gap-2">
             <li>
-              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left active menu-item-active bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
+              <button onclick="switchTab('fnb-chain', this)" data-tab="fnb-chain" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all text-left active menu-item-active bg-brand-500 text-white shadow-xs dark:bg-brand-500 dark:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
-                  <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-brand-500 dark:text-brand-400"></i>
+                  <i data-lucide="trophy" class="menu-icon w-5 h-5 shrink-0 text-white"></i>
                   <span class="truncate">Toàn Chuỗi & Xếp Hạng</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
@@ -644,7 +644,7 @@
           <div class="flex items-center gap-2">
             <span class="font-medium text-gray-700 dark:text-gray-300 text-xs">Vùng vận hành:</span>
             <div class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800 text-xs font-medium">
-              <button onclick="filterFnbChainByRegion('ALL')" id="filterRegALL" class="rounded-md bg-white px-3 py-1 text-gray-900 shadow-xs dark:bg-white/10 dark:text-white transition-all font-semibold">Tất cả (14)</button>
+              <button onclick="filterFnbChainByRegion('ALL')" id="filterRegALL" class="rounded-md bg-brand-500 px-3 py-1 text-white shadow-xs transition-all font-bold">Tất cả (14)</button>
               <button onclick="filterFnbChainByRegion('Miền Nam')" id="filterRegMN" class="rounded-md px-3 py-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">Miền Nam (10)</button>
               <button onclick="filterFnbChainByRegion('Miền Bắc')" id="filterRegMB" class="rounded-md px-3 py-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">Miền Bắc (4)</button>
             </div>
@@ -1502,8 +1502,8 @@
 <section id="wh-dashboard" class="tab-panel space-y-4">
         <!-- Sub-nav bar -->
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
-          <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700">
-            <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i>
+          <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-white"></i>
             <span>Tổng quan kho vận</span>
           </button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
@@ -1716,7 +1716,7 @@
             <!-- Controls: Tabs + Date Range Picker -->
             <div class="flex items-center gap-2.5 flex-wrap">
               <div class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800 text-xs font-medium">
-                <button onclick="changeTrendPeriod('week', this)" class="trend-btn active rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-xs dark:bg-white/10 dark:text-white transition-all">
+                <button onclick="changeTrendPeriod('week', this)" class="trend-btn active rounded-md bg-brand-500 px-3 py-1.5 text-white font-bold shadow-xs transition-all">
                   Tuần
                 </button>
                 <button onclick="changeTrendPeriod('month', this)" class="trend-btn rounded-md px-3 py-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all">
@@ -1802,7 +1802,7 @@
         <!-- Sub-nav bar -->
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
-          <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
+          <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="clipboard-check" class="w-4 h-4 text-white"></i><span>Kiểm kê hằng ngày</span></button>
           <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
@@ -2003,7 +2003,7 @@
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
-          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="package-plus" class="w-4 h-4 text-white"></i><span>Nhập hàng</span></button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
@@ -2149,7 +2149,7 @@
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
           <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
-          <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs border border-gray-200 dark:border-gray-700"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
+          <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="trash-2" class="w-4 h-4 text-white"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
         <!-- Page Header -->

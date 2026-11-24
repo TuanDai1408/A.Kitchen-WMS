@@ -16,7 +16,7 @@ export function switchFnbReceiptSubView(view: ReceiptSubView): void {
       poBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 bg-brand-500 text-white shadow-theme-xs';
     }
     if (histBtn) {
-      histBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3';
+      histBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-300/80 dark:border-gray-700 bg-gray-100 dark:bg-gray-800';
     }
     if (poView) poView.classList.remove('hidden');
     if (histView) histView.classList.add('hidden');
@@ -26,7 +26,7 @@ export function switchFnbReceiptSubView(view: ReceiptSubView): void {
       histBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 bg-brand-500 text-white shadow-theme-xs';
     }
     if (poBtn) {
-      poBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3';
+      poBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-300/80 dark:border-gray-700 bg-gray-100 dark:bg-gray-800';
     }
     if (histView) histView.classList.remove('hidden');
     if (poView) poView.classList.add('hidden');

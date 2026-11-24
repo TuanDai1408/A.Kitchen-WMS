@@ -12,19 +12,19 @@ export function switchFnbWasteSubView(view: WasteSubView): void {
 
   if (view === 'history') {
     if (btnStock) {
-      btnStock.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200';
+      btnStock.className = 'btn btn-secondary btn-sm';
     }
     if (btnHistory) {
-      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700';
+      btnHistory.className = 'btn btn-primary btn-sm';
     }
     if (secStock) secStock.classList.add('hidden');
     if (secHistory) secHistory.classList.remove('hidden');
   } else {
     if (btnStock) {
-      btnStock.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-white/3 text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-gray-700';
+      btnStock.className = 'btn btn-primary btn-sm';
     }
     if (btnHistory) {
-      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200';
+      btnHistory.className = 'btn btn-secondary btn-sm';
     }
     if (secStock) secStock.classList.remove('hidden');
     if (secHistory) secHistory.classList.add('hidden');
