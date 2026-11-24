@@ -23,6 +23,59 @@
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+  <!-- A.Kitchen High-Performance Lucide Engine (RAF Batching & Dynamic Tab Scoping) -->
+  <script>
+    (function () {
+      if (!window.lucide || typeof window.lucide.createIcons !== 'function') return;
+      var _origCreate = window.lucide.createIcons.bind(window.lucide);
+      var _raf = null;
+      var _customRoots = new Set();
+      var _ready = false;
+
+      function _renderScoped(rootEl) {
+        try {
+          if (rootEl && document.body.contains(rootEl)) {
+            _origCreate({ root: rootEl });
+          } else {
+            var activeTab = document.querySelector('.tab-panel.active') || document.body;
+            _origCreate({ root: activeTab });
+            var openModals = document.querySelectorAll('[id*="Modal"]:not(.hidden), [id^="modal"]:not(.hidden)');
+            openModals.forEach(function (m) {
+              if (m.offsetParent !== null || m.classList.contains('flex')) {
+                try { _origCreate({ root: m }); } catch (e) {}
+              }
+            });
+          }
+        } catch (err) {}
+      }
+
+      window.lucide.createIcons = function (opts) {
+        if (!_ready) {
+          try { _origCreate(opts); } catch (e) {}
+          return;
+        }
+
+        if (opts && opts.root) {
+          _customRoots.add(opts.root);
+        }
+
+        if (_raf) cancelAnimationFrame(_raf);
+        _raf = requestAnimationFrame(function () {
+          if (_customRoots.size > 0) {
+            _customRoots.forEach(function (r) { _renderScoped(r); });
+            _customRoots.clear();
+          } else {
+            _renderScoped();
+          }
+        });
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        try { _origCreate(); } catch (e) {}
+        _ready = true;
+      });
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.3.0/dist/apexcharts.min.js"></script>
   <script>
@@ -5912,6 +5965,32 @@
 <script>
 
 
+    // High-Performance Utility Helpers (Debounce & SWR Tab Cache)
+    function debounce(fn, wait = 200) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), wait);
+      };
+    }
+    window.debounce = debounce;
+
+    window._tabLoadedTime = {};
+    window.shouldRefreshTab = function(tabId, maxAgeMs = 45000) {
+      const lastTime = window._tabLoadedTime[tabId] || 0;
+      return (Date.now() - lastTime > maxAgeMs);
+    };
+    window.markTabLoaded = function(tabId) {
+      window._tabLoadedTime[tabId] = Date.now();
+    };
+    window.invalidateTabCache = function(tabId) {
+      if (tabId) {
+        delete window._tabLoadedTime[tabId];
+      } else {
+        window._tabLoadedTime = {};
+      }
+    };
+
     // Global App State
     let App = {
       currentBranch: (localStorage.getItem('orbit_user_site') || 'k001').toLowerCase(),
@@ -6133,77 +6212,90 @@
       }
     });
 
-    function switchTab(tabId, btn) {
+    function switchTab(tabId, btn, forceReload = false) {
       if (tabId === 'fnb-stock') tabId = 'wh-dashboard';
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
-        b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
-        const ic = b.querySelector('.menu-icon');
-        if (ic) {
-          ic.classList.remove('text-brand-500', 'dark:text-brand-400');
-          ic.classList.add('text-gray-500', 'dark:text-gray-400');
-        }
-      });
 
-      const target = document.getElementById(tabId);
-      if (target) {
-        target.classList.add('active');
+      const performDomSwitch = () => {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => {
+          b.classList.remove('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'text-brand-500', 'font-semibold', 'dark:bg-brand-500/15', 'dark:dark:bg-brand-500/[0.12]', 'dark:text-brand-400');
+          b.classList.add('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+          const ic = b.querySelector('.menu-icon');
+          if (ic) {
+            ic.classList.remove('text-brand-500', 'dark:text-brand-400');
+            ic.classList.add('text-gray-500', 'dark:text-gray-400');
+          }
+        });
+
+        const target = document.getElementById(tabId);
+        if (target) {
+          target.classList.add('active');
+        } else {
+          const notFound = document.getElementById('tab-404');
+          if (notFound) notFound.classList.add('active');
+        }
+        try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
+        if (!btn) {
+          btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+        }
+        if (btn) {
+          btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
+          btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
+          const ic = btn.querySelector('.menu-icon');
+          if (ic) {
+            ic.classList.add('text-brand-500', 'dark:text-brand-400');
+            ic.classList.remove('text-gray-500', 'dark:text-gray-400');
+          }
+        }
+
+        // Close mobile drawer on tab click (covers all responsive widths < 1280px)
+        if (window.innerWidth < 1280) {
+          closeSidebar();
+          if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
+        }
+        if (typeof updateMobileNavState === 'function') {
+          updateMobileNavState(tabId);
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      };
+
+      if (typeof document.startViewTransition === 'function') {
+        document.startViewTransition(performDomSwitch);
       } else {
-        const notFound = document.getElementById('tab-404');
-        if (notFound) notFound.classList.add('active');
+        performDomSwitch();
       }
-      try { localStorage.setItem('orbit_active_tab', tabId); } catch(e){}
-      if (!btn) {
-        btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
-      }
-      if (btn) {
-        btn.classList.add('active', 'menu-item-active', 'bg-brand-50', 'text-brand-700', 'dark:bg-brand-500/15', 'dark:text-brand-400');
-        btn.classList.remove('menu-item-inactive', 'text-gray-700', 'dark:text-gray-300');
-        const ic = btn.querySelector('.menu-icon');
-        if (ic) {
-          ic.classList.add('text-brand-500', 'dark:text-brand-400');
-          ic.classList.remove('text-gray-500', 'dark:text-gray-400');
+
+      // Load specific tab data with SWR memory cache (skip heavy re-fetching if loaded recently < 45s)
+      const shouldFetch = forceReload || (typeof window.shouldRefreshTab === 'function' ? window.shouldRefreshTab(tabId, 45000) : true);
+      if (shouldFetch) {
+        if (typeof window.markTabLoaded === 'function') window.markTabLoaded(tabId);
+        
+        // Orbit Siba F&B Tab Hooks
+        if (tabId === 'fnb-chain') loadFnbChain();
+        if (tabId === 'fnb-pl') loadFnbPL();
+        if (tabId === 'fnb-pos') loadFnbPOS();
+        if (tabId === 'fnb-stock') loadFnbStock();
+        if (tabId === 'fnb-counts') loadFnbCounts();
+        if (tabId === 'fnb-receipts') loadFnbReceipts();
+        if (tabId === 'fnb-waste') loadFnbWaste();
+        if (tabId === 'fnb-sites') loadFnbSites();
+        if (tabId === 'user-matrix') loadUserMatrix();
+        
+        if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
+        if (tabId === 'wh-stock') loadStockFEFO();
+        if (tabId === 'wh-reorder') loadReorderROP();
+        if (tabId === 'wh-leadtime') loadLeadTime();
+        if (tabId === 'wh-posap') {
+          if (typeof loadWhInventory === 'function') loadWhInventory();
+          else if (typeof loadPoSap === 'function') loadPoSap();
         }
+        if (tabId === 'portal-order') loadQuota();
+        if (tabId === 'portal-search') searchVouchers();
+        if (tabId === 'portal-history') loadHistory();
+        if (tabId === 'portal-kiemke') loadAudit();
       }
 
-      // Close mobile drawer on tab click (covers all responsive widths < 1280px)
-      if (window.innerWidth < 1280) {
-        closeSidebar();
-        if (typeof closeMobileMenuHub === 'function') closeMobileMenuHub();
-      }
-      if (typeof updateMobileNavState === 'function') {
-        updateMobileNavState(tabId);
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Load specific tab data
-      
-      // Orbit Siba F&B Tab Hooks
-      if (tabId === 'fnb-chain') loadFnbChain();
-      if (tabId === 'fnb-pl') loadFnbPL();
-      if (tabId === 'fnb-pos') loadFnbPOS();
-      if (tabId === 'fnb-stock') loadFnbStock();
-      if (tabId === 'fnb-counts') loadFnbCounts();
-      if (tabId === 'fnb-receipts') loadFnbReceipts();
-      if (tabId === 'fnb-waste') loadFnbWaste();
-      if (tabId === 'fnb-sites') loadFnbSites();
-      if (tabId === 'user-matrix') loadUserMatrix();
-      
-      if (tabId === 'wh-dashboard') { initTailadminCharts(); loadDashboardSummary(); }
-      if (tabId === 'wh-stock') loadStockFEFO();
-      if (tabId === 'wh-reorder') loadReorderROP();
-      if (tabId === 'wh-leadtime') loadLeadTime();
-      if (tabId === 'wh-posap') {
-        if (typeof loadWhInventory === 'function') loadWhInventory();
-        else if (typeof loadPoSap === 'function') loadPoSap();
-      }
-      if (tabId === 'portal-order') loadQuota();
-      if (tabId === 'portal-search') searchVouchers();
-      if (tabId === 'portal-history') loadHistory();
-      if (tabId === 'portal-kiemke') loadAudit();
-
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     window.onGlobalMonthChange = function(val) {
@@ -6215,6 +6307,7 @@
     function onGlobalBranchChange(code) {
       if (!code) code = 'ALL';
       App.currentBranch = code.toLowerCase();
+      if (typeof window.invalidateTabCache === 'function') window.invalidateTabCache();
       
       const sites = getAppSitesList();
       const siteObj = sites.find(s => s.code.toLowerCase() === code.toLowerCase());
@@ -18987,6 +19080,34 @@ window.confirmCancelReceivedOrder = async function(receiptId, poNumber, receiptC
     if (typeof hideLoading === 'function') hideLoading();
   }
 };
+
+    // =========================================================================
+    // A.KITCHEN HIGH-PERFORMANCE DEBOUNCED SEARCH & FILTER SYSTEM
+    // =========================================================================
+    (function() {
+      function _wrapDebounce(fnName, wait = 200) {
+        if (typeof window[fnName] === 'function') {
+          const orig = window[fnName];
+          window[fnName] = window.debounce(function(...args) {
+            orig.apply(this, args);
+          }, wait);
+        }
+      }
+
+      // Wrap all 12 key search/filter handlers with smart debouncing
+      _wrapDebounce('onFnbPoSearchInput', 200);
+      _wrapDebounce('filterWhInventoryTable', 200);
+      _wrapDebounce('filterItems', 200);
+      _wrapDebounce('filterAuditItems', 200);
+      _wrapDebounce('onFnbCountSearch', 200);
+      _wrapDebounce('onFnbWasteSearch', 200);
+      _wrapDebounce('filterFefoLive', 200);
+      _wrapDebounce('filterGlobalQuickSearch', 200);
+      _wrapDebounce('filterSidebarMenu', 150);
+      _wrapDebounce('filterManualCatalogList', 200);
+      _wrapDebounce('filterSiteOptionCards', 150);
+      _wrapDebounce('filterWhReceivedOrdersTable', 200);
+    })();
 
   </script>
 </body>

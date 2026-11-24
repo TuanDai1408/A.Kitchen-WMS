@@ -1554,12 +1554,32 @@ textarea:not(.bg-transparent) {
   @apply !border-brand-600 !bg-brand-600 !text-white hover:!border-brand-700 hover:!bg-brand-700;
 }
 
-/* WMS Tab Panel Management */
+/* WMS Tab Panel Management with Hardware-Accelerated Smooth Transition */
 .tab-panel {
   display: none;
 }
 .tab-panel.active {
   display: block;
+  animation: tabFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0.85;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* View Transition API Smooth Native-Like Cross-Fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.16s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
