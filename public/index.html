@@ -84,7 +84,7 @@
     <!-- =====================================================================
        TAILADMIN EXACT SPECIFICATION SIDEBAR (Width: w-72.5 / 290px, Dark: dark:bg-black)
        ===================================================================== -->
-  <aside id="sidebar" class="sidebar fixed top-0 left-0 z-9999 flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-all duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
+  <aside id="sidebar" class="sidebar fixed top-0 left-0 z-40 xl:z-auto flex h-screen w-72.5 flex-col shrink-0 border-r border-gray-200 bg-white px-5 transition-all duration-300 -translate-x-full xl:static xl:translate-x-0 dark:border-gray-800 dark:bg-black select-none shadow-2xl xl:shadow-none">
     
     <!-- SIDEBAR HEADER (A.Kitchen Brand Exact Specification) -->
     <div class="sidebar-header flex items-center justify-between gap-2 pt-5 pb-5">
@@ -4127,7 +4127,7 @@
   <!-- =====================================================================
        ORBIT SIBA FOOD: FULL IMAGE & DOCUMENT LIGHTBOX MODAL
        ===================================================================== -->
-  <div id="imageLightbox" class="fixed inset-0 z-[200] hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
+  <div id="imageLightbox" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/92 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this)closeImageLightbox()">
     <button onclick="closeImageLightbox()" class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 text-white p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:translate-y-px transition-all shadow-lg" title="Đóng (ESC)">
       <i data-lucide="x" class="w-5 h-5"></i>
     </button>
@@ -4155,7 +4155,7 @@
 
   
   <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
-  <div id="createReceiptModal" class="fixed inset-0 z-[120] hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
+  <div id="createReceiptModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -4263,7 +4263,7 @@
   </div>
 
   <!-- MODAL: NHẬP HÀNG THỦ CÔNG (NGOÀI PO / PR) -->
-  <div id="modalManualReceipt" style="z-index: 99999;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 select-none" onclick="if(event.target===this)closeManualReceiptModal()">
+  <div id="modalManualReceipt" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 select-none" onclick="if(event.target===this)closeManualReceiptModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-6xl xl:max-w-7xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
       <!-- Modal Header -->
       <div class="px-5 py-3.5 sm:px-6 sm:py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -4880,7 +4880,7 @@
   </div>
 
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
-  <div id="createWasteModal" class="fixed inset-0 z-[120] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
+  <div id="createWasteModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -4964,7 +4964,7 @@
   </div>
 
   <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
-  <div id="invDetailModal" class="fixed inset-0 z-[130] hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
+  <div id="invDetailModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div>
@@ -4989,7 +4989,7 @@
   <!-- =====================================================================
        A.KITCHEN WMS: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
        ===================================================================== -->
-  <div id="googleAuthModal" class="fixed inset-0 z-99999 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
+  <div id="googleAuthModal" style="z-index: 100030;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up" onclick="event.stopPropagation()">
       
       <!-- Modal Header with Centered Stacked Brand Logo -->
@@ -5068,7 +5068,7 @@
   <!-- =====================================================================
        POPUP THÔNG TIN USER & CHUYỂN ĐỔI TÀI KHOẢN (USER PROFILE MODAL)
        ===================================================================== -->
-  <div id="userProfileModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
+  <div id="userProfileModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeUserProfileModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
@@ -5164,7 +5164,7 @@
 <!-- =====================================================================
        POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
        ===================================================================== -->
-  <div id="siteSelectorModal" class="fixed inset-0 z-[155] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
+  <div id="siteSelectorModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
     <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
@@ -5226,7 +5226,7 @@
   <!-- =====================================================================
        POPUP 2: XIN QUYỀN TRUY CẬP CHỨC NĂNG SÂU (DÀNH CHO USER GỬI ADMIN)
        ===================================================================== -->
-  <div id="requestAccessModal" class="fixed inset-0 z-[155] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeRequestAccessModal()">
+  <div id="requestAccessModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeRequestAccessModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
       
       <!-- Header -->
@@ -5303,7 +5303,7 @@
   <!-- =====================================================================
        POPUP 3: ADMIN PHÊ DUYỆT CẤP QUYỀN (DÀNH CHO ADMIN)
        ===================================================================== -->
-  <div id="adminApprovalModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
+  <div id="adminApprovalModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
@@ -5361,7 +5361,7 @@
   </div>
 
 <!-- MODAL: ROLE SWITCHER (KIỂM THỬ NHANH PHÂN QUYỀN) -->
-  <div id="roleSwitcherModal" class="fixed inset-0 z-[160] hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
+  <div id="roleSwitcherModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 select-none" onclick="if(event.target===this)closeRoleSwitcherModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-sm rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
         <div>
@@ -5377,7 +5377,7 @@
     </div>
   </div>
 
-  <div id="generalModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="generalModal" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
         <h3 id="modalTitle" class="font-semibold text-lg text-gray-900 dark:text-white">Chi tiết</h3>
@@ -5391,7 +5391,7 @@
 
   
   <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - TailAdmin Profile Style) -->
-  <div id="modalInventoryDetail" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-4">
+  <div id="modalInventoryDetail" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
         <div class="flex items-center gap-3">
@@ -5488,7 +5488,7 @@
 
 
   <!-- Modal 1: Thẻ Kho & Lịch Sử Biến Động Xuất Nhập (WMS Ledger History Modal) -->
-  <div id="modalWhItemHistory" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-3 sm:p-5">
+  <div id="modalWhItemHistory" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-5xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
@@ -5579,7 +5579,7 @@
 
 
   <!-- Modal 2: Chi Tiết Các Lô Hàng Đã Nhập (WMS Batches Modal) -->
-  <div id="modalWhItemBatches" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-3 sm:p-5">
+  <div id="modalWhItemBatches" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
@@ -5662,7 +5662,7 @@
 
 
   <!-- Modal Chỉnh Sửa Định Mức Mặt Hàng (Edit Item Modal - TailAdmin Style) -->
-  <div id="modalEditItem" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 z-99999 z-50 flex items-center justify-center p-4">
+  <div id="modalEditItem" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-theme-xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-semibold text-lg text-gray-900 dark:text-white flex items-center gap-2">
@@ -5711,7 +5711,7 @@
   </div>
 
 <!-- WMS Fast Receipt Modal -->
-  <div id="modalFastReceipt" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="modalFastReceipt" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
@@ -5765,7 +5765,7 @@
   </div>
 
   <!-- WMS Fast Issue Modal -->
-  <div id="modalFastIssue" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="modalFastIssue" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
         <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
@@ -5798,7 +5798,7 @@
   </div>
 
   <!-- Modal: Chi tiết đơn hàng đã nhập kho & Hủy nhập kho -->
-  <div id="whReceivedOrderDetailModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+  <div id="whReceivedOrderDetailModal" style="z-index: 100004;" class="modal-backdrop hidden fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
       <!-- Modal Header -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
@@ -5893,13 +5893,13 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold hidden flex items-center gap-2 border border-slate-700 transition-all">
+  <div id="toast" style="z-index: 100040;" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold hidden flex items-center gap-2 border border-slate-700 transition-all">
     <i data-lucide="info" class="w-4 h-4 text-emerald-400"></i>
     <span id="toastMsg">Thông báo</span>
   </div>
 
   <!-- Loading Overlay -->
-  <div id="loading" class="fixed inset-0 bg-white/70 dark:bg-gray-900/80 backdrop-blur-xs z-50 flex flex-col items-center justify-center gap-3 hidden">
+  <div id="loading" style="z-index: 100050;" class="fixed inset-0 bg-white/70 dark:bg-gray-900/80 backdrop-blur-xs flex flex-col items-center justify-center gap-3 hidden">
     <div class="w-9 h-9 border-3 border-gray-200 dark:border-gray-800 border-t-brand-600 rounded-full animate-spin"></div>
     <span class="text-xs font-bold text-gray-700 dark:text-gray-200" id="loadingMsg">Đang tải dữ liệu Cloudflare D1...</span>
   </div>
