@@ -25,7 +25,7 @@ export function initTailadminCharts(): void {
     const optionsBar = {
       colors: ['#19723C', '#10B981'],
       chart: {
-        fontFamily: "Estedad, Inter, sans-serif",
+        fontFamily: "'Be Vietnam Pro', sans-serif",
         type: 'bar',
         height: 280,
         toolbar: { show: false }
@@ -74,7 +74,7 @@ export function initTailadminCharts(): void {
       series: [92.4],
       colors: ['#599973'],
       chart: {
-        fontFamily: "Estedad, Inter, sans-serif",
+        fontFamily: "'Be Vietnam Pro', sans-serif",
         type: 'radialBar',
         height: 270,
         sparkline: { enabled: true }
@@ -130,7 +130,7 @@ export function initTailadminCharts(): void {
       ],
       colors: ['#19723C', '#F59E0B'],
       chart: {
-        fontFamily: "Estedad, Inter, sans-serif",
+        fontFamily: "'Be Vietnam Pro', sans-serif",
         type: 'area',
         height: 300,
         toolbar: { show: false }
@@ -318,7 +318,7 @@ export function updateAuditKpisAndChart(items: any[]): void {
         ],
         colors: ['#19723C', '#10B981'],
         chart: {
-          fontFamily: "Estedad, Inter, sans-serif",
+          fontFamily: "'Be Vietnam Pro', sans-serif",
           type: 'bar',
           height: 240,
           toolbar: { show: false }

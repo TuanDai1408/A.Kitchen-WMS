@@ -119,8 +119,8 @@
 
 @theme {
   --font-*: initial;
-  --font-sans: "Estedad", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-outfit: "Estedad", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-outfit: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --text-xs: 12px;
   --text-xs--line-height: 16px;
@@ -257,8 +257,8 @@
 }
 
 :root {
-  font-family: "Estedad", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-sans: "Estedad", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 14px;
   line-height: 1.5;
@@ -268,71 +268,35 @@
 }
 
 /* ==========================================================================
-   ESTEDAD TYPOGRAPHY RULES (x-height ~0.49em)
-   1. Thang chữ: Thân/bảng/nút 14px, Nhãn/cột 13px (min 12px), Chú thích 12px,
-      Tiêu đề thẻ 16px, Số KPI 26-28px font-semibold, Tiêu đề trang 24px.
-   2. Độ đậm: Gốc 400, Nhấn 500-600; Bỏ 700-900.
-   3. Tabular nums: tnum cho số tiền, số lượng, phần trăm.
+   CANTEEN & A.KITCHEN DESIGN SYSTEM TYPOGRAPHY RULES
+   Primary: Be Vietnam Pro (clean, modern SaaS typography)
+   Monospace: JetBrains Mono (with tnum 1 tabular figures)
    ========================================================================== */
 
-/* Chuẩn hóa độ đậm: Bỏ 700-900, nhấn 500-600 */
-b, strong, th, h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-}
-.font-bold,
-.font-extrabold,
-.font-black {
-  font-weight: 600;
-}
-
-/* Thân trang: mặc định 14px */
+/* Thân trang: Be Vietnam Pro chuẩn 14px, mượt mà */
 body {
   font-family: var(--font-sans);
   font-size: 14px;
-  font-weight: 400;
+  line-height: 1.5;
+  color: #0f172a;
+  background-color: #f8fafc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Thân / ô bảng / nút: 14px (text-sm) */
-table td,
-button,
-.btn {
-  font-size: 14px;
+/* Monospace font classes for POS thermal bill, currency numbers & order codes */
+.font-mono,
+.pos-mono,
+.font-receipt,
+.code {
+  font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
+  font-feature-settings: 'tnum' 1;
 }
 
-/* Nhãn và tiêu đề cột: 13px (không dưới 12px) */
-label,
-table th,
-.table-th,
-.col-header {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* Chú thích & chữ nhỏ: 12px, đảm bảo không dưới 12px */
-caption,
-small,
-.caption,
-.text-caption {
-  font-size: 12px;
-}
-
-/* Tiêu đề thẻ: 16px */
-.card-title,
-.box-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-/* Tiêu đề trang: 24px */
-.page-title,
-h1.page-title {
-  font-size: 24px;
-  font-weight: 600;
-}
-
-/* Số KPI: 26–28px font-semibold (dùng chữ số tự nhiên của Estedad, KHÔNG tnum) */
+/* Tabular figures for numbers, currency, percentage, and table data */
+.num,
+.tabular-nums,
 .kpi-value,
 .kpi-stat,
 .stat-value,
@@ -341,33 +305,79 @@ h1.page-title {
 .kpi-card-compact-num,
 .kpi-value-hero,
 .kpi-value-compact {
-  font-size: 26px;
-  font-weight: 600;
-  font-variant-numeric: normal;
-  font-feature-settings: normal;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
-/* Quy ước số & mã định danh (Design System Phase 1) */
-.num {
-  font-family: "Inter", var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  letter-spacing: 0;
-} /* số tiền, số lượng, %, ngày trong cột bảng */
+/* Tiêu đề trang & thẻ chuẩn phong cách Canteen Portal */
+.card-title,
+.box-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
 
-.code {
+.page-title,
+h1.page-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* KPI numbers: Bold, crisp, tabular */
+.kpi-value,
+.kpi-stat,
+.stat-value,
+.kpi-card-hero-num,
+.kpi-card-standard-num,
+.kpi-card-compact-num,
+.kpi-value-hero,
+.kpi-value-compact {
   font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0;
-  white-space: nowrap;
-  font-feature-settings: normal;
-} /* mã chứng từ, SKU, mã điểm bán */
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
 
-/* Lưới an toàn: vô hiệu hóa tnum trên 320 chỗ tabular-nums cũ chưa chuyển sang .num */
-.tabular-nums:not(.num) {
-  font-variant-numeric: normal;
-  font-feature-settings: normal;
+/* Micro badges & status pills (Canteen Design System) */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+  border-width: 1px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+/* Smooth micro-interactions & hardware acceleration */
+button, a, input, select, textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+::selection {
+  background-color: #19723c;
+  color: #ffffff;
+}
+
+/* GPU hardware acceleration for smooth tab switching & modals */
+[id$="Modal"], [id^="modal"], .modal-card, aside, #mobileHubModal {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
 /* ==========================================================================
@@ -1256,7 +1266,7 @@ h1.page-title {
 .pos-mono,
 .font-receipt {
   font-family: 'JetBrains Mono', 'SF Pro Text', Menlo, Consolas, monospace !important;
-  font-feature-settings: normal;
+  font-feature-settings: 'tnum' 1;
 }
 
 [x-cloak] {
@@ -1341,7 +1351,7 @@ h1.page-title {
   }
 
   scrollbar-width: thin;
-  scrollbar-color: var(--color-gray-200, #e5e7eb) transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -1386,16 +1396,16 @@ h1.page-title {
 
   ::-webkit-scrollbar-thumb {
     border-radius: 9999px;
-    background-color: var(--color-gray-200, #e5e7eb);
+    background-color: #cbd5e1;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-gray-300, #d1d5db);
+    background-color: #94a3b8;
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-gray-200, #e5e7eb) transparent;
+    scrollbar-color: #cbd5e1 transparent;
   }
 }
 
@@ -1672,7 +1682,7 @@ table tbody tr {
 }
 
 /* ==========================================================================
-   MODAL / POPUP DESIGN SYSTEM (CHUẨN HÓA CỠ CHỮ THEO ESTEDAD SYSTEM)
+   MODAL / POPUP DESIGN SYSTEM (CANTEEN & A.KITCHEN SYSTEM)
    ========================================================================== */
 
 /* 1. Modal Dialog Container */
