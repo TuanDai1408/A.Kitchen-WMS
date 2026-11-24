@@ -1428,100 +1428,139 @@
       <!-- ====================================================================
            MODAL: THÊM TÀI KHOẢN MỚI
            ==================================================================== -->
-      <div id="addUserModal" class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-xs hidden p-4">
-        <div class="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 flex items-center justify-center shrink-0">
+      <div id="addUserModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAddUserModal()">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+          
+          <!-- Header -->
+          <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-brand-500 text-white flex items-center justify-center shadow-md shadow-brand-500/20 shrink-0">
                 <i data-lucide="user-plus" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-base text-gray-900 dark:text-white">Thêm tài khoản mới</h3>
-                <p class="text-xs text-gray-400">Tạo tài khoản và phân quyền khởi tạo</p>
+                <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Thêm tài khoản mới</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tạo tài khoản người dùng và thiết lập phân quyền ban đầu</p>
               </div>
             </div>
-            <button onclick="closeAddUserModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 hover:text-gray-600 transition-colors">
-              <i data-lucide="x" class="w-5 h-5"></i>
+            <button type="button" onclick="closeAddUserModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <form onsubmit="submitAddUser(event)" class="space-y-4">
-            <div class="field">
-              <label class="field-label">Email Google (*)</label>
-              <input type="email" id="addUserInputEmail" required placeholder="example@gmail.com" class="input">
+          <!-- Body -->
+          <form onsubmit="submitAddUser(event)" class="flex flex-col flex-1 overflow-hidden m-0">
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 text-xs sm:text-sm flex-1">
+              <div class="space-y-1.5">
+                <label class="block font-semibold text-gray-700 dark:text-gray-300">Email Google đăng nhập <span class="text-rose-500 font-bold">*</span></label>
+                <div class="relative">
+                  <i data-lucide="mail" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input type="email" id="addUserInputEmail" required placeholder="example@gmail.com" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono">
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-semibold text-gray-700 dark:text-gray-300">Họ và tên nhân sự</label>
+                <div class="relative">
+                  <i data-lucide="user" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input type="text" id="addUserInputName" placeholder="Nguyễn Văn A" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-semibold text-gray-700 dark:text-gray-300">Vai trò phân quyền ban đầu</label>
+                <div class="relative">
+                  <i data-lucide="shield" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                  <select id="addUserInputRole" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer">
+                    <option value="NHAN_VIEN">Nhân viên điểm bán (NHAN_VIEN)</option>
+                    <option value="KHO_TRUONG">Quản lý kho WMS (KHO_TRUONG)</option>
+                    <option value="BEP_TRUONG">Bếp trưởng / Quản lý điểm (BEP_TRUONG)</option>
+                    <option value="KE_TOAN">Kế toán kiểm soát (KE_TOAN)</option>
+                    <option value="ADMIN">Ban quản trị hệ thống (ADMIN)</option>
+                  </select>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-1">Sau khi tạo, bạn có thể phân quyền chi tiết từng tab cho tài khoản trong bảng ma trận.</p>
+              </div>
             </div>
 
-            <div class="field">
-              <label class="field-label">Họ và tên</label>
-              <input type="text" id="addUserInputName" placeholder="Nguyễn Văn A" class="input">
-            </div>
-
-            <div class="field">
-              <label class="field-label">Vai trò ban đầu</label>
-              <select id="addUserInputRole" class="select">
-                <option value="NHAN_VIEN">Nhân viên điểm bán (NHAN_VIEN)</option>
-                <option value="KHO_TRUONG">Quản lý kho (KHO_TRUONG)</option>
-                <option value="BEP_TRUONG">Bếp trưởng (BEP_TRUONG)</option>
-                <option value="KE_TOAN">Kế toán chuỗi (KE_TOAN)</option>
-                <option value="QUAN_LY_VUNG">Quản lý vùng (QUAN_LY_VUNG)</option>
-                <option value="ADMIN">Quản trị viên (ADMIN)</option>
-              </select>
-            </div>
-
-            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
-              <button type="button" onclick="closeAddUserModal()" class="btn btn-secondary">Hủy</button>
-              <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+            <!-- Footer -->
+            <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+              <button type="button" onclick="closeAddUserModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Tạo tài khoản</span>
+              </button>
             </div>
           </form>
+
         </div>
       </div>
 
       <!-- ====================================================================
            MODAL: CHỈNH SỬA VAI TRÒ & RESET QUYỀN USER
            ==================================================================== -->
-      <div id="editUserModal" class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-xs hidden p-4">
-        <div class="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 flex items-center justify-center shrink-0">
+      <div id="editUserModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditUserModal()">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+          
+          <!-- Header -->
+          <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0">
                 <i data-lucide="shield" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-base text-gray-900 dark:text-white">Điều chỉnh tài khoản</h3>
-                <p id="editUserEmailDisplay" class="text-xs text-gray-400 code">user@gmail.com</p>
+                <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Điều chỉnh tài khoản</h3>
+                <p id="editUserEmailDisplay" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">user@gmail.com</p>
               </div>
             </div>
-            <button onclick="closeEditUserModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 hover:text-gray-600 transition-colors">
-              <i data-lucide="x" class="w-5 h-5"></i>
+            <button type="button" onclick="closeEditUserModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <form onsubmit="submitEditUserRole(event)" class="space-y-4">
+          <!-- Body -->
+          <form onsubmit="submitEditUserRole(event)" class="flex flex-col flex-1 overflow-hidden m-0">
             <input type="hidden" id="editUserTargetEmail">
 
-            <div class="field">
-              <label class="field-label">Vai trò hệ thống</label>
-              <select id="editUserRoleSelect" class="select">
-                <option value="ADMIN">Quản trị viên (ADMIN)</option>
-                <option value="KHO_TRUONG">Quản lý kho (KHO_TRUONG)</option>
-                <option value="BEP_TRUONG">Bếp trưởng (BEP_TRUONG)</option>
-                <option value="KE_TOAN">Kế toán chuỗi (KE_TOAN)</option>
-                <option value="QUAN_LY_VUNG">Quản lý vùng (QUAN_LY_VUNG)</option>
-                <option value="NHAN_VIEN">Nhân viên điểm bán (NHAN_VIEN)</option>
-              </select>
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 text-xs sm:text-sm flex-1">
+              <div class="space-y-1.5">
+                <label class="block font-semibold text-gray-700 dark:text-gray-300">Vai trò hệ thống</label>
+                <div class="relative">
+                  <i data-lucide="award" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                  <select id="editUserRoleSelect" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <option value="ADMIN">Ban quản trị hệ thống (ADMIN)</option>
+                    <option value="KHO_TRUONG">Quản lý kho WMS (KHO_TRUONG)</option>
+                    <option value="BEP_TRUONG">Bếp trưởng / Quản lý điểm (BEP_TRUONG)</option>
+                    <option value="KE_TOAN">Kế toán kiểm soát (KE_TOAN)</option>
+                    <option value="NHAN_VIEN">Nhân viên điểm bán (NHAN_VIEN)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/40 space-y-2">
+                <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs">
+                  <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                  <span>Khôi phục quyền theo vai trò</span>
+                </div>
+                <p class="text-[11px] text-amber-700/80 dark:text-amber-400/80 leading-relaxed">
+                  Bấm nút bên dưới để đặt lại toàn bộ ma trận phân quyền cá nhân về giá trị mặc định của vai trò đã chọn.
+                </p>
+                <button type="button" onclick="resetUserRolePermissions()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 font-bold text-xs hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5 shadow-2xs">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Reset quyền về mặc định</span>
+                </button>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between pt-2">
-              <button type="button" onclick="resetUserRolePermissions()" class="btn btn-secondary btn-sm" title="Khôi phục quyền mặc định theo vai trò">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset quyền về mặc định
+            <!-- Footer -->
+            <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+              <button type="button" onclick="closeEditUserModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Đóng</button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center gap-1.5 transition-all">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Lưu thay đổi</span>
               </button>
             </div>
-
-            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
-              <button type="button" onclick="closeEditUserModal()" class="btn btn-secondary">Đóng</button>
-              <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-            </div>
           </form>
+
         </div>
       </div>
 <section id="wh-dashboard" class="tab-panel space-y-4">
@@ -4599,25 +4638,23 @@
   </div>
 
   <!-- MODAL XÁC NHẬN XÓA TẤT CẢ MẶT HÀNG TRONG PHIẾU NHẬP THỦ CÔNG -->
-  <div id="modalConfirmClearManualLines" style="z-index: 100005;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeConfirmClearManualLinesModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
-      <div class="flex items-start gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
-        </div>
-        <div class="flex-1">
-          <h4 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa tất cả mặt hàng?</h4>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-            Bạn có chắc chắn muốn xóa toàn bộ <b id="confirmClearManualCountText" class="text-rose-600 font-mono font-bold">0</b> mặt hàng đã thêm vào phiếu nhập thủ công này không? Thao tác này sẽ làm trống danh sách hàng nhập.
-          </p>
-        </div>
+  <div id="modalConfirmClearManualLines" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeConfirmClearManualLinesModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-6 sm:p-7 space-y-5 animate-scale-up text-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-sm">
+        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
       </div>
-      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
-        <button type="button" onclick="closeConfirmClearManualLinesModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+      <div>
+        <h4 class="font-bold text-lg text-gray-900 dark:text-white leading-tight">Xóa tất cả mặt hàng?</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+          Bạn có chắc chắn muốn xóa toàn bộ <b id="confirmClearManualCountText" class="text-rose-600 font-mono font-bold">0</b> mặt hàng đã thêm vào phiếu nhập thủ công này không? Thao tác này sẽ làm trống danh sách hàng nhập.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button type="button" onclick="closeConfirmClearManualLinesModal()" class="w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           Hủy bỏ
         </button>
-        <button type="button" onclick="executeClearAllManualReceiptLines()" id="btnExecuteClearAllManual" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-theme-xs transition-colors">
-          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        <button type="button" onclick="executeClearAllManualReceiptLines()" id="btnExecuteClearAllManual" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-all">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
           <span>Xác nhận xóa</span>
         </button>
       </div>
@@ -4625,21 +4662,30 @@
   </div>
 
     <!-- MODAL XÁC NHẬN XÓA CHỨNG TỪ (RBAC) -->
-  <div id="modalConfirmDeleteVoucher" style="z-index: 100005;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteVoucherModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
-      <div class="flex items-start gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-          <i data-lucide="trash-2" class="w-5 h-5"></i>
-        </div>
-        <div class="flex-1">
-          <h4 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa chứng từ?</h4>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-            Hành động này sẽ xóa vĩnh viễn chứng từ <span id="confirmDeleteVoucherCode" class="font-mono font-bold text-rose-600 dark:text-rose-400"></span> cùng toàn bộ tệp đính kèm liên quan khỏi hệ thống CSDL. Thao tác không thể hoàn tác.
-          </p>
-          <div id="confirmDeleteVoucherInfo" class="mt-3 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 text-xs space-y-1 text-gray-600 dark:text-gray-300">
-          </div>
-        </div>
+  <div id="modalConfirmDeleteVoucher" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteVoucherModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-6 sm:p-7 space-y-4 animate-scale-up text-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-sm">
+        <i data-lucide="trash-2" class="w-7 h-7"></i>
       </div>
+      <div>
+        <h4 class="font-bold text-lg text-gray-900 dark:text-white leading-tight">Xóa vĩnh viễn chứng từ?</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+          Hành động này sẽ xóa vĩnh viễn chứng từ <span id="confirmDeleteVoucherCode" class="font-mono font-bold text-rose-600 dark:text-rose-400"></span> cùng toàn bộ tệp đính kèm liên quan khỏi hệ thống CSDL Cloudflare D1. Thao tác không thể hoàn tác.
+        </p>
+      </div>
+      <div id="confirmDeleteVoucherInfo" class="text-left p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 text-xs space-y-1 text-gray-600 dark:text-gray-300">
+      </div>
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button type="button" onclick="closeDeleteVoucherModal()" class="w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Hủy bỏ
+        </button>
+        <button type="button" id="btnExecuteDeleteVoucher" onclick="executeDeleteVoucher()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-bold shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Xác nhận xóa</span>
+        </button>
+      </div>
+    </div>
+  </div>
       <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
         <button type="button" onclick="closeDeleteVoucherModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           Hủy bỏ
@@ -4653,33 +4699,37 @@
   </div>
 
   <!-- MODAL CHỈNH SỬA CHỨNG TỪ (RBAC) -->
-  <div id="modalEditVoucher" style="z-index: 100004;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeEditVoucherModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4 max-h-[92vh] flex flex-col">
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <i data-lucide="file-edit" class="w-4 h-4"></i>
+  <div id="modalEditVoucher" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditVoucherModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      
+      <!-- Header -->
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm shrink-0">
+            <i data-lucide="file-edit" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base text-gray-900 dark:text-white">Chỉnh sửa chứng từ</h3>
-            <p id="editVoucherSubtitle" class="text-xs text-gray-500 font-mono"></p>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chỉnh sửa chứng từ</h3>
+            <p id="editVoucherSubtitle" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5"></p>
           </div>
         </div>
-        <button type="button" onclick="closeEditVoucherModal()" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button type="button" onclick="closeEditVoucherModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-3.5 overflow-y-auto flex-1 pr-1 text-xs">
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
         <input type="hidden" id="editVoucherCode">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Điểm bán / Site</label>
-            <select id="editVoucherSite" class="select w-full"></select>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Điểm bán / Site</label>
+            <select id="editVoucherSite" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"></select>
           </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Loại chứng từ</label>
-            <select id="editVoucherLoai" class="select w-full">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Loại chứng từ</label>
+            <select id="editVoucherLoai" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
               <option value="Hóa đơn GTGT">Hóa đơn GTGT</option>
               <option value="Hóa đơn bán lẻ">Hóa đơn bán lẻ</option>
               <option value="Biên bản giao nhận">Biên bản giao nhận</option>
@@ -4689,47 +4739,59 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày xuất hóa đơn</label>
-            <input type="date" id="editVoucherNgayXuat" class="input w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày xuất hóa đơn</label>
+            <input type="date" id="editVoucherNgayXuat" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono">
           </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày nhận hàng</label>
-            <input type="date" id="editVoucherNgayNhan" class="input w-full">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nhà cung cấp</label>
-          <input type="text" id="editVoucherNCC" placeholder="Nhập tên nhà cung cấp..." class="input w-full">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Người giao</label>
-            <input type="text" id="editVoucherNguoiGiao" placeholder="Tên người giao..." class="input w-full">
-          </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Người nhận</label>
-            <input type="text" id="editVoucherNguoiNhan" placeholder="Tên người nhận..." class="input w-full">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày nhận hàng</label>
+            <input type="date" id="editVoucherNgayNhan" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono">
           </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ghi chú nghiệp vụ</label>
-          <textarea id="editVoucherGhiChu" rows="2" placeholder="Ghi chú thêm về chứng từ..." class="input w-full h-18 py-2"></textarea>
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Nhà cung cấp</label>
+          <input type="text" id="editVoucherNCC" placeholder="Nhập tên nhà cung cấp..." class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
         </div>
 
-        <div id="editVoucherFilesSection" class="pt-2 border-t border-gray-100 dark:border-gray-800">
-          <div class="font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-between">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Người giao hàng</label>
+            <input type="text" id="editVoucherNguoiGiao" placeholder="Tên người giao..." class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Người nhận hàng</label>
+            <input type="text" id="editVoucherNguoiNhan" placeholder="Tên người nhận..." class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Ghi chú nghiệp vụ</label>
+          <textarea id="editVoucherGhiChu" rows="2" placeholder="Ghi chú thêm về chứng từ..." class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <div id="editVoucherFilesSection" class="pt-3 border-t border-gray-100 dark:border-gray-800">
+          <div class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
             <span>Tệp đính kèm hiện có</span>
-            <span id="editVoucherFilesCount" class="badge badge-neutral">0 tệp</span>
+            <span id="editVoucherFilesCount" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">0 tệp</span>
           </div>
-          <div id="editVoucherFilesList" class="space-y-1.5 max-h-32 overflow-y-auto">
+          <div id="editVoucherFilesList" class="space-y-1.5 max-h-36 overflow-y-auto custom-scrollbar">
           </div>
         </div>
       </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button type="button" onclick="closeEditVoucherModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+        <button type="button" id="btnSaveEditVoucher" onclick="saveEditVoucher()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Lưu thay đổi</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
 
       <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800 shrink-0">
         <button type="button" onclick="closeEditVoucherModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
@@ -4742,70 +4804,71 @@
   </div>
 
   <!-- MODAL XÁC NHẬN XÓA ĐƠN HÀNG (RBAC) -->
-  <div id="modalConfirmDeleteOrder" style="z-index: 100005;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteOrderModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4">
-      <div class="flex items-start gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-          <i data-lucide="trash-2" class="w-5 h-5"></i>
-        </div>
-        <div class="flex-1">
-          <h4 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa đơn hàng?</h4>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-            Hành động này sẽ xóa vĩnh viễn đơn hàng <span id="confirmDeleteOrderCode" class="font-mono font-bold text-rose-600 dark:text-rose-400"></span> cùng toàn bộ mặt hàng và tiến trình liên quan khỏi CSDL. Thao tác không thể hoàn tác.
-          </p>
-        </div>
+  <div id="modalConfirmDeleteOrder" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteOrderModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-6 sm:p-7 space-y-4 animate-scale-up text-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-sm">
+        <i data-lucide="trash-2" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h4 class="font-bold text-lg text-gray-900 dark:text-white leading-tight">Hủy vĩnh viễn đơn hàng?</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+          Hành động này sẽ xóa vĩnh viễn đơn hàng <span id="confirmDeleteOrderCode" class="font-mono font-bold text-rose-600 dark:text-rose-400"></span> cùng toàn bộ tiến trình liên quan khỏi CSDL. Thao tác không thể hoàn tác.
+        </p>
       </div>
 
-      <div id="confirmDeleteOrderInfo" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 space-y-1.5 text-xs">
+      <div id="confirmDeleteOrderInfo" class="text-left p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 space-y-1.5 text-xs">
         <span class="text-gray-400">Đang tải chi tiết đơn...</span>
       </div>
 
-      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
-        <button type="button" onclick="closeDeleteOrderModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button type="button" onclick="closeDeleteOrderModal()" class="w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           Hủy bỏ
         </button>
-        <button type="button" id="btnExecuteDeleteOrder" onclick="executeDeleteOrder()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-theme-xs transition-colors">
-          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          <span>Xác nhận xóa đơn</span>
+        <button type="button" id="btnExecuteDeleteOrder" onclick="executeDeleteOrder()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-all">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Xác nhận xóa</span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- MODAL CHỈNH SỬA ĐƠN HÀNG (RBAC) -->
-  <div id="modalEditOrder" style="z-index: 100004;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditOrderModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4 max-h-[94vh] flex flex-col">
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <i data-lucide="file-edit" class="w-4 h-4"></i>
+  <div id="modalEditOrder" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditOrderModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[94vh] animate-scale-up">
+      
+      <!-- Header -->
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm shrink-0">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base text-gray-900 dark:text-white">Chỉnh sửa đơn hàng</h3>
-            <p id="editOrderSubtitle" class="text-xs text-gray-500 font-mono"></p>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chỉnh sửa đơn đặt hàng</h3>
+            <p id="editOrderSubtitle" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5"></p>
           </div>
         </div>
-        <button type="button" onclick="closeEditOrderModal()" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button type="button" onclick="closeEditOrderModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-4 overflow-y-auto flex-1 pr-1 text-xs">
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
         <input type="hidden" id="editOrderCode">
         
         <!-- Thông tin cơ bản đơn hàng -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Điểm bán / Site</label>
-            <select id="editOrderSite" class="select w-full"></select>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Điểm bán / Site</label>
+            <select id="editOrderSite" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"></select>
           </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày đặt hàng</label>
-            <input type="date" id="editOrderDate" class="input w-full">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày đặt hàng</label>
+            <input type="date" id="editOrderDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono">
           </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Trạng thái duyệt</label>
-            <select id="editOrderStatus" class="select w-full font-semibold">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Trạng thái duyệt</label>
+            <select id="editOrderStatus" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
               <option value="Mới tạo">Mới tạo</option>
               <option value="Chờ duyệt">Chờ duyệt</option>
               <option value="Đã duyệt">Đã duyệt</option>
@@ -4816,72 +4879,92 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Người đặt hàng</label>
-            <input type="text" id="editOrderNguoiDat" placeholder="Tên người đặt..." class="input w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Người đặt hàng</label>
+            <input type="text" id="editOrderNguoiDat" placeholder="Tên người đặt..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
-          <div>
-            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Tháng áp dụng định mức</label>
-            <input type="text" id="editOrderThang" placeholder="MM/YYYY (ví dụ: 11/2026)" class="input w-full font-mono">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Tháng áp dụng định mức</label>
+            <input type="text" id="editOrderThang" placeholder="MM/YYYY (ví dụ: 11/2026)" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ghi chú chỉnh sửa</label>
-          <input type="text" id="editOrderGhiChu" placeholder="Lý do hoặc ghi chú chỉnh sửa đơn..." class="input w-full">
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Ghi chú chỉnh sửa</label>
+          <input type="text" id="editOrderGhiChu" placeholder="Lý do hoặc ghi chú chỉnh sửa đơn..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
         </div>
 
         <!-- Bảng danh sách mặt hàng đặt -->
-        <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold text-sm text-gray-900 dark:text-white">Danh sách mặt hàng đặt (<span id="editOrderItemsCount" class="font-mono text-brand-600">0</span>)</span>
-            <div class="text-xs text-gray-500 font-mono">
-              Tổng tiền: <b id="editOrderTotalAmount" class="text-brand-600 dark:text-brand-400 font-bold text-sm">0 đ</b>
+        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+              <span>Danh sách mặt hàng đặt</span>
+              <span id="editOrderItemsCount" class="font-mono px-2 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300">0</span>
+            </span>
+            <div class="text-xs text-gray-500">
+              Tổng tiền: <b id="editOrderTotalAmount" class="text-brand-600 dark:text-brand-400 font-bold text-sm font-mono tabular-nums">0 đ</b>
             </div>
           </div>
 
           <!-- Desktop editable table -->
-          <div class="hidden sm:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 max-h-56">
+          <div class="hidden sm:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 max-h-60 custom-scrollbar">
             <table class="w-full text-xs text-left">
-              <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-400 sticky top-0">
+              <thead class="bg-gray-50 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 sticky top-0 z-10 font-bold border-b border-gray-200 dark:border-gray-700">
                 <tr>
-                  <th class="p-2.5 w-10 text-center font-semibold">STT</th>
-                  <th class="p-2.5 font-semibold">Mã hàng</th>
-                  <th class="p-2.5 font-semibold">Tên hàng hóa</th>
-                  <th class="p-2.5 font-semibold text-center w-16">ĐVT</th>
-                  <th class="p-2.5 font-semibold text-right w-24">Số lượng</th>
-                  <th class="p-2.5 font-semibold text-right w-24">Đơn giá</th>
-                  <th class="p-2.5 font-semibold text-right w-28">Thành tiền</th>
-                  <th class="p-2.5 w-10 text-center">Xóa</th>
+                  <th class="p-2.5 w-10 text-center">STT</th>
+                  <th class="p-2.5">Mã hàng</th>
+                  <th class="p-2.5">Tên hàng hóa</th>
+                  <th class="p-2.5 text-center w-16">ĐVT</th>
+                  <th class="p-2.5 text-right w-24">Số lượng</th>
+                  <th class="p-2.5 text-right w-28">Đơn giá</th>
+                  <th class="p-2.5 text-right w-32">Thành tiền</th>
+                  <th class="p-2.5 w-12 text-center">Xóa</th>
                 </tr>
               </thead>
-              <tbody id="editOrderItemsBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody id="editOrderItemsBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
               </tbody>
             </table>
           </div>
 
           <!-- Mobile editable items list -->
-          <div id="editOrderItemsMobile" class="block sm:hidden space-y-2 max-h-56 overflow-y-auto pr-0.5">
+          <div id="editOrderItemsMobile" class="block sm:hidden space-y-2 max-h-60 overflow-y-auto pr-0.5 custom-scrollbar">
           </div>
 
           <!-- Thêm mặt hàng vào đơn -->
-          <div class="mt-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-dashed border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div class="p-3 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 border border-dashed border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <div class="flex-1">
-              <select id="editOrderAddSelect" class="select w-full text-xs">
+              <select id="editOrderAddSelect" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white">
                 <option value="">-- Chọn mặt hàng muốn thêm --</option>
               </select>
             </div>
-            <div class="w-full sm:w-24">
-              <input type="number" id="editOrderAddQty" min="0.1" step="0.5" placeholder="Số lượng" value="1" class="input w-full text-xs font-mono text-center">
+            <div class="w-full sm:w-28">
+              <input type="number" id="editOrderAddQty" min="0.1" step="0.5" placeholder="Số lượng" value="1" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-mono text-center">
             </div>
-            <button type="button" onclick="addEditOrderItemLine()" class="btn btn-secondary text-xs shrink-0 flex items-center justify-center gap-1 py-2">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <button type="button" onclick="addEditOrderItemLine()" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-bold shrink-0 flex items-center justify-center gap-1 transition-colors">
+              <i data-lucide="plus" class="w-4 h-4 text-brand-500"></i>
               <span>Thêm món</span>
             </button>
           </div>
         </div>
       </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-between shrink-0">
+        <div class="text-xs text-gray-500">
+          Tổng số lượng: <b id="editOrderTotalQty" class="font-mono font-bold text-gray-900 dark:text-white tabular-nums">0</b> phần
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="closeEditOrderModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+          <button type="button" id="btnSaveEditOrder" onclick="saveEditOrder()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Lưu thay đổi</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
       <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 shrink-0">
         <div class="text-xs text-gray-500">
@@ -4901,44 +4984,119 @@
   </div>
 
   <!-- MODAL THEO DÕI & XÁC THỰC HÀNH TRÌNH ĐƠN HÀNG (7 BƯỚC TIÊU CHUẨN) -->
-  <div id="modalOrderJourney" style="z-index: 100006;" class="fixed inset-0 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeOrderJourneyModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 space-y-4 max-h-[92vh] flex flex-col">
+  <div id="modalOrderJourney" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeOrderJourneyModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      
       <!-- Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-sm shrink-0">
             <i data-lucide="route" class="w-5 h-5"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="font-bold text-base text-gray-900 dark:text-white">Hành trình xử lý đơn hàng</h3>
-              <span id="journeyBadgeStatus" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300"></span>
+              <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Hành trình xử lý đơn hàng</h3>
+              <span id="journeyBadgeStatus" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300"></span>
             </div>
-            <p id="journeyOrderSubtitle" class="text-xs text-gray-500 font-mono"></p>
+            <p id="journeyOrderSubtitle" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5"></p>
           </div>
         </div>
-        <button type="button" onclick="closeOrderJourneyModal()" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button type="button" onclick="closeOrderJourneyModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
       <!-- Body -->
-      <div class="space-y-4 overflow-y-auto flex-1 pr-1 text-xs">
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
         <!-- Tóm tắt đơn hàng -->
-        <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200/60 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3">
+        <div class="p-3.5 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200/60 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div class="text-[11px] text-gray-500">Điểm bán / Site</div>
-            <div id="journeySiteName" class="font-semibold text-gray-900 dark:text-white text-sm"></div>
+            <div class="text-[11px] text-gray-400">Điểm bán / Site</div>
+            <div id="journeySiteName" class="font-bold text-gray-900 dark:text-white text-xs sm:text-sm"></div>
           </div>
           <div>
-            <div class="text-[11px] text-gray-500">Người đặt</div>
-            <div id="journeyOrderedBy" class="font-medium text-gray-800 dark:text-gray-200"></div>
+            <div class="text-[11px] text-gray-400">Người đặt</div>
+            <div id="journeyOrderedBy" class="font-semibold text-gray-800 dark:text-gray-200"></div>
           </div>
           <div>
-            <div class="text-[11px] text-gray-500">Ngày đặt hàng</div>
+            <div class="text-[11px] text-gray-400">Ngày đặt hàng</div>
             <div id="journeyOrderDate" class="font-mono text-gray-800 dark:text-gray-200"></div>
           </div>
         </div>
+
+        <!-- Visual Stepper Progress (Timeline các bước) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+              <i data-lucide="git-commit" class="w-4 h-4 text-brand-600"></i>
+              Tiến trình 7 bước tiêu chuẩn
+            </span>
+            <span id="journeyCurrentStepText" class="text-xs font-semibold text-brand-600 dark:text-brand-400 font-mono"></span>
+          </div>
+
+          <div id="journeyTimelineContainer" class="space-y-3 relative pl-4 border-l-2 border-dashed border-gray-200 dark:border-gray-800 ml-3 py-1">
+            <!-- Dynamic Steps rendered by renderJourneyTimeline -->
+          </div>
+        </div>
+
+        <!-- Khung Admin: Xác thực & Cập nhật tiến độ bước (Hiển thị khi có quyền) -->
+        <div id="journeyAdminSection" class="hidden p-4 rounded-2xl border border-indigo-200 dark:border-indigo-800/70 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+              Xác thực & Cập nhật tiến độ đơn hàng
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 font-bold">Phân quyền Admin / Kho</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Chọn bước xác thực</label>
+              <select id="journeySelectStep" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-semibold">
+                <option value="1">Bước 1: Quản lý site đặt hàng</option>
+                <option value="2">Bước 2: Admin tiếp nhận đơn hàng</option>
+                <option value="3">Bước 3: Chuyển bộ phận Trưởng Kho</option>
+                <option value="4">Bước 4: Kho mail cho PMH</option>
+                <option value="5">Bước 5: PMH tiếp nhận & đặt hàng</option>
+                <option value="6">Bước 6: Vận chuyển về kho</option>
+                <option value="7">Bước 7: Kho giao về các site (Hoàn tất)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Trạng thái bước</label>
+              <select id="journeyStepStatus" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-semibold">
+                <option value="Hoàn thành">Hoàn thành (Đạt)</option>
+                <option value="Đang xử lý">Đang xử lý</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ghi chú xác thực / Diễn giải tiến độ</label>
+            <input type="text" id="journeyStepNote" placeholder="Ví dụ: Đã duyệt đơn, chuẩn bị soạn hàng..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] text-gray-500 dark:text-gray-400">
+              Người xác thực: <b id="journeyAdminActor" class="text-gray-800 dark:text-gray-200">Admin</b>
+            </span>
+            <button type="button" id="btnSubmitJourneyStep" onclick="submitJourneyStep()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Xác nhận cập nhật bước này</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end shrink-0">
+        <button type="button" onclick="closeOrderJourneyModal()" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Đóng
+        </button>
+      </div>
+
+    </div>
+  </div>
 
         <!-- Visual Stepper Progress (Timeline các bước) -->
         <div>
@@ -5014,39 +5172,40 @@
   </div>
 
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
-  <div id="createWasteModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+  <div id="createWasteModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
+      
       <!-- Header -->
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 flex items-center justify-center font-bold">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Ghi Biên Bản Hủy Hàng / Hao Hụt</h3>
-            <p class="text-xs text-gray-400">Tự động trừ số lượng tồn và hạch toán giá trị hủy</p>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Ghi biên bản hủy hàng / hao hụt</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tự động trừ số lượng tồn kho thực tế và hạch toán giá trị hủy</p>
           </div>
         </div>
-        <button onclick="closeCreateWasteModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+        <button onclick="closeCreateWasteModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
       <!-- Form Body -->
-      <div class="p-5 overflow-y-auto space-y-4 text-xs custom-scrollbar">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Điểm bán *</label>
-            <select id="wasteModalSite" onchange="onWasteModalSiteChange()" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-semibold outline-none focus:border-rose-500">
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Điểm bán <span class="text-rose-500 font-bold">*</span></label>
+            <select id="wasteModalSite" onchange="onWasteModalSiteChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-semibold text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
             </select>
           </div>
-          <div>
-            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Ngày ghi hủy *</label>
-            <input type="date" id="wasteModalDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-semibold outline-none focus:border-rose-500">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày ghi hủy <span class="text-rose-500 font-bold">*</span></label>
+            <input type="date" id="wasteModalDate" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-semibold text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono">
           </div>
-          <div>
-            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Lý do hủy chính *</label>
-            <select id="wasteModalReason" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-semibold outline-none focus:border-rose-500">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Lý do hủy chính <span class="text-rose-500 font-bold">*</span></label>
+            <select id="wasteModalReason" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-semibold text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
               <option value="Hàng hỏng / ôi thiu không đạt chuẩn">Hàng hỏng / ôi thiu không đạt chuẩn</option>
               <option value="Quá hạn sử dụng (HSD)">Quá hạn sử dụng (HSD)</option>
               <option value="Rách vỡ bao bì / đổ vỡ khi vận chuyển">Rách vỡ bao bì / đổ vỡ khi vận chuyển</option>
@@ -5055,17 +5214,17 @@
               <option value="Nấu dư cuối ngày không bảo quản được">Nấu dư cuối ngày không bảo quản được</option>
             </select>
           </div>
-          <div>
-            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Người xác nhận (Bếp trưởng / QL) *</label>
-            <input type="text" id="wasteModalConfirmedBy" value="Nguyễn Văn Hùng - Bếp trưởng" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-semibold outline-none focus:border-rose-500">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Người xác nhận (Bếp trưởng / QL) <span class="text-rose-500 font-bold">*</span></label>
+            <input type="text" id="wasteModalConfirmedBy" value="Nguyễn Văn Hùng - Bếp trưởng" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-semibold text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
           </div>
         </div>
 
         <!-- Lines Header -->
-        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-          <span class="font-bold text-gray-800 dark:text-gray-200 text-xs">Mặt Hàng Cần Hủy *</span>
-          <button onclick="addWasteLineRow()" class="px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1 transition-all">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm Hàng Hủy
+        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <span class="font-bold text-gray-800 dark:text-gray-200 text-xs sm:text-sm">Mặt hàng cần hủy <span class="text-rose-500 font-bold">*</span></span>
+          <button onclick="addWasteLineRow()" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm hàng hủy
           </button>
         </div>
 
@@ -5074,46 +5233,54 @@
         </div>
 
         <!-- Total & Notes -->
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between tabular-nums">
-          <span class="font-bold text-gray-600 dark:text-gray-400">Tổng Giá Trị Hủy:</span>
-          <span id="wasteModalTotalAmount" class="font-semibold text-base text-rose-600 dark:text-rose-400">0 đ</span>
+        <div class="p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 flex items-center justify-between tabular-nums">
+          <span class="font-bold text-gray-600 dark:text-gray-400 text-xs">Tổng giá trị hủy ước tính:</span>
+          <span id="wasteModalTotalAmount" class="font-bold text-base text-rose-600 dark:text-rose-400 font-mono">0 đ</span>
         </div>
 
-        <div>
-          <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Ghi chú chi tiết biên bản</label>
-          <input type="text" id="wasteModalNotes" placeholder="Ghi chú nguyên nhân cụ thể, hướng xử lý..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 outline-none focus:border-rose-500">
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Ghi chú chi tiết biên bản</label>
+          <input type="text" id="wasteModalNotes" placeholder="Ghi chú nguyên nhân cụ thể, hướng xử lý..." class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500">
         </div>
       </div>
 
       <!-- Footer Buttons -->
-      <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-2.5 bg-gray-50/50 dark:bg-gray-900/50">
-        <button onclick="closeCreateWasteModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold">
-          Hủy Bỏ
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeCreateWasteModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Hủy bỏ
         </button>
-        <button onclick="submitCreateWaste()" id="btnSubmitWaste" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 transition-all shadow-md shadow-rose-900/20">
-          <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Hủy Hàng
+        <button onclick="submitCreateWaste()" id="btnSubmitWaste" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="check" class="w-4 h-4"></i> Xác nhận hủy hàng
         </button>
       </div>
+
     </div>
   </div>
 
   <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
-  <div id="invDetailModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <div>
-          <h3 id="invDetailModalTitle" class="font-semibold text-lg text-gray-900 dark:text-white">Chi Tiết Chứng Từ</h3>
-          <p id="invDetailModalSub" class="text-xs text-gray-500 dark:text-gray-400">A.Kitchen WMS Database</p>
+  <div id="invDetailModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm shrink-0">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="invDetailModalTitle" class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chi tiết chứng từ</h3>
+            <p id="invDetailModalSub" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">A.Kitchen WMS Database</p>
+          </div>
         </div>
-        <button onclick="closeInvDetailModal()" class="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+        <button onclick="closeInvDetailModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-      <div id="invDetailModalBody" class="p-5 overflow-y-auto space-y-3 text-sm custom-scrollbar">
+
+      <div id="invDetailModalBody" class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
       </div>
-      <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-        <button onclick="closeInvDetailModal()" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs">
-          Đóng Lại
+
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex justify-end shrink-0">
+        <button onclick="closeInvDetailModal()" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          Đóng lại
         </button>
       </div>
     </div>
@@ -5298,6 +5465,30 @@
           <button onclick="closeUserProfileModal(); openSiteSelectorModal();" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs flex items-center gap-1 transition-all">
             Đổi Site
           </button>
+        </div>
+
+        <!-- Master Owner Control Section (Chỉ hiển thị cho trantuandai2508) -->
+        <div id="profMasterControlContainer" class="hidden">
+          <div class="p-3.5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800/80 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-white dark:from-indigo-950/30 dark:via-purple-950/20 dark:to-gray-900 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs text-xs font-bold">
+                  👑
+                </span>
+                <div>
+                  <div class="font-bold text-xs text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
+                    Quản Trị Tối Cao (Master)
+                    <span class="text-[9px] px-1.5 py-0.2 rounded-full font-extrabold bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-700">ĐỘC QUYỀN</span>
+                  </div>
+                  <div class="text-[11px] text-indigo-600/80 dark:text-indigo-400">Ẩn / Hiện tab toàn hệ thống (chặn cả Admin)</div>
+                </div>
+              </div>
+            </div>
+            <button onclick="closeUserProfileModal(); openTabVisibilityModal();" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all">
+              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+              <span>Cấu Hình Ẩn / Hiện Tab Webapp</span>
+            </button>
+          </div>
         </div>
 
         <!-- Action Buttons -->
@@ -5533,66 +5724,74 @@
     </div>
   </div>
 
-  <div id="generalModal" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
-        <h3 id="modalTitle" class="font-semibold text-lg text-gray-900 dark:text-white">Chi tiết</h3>
-        <button onclick="closeGeneralModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
+  <div id="generalModal" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeGeneralModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <h3 id="modalTitle" class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chi tiết</h3>
+        <button onclick="closeGeneralModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-      <div id="modalBody" class="p-5 overflow-y-auto text-sm space-y-4"></div>
+      <div id="modalBody" class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm"></div>
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex justify-end shrink-0">
+        <button onclick="closeGeneralModal()" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          Đóng
+        </button>
+      </div>
     </div>
   </div>
 
   
-  <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - TailAdmin Profile Style) -->
-  <div id="modalInventoryDetail" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+  <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - Modern Canteen Style) -->
+  <div id="modalInventoryDetail" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalInventoryDetail')">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
+      
+      <!-- Header -->
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums font-bold text-sm shrink-0">
+          <div class="w-11 h-11 rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
             <span id="detailBadgeCategory">GV</span>
           </div>
           <div>
-            <h3 id="detailItemName" class="font-bold text-base text-gray-800 dark:text-white/90">Tên Mặt Hàng</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5">
-              <span>Mã SKU: <strong id="detailItemSku" class="tabular-nums text-gray-700 dark:text-gray-300">GV-001</strong></span>
+            <h3 id="detailItemName" class="font-bold text-base sm:text-lg text-gray-900 dark:text-white leading-tight">Tên Mặt Hàng</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
+              <span>Mã SKU: <strong id="detailItemSku" class="font-mono text-gray-700 dark:text-gray-300">GV-001</strong></span>
               <span>•</span>
               <span id="detailItemUnit" class="text-gray-500">Can 5L</span>
             </p>
           </div>
         </div>
-        <button onclick="closeModal('modalInventoryDetail')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeModal('modalInventoryDetail')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="overflow-y-auto space-y-5 py-4 custom-scrollbar flex-1 text-sm">
+      <!-- Body -->
+      <div class="overflow-y-auto custom-scrollbar flex-1 p-4 sm:p-6 space-y-5 text-xs sm:text-sm">
         <!-- 4 Key Specs Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
+          <div class="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800">
             <span class="text-gray-400 block text-xs">Tồn Khả Dụng</span>
-            <span id="detailQty" class="text-base font-bold tabular-nums text-gray-800 dark:text-white mt-0.5 block">0</span>
+            <span id="detailQty" class="text-base sm:text-lg font-bold font-mono tabular-nums text-gray-900 dark:text-white mt-0.5 block">0</span>
           </div>
-          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-xs">Định Mức An Toàn</span>
-            <span id="detailSafetyStock" class="text-base font-bold tabular-nums text-amber-600 mt-0.5 block">0</span>
+          <div class="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40">
+            <span class="text-amber-700 dark:text-amber-400 block text-xs">Định Mức An Toàn</span>
+            <span id="detailSafetyStock" class="text-base sm:text-lg font-bold font-mono tabular-nums text-amber-700 dark:text-amber-400 mt-0.5 block">0</span>
           </div>
-          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-xs">Giá Chuẩn SAP</span>
-            <span id="detailStandardCost" class="text-base font-bold tabular-nums text-brand-500 mt-0.5 block">0 ₫</span>
+          <div class="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40">
+            <span class="text-blue-700 dark:text-blue-400 block text-xs">Giá Chuẩn SAP</span>
+            <span id="detailStandardCost" class="text-base sm:text-lg font-bold font-mono tabular-nums text-brand-600 dark:text-brand-400 mt-0.5 block">0 ₫</span>
           </div>
-          <div class="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800/80">
-            <span class="text-gray-400 block text-xs">Lead Time PO</span>
-            <span id="detailLeadTime" class="text-base font-bold tabular-nums text-emerald-600 mt-0.5 block">24h</span>
+          <div class="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40">
+            <span class="text-emerald-700 dark:text-emerald-400 block text-xs">Lead Time PO</span>
+            <span id="detailLeadTime" class="text-base sm:text-lg font-bold font-mono tabular-nums text-emerald-700 dark:text-emerald-400 mt-0.5 block">24h</span>
           </div>
         </div>
 
         <!-- 30-Day Stock Trend Chart -->
-        <div class="rounded-xl border border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-white/2">
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-800/40">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="font-bold text-gray-800 dark:text-white/90 flex items-center gap-1.5">
+            <h4 class="font-bold text-gray-800 dark:text-white/90 flex items-center gap-1.5 text-xs sm:text-sm">
               <i data-lucide="activity" class="w-4 h-4 text-brand-500"></i>
               Biến Động Tồn Kho 30 Ngày Gần Nhất
             </h4>
@@ -5602,14 +5801,14 @@
         </div>
 
         <!-- Movement History Table -->
-        <div class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div class="p-3 bg-gray-50/75 dark:bg-white/2 border-b border-gray-100 dark:border-gray-800 font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div class="p-3.5 bg-gray-50/80 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-800 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5 text-xs sm:text-sm">
             <i data-lucide="history" class="w-4 h-4 text-gray-500"></i>
             Lịch Sử Nhập / Xuất Kho Gần Nhất
           </div>
-          <div class="hidden md:block max-h-48 overflow-y-auto">
-            <table class="data-table">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 sticky top-0">
+          <div class="hidden md:block max-h-52 overflow-y-auto custom-scrollbar">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-gray-50 dark:bg-gray-800/90 text-gray-600 dark:text-gray-400 sticky top-0 z-10 font-bold border-b border-gray-200 dark:border-gray-700">
                 <tr>
                   <th class="p-2.5">Thời Gian</th>
                   <th class="p-2.5">Loại Giao Dịch</th>
@@ -5618,17 +5817,30 @@
                   <th class="p-2.5">Ghi Chú</th>
                 </tr>
               </thead>
-              <tbody id="detailTransactionsBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody id="detailTransactionsBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
                 <tr><td colspan="5" class="p-4 text-center text-gray-400">Chưa có phát sinh trong kỳ</td></tr>
               </tbody>
             </table>
           </div>
 
           <!-- Native Mobile Cards for Inventory Detail Transactions -->
-          <div id="detailTransactionsMobileCards" class="block md:hidden space-y-2 max-h-48 overflow-y-auto p-2">
+          <div id="detailTransactionsMobileCards" class="block md:hidden space-y-2 max-h-52 overflow-y-auto p-3 custom-scrollbar">
             <div class="p-4 text-center text-gray-400 text-xs">Chưa có phát sinh trong kỳ</div>
           </div>
         </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modalInventoryDetail')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-xs transition-all">
+          Đóng
+        </button>
+        <button onclick="closeModal('modalInventoryDetail'); openReceiptModal();" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-brand-500/20 transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Nhập Lô Mới
+        </button>
+      </div>
+    </div>
+  </div>
       </div>
 
       <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-2.5">
@@ -5644,17 +5856,17 @@
 
 
   <!-- Modal 1: Thẻ Kho & Lịch Sử Biến Động Xuất Nhập (WMS Ledger History Modal) -->
-  <div id="modalWhItemHistory" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-5xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
+  <div id="modalWhItemHistory" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalWhItemHistory')">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-5xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 font-bold text-sm shrink-0">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
             <i data-lucide="history" class="w-6 h-6"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base text-gray-800 dark:text-white flex items-center gap-2">
-              <span>Thẻ Kho &amp; Lịch Sử Biến Động Xuất Nhập</span>
+            <h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white leading-tight">
+              Thẻ kho &amp; Lịch sử biến động xuất nhập
             </h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
               <span>Mã SKU: <strong id="histItemSku" class="font-mono text-gray-700 dark:text-gray-300"></strong></span>
@@ -5668,52 +5880,52 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="exportWhItemHistoryToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs">
-            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
-            <span>Xuất Excel Thẻ Kho</span>
+          <button onclick="exportWhItemHistoryToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Xuất Excel Thẻ Kho</span>
           </button>
-          <button onclick="closeModal('modalWhItemHistory')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
-            <i data-lucide="x" class="w-5 h-5"></i>
+          <button onclick="closeModal('modalWhItemHistory')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
       <!-- Mini KPI Summary Bar -->
-      <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
-        <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
+      <div class="grid grid-cols-3 gap-3 p-4 sm:px-6 bg-gray-50/70 dark:bg-gray-800/40 border-b border-gray-100 dark:border-gray-800 text-xs shrink-0">
+        <div class="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-emerald-200/70 dark:border-emerald-900/40 shadow-2xs">
           <span class="text-emerald-700 dark:text-emerald-400 block text-xs font-semibold">Tổng Lượng Nhập (+)</span>
-          <span id="histTotalIn" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
+          <span id="histTotalIn" class="text-base sm:text-lg font-bold font-mono tabular-nums text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-800/40">
+        <div class="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-rose-200/70 dark:border-rose-900/40 shadow-2xs">
           <span class="text-rose-700 dark:text-rose-400 block text-xs font-semibold">Tổng Lượng Xuất (-)</span>
-          <span id="histTotalOut" class="text-base font-bold font-mono text-rose-700 dark:text-rose-400 block mt-0.5">0</span>
+          <span id="histTotalOut" class="text-base sm:text-lg font-bold font-mono tabular-nums text-rose-700 dark:text-rose-400 block mt-0.5">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-800/40">
+        <div class="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-blue-200/70 dark:border-blue-900/40 shadow-2xs">
           <span class="text-blue-700 dark:text-blue-400 block text-xs font-semibold">Số Dòng Giao Dịch</span>
-          <span id="histRowCount" class="text-base font-bold font-mono text-blue-700 dark:text-blue-400 block mt-0.5">0</span>
+          <span id="histRowCount" class="text-base sm:text-lg font-bold font-mono tabular-nums text-blue-700 dark:text-blue-400 block mt-0.5">0</span>
         </div>
       </div>
 
       <!-- History Content List -->
-      <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
+      <div class="overflow-y-auto custom-scrollbar flex-1 p-4 sm:p-6 space-y-4 text-xs">
         <!-- Desktop Table -->
-        <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <table class="data-table" id="whHistTable">
-            <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+        <div class="hidden lg:block rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-2xs">
+          <table class="w-full text-xs text-left" id="whHistTable">
+            <thead class="bg-gray-50 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
               <tr>
-                <th class="p-2.5 text-center w-24">Ngày CT</th>
-                <th class="p-2.5">Số Chứng Từ</th>
-                <th class="p-2.5">Nghiệp Vụ</th>
-                <th class="p-2.5">Mã Lô / HSD</th>
-                <th class="p-2.5 text-right bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">Nhập (+)</th>
-                <th class="p-2.5 text-right bg-rose-50/40 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300">Xuất (-)</th>
-                <th class="p-2.5 text-right">Đơn Giá</th>
-                <th class="p-2.5 text-right">Thành Tiền</th>
-                <th class="p-2.5">Đối Tác / NCC</th>
-                <th class="p-2.5">Ghi Chú</th>
+                <th class="p-3 text-center w-24">Ngày CT</th>
+                <th class="p-3">Số Chứng Từ</th>
+                <th class="p-3">Nghiệp Vụ</th>
+                <th class="p-3">Mã Lô / HSD</th>
+                <th class="p-3 text-right bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">Nhập (+)</th>
+                <th class="p-3 text-right bg-rose-50/50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300">Xuất (-)</th>
+                <th class="p-3 text-right">Đơn Giá</th>
+                <th class="p-3 text-right">Thành Tiền</th>
+                <th class="p-3">Đối Tác / NCC</th>
+                <th class="p-3">Ghi Chú</th>
               </tr>
             </thead>
-            <tbody id="whHistTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody id="whHistTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
               <tr><td colspan="10" class="p-8 text-center text-gray-400">Đang tải thẻ kho...</td></tr>
             </tbody>
           </table>
@@ -5724,9 +5936,9 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-400">
+      <div class="p-4 sm:px-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-between text-xs text-gray-400 shrink-0">
         <span>* Ghi nhận từ phiếu nhập kho, phiếu xuất hủy F&amp;B và chứng từ SAP MB51.</span>
-        <button onclick="closeModal('modalWhItemHistory')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold transition-all">
+        <button onclick="closeModal('modalWhItemHistory')" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold transition-all">
           Đóng
         </button>
       </div>
@@ -5735,81 +5947,60 @@
 
 
   <!-- Modal 2: Chi Tiết Các Lô Hàng Đã Nhập (WMS Batches Modal) -->
-  <div id="modalWhItemBatches" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-3 sm:p-5">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full p-5 md:p-6 shadow-theme-xl border border-gray-200 dark:border-gray-800 max-h-[92vh] flex flex-col">
+  <div id="modalWhItemBatches" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalWhItemBatches')">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-4xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 font-bold text-sm shrink-0">
+          <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
             <i data-lucide="layers" class="w-6 h-6"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base text-gray-800 dark:text-white flex items-center gap-2">
-              <span>Chi Tiết Các Lô Hàng Đã Nhập (FEFO)</span>
+            <h3 class="font-bold text-base sm:text-lg text-gray-900 dark:text-white leading-tight">
+              Chi tiết các lô hàng đã nhập (FEFO)
             </h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5 flex-wrap">
               <span>Mã SKU: <strong id="batchItemSku" class="font-mono text-gray-700 dark:text-gray-300"></strong></span>
               <span>•</span>
               <span id="batchItemName" class="font-semibold text-gray-900 dark:text-white"></span>
               <span>•</span>
-              <span>ĐVT: <b id="batchItemUnit" class="text-gray-700 dark:text-gray-300"></b></span>
-              <span>•</span>
               <span>Điểm: <b id="batchItemSite" class="text-brand-600 dark:text-brand-400"></b></span>
             </p>
           </div>
         </div>
-        <button onclick="closeModal('modalWhItemBatches')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeModal('modalWhItemBatches')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- Mini KPI Summary Bar -->
-      <div class="grid grid-cols-3 gap-3 py-3 border-b border-gray-100 dark:border-gray-800 text-xs">
-        <div class="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-800/40">
-          <span class="text-purple-700 dark:text-purple-400 block text-xs font-semibold">Tổng Số Lô Đã Nhập</span>
-          <span id="batchTotalCount" class="text-base font-bold font-mono text-purple-700 dark:text-purple-400 block mt-0.5">0</span>
-        </div>
-        <div class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40">
-          <span class="text-emerald-700 dark:text-emerald-400 block text-xs font-semibold">Lô Còn Hạn An Toàn</span>
-          <span id="batchSafeCount" class="text-base font-bold font-mono text-emerald-700 dark:text-emerald-400 block mt-0.5">0</span>
-        </div>
-        <div class="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800/40">
-          <span class="text-amber-700 dark:text-amber-400 block text-xs font-semibold">Cận Date (≤ 30 ngày) / Quá Hạn</span>
-          <span id="batchWarnCount" class="text-base font-bold font-mono text-amber-700 dark:text-amber-400 block mt-0.5">0</span>
-        </div>
-      </div>
-
-      <!-- Batches Content List -->
-      <div class="overflow-y-auto space-y-4 py-3 custom-scrollbar flex-1 text-xs">
-        <!-- Desktop Table -->
-        <div class="hidden lg:block rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <table class="data-table" id="whBatchesTable">
-            <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <!-- Batches Content Table -->
+      <div class="overflow-y-auto custom-scrollbar flex-1 p-4 sm:p-6 space-y-4 text-xs">
+        <div class="hidden sm:block rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-2xs">
+          <table class="w-full text-xs text-left" id="whBatchTable">
+            <thead class="bg-gray-50 dark:bg-gray-800/80 text-gray-700 dark:text-gray-200 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
               <tr>
-                <th class="p-2.5">Mã Lô (Batch No)</th>
-                <th class="p-2.5">Điểm Kho / Vị Trí</th>
-                <th class="p-2.5 text-center">Hạn Sử Dụng (HSD)</th>
-                <th class="p-2.5 text-center">Còn Lại</th>
-                <th class="p-2.5 text-center">Trạng Thái FEFO</th>
-                <th class="p-2.5 text-right bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">SL Nhập Ban Đầu</th>
-                <th class="p-2.5 text-right bg-blue-50/40 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300">SL Tồn Hiện Tại</th>
-                <th class="p-2.5">Chứng Từ Nhập</th>
+                <th class="p-3">Số Lô (Batch No.)</th>
+                <th class="p-3">Hạn Dùng (EXP)</th>
+                <th class="p-3 text-center">Trạng Thái HSD</th>
+                <th class="p-3 text-right">Tồn Thực Tế</th>
+                <th class="p-3">Vị Trí Kệ / Ô</th>
+                <th class="p-3">Ngày Nhập Kho</th>
               </tr>
             </thead>
-            <tbody id="whBatchesTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
-              <tr><td colspan="8" class="p-8 text-center text-gray-400">Đang tải danh sách lô...</td></tr>
+            <tbody id="whBatchTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
+              <tr><td colspan="6" class="p-8 text-center text-gray-400">Đang tải danh sách lô...</td></tr>
             </tbody>
           </table>
         </div>
 
         <!-- Mobile Cards List -->
-        <div id="whBatchesMobileCards" class="block lg:hidden space-y-2.5"></div>
+        <div id="whBatchMobileCards" class="block sm:hidden space-y-2.5"></div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-400">
-        <span>* Thứ tự ưu tiên xuất kho tự động sắp xếp theo chuẩn FEFO (First Expired, First Out).</span>
-        <button onclick="closeModal('modalWhItemBatches')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 font-semibold transition-all">
+      <div class="p-4 sm:px-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-between text-xs text-gray-400 shrink-0">
+        <span>* Sắp xếp tự động ưu tiên xuất lô cận date trước theo chuẩn FEFO (First Expired, First Out).</span>
+        <button onclick="closeModal('modalWhItemBatches')" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold transition-all">
           Đóng
         </button>
       </div>
@@ -5817,68 +6008,97 @@
   </div>
 
 
-  <!-- Modal Chỉnh Sửa Định Mức Mặt Hàng (Edit Item Modal - TailAdmin Style) -->
-  <div id="modalEditItem" style="z-index: 100004;" class="hidden fixed inset-0 bg-gray-400/50 backdrop-blur-[32px] dark:bg-black/80 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-theme-xl border border-gray-200 dark:border-gray-800">
-      <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-semibold text-lg text-gray-900 dark:text-white flex items-center gap-2">
-          <i data-lucide="edit-3" class="w-4 h-4 text-brand-500"></i>
-          Chỉnh Sửa Định Mức &amp; Thông Số Kho
-        </h3>
-        <button onclick="closeModal('modalEditItem')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+  <!-- Modal Chỉnh Sửa Định Mức & Thông Số Kho (TailAdmin Style) -->
+  <div id="modalEditItem" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalEditItem')">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      
+      <!-- Header -->
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">
+              Chỉnh sửa định mức &amp; thông số kho
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Cấu hình tồn an toàn ROP và thời gian đặt hàng Lead Time</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalEditItem')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-4 text-sm">
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs sm:text-sm">
         <input type="hidden" id="editItemSku">
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt Hàng</label>
-          <input type="text" id="editItemName" readonly class="w-full bg-gray-50 dark:bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100/5 border border-gray-200 dark:border-gray-700 rounded-xl p-2.5 text-gray-500 font-medium">
+        
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Tên mặt hàng</label>
+          <input type="text" id="editItemName" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 font-semibold cursor-not-allowed">
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Định Mức An Toàn (Min)</label>
-            <input type="number" id="editItemSafetyStock" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 tabular-nums focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Tồn tối thiểu (Min / ROP)</label>
+            <input type="number" id="editItemMin" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Đơn Vị Tính</label>
-            <input type="text" id="editItemUnit" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Tồn tối đa (Max)</label>
+            <input type="number" id="editItemMax" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-brand-500">
           </div>
         </div>
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị Trí Kệ / Lưu Trữ</label>
-          <input type="text" id="editItemStorageLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
-        </div>
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi Chú Quản Lý</label>
-          <input type="text" id="editItemNote" placeholder="Ghi chú điều kiện bảo quản..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-xl p-2.5 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/20 dark:focus:border-brand-500/40 outline-none">
-        </div>
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
-          <button onclick="closeModal('modalEditItem')" class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
-            Hủy
-          </button>
-          <button onclick="saveItemSpecs()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-theme-xs transition-all">
-            <i data-lucide="check" class="w-4 h-4"></i> Lưu Thay Đổi
-          </button>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Lead Time NCC (Giờ)</label>
+            <input type="number" id="editItemLeadTime" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Vị trí lưu kho</label>
+            <input type="text" id="editItemLocation" placeholder="Kệ A - Tầng 2" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
         </div>
       </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modalEditItem')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          Hủy bỏ
+        </button>
+        <button onclick="saveItemSpecs()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Lưu thay đổi</span>
+        </button>
+      </div>
+
     </div>
+  </div>
   </div>
 
 <!-- WMS Fast Receipt Modal -->
-  <div id="modalFastReceipt" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-          <i data-lucide="package-plus" class="w-4 h-4 text-emerald-600"></i> Nhập Kho Lô Mới (Cloudflare D1)
-        </h3>
-        <button onclick="closeModal('modalFastReceipt')" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"><i data-lucide="x" class="w-4 h-4"></i></button>
+  <div id="modalFastReceipt" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalFastReceipt')">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-md w-full border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <i data-lucide="package-plus" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Nhập kho lô mới</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Đồng bộ tức thì lên Cloudflare D1</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalFastReceipt')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mặt hàng gia vị</label>
-          <select id="recSku" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 font-medium outline-none">
+
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-3.5 text-xs sm:text-sm">
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Mặt hàng gia vị</label>
+          <select id="recSku" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="GV-BBQ-01">GV-BBQ-01: Sốt Ướp BBQ Thượng Hạng</option>
             <option value="GV-BOT-CANH-01">GV-BOT-CANH-01: Bột Canh Vifon Tiêu Chuẩn</option>
             <option value="GV-DAU-HAO-01">GV-DAU-HAO-01: Dầu Hào Maggi Đậm Đặc</option>
@@ -5886,153 +6106,177 @@
             <option value="GV-TIEU-SO-01">GV-TIEU-SO-01: Tiêu Sọ Phú Quốc Xay</option>
           </select>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Mã Lô (Batch)</label>
-            <input type="text" id="recBatch" placeholder="VD: L2611-09" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
-          </div>
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng nhập</label>
-            <input type="number" id="recQty" value="10" min="0.1" step="0.5" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
-          </div>
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Mã lô sản xuất (Batch No.)</label>
+          <input type="text" id="recBatch" value="LOT-2026-X01" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ngày SX (MFG)</label>
-            <input type="date" id="recMfg" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Số lượng</label>
+            <input type="number" id="recQty" value="10" min="1" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono text-center focus:outline-none focus:ring-2 focus:ring-emerald-500">
           </div>
-          <div>
-            <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Hạn Dùng (EXP)</label>
-            <input type="date" id="recExp" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Hạn dùng (EXP)</label>
+            <input type="date" id="recExp" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
           </div>
-        </div>
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Vị trí lưu kho</label>
-          <input type="text" id="recLoc" value="Kệ Gia Vị A1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
-        </div>
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
-          <button onclick="closeModal('modalFastReceipt')" class="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-bold">Hủy</button>
-          <button onclick="submitReceiptToBackend()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Nhập
-          </button>
         </div>
       </div>
+
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modalFastReceipt')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+        <button onclick="submitReceiptToBackend()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Xác nhận nhập</span>
+        </button>
+      </div>
     </div>
+  </div>
   </div>
 
   <!-- WMS Fast Issue Modal -->
-  <div id="modalFastIssue" style="z-index: 100004;" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-200 dark:border-gray-800">
-      <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-        <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-          <i data-lucide="package-minus" class="w-4 h-4 text-amber-600"></i> Xuất Kho Gia Vị (Chuẩn FEFO)
-        </h3>
-        <button onclick="closeModal('modalFastIssue')" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"><i data-lucide="x" class="w-4 h-4"></i></button>
+  <div id="modalFastIssue" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalFastIssue')">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-md w-full border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <i data-lucide="package-minus" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Xuất kho gia vị (FEFO)</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tự động chọn lô hàng cận date nhất</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalFastIssue')" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
-      <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/60 text-xs mb-3">
-        <span class="font-bold text-amber-900">Lô ưu tiên xuất:</span>
-        <div class="mt-1 tabular-nums text-gray-700 dark:text-gray-200" id="issueBatchLabel">Đang tải...</div>
+
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-3.5 text-xs sm:text-sm">
+        <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-900/60 text-xs">
+          <span class="font-bold text-amber-900 dark:text-amber-300">Lô ưu tiên xuất (FEFO):</span>
+          <div class="mt-1 font-mono font-bold text-gray-800 dark:text-gray-100" id="issueBatchLabel">Đang tải...</div>
+        </div>
+
+        <input type="hidden" id="issueSku" value="GV-BBQ-01">
+        <input type="hidden" id="issueBatchId" value="LOT-2026-X01">
+        
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Số lượng cần xuất</label>
+          <input type="number" id="issueQty" value="1" min="1" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white font-mono text-center focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
       </div>
-      <div class="space-y-3 text-xs">
-        <input type="hidden" id="issueSku">
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Số lượng xuất ca nấu</label>
-          <input type="number" id="issueQty" value="1.0" min="0.1" step="0.1" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 tabular-nums outline-none">
-        </div>
-        <div>
-          <label class="font-bold text-gray-700 dark:text-gray-200 block mb-1">Ghi chú ca bếp</label>
-          <input type="text" id="issueNote" value="Xuất bếp nấu ca trưa" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg p-2 outline-none">
-        </div>
-        <div class="pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
-          <button onclick="closeModal('modalFastIssue')" class="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-bold">Hủy</button>
-          <button onclick="submitIssueToBackend()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Xuất Bếp
-          </button>
-        </div>
+
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modalFastIssue')" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+        <button onclick="submitIssueToBackend()" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-amber-600/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Xác nhận xuất bếp</span>
+        </button>
       </div>
     </div>
   </div>
+  </div>
 
   <!-- Modal: Chi tiết đơn hàng đã nhập kho & Hủy nhập kho -->
-  <div id="whReceivedOrderDetailModal" style="z-index: 100004;" class="modal-backdrop hidden fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+  <div id="whReceivedOrderDetailModal" style="z-index: 100015;" class="modal-backdrop hidden fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeWhReceivedOrderDetailModal()">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+      <div class="flex items-center justify-between p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 shrink-0">
         <div>
           <div class="flex items-center gap-2">
-            <span class="badge badge-brand">Đã nhập kho</span>
-            <h3 class="text-base font-semibold text-gray-900 dark:text-white" id="whRecModalTitle">Chi tiết đơn hàng đã nhập kho</h3>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">ĐÃ NHẬP KHO</span>
+            <h3 class="text-base font-bold text-gray-900 dark:text-white leading-tight" id="whRecModalTitle">Chi tiết đơn hàng đã nhập kho</h3>
           </div>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" id="whRecModalSubtitle">Thông tin chi tiết mặt hàng, số lượng và lô hạn dùng</p>
         </div>
-        <button onclick="closeWhReceivedOrderDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeWhReceivedOrderDetailModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1 text-xs sm:text-sm">
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800 text-xs">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 dark:bg-gray-800/40 p-3.5 sm:p-4 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs">
           <div>
-            <span class="text-gray-400 block">Số đơn PO / PR:</span>
-            <span class="code font-bold text-brand-600 dark:text-brand-400" id="whRecModalPoNumber">—</span>
+            <span class="text-gray-400 block text-[11px]">Số đơn PO / PR:</span>
+            <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs sm:text-sm" id="whRecModalPoNumber">—</span>
           </div>
           <div>
-            <span class="text-gray-400 block">Mã phiếu nhập:</span>
-            <span class="code font-bold text-gray-900 dark:text-white" id="whRecModalReceiptCode">—</span>
+            <span class="text-gray-400 block text-[11px]">Mã phiếu nhập:</span>
+            <span class="font-mono font-bold text-gray-900 dark:text-white text-xs sm:text-sm" id="whRecModalReceiptCode">—</span>
           </div>
           <div>
-            <span class="text-gray-400 block">Điểm nhận hàng:</span>
-            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalSite">—</span>
+            <span class="text-gray-400 block text-[11px]">Điểm nhận hàng:</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm truncate block" id="whRecModalSite">—</span>
           </div>
           <div>
-            <span class="text-gray-400 block">Ngày nhập kho:</span>
-            <span class="num font-semibold text-gray-900 dark:text-white" id="whRecModalDate">—</span>
+            <span class="text-gray-400 block text-[11px]">Ngày nhập kho:</span>
+            <span class="font-mono font-semibold text-gray-900 dark:text-white text-xs sm:text-sm" id="whRecModalDate">—</span>
           </div>
           <div class="col-span-2">
-            <span class="text-gray-400 block">Nhà cung cấp / Nguồn hàng:</span>
-            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalSupplier">—</span>
+            <span class="text-gray-400 block text-[11px]">Nhà cung cấp:</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm truncate block" id="whRecModalSupplier">—</span>
           </div>
           <div>
-            <span class="text-gray-400 block">Người nhập:</span>
-            <span class="font-semibold text-gray-900 dark:text-white" id="whRecModalCreatedBy">—</span>
+            <span class="text-gray-400 block text-[11px]">Người lập phiếu:</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm truncate block" id="whRecModalCreatedBy">—</span>
           </div>
           <div>
-            <span class="text-gray-400 block">Tổng tiền nhập:</span>
-            <span class="num font-bold text-brand-600 dark:text-brand-400 text-sm" id="whRecModalTotalAmount">0 ₫</span>
+            <span class="text-gray-400 block text-[11px]">Tổng giá trị nhập:</span>
+            <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs sm:text-sm tabular-nums" id="whRecModalTotalAmount">0 ₫</span>
           </div>
         </div>
 
-        <!-- Lines Table -->
-        <div class="space-y-2">
-          <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300">Danh mục hàng hóa đã nhập</h4>
-          <div class="table-scroll hidden lg:block max-h-72 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
-            <table class="data-table">
-              <thead>
+        <!-- Detail Lines Section -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold text-gray-800 dark:text-white text-xs sm:text-sm">Danh sách mặt hàng thực nhập</h4>
+            <span class="text-xs text-gray-400" id="whRecModalLineCount">0 dòng hàng</span>
+          </div>
+
+          <!-- Desktop Table View -->
+          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 max-h-72 custom-scrollbar shadow-2xs">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-gray-50 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
                 <tr>
-                  <th class="w-10 text-center">STT</th>
-                  <th class="col-code">Mã SKU</th>
-                  <th>Tên mặt hàng</th>
-                  <th class="text-center w-16">ĐVT</th>
-                  <th class="col-num text-right">Số lượng</th>
-                  <th class="col-num text-right">Đơn giá</th>
-                  <th class="col-num text-right">Thành tiền</th>
-                  <th class="text-center w-28">Mã lô</th>
-                  <th class="col-date text-center">Hạn dùng</th>
+                  <th class="p-3 text-center w-12">#</th>
+                  <th class="p-3">Mã hàng</th>
+                  <th class="p-3">Tên hàng hóa</th>
+                  <th class="p-3 text-center w-20">ĐVT</th>
+                  <th class="p-3 text-right w-24">SL PO</th>
+                  <th class="p-3 text-right w-28 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300">Thực nhập</th>
+                  <th class="p-3 w-32">Số lô</th>
+                  <th class="p-3 w-32">Hạn dùng (EXP)</th>
+                  <th class="p-3 text-right w-32">Đơn giá</th>
+                  <th class="p-3 text-right w-36">Thành tiền</th>
                 </tr>
               </thead>
-              <tbody id="whRecModalLinesBody">
-                <tr><td colspan="9" class="p-4 text-center text-gray-400">Đang tải dòng hàng...</td></tr>
+              <tbody id="whRecModalLinesBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
+                <tr><td colspan="10" class="p-4 text-center text-gray-400 text-xs">Đang tải dòng hàng...</td></tr>
               </tbody>
             </table>
           </div>
 
           <!-- Native Mobile Card View for Received Order Detail Lines -->
-          <div id="whRecModalLinesMobileCards" class="block lg:hidden space-y-3 max-h-72 overflow-y-auto">
+          <div id="whRecModalLinesMobileCards" class="block lg:hidden space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar">
             <div class="p-4 text-center text-gray-400 text-xs">Đang tải dòng hàng...</div>
           </div>
         </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between p-4 sm:px-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 shrink-0">
+        <button id="whRecModalCancelBtn" onclick="onWhRecModalCancelClick()" class="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1.5 transition-colors">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Hủy nhập kho đơn này</span>
+        </button>
+        <button onclick="closeWhReceivedOrderDetailModal()" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <span>Đóng</span>
+        </button>
+      </div>
+    </div>
+  </div>
       </div>
 
       <!-- Modal Footer -->
