@@ -170,49 +170,58 @@ export function renderSavedAccountsInLoginModal(): void {
   const accounts = getSavedAccounts();
   if (accounts.length === 0) {
     container.classList.add('hidden');
-    if (labelEl) labelEl.textContent = 'Đăng nhập bằng tài khoản Google';
+    if (labelEl) labelEl.textContent = 'Đăng nhập tài khoản Google';
     return;
   }
 
   container.classList.remove('hidden');
-  if (labelEl) labelEl.textContent = 'Hoặc đăng nhập tài khoản Google khác:';
+  if (labelEl) labelEl.textContent = 'Hoặc tiếp tục với tài khoản khác';
 
   if (accounts[0]) {
     if (typeof (window as any).renderLoginRoleSelection === 'function') {
       (window as any).renderLoginRoleSelection(gCurrentUser || accounts[0]);
     }
   }
+
   listEl.innerHTML = accounts.map(acc => {
     const isCurrent = gCurrentUser && gCurrentUser.email.toLowerCase() === acc.email.toLowerCase();
-    const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' :
-      acc.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' :
-      acc.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' :
-      acc.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' :
-      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    const isLocked = acc.status === 'LOCKED';
+    
+    let roleBadge = '';
+    if (isLocked) {
+      roleBadge = '<span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-rose-500 text-white shadow-xs">BỊ KHÓA</span>';
+    } else {
+      const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40' :
+        acc.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40' :
+        acc.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40' :
+        acc.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40' :
+        'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700';
+      roleBadge = `<span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${roleBadgeColor}">${acc.role}</span>`;
+    }
 
     const avSrc = (acc.avatarUrl && !acc.avatarUrl.includes('ui-avatars.com'))
       ? acc.avatarUrl
-      : `https://ui-avatars.com/api/?name=${getCleanInitials(acc.fullName || acc.email)}&background=465fff&color=fff&bold=true`;
+      : `https://ui-avatars.com/api/?name=${getCleanInitials(acc.fullName || acc.email)}&background=19723C&color=fff&bold=true`;
 
     return `
-      <div onclick="switchToSavedAccount('${acc.email}')" class="p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+      <div onclick="switchToSavedAccount('${acc.email}')" class="group p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
         isCurrent
-          ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15 ring-2 ring-[#19723C]/40'
-          : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300 dark:hover:border-gray-700'
+          ? 'border-brand-500 bg-emerald-50/70 dark:bg-emerald-950/20 ring-1.5 ring-brand-500/30 shadow-xs'
+          : 'border-gray-200/80 dark:border-gray-800/80 bg-white dark:bg-gray-800/50 hover:border-brand-500/60 hover:bg-gray-50/80 dark:hover:bg-gray-800/90 hover:shadow-xs'
       }">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <img src="${avSrc}" alt="${acc.fullName}" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-gray-200 dark:ring-gray-700">
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="${avSrc}" alt="${acc.fullName}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0 ring-2 ring-gray-100 dark:ring-gray-700/80 shadow-xs">
           <div class="min-w-0 text-left">
-            <div class="font-bold text-xs text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+            <div class="font-bold text-xs sm:text-[13px] text-gray-900 dark:text-white truncate flex items-center gap-1.5 leading-tight">
               <span>${acc.fullName}</span>
-              ${isCurrent ? '<span class="text-xs px-1 py-0.2 rounded font-semibold bg-brand-500 text-white">ĐANG DÙNG</span>' : ''}
+              ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-brand-500 text-white tracking-wider">HIỆN TẠI</span>' : ''}
             </div>
-            <div class="text-xs text-gray-400 tabular-nums truncate">${acc.email}</div>
+            <div class="text-[11px] text-gray-400 dark:text-gray-400 font-mono tabular-nums truncate mt-0.5">${acc.email}</div>
           </div>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-xs px-1.5 py-0.5 rounded font-semibold uppercase ${roleBadgeColor}">${acc.role}</span>
-          <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="p-1 rounded text-gray-400 hover:text-rose-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <div class="flex items-center gap-2 shrink-0">
+          ${roleBadge}
+          <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
             <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
         </div>

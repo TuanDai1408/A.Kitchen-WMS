@@ -700,26 +700,26 @@ export function renderLoginRoleSelection(targetUser: any): void {
 
     if (isPermitted) {
       return `
-        <div onclick="switchRoleAction('${r.code}')" class="p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+        <div onclick="switchRoleAction('${r.code}')" class="p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
           isCurrent
-            ? 'border-brand-500 bg-brand-50/80 dark:bg-brand-500/20 ring-1 ring-brand-500/40'
-            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/40 hover:border-gray-300'
+            ? 'border-brand-500 bg-emerald-50/80 dark:bg-emerald-950/25 ring-1.5 ring-brand-500/40 shadow-xs'
+            : 'border-gray-200/80 dark:border-gray-800/80 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs'
         }">
           <div class="flex items-center gap-2 min-w-0">
             <span class="w-2 h-2 rounded-full ${isCurrent ? 'bg-emerald-500 ring-2 ring-emerald-200 dark:ring-emerald-900' : 'bg-gray-300 dark:bg-gray-600'} shrink-0"></span>
-            <span class="font-bold text-gray-800 dark:text-gray-200 truncate">${r.name}</span>
+            <span class="font-bold text-xs text-gray-800 dark:text-gray-200 truncate">${r.name}</span>
           </div>
-          <span class="text-xs px-1.5 py-0.2 rounded font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 shrink-0">ĐÃ DUYỆT</span>
+          <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0">ĐÃ DUYỆT</span>
         </div>
       `;
     } else {
       return `
-        <div class="p-2 rounded-xl border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20 flex items-center justify-between gap-2 opacity-40 select-none">
+        <div class="p-2 sm:p-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-800/20 flex items-center justify-between gap-2 opacity-50 select-none">
           <div class="flex items-center gap-2 min-w-0">
             <i data-lucide="lock" class="w-3 h-3 text-gray-400 shrink-0"></i>
-            <span class="font-bold text-gray-400 dark:text-gray-500 truncate">${r.name}</span>
+            <span class="font-medium text-xs text-gray-400 dark:text-gray-500 truncate">${r.name}</span>
           </div>
-          <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto text-xs px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 font-bold hover:underline shrink-0">Xin duyệt</button>
+          <button onclick="openRequestAccessForRole('${r.code}', event)" class="pointer-events-auto text-[10px] px-2 py-0.5 rounded-full bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 text-brand-600 dark:text-brand-400 font-bold hover:underline shrink-0 transition-colors">Xin duyệt ↗</button>
         </div>
       `;
     }

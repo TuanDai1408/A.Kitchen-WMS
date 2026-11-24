@@ -1880,3 +1880,21 @@ table td {
   font-size: 12px;
   line-height: 1.45;
 }
+
+/* 6. Google Auth Modal Elevation & Touch Alignment */
+#googleAuthModal {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+#googleAuthModal #googleSignInBtn {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#googleAuthModal #googleSignInBtn iframe {
+  margin: 0 auto !important;
+  display: block !important;
+  border-radius: 9999px !important;
+}

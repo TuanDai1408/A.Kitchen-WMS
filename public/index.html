@@ -5096,78 +5096,100 @@
 
   
   <!-- =====================================================================
-       A.KITCHEN WMS: GOOGLE AUTH LOGIN MODAL (CHỈ ĐĂNG NHẬP BẰNG GOOGLE)
+       A.KITCHEN WMS: GOOGLE AUTH LOGIN MODAL (CHUYÊN NGHIỆP & HIỆN ĐẠI)
+       Thiết kế chuẩn TailAdmin / Canteen Order System cho PC và Mobile
        ===================================================================== -->
-  <div id="googleAuthModal" style="z-index: 100030;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-sm sm:max-w-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xl flex flex-col overflow-hidden animate-scale-up" onclick="event.stopPropagation()">
+  <div id="googleAuthModal" style="z-index: 100030;" class="fixed inset-0 hidden bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none" onclick="if(!window.isForceAuthModal && event.target===this)closeGoogleAuthModal()">
+    <div class="bg-white/95 dark:bg-gray-900/95 w-full max-w-[410px] max-h-[92vh] rounded-[24px] sm:rounded-[28px] border border-gray-100 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-scale-up ring-1 ring-black/5 dark:ring-white/5 transition-all" onclick="event.stopPropagation()">
       
-      <!-- Modal Header with Centered Stacked Brand Logo -->
-      <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 relative flex flex-col items-center text-center bg-gray-50/50 dark:bg-white/[0.02]">
-        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors" title="Đóng">
-          <i data-lucide="x" class="w-4 h-4"></i>
+      <!-- Top Color Accent Bar -->
+      <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-[#19723c] to-teal-500 shrink-0"></div>
+
+      <!-- Modal Header (Compact & Responsive) -->
+      <div class="px-5 sm:px-6 pt-4 sm:pt-5 pb-3 relative flex flex-col items-center text-center shrink-0">
+        <!-- Close Button -->
+        <button id="googleAuthCloseBtn" onclick="closeGoogleAuthModal()" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100/80 hover:bg-gray-200/90 dark:bg-gray-800/80 dark:hover:bg-gray-700 transition-all hover:scale-105 active:scale-95 shadow-2xs" title="Đóng">
+          <i data-lucide="x" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
         </button>
-        <div class="mb-3 flex items-center justify-center">
-          <img src="/assets/brand/logo-stacked.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain block dark:hidden">
-          <img src="/assets/brand/logo-stacked-dark.png" alt="A.Kitchen" width="180" height="191" class="h-20 sm:h-24 w-auto object-contain hidden dark:block">
+
+        <!-- Brand Icon & Badge -->
+        <div class="mb-2">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-50/90 to-teal-50/60 dark:from-emerald-950/40 dark:to-teal-950/20 border border-emerald-200/80 dark:border-emerald-700/40 p-2 shadow-xs flex items-center justify-center mx-auto transition-transform hover:scale-105">
+            <img src="/assets/brand/logo-mark.png" alt="A.Kitchen" width="68" height="68" class="w-full h-full object-contain block dark:hidden">
+            <img src="/assets/brand/logo-mark-dark.png" alt="A.Kitchen" width="68" height="68" class="w-full h-full object-contain hidden dark:block">
+          </div>
         </div>
-        <h3 class="font-semibold text-base text-gray-900 dark:text-white leading-tight">Đăng Nhập Hệ Thống</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">A.Kitchen WMS • Chuỗi Bếp & Điểm Bán</p>
+
+        <!-- System Tag -->
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[10.5px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 mb-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>A.Kitchen Enterprise WMS</span>
+        </div>
+
+        <h3 class="font-extrabold text-base sm:text-lg text-gray-900 dark:text-white tracking-tight leading-snug">Đăng Nhập Hệ Thống</h3>
+        <p class="text-[11.5px] text-gray-500 dark:text-gray-400 mt-0.5 font-normal max-w-[280px]">Điều hành Kho vận & Chuỗi Bếp Ăn Công Nghiệp</p>
       </div>
 
-      <!-- Modal Body (Hỗ trợ tài khoản đã lưu & Đăng nhập Google) -->
-      <div class="p-6 sm:p-7 space-y-5 text-center">
+      <!-- Modal Body (Scrollable if needed on small phones) -->
+      <div class="px-5 sm:px-6 pb-5 pt-0.5 space-y-3.5 text-center overflow-y-auto custom-scrollbar flex-1">
         
-        <div class="space-y-1.5">
-          <h4 class="font-semibold text-base text-gray-900 dark:text-white">Đăng Nhập Bằng Google</h4>
-          <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-            Chọn tài khoản Google đã lưu trên máy hoặc đăng nhập tài khoản Gmail mới để tiếp tục
-          </p>
-        </div>
-
         <!-- Danh sách tài khoản đã lưu trên máy (nếu có) -->
-        <div id="loginSavedAccountsContainer" class="hidden text-left space-y-2">
-          <div class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Tài khoản đã đăng nhập:</span>
-            <span class="text-xs text-gray-400 font-normal">Nhấn để chuyển đổi</span>
+        <div id="loginSavedAccountsContainer" class="hidden text-left space-y-1.5">
+          <div class="text-[10.5px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between px-0.5">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="history" class="w-3.5 h-3.5 text-brand-500"></i>
+              <span>Tài khoản đã ghi nhớ:</span>
+            </span>
+            <span class="text-[9.5px] text-gray-400 font-normal">Nhấn để truy cập ngay</span>
           </div>
-          <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[180px] overflow-y-auto custom-scrollbar">
+          <div id="loginSavedAccountsList" class="space-y-1.5 max-h-[145px] overflow-y-auto custom-scrollbar pr-0.5">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Phần chọn vai trò khi đăng nhập (Các vai trò chưa được duyệt sẽ tối mờ & không chọn được) -->
-        <div id="loginRoleSelectionContainer" class="hidden text-left space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chọn vai trò khi đăng nhập:</span>
-            <span class="text-xs text-gray-400">Cần Ban Quản Trị duyệt</span>
+        <!-- Phần chọn vai trò khi đăng nhập (nếu có) -->
+        <div id="loginRoleSelectionContainer" class="hidden text-left space-y-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800/80">
+          <div class="flex items-center justify-between px-0.5">
+            <span class="text-[10.5px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span>Vai trò truy cập:</span>
+            </span>
+            <span class="text-[9.5px] text-gray-400 font-normal">Cần duyệt bởi BQT</span>
           </div>
-          <div id="loginRoleSelectionList" class="space-y-1.5 max-h-[150px] overflow-y-auto custom-scrollbar text-xs">
+          <div id="loginRoleSelectionList" class="space-y-1 max-h-[110px] overflow-y-auto custom-scrollbar pr-0.5 text-xs">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Official Google GIS Button Container -->
-        <div class="space-y-2 pt-1">
-          <div class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider" id="googleBtnLabel">Đăng nhập tài khoản Google khác</div>
-          <div id="googleSignInBtn" class="flex justify-center min-h-[46px]"></div>
+        <!-- Khối Đăng Nhập Google GIS -->
+        <div class="space-y-2.5 pt-0.5">
+          <!-- Đường phân cách tinh tế -->
+          <div class="relative flex items-center justify-center my-0.5">
+            <div class="w-full border-t border-gray-200/80 dark:border-gray-800"></div>
+            <span class="absolute bg-white dark:bg-gray-900 px-3 text-[10.5px] font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase" id="googleBtnLabel">Đăng nhập tài khoản Google</span>
+          </div>
+
+          <!-- Official Google GIS Button Container -->
+          <div id="googleSignInBtn" class="flex justify-center items-center min-h-[44px] w-full"></div>
           
-          <!-- Fallback direct Google button if GIS button is delayed or customized -->
+          <!-- Fallback direct Google button -->
           <div id="googleSignInFallback" class="hidden">
-            <button onclick="promptGoogleOneTap()" class="w-full py-2.5 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-bold text-xs flex items-center justify-center gap-3 shadow-theme-xs hover:border-brand-500 active:translate-y-px transition-all">
-              <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <button onclick="promptGoogleOneTap()" class="w-full py-2.5 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-800 dark:text-white font-semibold text-xs flex items-center justify-center gap-3 shadow-xs hover:border-brand-500 hover:shadow-sm active:translate-y-px transition-all">
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
-              <span>Mở hộp thoại đăng nhập Google</span>
+              <span>Tiếp tục với Google Workspace</span>
             </button>
           </div>
         </div>
 
-        <!-- Privacy & Security note -->
-        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-400">
-          Xác thực bảo mật OAuth 2.0 • A.Kitchen WMS
+        <!-- Privacy & Trust Footer -->
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-center gap-1.5 text-[10.5px] text-gray-400 dark:text-gray-500">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+          <span>OAuth 2.0 • Cloudflare SSL • A.Kitchen WMS</span>
         </div>
 
       </div>

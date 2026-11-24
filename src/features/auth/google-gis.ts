@@ -29,13 +29,14 @@ export function initGoogleGIS(): void {
     const btnContainer = document.getElementById('googleSignInBtn');
     if (btnContainer) {
       btnContainer.innerHTML = '';
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 420;
       google.accounts.id.renderButton(btnContainer, {
         theme: 'outline',
         size: 'large',
         text: 'signin_with',
         shape: 'pill',
         logo_alignment: 'left',
-        width: 300
+        width: isMobile ? 280 : 320
       });
     }
 
