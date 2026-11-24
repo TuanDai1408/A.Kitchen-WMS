@@ -177,11 +177,9 @@ export function renderSavedAccountsInLoginModal(): void {
   container.classList.remove('hidden');
   if (labelEl) labelEl.textContent = 'Hoặc tiếp tục với tài khoản khác';
 
-  if (accounts[0]) {
-    if (typeof (window as any).renderLoginRoleSelection === 'function') {
-      (window as any).renderLoginRoleSelection(gCurrentUser || accounts[0]);
-    }
-  }
+  // Ẩn role selection container ở modal đăng nhập để giữ giao diện thoáng đãng chuẩn Canteen Order
+  const roleContainer = document.getElementById('loginRoleSelectionContainer');
+  if (roleContainer) roleContainer.classList.add('hidden');
 
   listEl.innerHTML = accounts.map(acc => {
     const isCurrent = gCurrentUser && gCurrentUser.email.toLowerCase() === acc.email.toLowerCase();
@@ -191,11 +189,11 @@ export function renderSavedAccountsInLoginModal(): void {
     if (isLocked) {
       roleBadge = '<span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-rose-500 text-white shadow-xs">BỊ KHÓA</span>';
     } else {
-      const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40' :
-        acc.role === 'BEP_TRUONG' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40' :
-        acc.role === 'KHO_TRUONG' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40' :
-        acc.role === 'KE_TOAN' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40' :
-        'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700';
+      const roleBadgeColor = acc.role === 'ADMIN' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800/40' :
+        acc.role === 'BEP_TRUONG' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/40' :
+        acc.role === 'KHO_TRUONG' ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/40' :
+        acc.role === 'KE_TOAN' ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/40' :
+        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
       roleBadge = `<span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${roleBadgeColor}">${acc.role}</span>`;
     }
 
@@ -204,24 +202,24 @@ export function renderSavedAccountsInLoginModal(): void {
       : `https://ui-avatars.com/api/?name=${getCleanInitials(acc.fullName || acc.email)}&background=19723C&color=fff&bold=true`;
 
     return `
-      <div onclick="switchToSavedAccount('${acc.email}')" class="group p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+      <div onclick="switchToSavedAccount('${acc.email}')" class="group p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-3 ${
         isCurrent
-          ? 'border-brand-500 bg-emerald-50/70 dark:bg-emerald-950/20 ring-1.5 ring-brand-500/30 shadow-xs'
-          : 'border-gray-200/80 dark:border-gray-800/80 bg-white dark:bg-gray-800/50 hover:border-brand-500/60 hover:bg-gray-50/80 dark:hover:bg-gray-800/90 hover:shadow-xs'
+          ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30 shadow-xs'
+          : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:border-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-xs'
       }">
-        <div class="flex items-center gap-3 min-w-0">
-          <img src="${avSrc}" alt="${acc.fullName}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0 ring-2 ring-gray-100 dark:ring-gray-700/80 shadow-xs">
-          <div class="min-w-0 text-left">
-            <div class="font-bold text-xs sm:text-[13px] text-gray-900 dark:text-white truncate flex items-center gap-1.5 leading-tight">
-              <span>${acc.fullName}</span>
-              ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-brand-500 text-white tracking-wider">HIỆN TẠI</span>' : ''}
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <img src="${avSrc}" alt="${acc.fullName}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shrink-0 ring-2 ring-slate-100 dark:ring-slate-700 shadow-xs">
+          <div class="min-w-0 flex-1 text-left">
+            <div class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white truncate flex items-center gap-1.5 leading-tight">
+              <span class="truncate">${acc.fullName}</span>
+              ${isCurrent ? '<span class="inline-flex items-center gap-1 text-[8.5px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shrink-0"><span class="w-1 h-1 rounded-full bg-emerald-500"></span>Đang dùng</span>' : ''}
             </div>
-            <div class="text-[11px] text-gray-400 dark:text-gray-400 font-mono tabular-nums truncate mt-0.5">${acc.email}</div>
+            <div class="text-[11px] text-slate-400 dark:text-slate-500 font-mono tabular-nums truncate mt-0.5">${acc.email}</div>
           </div>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 shrink-0">
           ${roleBadge}
-          <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
+          <button onclick="removeSavedAccount('${acc.email}', event)" title="Xóa tài khoản này khỏi máy" class="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
             <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
         </div>
