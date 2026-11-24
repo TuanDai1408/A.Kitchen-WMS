@@ -1114,10 +1114,10 @@ function M(e){return e==null||isNaN(e)?"0 \u20AB":Math.round(e).toLocaleString("
               <span>${d}</span>
             </div>
           </td>
-          <td class="p-3.5 text-right font-mono text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap min-w-[110px]">
-            ${ho(u)} <span class="font-sans text-xs font-normal text-gray-500">${l}</span>
+          <td class="p-3.5 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap min-w-[110px]">
+            ${ho(u)} <span class="font-normal text-gray-500">${l}</span>
           </td>
-          <td class="p-3.5 text-right font-mono text-xs font-bold whitespace-nowrap min-w-[95px] ${f}">${m}</td>
+          <td class="p-3.5 text-right tabular-nums text-xs font-bold whitespace-nowrap min-w-[95px] ${f}">${m}</td>
           <td class="p-3.5 text-center whitespace-nowrap min-w-[110px]">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold border ${a}">${n.status_text||"An to\xE0n"}</span>
           </td>

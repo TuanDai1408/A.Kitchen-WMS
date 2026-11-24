@@ -89,10 +89,10 @@ export function renderFefoRows(items: StockFefoItem[]): void {
               <span>${expDisp}</span>
             </div>
           </td>
-          <td class="p-3.5 text-right font-mono text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap min-w-[110px]">
-            ${formatItemQty(qtyNum)} <span class="font-sans text-xs font-normal text-gray-500">${uomDisp}</span>
+          <td class="p-3.5 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap min-w-[110px]">
+            ${formatItemQty(qtyNum)} <span class="font-normal text-gray-500">${uomDisp}</span>
           </td>
-          <td class="p-3.5 text-right font-mono text-xs font-bold whitespace-nowrap min-w-[95px] ${daysColor}">${daysText}</td>
+          <td class="p-3.5 text-right tabular-nums text-xs font-bold whitespace-nowrap min-w-[95px] ${daysColor}">${daysText}</td>
           <td class="p-3.5 text-center whitespace-nowrap min-w-[110px]">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold border ${badgeClass}">${r.status_text || 'An toàn'}</span>
           </td>
