@@ -50,6 +50,20 @@ export function formatDateYMD(dateInput: string | Date | null | undefined): stri
   }
 }
 
+export function formatDate(val: string | Date | null | undefined): string {
+  if (!val) return '—';
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return String(val);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  } catch {
+    return String(val);
+  }
+}
+
 export function formatNumber(n: number | null | undefined, decimals = 1): string {
   if (n === null || n === undefined || isNaN(n)) return '0';
   return Number(n).toLocaleString('vi-VN', {

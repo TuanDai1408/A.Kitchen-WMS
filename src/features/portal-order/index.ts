@@ -13,7 +13,6 @@ import {
 } from './order-actions';
 
 export * from './types';
-export * from './helpers';
 export * from './order-table';
 export * from './order-actions';
 
