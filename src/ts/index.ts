@@ -8,5 +8,6 @@ export * from '@/ts/api/client';
 export * from '@/features/receipts';
 export * from '@/features/waste';
 export * from '@/features/counts';
+export * from '@/features/stock';
 
 console.log('A.Kitchen WMS TypeScript Core v1.0 initialized.');
