@@ -396,8 +396,8 @@ html {
 }
 
 .field-label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.25rem;
   color: #374151; /* text-gray-700 */
   text-transform: none; /* Không in HOA */
@@ -411,14 +411,14 @@ html {
 /* --- Base Input & Select & Textarea --- */
 .input,
 .select {
-  height: 40px;
-  min-height: 40px;
-  max-height: 40px;
+  height: 38px;
+  min-height: 38px;
+  max-height: 38px;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
-  font-size: 14px; /* text-sm */
+  font-size: 13px;
   line-height: 1.5;
-  border-radius: 0.5rem; /* rounded-lg */
+  border-radius: 0.75rem; /* rounded-lg */
   border: 1px solid #d1d5db; /* border-gray-300 */
   background-color: #ffffff;
   color: #111827; /* text-gray-900 */
@@ -551,13 +551,13 @@ html {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  height: 2.5rem; /* 40px (h-10) */
-  min-height: 40px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 0.5rem; /* rounded-lg */
+  height: 38px;
+  min-height: 38px;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 0.75rem; /* rounded-lg */
   white-space: nowrap;
   transition: all 0.15s ease;
   cursor: pointer;
@@ -778,39 +778,42 @@ html {
 }
 
 .data-table thead th {
-  padding: 0.75rem 1rem;
-  font-size: 13px;
-  font-weight: 500;
-  color: #6b7280; /* text-gray-500 */
+  padding: 0.625rem 0.875rem;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
   white-space: nowrap;
-  text-transform: none; /* No uppercase */
-  letter-spacing: normal; /* No tracking-wider */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 :is(.dark *) .data-table thead th,
 .dark .data-table thead th {
-  color: #9ca3af;
+  color: #94a3b8;
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f1f5f9;
   transition: background-color 150ms ease;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 38px;
 }
 :is(.dark *) .data-table tbody tr,
 .dark .data-table tbody tr {
-  border-bottom-color: rgba(31, 41, 55, 0.6);
+  border-bottom-color: rgba(30, 41, 59, 0.6);
 }
 .data-table tbody tr:hover {
-  background-color: rgba(249, 250, 251, 0.6);
+  background-color: rgba(241, 245, 249, 0.7);
 }
 :is(.dark *) .data-table tbody tr:hover,
 .dark .data-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .data-table tbody td {
-  padding: 0.75rem 1rem;
-  font-size: 14px;
-  color: #374151; /* text-gray-700 */
+  padding: 0.625rem 0.875rem;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #1e293b;
 }
 :is(.dark *) .data-table tbody td,
 .dark .data-table tbody td {
@@ -1711,7 +1714,7 @@ table tbody tr {
   font-size: 14px;
 }
 
-/* 2. Tiêu đề Modal (Modal Title) - Chuẩn 18px (text-lg), semibold */
+/* 2. Tiêu đề Modal (Modal Title) - Chuẩn Canteen 16px (text-base), font-extrabold */
 [id$="Modal"] h3,
 [id^="modal"] h3,
 [id$="Modal"] h4,
@@ -1722,43 +1725,46 @@ table tbody tr {
 #receiptModalTitle,
 #invDetailModalTitle,
 #detailItemName {
-  font-size: 18px !important;
-  line-height: 26px !important;
-  font-weight: 600 !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
 }
 
-/* 3. Phụ đề Modal (Modal Subtitle) - Chuẩn 13px */
+/* 3. Phụ đề Modal (Modal Subtitle) - Chuẩn Canteen 12px (text-xs) */
 [id$="Modal"] p,
 [id^="modal"] p,
 [id$="Modal"] .modal-subtitle,
 [id^="modal"] .modal-subtitle,
 #receiptModalSubtitle,
 #invDetailModalSub {
-  font-size: 13px !important;
+  font-size: 12px !important;
   line-height: 18px !important;
 }
 
-/* 4. Thân Modal (Modal Body Container) - Kế thừa 14px */
+/* 4. Thân Modal (Modal Body Container) - Chuẩn Canteen text-xs (12px/13px) */
 #modalBody,
 #invDetailModalBody,
 [id$="Modal"] .overflow-y-auto,
 [id^="modal"] .overflow-y-auto,
 .modal-body {
-  font-size: 14px !important;
+  font-size: 13px !important;
   line-height: 1.5 !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
-/* 5. Nhãn trường Form trong Modal - Chuẩn 13px font-medium */
+/* 5. Nhãn trường Form trong Modal - Chuẩn Canteen 12px font-bold */
 [id$="Modal"] label,
 [id^="modal"] label,
 [id$="Modal"] .field-label,
 [id^="modal"] .field-label {
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  line-height: 18px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 16px !important;
 }
 
-/* 6. Ô nhập liệu trong Modal - Chuẩn 14px */
+/* 6. Ô nhập liệu trong Modal - Chuẩn Canteen 13px font-semibold */
 [id$="Modal"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
 [id^="modal"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
 [id$="Modal"] select,
@@ -1769,31 +1775,87 @@ table tbody tr {
 [id^="modal"] .input,
 [id$="Modal"] .select,
 [id^="modal"] .select {
-  font-size: 14px !important;
+  font-size: 13px !important;
+  height: 38px;
+  min-height: 38px;
+  border-radius: 0.75rem;
 }
 
-/* 7. Bảng trong Modal (Modal Table Headers & Cells) - Chuẩn 13px / 14px */
+/* 7. Bảng trong Modal (Modal Table Headers & Cells) - Chuẩn Canteen 11px / 12px */
 [id$="Modal"] table th,
 [id^="modal"] table th {
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  padding: 0.625rem 0.75rem !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 0.5rem 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
 }
 
 [id$="Modal"] table td,
 [id^="modal"] table td {
-  font-size: 14px !important;
+  font-size: 12px !important;
   line-height: 1.4 !important;
-  padding: 0.625rem 0.75rem !important;
+  padding: 0.5rem 0.75rem !important;
 }
 
-/* 8. Huy hiệu trong Modal - Chuẩn 12px min */
+/* 8. Huy hiệu trong Modal - Chuẩn Canteen 10px micro-badge font-mono */
 [id$="Modal"] .badge,
 [id^="modal"] .badge,
 [id$="Modal"] [class*="rounded-full"],
 [id^="modal"] [class*="rounded-full"] {
-  font-size: 12px !important;
-  line-height: 16px !important;
+  font-size: 10px !important;
+  line-height: 14px !important;
+  font-family: var(--font-mono) !important;
+  font-feature-settings: 'tnum' 1 !important;
+}
+
+/* ==========================================================================
+   CANTEEN FLUID WEBAPP PERFORMANCE ENGINE (60-120 FPS FLUIDITY)
+   ========================================================================== */
+
+/* 1. Hardware Compositing: Smooth non-blocking headers, drawers and sidebars */
+header,
+aside#sidebar,
+#mobileMenuHubModal,
+.sticky {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* 2. Fast Lightweight Blur for Smooth 60 FPS backdrop animations */
+#overlay,
+.backdrop-blur-xs,
+[id$="Modal"] > div:first-child,
+[id^="modal"] > div:first-child {
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* 3. GPU Table Row Virtualization & Smooth Scroll Budget */
+table tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 40px;
+}
+
+/* 4. Touch Momentum Scrolling & Overscroll Containment on Mobile */
+#mainScrollContainer,
+.tab-panel,
+.custom-scrollbar {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* 5. General Table Header and Cell Font Scale (Canteen Standard) */
+table th,
+.table-th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table td {
+  font-size: 12px;
+  line-height: 1.45;
 }
