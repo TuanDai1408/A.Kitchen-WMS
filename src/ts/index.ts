@@ -15,5 +15,6 @@ export * from '@/features/wh-stock';
 export * from '@/features/reorder';
 export * from '@/features/wh-dashboard';
 export * from '@/features/wh-inventory';
+export * from '@/features/chain';
 
 console.log('A.Kitchen WMS TypeScript Core v1.0 initialized.');
