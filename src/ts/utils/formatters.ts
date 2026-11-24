@@ -94,3 +94,16 @@ export function debounce<T extends (...args: unknown[]) => void>(
     }, wait);
   };
 }
+
+export function getCleanInitials(name: string | null | undefined): string {
+  if (!name) return 'U';
+  try {
+    const cleaned = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+    const parts = cleaned.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  } catch {
+    return 'U';
+  }
+}

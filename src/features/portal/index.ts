@@ -10,8 +10,6 @@ import {
   saveVoucher,
   taiTemplateChungTu,
   importExcelChungTu,
-  searchVouchers,
-  viewVoucherDetail
 } from './vouchers';
 
 import {
@@ -76,8 +74,6 @@ if (typeof window !== 'undefined') {
   w.saveVoucher = saveVoucher;
   w.taiTemplateChungTu = taiTemplateChungTu;
   w.importExcelChungTu = importExcelChungTu;
-  w.searchVouchers = searchVouchers;
-  w.viewVoucherDetail = viewVoucherDetail;
 
   // Catering Report
   w.bcAnhFiles = bcAnhFiles;

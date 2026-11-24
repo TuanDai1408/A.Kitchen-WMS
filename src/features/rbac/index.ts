@@ -1,0 +1,92 @@
+/**
+ * Module 12: RBAC & User Management + Vouchers RBAC
+ */
+
+import {
+  gUserMatrixData,
+  loadUserMatrix,
+  renderUserMatrixKPIs,
+  filterUserMatrix,
+  resolveUserFeaturePermission,
+  renderUserMatrixTable,
+  renderUserMatrixMobile,
+  toggleUserPermission,
+  resetUserFeaturePermission
+} from './user-matrix';
+
+import {
+  openAddUserModal,
+  closeAddUserModal,
+  submitAddUser,
+  openEditUserModal,
+  closeEditUserModal,
+  submitEditUserRole,
+  resetUserAllPermsPrompt,
+  toggleUserStatusPrompt
+} from './user-modals';
+
+import {
+  _pendingDeleteVoucherCode,
+  getAppCurrentUser,
+  canEditVouchers,
+  canDeleteVouchers,
+  openEditVoucherModal,
+  closeEditVoucherModal,
+  saveEditVoucher,
+  confirmDeleteVoucher,
+  closeDeleteVoucherModal,
+  executeDeleteVoucher,
+  searchVouchers,
+  viewVoucherDetail
+} from './vouchers-rbac';
+
+import { exportUserMatrixExcel } from './export';
+
+export * from './types';
+export * from './user-matrix';
+export * from './user-modals';
+export * from './vouchers-rbac';
+export * from './export';
+
+// Bind globals to window for HTML inline event handlers & backwards compatibility
+if (typeof window !== 'undefined') {
+  const w = window as any;
+
+  // User Matrix
+  w.gUserMatrixData = gUserMatrixData;
+  w.loadUserMatrix = loadUserMatrix;
+  w.renderUserMatrixKPIs = renderUserMatrixKPIs;
+  w.filterUserMatrix = filterUserMatrix;
+  w.resolveUserFeaturePermission = resolveUserFeaturePermission;
+  w.renderUserMatrixTable = renderUserMatrixTable;
+  w.renderUserMatrixMobile = renderUserMatrixMobile;
+  w.toggleUserPermission = toggleUserPermission;
+  w.resetUserFeaturePermission = resetUserFeaturePermission;
+
+  // User Modals & Actions
+  w.openAddUserModal = openAddUserModal;
+  w.closeAddUserModal = closeAddUserModal;
+  w.submitAddUser = submitAddUser;
+  w.openEditUserModal = openEditUserModal;
+  w.closeEditUserModal = closeEditUserModal;
+  w.submitEditUserRole = submitEditUserRole;
+  w.resetUserAllPermsPrompt = resetUserAllPermsPrompt;
+  w.toggleUserStatusPrompt = toggleUserStatusPrompt;
+
+  // Vouchers RBAC & Management
+  w._pendingDeleteVoucherCode = _pendingDeleteVoucherCode;
+  w.getAppCurrentUser = getAppCurrentUser;
+  w.canEditVouchers = canEditVouchers;
+  w.canDeleteVouchers = canDeleteVouchers;
+  w.openEditVoucherModal = openEditVoucherModal;
+  w.closeEditVoucherModal = closeEditVoucherModal;
+  w.saveEditVoucher = saveEditVoucher;
+  w.confirmDeleteVoucher = confirmDeleteVoucher;
+  w.closeDeleteVoucherModal = closeDeleteVoucherModal;
+  w.executeDeleteVoucher = executeDeleteVoucher;
+  w.searchVouchers = searchVouchers;
+  w.viewVoucherDetail = viewVoucherDetail;
+
+  // Export
+  w.exportUserMatrixExcel = exportUserMatrixExcel;
+}
