@@ -11,5 +11,6 @@ export * from '@/features/counts';
 export * from '@/features/stock';
 export * from '@/features/portal-order';
 export * from '@/features/portal-history';
+export * from '@/features/wh-stock';
 
 console.log('A.Kitchen WMS TypeScript Core v1.0 initialized.');
