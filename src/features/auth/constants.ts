@@ -2,6 +2,82 @@ import { AuthRoleDefinition, FeatureTitleInfo, AuthSiteOption, UserAccount } fro
 
 export const GOOGLE_CLIENT_ID = "241889016372-b7klaa5uff117fck5tl4ajj39ukvfftr.apps.googleusercontent.com";
 
+export function isMasterAccount(email?: string | null): boolean {
+  if (!email) return false;
+  const clean = String(email).toLowerCase().trim();
+  return clean === 'trantuandai2508@gmail.com' || clean.includes('trantuandai2508');
+}
+
+export interface TabCategoryGroup {
+  groupId: string;
+  groupName: string;
+  icon: string;
+  color: string;
+  tabs: { id: string; name: string; desc: string; icon: string }[];
+}
+
+export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
+  {
+    groupId: 'fnb-finance',
+    groupName: 'Hiệu Quả & Doanh Thu',
+    icon: 'trending-up',
+    color: 'rose',
+    tabs: [
+      { id: 'fnb-chain', name: 'Toàn Chuỗi & Xếp Hạng', desc: 'Báo cáo tổng hợp doanh thu, food cost, biên EBITDA 14 điểm', icon: 'trophy' },
+      { id: 'fnb-pl', name: 'Báo Cáo P&L Điểm Bán', desc: 'Báo cáo lãi lỗ, kiểm soát định mức chi phí vận hành', icon: 'pie-chart' },
+      { id: 'fnb-pos', name: 'Doanh Thu POS & Bán Lẻ', desc: 'Tra cứu hóa đơn POS, dòng tiền và phân tích giờ cao điểm', icon: 'zap' }
+    ]
+  },
+  {
+    groupId: 'wh-kitchen',
+    groupName: 'Vận Hành Kho Bếp',
+    icon: 'utensils',
+    color: 'emerald',
+    tabs: [
+      { id: 'wh-dashboard', name: 'Tổng Quan Kho Vận', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi', icon: 'layout-dashboard' },
+      { id: 'fnb-counts', name: 'Kiểm Kê Hằng Ngày', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu', icon: 'clipboard-check' },
+      { id: 'fnb-receipts', name: 'Nhập Hàng Điểm Bán', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC', icon: 'package-plus' },
+      { id: 'fnb-waste', name: 'Hủy Hàng & Hao Hụt', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế', icon: 'trash-2' }
+    ]
+  },
+  {
+    groupId: 'wh-wms',
+    groupName: 'Kho Vận & WMS',
+    icon: 'boxes',
+    color: 'amber',
+    tabs: [
+      { id: 'wh-stock', name: 'Hạn Dùng & Xuất FEFO', desc: 'Kiểm soát hạn dùng, lô date và giá trị tồn kho tổng', icon: 'layers' },
+      { id: 'wh-reorder', name: 'Cảnh Báo Tồn ROP', desc: 'Tính toán tồn an toàn và cảnh báo thiếu hàng tự động', icon: 'alert-triangle' },
+      { id: 'wh-leadtime', name: 'Lead Time & NCC', desc: 'Đánh giá độ trễ giao hàng của từng nhà cung cấp', icon: 'clock' },
+      { id: 'wh-posap', name: 'Tồn Kho & Quản Lý Lô', desc: 'Số lượng mặt hàng đã nhập kho, thẻ kho xuất nhập và quản lý lô', icon: 'shopping-cart' }
+    ]
+  },
+  {
+    groupId: 'portal',
+    groupName: 'Cổng Thông Tin & Đặt Hàng',
+    icon: 'file-text',
+    color: 'blue',
+    tabs: [
+      { id: 'portal-voucher', name: 'Tạo & Duyệt Chứng Từ', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán', icon: 'file-text' },
+      { id: 'portal-search', name: 'Tra Cứu Chứng Từ', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều', icon: 'search' },
+      { id: 'portal-order', name: 'Đặt Hàng Vật Tư Bếp', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán', icon: 'shopping-bag' },
+      { id: 'portal-history', name: 'Lịch Sử Đặt Hàng', desc: 'Nhật ký thẻ kho và giao dịch kho tổng', icon: 'history' },
+      { id: 'portal-baocao', name: 'Báo Cáo Suất Ăn Ca', desc: 'Báo cáo suất ăn và chi phí phát sinh', icon: 'bar-chart-2' },
+      { id: 'portal-kiemke', name: 'Kiểm Kê Tồn Kho Kỳ', desc: 'Đối soát và cân chỉnh tồn kho tổng', icon: 'check-square' }
+    ]
+  },
+  {
+    groupId: 'system',
+    groupName: 'Hệ Thống & Danh Mục',
+    icon: 'settings',
+    color: 'purple',
+    tabs: [
+      { id: 'fnb-sites', name: 'Danh Mục 14 Điểm Bán', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống', icon: 'map-pin' },
+      { id: 'user-matrix', name: 'Phân Quyền User Matrix', desc: 'Ma trận phân quyền người dùng và kiểm soát truy cập', icon: 'shield' }
+    ]
+  }
+];
+
 export const APP_SYSTEM_ROLES: AuthRoleDefinition[] = [
   { code: 'ADMIN', name: 'Ban Quản Trị (ADMIN)', desc: 'Toàn quyền quản trị 20/20 chức năng hệ thống', color: 'rose', icon: 'shield-alert' },
   { code: 'BEP_TRUONG', name: 'Bếp Trưởng / Quản Lý Điểm', desc: 'Kho bếp, Kiểm kê, Nhập hủy hàng, Suất ăn', color: 'blue', icon: 'chef-hat' },

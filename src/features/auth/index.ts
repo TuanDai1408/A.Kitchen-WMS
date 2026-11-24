@@ -59,6 +59,9 @@ import {
   updateUIForUnauthenticated,
   applyUserSessionToUI,
   canAccessTab,
+  gSystemTabVisibility,
+  setSystemTabVisibility,
+  loadPersistedTabVisibility,
   renderRoleSwitcherModal,
   openRoleSwitcherModal,
   closeRoleSwitcherModal,
@@ -66,6 +69,18 @@ import {
   switchRoleAction,
   renderLoginRoleSelection
 } from './rbac-session';
+
+import {
+  loadSystemTabVisibility,
+  openTabVisibilityModal,
+  closeTabVisibilityModal,
+  toggleTabVisibilityItem,
+  setAllTabsVisible,
+  filterTabVisibility,
+  onTabVisSearch,
+  renderTabVisibilityList,
+  saveSystemTabVisibility
+} from './tab-visibility-modal';
 
 import {
   initGoogleGIS,
@@ -90,6 +105,7 @@ export * from './accounts';
 export * from './sites-modal';
 export * from './access-requests';
 export * from './rbac-session';
+export * from './tab-visibility-modal';
 export * from './google-gis';
 export * from './search-filter';
 
@@ -160,6 +176,20 @@ if (typeof window !== 'undefined') {
   w.switchRoleAction = switchRoleAction;
   w.renderLoginRoleSelection = renderLoginRoleSelection;
 
+  // Master Tab Visibility Operations (trantuandai2508 exclusive)
+  w.gSystemTabVisibility = gSystemTabVisibility;
+  w.setSystemTabVisibility = setSystemTabVisibility;
+  w.loadPersistedTabVisibility = loadPersistedTabVisibility;
+  w.loadSystemTabVisibility = loadSystemTabVisibility;
+  w.openTabVisibilityModal = openTabVisibilityModal;
+  w.closeTabVisibilityModal = closeTabVisibilityModal;
+  w.toggleTabVisibilityItem = toggleTabVisibilityItem;
+  w.setAllTabsVisible = setAllTabsVisible;
+  w.filterTabVisibility = filterTabVisibility;
+  w.onTabVisSearch = onTabVisSearch;
+  w.renderTabVisibilityList = renderTabVisibilityList;
+  w.saveSystemTabVisibility = saveSystemTabVisibility;
+
   // Google GIS & Auth Modals
   w.initGoogleGIS = initGoogleGIS;
   w.handleGoogleLoginResponse = handleGoogleLoginResponse;
@@ -196,7 +226,11 @@ if (typeof window !== 'undefined') {
     // Nếu không có quyền truy cập tab
     if (!canAccessTab(tabId)) {
       if (typeof w.showToast === 'function') {
-        w.showToast('Bạn không có quyền truy cập chức năng này', 'warning');
+        if (gSystemTabVisibility[tabId] === true) {
+          w.showToast('Chức năng này đã bị ẩn bởi Quản trị viên tối cao (trantuandai2508)', 'error');
+        } else {
+          w.showToast('Bạn không có quyền truy cập chức năng này', 'warning');
+        }
       }
       const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
       const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'tab-403';

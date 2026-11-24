@@ -1,5 +1,5 @@
 import { gCurrentUser, saveAccountToList } from './accounts';
-import { APP_SYSTEM_ROLES, repairAtobMojibake, loadPersistedUser } from './constants';
+import { APP_SYSTEM_ROLES, repairAtobMojibake, loadPersistedUser, isMasterAccount } from './constants';
 import { checkAndPromptUserSite, renderSitesOptions } from './sites-modal';
 import { checkPendingAccessRequests } from './access-requests';
 import { getCleanInitials } from '@/ts/utils/formatters';
@@ -12,7 +12,33 @@ declare const TAB_META: any;
 
 let lastFocusSyncTime = Date.now();
 
+export let gSystemTabVisibility: Record<string, boolean> = {};
+
+export function loadPersistedTabVisibility(): Record<string, boolean> {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem('orbit_tab_visibility');
+      if (raw) {
+        gSystemTabVisibility = JSON.parse(raw) || {};
+        return gSystemTabVisibility;
+      }
+    }
+  } catch (e) {}
+  gSystemTabVisibility = {};
+  return gSystemTabVisibility;
+}
+
+export function setSystemTabVisibility(vis: Record<string, boolean>): void {
+  gSystemTabVisibility = vis || {};
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('orbit_tab_visibility', JSON.stringify(gSystemTabVisibility));
+    }
+  } catch (e) {}
+}
+
 export function initRbacAuth(): void {
+  loadPersistedTabVisibility();
   const w = typeof window !== 'undefined' ? (window as any) : {};
   let curUser = w.gCurrentUser || gCurrentUser;
   if (!curUser) {
@@ -70,6 +96,9 @@ export async function syncCurrentUserPermissions(): Promise<void> {
     }
 
     if (json.success && json.data) {
+      if (json.data.tabVisibility && typeof json.data.tabVisibility === 'object') {
+        setSystemTabVisibility(json.data.tabVisibility);
+      }
       curUser.status = (json.data.user && json.data.user.status) || json.data.status || 'ACTIVE';
       curUser.permissions = json.data.permissions || {};
       curUser.role = json.data.role;
@@ -245,6 +274,29 @@ export function applyUserSessionToUI(): void {
       adminBtn.classList.remove('hidden');
     } else {
       adminBtn.classList.add('hidden');
+    }
+  }
+
+  // Master Owner Control Section (chỉ dành riêng cho trantuandai2508)
+  const masterContainer = document.getElementById('profMasterControlContainer');
+  if (masterContainer) {
+    if (isMasterAccount(curUser.email)) {
+      masterContainer.classList.remove('hidden');
+      masterContainer.style.display = '';
+    } else {
+      masterContainer.classList.add('hidden');
+      masterContainer.style.display = 'none';
+    }
+  }
+
+  const masterMatrixBtn = document.getElementById('masterTabVisBtn');
+  if (masterMatrixBtn) {
+    if (isMasterAccount(curUser.email)) {
+      masterMatrixBtn.classList.remove('hidden');
+      masterMatrixBtn.style.display = '';
+    } else {
+      masterMatrixBtn.classList.add('hidden');
+      masterMatrixBtn.style.display = 'none';
     }
   }
 
@@ -473,6 +525,15 @@ export function canAccessTab(tabId: string): boolean {
   }
   if (tabId === 'tab-account-locked') {
     return false;
+  }
+
+  // ĐẶC QUYỀN VÀ KHÓA CHẶN MASTER OWNER (trantuandai2508):
+  // Nếu tab bị Master Owner đánh dấu ẨN (gSystemTabVisibility[tabId] === true),
+  // thì BẤT KỲ AI KHÁC (kể cả role === 'ADMIN') ĐỀU BỊ CẤM TRUY CẬP 100%!
+  if (gSystemTabVisibility[tabId] === true) {
+    if (!isMasterAccount(curUser.email)) {
+      return false;
+    }
   }
 
   // Single Source of Truth từ CSDL Backend D1

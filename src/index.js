@@ -354,6 +354,22 @@ async function ensureUserPermissionsTable(env) {
   }
 }
 
+async function ensureSystemTabVisibilityTable(env) {
+  if (db.isPg(env)) return;
+  try {
+    await db.exec(env, `
+      CREATE TABLE IF NOT EXISTS system_tab_visibility (
+        tab_id TEXT PRIMARY KEY,
+        is_hidden INTEGER DEFAULT 0,
+        updated_by TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } catch (err) {
+    console.error('ensureSystemTabVisibilityTable notice:', err);
+  }
+}
+
 
 const ALL_SYSTEM_FEATURES = [
   'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
@@ -513,6 +529,39 @@ async function buildUserPermissions(env, user) {
   // 4. Bảo vệ an toàn: Owner hệ thống luôn có quyền quản lý phân quyền (user-matrix) khi không bị khóa
   if (user.email === 'trantuandai2508@gmail.com' && user.status !== 'LOCKED') {
     permissions['user-matrix'] = { canView: true, canCreate: true, canEdit: true, canDelete: true };
+  }
+
+  // 5. CƠ CHẾ ẨN / HIỆN TAB TOÀN HỆ THỐNG (DO RIÊNG TÀI KHOẢN trantuandai2508 CẤU HÌNH)
+  // NẾU TAB BỊ ẨN -> KHÔNG MỘT USER NÀO XEM ĐƯỢC KỂ CẢ ADMIN
+  // CHỈ RIÊNG TÀI KHOẢN trantuandai2508 MỚI ĐƯỢC PHÉP TRUY CẬP VÀ MỞ LẠI
+  const isMasterUser = user && user.email && (user.email.toLowerCase().trim() === 'trantuandai2508@gmail.com' || user.email.toLowerCase().includes('trantuandai2508'));
+  try {
+    const { rows: hiddenTabRows } = await db.query(env, `SELECT tab_id FROM system_tab_visibility WHERE is_hidden = 1`).catch(() => ({ rows: [] }));
+    if (hiddenTabRows && hiddenTabRows.length > 0) {
+      hiddenTabRows.forEach(row => {
+        const tId = row.tab_id;
+        if (!isMasterUser) {
+          // Bất kỳ user nào khác (kể cả role ADMIN hay vai trò nào) đều bị cắt quyền tuyệt đối
+          permissions[tId] = {
+            canView: false,
+            canCreate: false,
+            canEdit: false,
+            canDelete: false,
+            isRevoked: true,
+            isGloballyHidden: true
+          };
+        } else {
+          // Đối với riêng tài khoản Master trantuandai2508: vẫn có thể xem và quản lý
+          if (permissions[tId]) {
+            permissions[tId].isGloballyHidden = true;
+          } else {
+            permissions[tId] = { canView: true, canCreate: true, canEdit: true, canDelete: true, isGloballyHidden: true };
+          }
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Error applying system_tab_visibility in buildUserPermissions:', err);
   }
 
   return permissions;
@@ -2949,6 +2998,14 @@ export default {
             });
           }
 
+          const isMaster = user && user.email && (user.email.toLowerCase().trim() === 'trantuandai2508@gmail.com' || user.email.toLowerCase().includes('trantuandai2508'));
+          await ensureSystemTabVisibilityTable(env);
+          const { rows: tabVisRows } = await db.query(env, `SELECT tab_id, is_hidden FROM system_tab_visibility`).catch(() => ({ rows: [] }));
+          const tabVisibility = {};
+          (tabVisRows || []).forEach(r => {
+            tabVisibility[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true;
+          });
+
           const authResponseData = {
             success: true,
             data: {
@@ -2966,7 +3023,9 @@ export default {
               roleName: roleInfo?.role_name || user.role_code,
               badgeColor: roleInfo?.badge_color || 'bg-brand-500',
               approvedRoles,
-              permissions
+              permissions,
+              isMasterOwner: isMaster,
+              tabVisibility
             }
           };
           setMemoryCache(authCacheKey, authResponseData, 60);
@@ -3519,6 +3578,69 @@ export default {
         }, [cleanEmail, safeName, avatarUrl, initialRole]);
 
         return new Response(JSON.stringify({ success: true, message: `Đã thêm người dùng ${cleanEmail} thành công` }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // 2.11.TV QUẢN LÝ ẨN/HIỆN TAB TOÀN HỆ THỐNG (CHỈ DÀNH RIÊNG trantuandai2508)
+      // ======================================================================
+      if (pathname === '/api/system/tab-visibility' && request.method === 'GET') {
+        await ensureSystemTabVisibilityTable(env);
+        const { rows } = await db.query(env, `SELECT tab_id, is_hidden, updated_by, updated_at FROM system_tab_visibility`).catch(() => ({ rows: [] }));
+        const visibilityMap = {};
+        (rows || []).forEach(r => {
+          visibilityMap[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true;
+        });
+        return new Response(JSON.stringify({
+          success: true,
+          data: visibilityMap,
+          masterEmail: 'trantuandai2508@gmail.com'
+        }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/system/tab-visibility' && request.method === 'POST') {
+        await ensureSystemTabVisibilityTable(env);
+        const body = await request.json().catch(() => ({}));
+        const { requestorEmail, tabId, isHidden } = body;
+        const bulkUpdates = body.bulkUpdates || body.visibility;
+
+        // BẢO MẬT TUYỆT ĐỐI: CHỈ DUY NHẤT TÀI KHOẢN trantuandai2508 ĐƯỢC PHÉP CẤU HÌNH
+        const isMaster = requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508'));
+        if (!isMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Từ chối truy cập: Chức năng phân quyền ẩn/hiện tab chỉ dành riêng cho tài khoản trantuandai2508.'
+          }), { status: 403, headers: corsHeaders });
+        }
+
+        if (bulkUpdates && typeof bulkUpdates === 'object') {
+          for (const [tId, hiddenVal] of Object.entries(bulkUpdates)) {
+            const hVal = (hiddenVal === true || hiddenVal === 1) ? 1 : 0;
+            await db.exec(env, `
+              INSERT INTO system_tab_visibility (tab_id, is_hidden, updated_by, updated_at)
+              VALUES (?, ?, ?, datetime('now'))
+              ON CONFLICT(tab_id) DO UPDATE SET
+                is_hidden = excluded.is_hidden,
+                updated_by = excluded.updated_by,
+                updated_at = datetime('now')
+            `, [tId, hVal, requestorEmail]).catch(() => {});
+          }
+        } else if (tabId) {
+          const hVal = (isHidden === true || isHidden === 1) ? 1 : 0;
+          await db.exec(env, `
+            INSERT INTO system_tab_visibility (tab_id, is_hidden, updated_by, updated_at)
+            VALUES (?, ?, ?, datetime('now'))
+            ON CONFLICT(tab_id) DO UPDATE SET
+              is_hidden = excluded.is_hidden,
+              updated_by = excluded.updated_by,
+              updated_at = datetime('now')
+          `, [tabId, hVal, requestorEmail]).catch(() => {});
+        }
+
+        invalidateMemoryCache('auth_me_');
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Đã cập nhật trạng thái ẩn/hiện tab hệ thống thành công!'
+        }), { headers: corsHeaders });
       }
 
       // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)
