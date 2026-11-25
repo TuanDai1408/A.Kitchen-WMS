@@ -5206,6 +5206,148 @@ export default {
 
       // 3.7 NHẬP HÀNG: GET & POST /api/fnb/receipts
       if ((pathname.startsWith('/api/fnb/receipts') || pathname.startsWith('/fnb/receipts'))) {
+        // 3.7.0 KIỂM TRA TÁC ĐỘNG TRƯỚC KHI HỦY NHẬP KHO: GET /api/fnb/receipts/cancel-preview
+        if (pathname.endsWith('/cancel-preview') && request.method === 'GET') {
+          try {
+            const receiptId = searchParams.get('id');
+            const poNumber = searchParams.get('po_number');
+            if (!receiptId && !poNumber) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu id phiếu nhập hoặc po_number' }), { headers: corsHeaders, status: 400 });
+            }
+
+            let receipt = null;
+            if (receiptId) {
+              receipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE id = ?`, [receiptId]);
+            } else if (poNumber) {
+              receipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE invoice_no = ? ORDER BY id DESC LIMIT 1`, [poNumber]);
+            }
+
+            if (!receipt) {
+              return new Response(JSON.stringify({
+                success: true,
+                data: {
+                  receipt: null,
+                  po_number: poNumber || null,
+                  items: [],
+                  summary: {
+                    hasConflicts: false,
+                    hasInsufficientStock: false,
+                    totalIssuedAfter: 0,
+                    totalWastedAfter: 0,
+                    countRecordsCount: 0
+                  }
+                }
+              }), { headers: corsHeaders });
+            }
+
+            const siteCode = receipt.site_code;
+            const receiptDate = (receipt.receipt_date || '').slice(0, 10) || '1970-01-01';
+
+            const { rows: lines } = await db.query(env, `
+              SELECT l.*,
+                     COALESCE(d.material_desc, p.article_desc, i.name, l.item_code) as item_name,
+                     COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit
+              FROM fnb_stock_receipt_lines l
+              LEFT JOIN dim_article_stock d ON l.item_code = d.material
+              LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, order_unit FROM sap_po_items) p ON l.item_code = p.article
+              LEFT JOIN fnb_stock_items i ON l.item_code = i.code
+              WHERE l.receipt_id = ?
+            `, [receipt.id]);
+
+            const itemsAnalysis = [];
+            let hasConflicts = false;
+            let hasInsufficientStock = false;
+            let totalIssuedAfter = 0;
+            let totalWastedAfter = 0;
+            let countRecordsCount = 0;
+
+            for (const line of (lines || [])) {
+              const receiptQty = Number(line.qty) || 0;
+
+              const bal = await db.queryOne(env, `
+                SELECT COALESCE(book_qty, 0) as book_qty, COALESCE(receipt_qty, 0) as receipt_qty, COALESCE(waste_qty, 0) as waste_qty, last_count_qty, last_count_date
+                FROM fnb_stock_balances
+                WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                LIMIT 1
+              `, [line.item_code, siteCode]).catch(() => null);
+
+              const currentBookQty = Number(bal?.book_qty) || 0;
+              const projectedBookQty = currentBookQty - receiptQty;
+              const isInsufficient = currentBookQty < receiptQty;
+
+              // Kiểm tra đã Xuất kho sử dụng từ ngày nhập trở đi
+              const issueStats = await db.queryOne(env, `
+                SELECT COALESCE(SUM(l.qty), 0) as total_qty, COUNT(DISTINCT i.id) as slip_count
+                FROM fnb_kitchen_issue_lines l
+                INNER JOIN fnb_kitchen_issues i ON l.issue_id = i.id
+                WHERE l.item_code = ? AND UPPER(i.site_code) = UPPER(?) AND SUBSTR(CAST(i.issue_date AS TEXT), 1, 10) >= ?
+              `, [line.item_code, siteCode, receiptDate]).catch(() => ({ total_qty: 0, slip_count: 0 }));
+
+              // Kiểm tra đã Hủy hàng từ ngày nhập trở đi
+              const wasteStats = await db.queryOne(env, `
+                SELECT COALESCE(SUM(l.qty), 0) as total_qty, COUNT(DISTINCT w.id) as slip_count
+                FROM fnb_stock_waste_lines l
+                INNER JOIN fnb_stock_wastes w ON l.waste_id = w.id
+                WHERE l.item_code = ? AND UPPER(w.site_code) = UPPER(?) AND SUBSTR(CAST(w.waste_date AS TEXT), 1, 10) >= ?
+              `, [line.item_code, siteCode, receiptDate]).catch(() => ({ total_qty: 0, slip_count: 0 }));
+
+              // Kiểm tra đã Kiểm kê từ ngày nhập trở đi
+              const { rows: countRows } = await db.query(env, `
+                SELECT c.count_code, c.count_date, l.book_qty, l.count_qty, l.diff_qty
+                FROM fnb_stock_count_lines l
+                INNER JOIN fnb_stock_counts c ON l.count_id = c.id
+                WHERE l.item_code = ? AND UPPER(c.site_code) = UPPER(?) AND SUBSTR(CAST(c.count_date AS TEXT), 1, 10) >= ?
+                ORDER BY c.count_date DESC, c.id DESC
+                LIMIT 5
+              `, [line.item_code, siteCode, receiptDate]).catch(() => ({ rows: [] }));
+
+              const issuedQty = Number(issueStats?.total_qty) || 0;
+              const wastedQty = Number(wasteStats?.total_qty) || 0;
+              const counts = countRows || [];
+
+              if (isInsufficient) hasInsufficientStock = true;
+              if (isInsufficient || issuedQty > 0 || wastedQty > 0 || counts.length > 0) {
+                hasConflicts = true;
+              }
+              totalIssuedAfter += issuedQty;
+              totalWastedAfter += wastedQty;
+              countRecordsCount += counts.length;
+
+              itemsAnalysis.push({
+                item_code: line.item_code,
+                item_name: line.item_name || line.item_code,
+                unit: line.unit || 'Phần',
+                receipt_qty: receiptQty,
+                current_book_qty: currentBookQty,
+                projected_book_qty: projectedBookQty,
+                is_insufficient: isInsufficient,
+                issued_after_qty: issuedQty,
+                issued_slips: Number(issueStats?.slip_count) || 0,
+                wasted_after_qty: wastedQty,
+                wasted_slips: Number(wasteStats?.slip_count) || 0,
+                counts_after: counts
+              });
+            }
+
+            return new Response(JSON.stringify({
+              success: true,
+              data: {
+                receipt,
+                items: itemsAnalysis,
+                summary: {
+                  hasConflicts,
+                  hasInsufficientStock,
+                  totalIssuedAfter,
+                  totalWastedAfter,
+                  countRecordsCount
+                }
+              }
+            }), { headers: corsHeaders });
+          } catch (prevErr) {
+            return new Response(JSON.stringify({ success: false, error: prevErr.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
         if (request.method === 'GET') {
           const siteCode = searchParams.get('site_code');
           let q = `SELECT * FROM fnb_stock_receipts`;
@@ -5399,12 +5541,12 @@ export default {
                   const unitPrice = Number(line.unit_price) || 0;
                   const lineAmount = Number(line.amount) || (qty * unitPrice);
 
-                  // Hoàn tác tồn kho fnb_stock_balances
+                  // Hoàn tác tồn kho fnb_stock_balances (trừ đúng SL nhập khỏi book_qty hiện tại để giữ nguyên các phát sinh Xuất kho sử dụng & Hủy hàng)
                   await tx.exec(`
                     UPDATE fnb_stock_balances
-                    SET receipt_qty = GREATEST(0, receipt_qty - ?),
-                        book_qty = opening_qty + (GREATEST(0, receipt_qty - ?)) - sales_bom_qty - waste_qty,
-                        total_value = (opening_qty + (GREATEST(0, receipt_qty - ?)) - sales_bom_qty - waste_qty) * ?,
+                    SET receipt_qty = GREATEST(0, COALESCE(receipt_qty, 0) - ?),
+                        book_qty = COALESCE(book_qty, 0) - ?,
+                        total_value = (COALESCE(book_qty, 0) - ?) * ?,
                         updated_at = NOW()
                     WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
                   `, [qty, qty, qty, unitPrice, line.item_code, siteCode]);

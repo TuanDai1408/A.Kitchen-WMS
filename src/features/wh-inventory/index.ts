@@ -23,7 +23,10 @@ import {
   openWhReceivedOrderDetail,
   closeWhReceivedOrderDetailModal,
   onWhRecModalCancelClick,
-  confirmCancelReceivedOrder
+  confirmCancelReceivedOrder,
+  closeConfirmCancelReceiptModal,
+  onCancelReceiptAckChange,
+  executeCancelReceivedOrder
 } from './received-orders';
 
 import {
@@ -64,6 +67,9 @@ if (typeof window !== 'undefined') {
   w.closeWhReceivedOrderDetailModal = closeWhReceivedOrderDetailModal;
   w.onWhRecModalCancelClick = onWhRecModalCancelClick;
   w.confirmCancelReceivedOrder = confirmCancelReceivedOrder;
+  w.closeConfirmCancelReceiptModal = closeConfirmCancelReceiptModal;
+  w.onCancelReceiptAckChange = onCancelReceiptAckChange;
+  w.executeCancelReceivedOrder = executeCancelReceivedOrder;
 
   w.exportWhInventoryToExcel = exportWhInventoryToExcel;
   w.exportWhItemHistoryToExcel = exportWhItemHistoryToExcel;

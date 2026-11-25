@@ -6482,6 +6482,68 @@
     </div>
   </div>
 
+  <!-- MODAL XÁC NHẬN HỦY NHẬP KHO & KIỂM TRA TÁC ĐỘNG TỒN KHO -->
+  <div id="modalConfirmCancelReceipt" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeConfirmCancelReceiptModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      <!-- Header -->
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shrink-0 bg-rose-50/50 dark:bg-rose-950/20">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs shrink-0">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Xác nhận Hủy nhập kho</h3>
+            <p id="cancelReceiptSubtitle" class="text-xs text-rose-600 dark:text-rose-400 font-mono font-semibold mt-0.5"></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeConfirmCancelReceiptModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-white/80 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs">
+        <div id="cancelReceiptSummaryCard" class="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        </div>
+
+        <div id="cancelReceiptImpactContainer" class="space-y-3">
+          <div class="p-6 text-center text-gray-400">Đang kiểm tra tác động tới Xuất kho, Hủy hàng và Kiểm kê...</div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 space-y-1.5 text-[11px] text-blue-900 dark:text-blue-200">
+          <div class="font-bold flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
+            <i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>Quy tắc tính lại số liệu khi Hủy nhập kho:</span>
+          </div>
+          <ul class="list-disc pl-5 space-y-1 text-blue-800/90 dark:text-blue-200/90">
+            <li><b>Tồn kho hiện tại:</b> Trừ đúng số lượng đã nhập của phiếu này (<span class="font-mono">Tồn mới = Tồn hiện tại - SL nhập</span>).</li>
+            <li><b>Xuất kho sử dụng &amp; Hủy hàng:</b> Các phiếu xuất sử dụng / hủy hàng đã lập vẫn được giữ nguyên (không bị mất lịch sử trừ kho).</li>
+            <li><b>Kiểm kê:</b> Phiếu kiểm kê cũ vẫn giữ nguyên làm lịch sử đối chiếu; nếu đã kiểm kê sau ngày nhập, bạn nên kiểm kê lại sau khi hủy.</li>
+            <li><b>Đơn PO/PR:</b> Nếu có liên kết SAP PO/PR, trạng thái đơn sẽ mở lại về <b>Chờ nhập</b> để nhập lại khi cần.</li>
+          </ul>
+        </div>
+
+        <label id="cancelReceiptAckWrapper" class="hidden flex items-start gap-2.5 p-3 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30 cursor-pointer">
+          <input type="checkbox" id="cancelReceiptAckCheckbox" onchange="onCancelReceiptAckChange()" class="mt-0.5 rounded border-amber-400 text-rose-600 focus:ring-rose-500">
+          <span class="text-xs font-semibold text-amber-900 dark:text-amber-200 leading-relaxed">
+            Tôi đã kiểm tra các phát sinh Xuất kho / Hủy hàng / Kiểm kê liên quan và xác nhận vẫn muốn Hủy nhập kho phiếu này.
+          </span>
+        </label>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button type="button" onclick="closeConfirmCancelReceiptModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          Đóng / Giữ lại
+        </button>
+        <button type="button" id="btnExecuteCancelReceipt" onclick="executeCancelReceivedOrder()" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Xác nhận Hủy nhập kho</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- =====================================================================
        POPUP 6: CẤU HÌNH ẨN / HIỆN TAB WEBAPP (ĐỘC QUYỀN trantuandai2508)
        Khi ẩn một tab, toàn bộ người dùng (kể cả ADMIN) đều bị chặn truy cập.

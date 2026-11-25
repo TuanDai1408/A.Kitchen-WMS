@@ -385,18 +385,175 @@ export function onWhRecModalCancelClick(): void {
   confirmCancelReceivedOrder(receiptId, poNumber, receiptCode, totalAmount);
 }
 
+let _pendingCancelReceipt: {
+  receiptId: string;
+  poNumber: string;
+  receiptCode: string;
+  totalAmount: number;
+  hasConflicts: boolean;
+} | null = null;
+
+export function closeConfirmCancelReceiptModal(): void {
+  _pendingCancelReceipt = null;
+  const modal = document.getElementById('modalConfirmCancelReceipt');
+  if (modal) modal.classList.add('hidden');
+}
+
+export function onCancelReceiptAckChange(): void {
+  const ack = document.getElementById('cancelReceiptAckCheckbox') as HTMLInputElement | null;
+  const btn = document.getElementById('btnExecuteCancelReceipt') as HTMLButtonElement | null;
+  if (btn && _pendingCancelReceipt?.hasConflicts) {
+    btn.disabled = !(ack && ack.checked);
+  }
+}
+
 export async function confirmCancelReceivedOrder(receiptId: string, poNumber: string, receiptCode: string, totalAmount: number): Promise<void> {
   if (!assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho')) return;
 
   const codeDisplay = receiptCode || poNumber || 'đơn hàng này';
-  const amtDisplay = totalAmount ? (Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫') : '';
+  const amtDisplay = totalAmount ? (Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫') : '0 ₫';
 
-  const confirmMsg = `Bạn có chắc chắn muốn HỦY NHẬP KHO cho đơn hàng [${codeDisplay}]` +
-    (amtDisplay ? ` với giá trị ${amtDisplay}` : '') + `?\n\n` +
-    `• Toàn bộ số lượng nhập kho sẽ được HOÀN TÁC TRỪ KHỎI TỒN KHO thực tế.\n` +
-    `• Đơn hàng PO/PR sẽ được mở lại (trạng thái Chờ nhập) để có thể nhập lại khi cần.`;
+  _pendingCancelReceipt = { receiptId, poNumber, receiptCode, totalAmount, hasConflicts: false };
 
-  if (!confirm(confirmMsg)) return;
+  const modal = document.getElementById('modalConfirmCancelReceipt');
+  const subtitleEl = document.getElementById('cancelReceiptSubtitle');
+  const summaryCardEl = document.getElementById('cancelReceiptSummaryCard');
+  const impactEl = document.getElementById('cancelReceiptImpactContainer');
+  const ackWrapper = document.getElementById('cancelReceiptAckWrapper');
+  const ackCheckbox = document.getElementById('cancelReceiptAckCheckbox') as HTMLInputElement | null;
+  const submitBtn = document.getElementById('btnExecuteCancelReceipt') as HTMLButtonElement | null;
+
+  if (subtitleEl) subtitleEl.textContent = `Phiếu: ${codeDisplay}${poNumber && poNumber !== codeDisplay ? ` • PO: ${poNumber}` : ''}`;
+  if (ackWrapper) ackWrapper.classList.add('hidden');
+  if (ackCheckbox) ackCheckbox.checked = false;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Xác nhận Hủy nhập kho</span>';
+  }
+
+  const orderInfo = (gWhReceivedOrders || []).find(
+    o => (receiptId && String(o.id) === String(receiptId)) || (poNumber && o.po_number === poNumber)
+  );
+  if (summaryCardEl) {
+    summaryCardEl.innerHTML = `
+      <div><span class="text-gray-400 block">Điểm bán</span><b class="text-gray-900 dark:text-white">${escapeHtml(orderInfo?.site_code || '—')}</b></div>
+      <div><span class="text-gray-400 block">Ngày nhập</span><b class="font-mono text-gray-900 dark:text-white">${orderInfo?.receipt_date ? formatDate(orderInfo.receipt_date) : '—'}</b></div>
+      <div><span class="text-gray-400 block">Nhà cung cấp</span><b class="text-gray-900 dark:text-white truncate block">${escapeHtml(orderInfo?.supplier || '—')}</b></div>
+      <div><span class="text-gray-400 block">Giá trị hoàn tác</span><b class="font-mono text-rose-600 dark:text-rose-400">${amtDisplay}</b></div>
+    `;
+  }
+  if (impactEl) {
+    impactEl.innerHTML = '<div class="p-6 text-center text-gray-400">Đang kiểm tra tác động tới Xuất kho, Hủy hàng và Kiểm kê...</div>';
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+
+  try {
+    const qs = new URLSearchParams();
+    if (receiptId) qs.set('id', receiptId);
+    if (poNumber) qs.set('po_number', poNumber);
+    const res = await fetch(`/api/fnb/receipts/cancel-preview?${qs.toString()}`);
+    const json = await res.json();
+
+    if (!json.success || !json.data) {
+      throw new Error(json.error || 'Không kiểm tra được tác động tồn kho');
+    }
+
+    const { items = [], summary = {} } = json.data;
+    const hasConflicts = Boolean(summary.hasConflicts);
+    if (_pendingCancelReceipt) _pendingCancelReceipt.hasConflicts = hasConflicts;
+
+    if (impactEl) {
+      if (!items.length) {
+        impactEl.innerHTML = '<div class="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300">Đơn hàng này chưa ghi nhận dòng chi tiết nhập kho F&amp;B hoặc chỉ mở lại trạng thái PO. Bạn có thể xác nhận hủy an toàn.</div>';
+      } else {
+        const conflictBanner = hasConflicts ? `
+          <div class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-200 flex items-start gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0 mt-0.5"></i>
+            <div>
+              <div class="font-bold">Cảnh báo: Đã có phát sinh nghiệp vụ sau khi nhập kho!</div>
+              <div class="text-[11px] mt-0.5">
+                ${summary.hasInsufficientStock ? '• Một số mặt hàng có <b>Tồn hiện tại nhỏ hơn SL hủy nhập</b> (tồn dự kiến sẽ bị âm).<br>' : ''}
+                ${summary.totalIssuedAfter > 0 ? `• Đã phát sinh <b>Xuất kho sử dụng: ${formatNumber(summary.totalIssuedAfter, 1)}</b> đơn vị.<br>` : ''}
+                ${summary.totalWastedAfter > 0 ? `• Đã phát sinh <b>Hủy hàng: ${formatNumber(summary.totalWastedAfter, 1)}</b> đơn vị.<br>` : ''}
+                ${summary.countRecordsCount > 0 ? `• Đã có <b>${summary.countRecordsCount} dòng kiểm kê</b> sau ngày nhập kho.` : ''}
+              </div>
+            </div>
+          </div>
+        ` : `
+          <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+            <span class="font-semibold">An toàn: Tồn kho hiện tại đủ để hoàn tác và chưa phát sinh xung đột xuất/hủy/kiểm kê.</span>
+          </div>
+        `;
+
+        const rowsHtml = items.map((it: any) => {
+          const tags: string[] = [];
+          if (it.issued_after_qty > 0) {
+            tags.push(`<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-semibold">Đã xuất: ${formatNumber(it.issued_after_qty, 1)} (${it.issued_slips} phiếu)</span>`);
+          }
+          if (it.wasted_after_qty > 0) {
+            tags.push(`<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-semibold">Đã hủy: ${formatNumber(it.wasted_after_qty, 1)} (${it.wasted_slips} phiếu)</span>`);
+          }
+          if (it.counts_after && it.counts_after.length > 0) {
+            const latest = it.counts_after[0];
+            tags.push(`<span class="px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 font-semibold">Đã kiểm kê: ${escapeHtml(latest.count_code)}</span>`);
+          }
+
+          return `
+            <div class="p-2.5 rounded-xl border ${it.is_insufficient ? 'border-rose-200 bg-rose-50/40 dark:border-rose-900/50 dark:bg-rose-950/10' : 'border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900/40'} space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <span class="font-bold text-gray-900 dark:text-white">${escapeHtml(it.item_name)}</span>
+                  <span class="ml-1.5 font-mono text-[11px] text-gray-400">${escapeHtml(it.item_code)}</span>
+                </div>
+                <div class="font-mono text-xs shrink-0">
+                  <span class="text-rose-600 font-bold">-${formatNumber(it.receipt_qty, 1)} ${escapeHtml(it.unit)}</span>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-500 dark:text-gray-400 font-mono">
+                <span>Tồn hiện tại: <b class="text-gray-900 dark:text-white">${formatNumber(it.current_book_qty, 1)}</b></span>
+                <span>→ Tồn sau hủy: <b class="${it.projected_book_qty < 0 ? 'text-rose-600 font-extrabold' : 'text-emerald-600 font-bold'}">${formatNumber(it.projected_book_qty, 1)}</b></span>
+              </div>
+              ${tags.length ? `<div class="flex flex-wrap gap-1.5 text-[10px]">${tags.join('')}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+
+        impactEl.innerHTML = `
+          ${conflictBanner}
+          <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">${rowsHtml}</div>
+        `;
+      }
+    }
+
+    if (hasConflicts && ackWrapper) {
+      ackWrapper.classList.remove('hidden');
+      if (submitBtn) submitBtn.disabled = true;
+    } else {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  } catch (err: any) {
+    if (impactEl) {
+      impactEl.innerHTML = `<div class="p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">Không thể tải phân tích chi tiết (${escapeHtml(err.message)}). Vẫn có thể xác nhận hủy nếu bạn chắc chắn.</div>`;
+    }
+    if (submitBtn) submitBtn.disabled = false;
+  }
+
+  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+}
+
+export async function executeCancelReceivedOrder(): Promise<void> {
+  if (!assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho')) return;
+  if (!_pendingCancelReceipt) return;
+
+  const { receiptId, poNumber } = _pendingCancelReceipt;
+  const submitBtn = document.getElementById('btnExecuteCancelReceipt') as HTMLButtonElement | null;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Đang hủy nhập...';
+  }
 
   try {
     if (typeof showLoading === 'function') showLoading('Đang hủy nhập kho và hoàn tác tồn kho...');
@@ -415,19 +572,32 @@ export async function confirmCancelReceivedOrder(receiptId: string, poNumber: st
       if (typeof showToast === 'function') {
         showToast(json.message || 'Hủy nhập kho thành công!', 'success');
       }
+      closeConfirmCancelReceiptModal();
       closeWhReceivedOrderDetailModal();
       loadWhReceivedOrders();
+      if (typeof (window as any).loadWhInventory === 'function') {
+        (window as any).loadWhInventory();
+      }
     } else {
       if (typeof showToast === 'function') {
         showToast(`Lỗi hủy nhập kho: ${json.error}`, 'error');
       }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Xác nhận Hủy nhập kho</span>';
+      }
     }
   } catch (err: any) {
-    console.error('confirmCancelReceivedOrder error:', err);
+    console.error('executeCancelReceivedOrder error:', err);
     if (typeof showToast === 'function') {
       showToast(`Lỗi kết nối: ${err.message}`, 'error');
     }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Xác nhận Hủy nhập kho</span>';
+    }
   } finally {
     if (typeof hideLoading === 'function') hideLoading();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
   }
 }
