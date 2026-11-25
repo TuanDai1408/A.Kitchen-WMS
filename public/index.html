@@ -2106,7 +2106,8 @@
                   <th class="col-num text-right">Tổng món</th>
                   <th class="col-num text-right">Số lệch</th>
                   <th class="col-num text-right">Giá trị lệch</th>
-                  <th>Người kiểm</th>
+                  <th>Ghi chú</th>
+                  <th class="col-actions text-center w-32">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="fnbCountsHistoryBody">
@@ -4189,6 +4190,37 @@
           </div>
           <!-- Native Mobile Card View -->
           <div id="kkMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+        </div>
+
+        <!-- Lịch sử phiếu kiểm kê (trong tab Kiểm Kê Tồn Kho Kỳ) -->
+        <div class="table-card p-5 space-y-3 mt-4">
+          <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+            <h3 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-brand-600"></i> Lịch sử các phiếu kiểm kê
+            </h3>
+            <button type="button" onclick="typeof loadPortalAuditHistory === 'function' && loadPortalAuditHistory()" class="btn btn-secondary btn-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
+            </button>
+          </div>
+          <div class="hidden lg:block table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="col-code">Mã phiếu</th>
+                  <th>Điểm bán</th>
+                  <th class="col-date">Ngày kiểm</th>
+                  <th>Loại phiếu</th>
+                  <th class="col-num text-right">Tổng món</th>
+                  <th class="col-num text-right">Số lệch</th>
+                  <th class="col-num text-right">Giá trị lệch</th>
+                  <th>Ghi chú</th>
+                  <th class="col-actions text-center w-32">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="kkCountsHistoryBody"></tbody>
+            </table>
+          </div>
+          <div id="kkCountsHistoryMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
       <!-- Tab 403: Không Có Quyền Truy Cập (TailAdmin Access Denied Pattern) -->
@@ -6543,6 +6575,90 @@
         <button type="button" id="btnExecuteCancelReceipt" onclick="executeCancelReceivedOrder()" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-1.5 transition-all">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
           <span>Xác nhận Hủy nhập kho</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHỈNH SỬA PHIẾU KIỂM KÊ -->
+  <div id="modalEditStockCount" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeEditCountModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs shrink-0">
+            <i data-lucide="clipboard-edit" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chỉnh sửa phiếu kiểm kê</h3>
+            <p id="editCountSubtitle" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5"></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditCountModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs">
+        <input type="hidden" id="editCountId">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày kiểm kê</label>
+            <input type="date" id="editCountDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-mono text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Loại phiếu</label>
+            <select id="editCountType" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+              <option value="DAILY">Kiểm kê Hằng Ngày</option>
+              <option value="PERIODIC">Kiểm kê Định Kỳ</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ghi chú</label>
+            <input type="text" id="editCountNotes" placeholder="Ghi chú đợt kiểm kê..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+          </div>
+        </div>
+        <div class="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
+          <div class="max-h-72 overflow-y-auto custom-scrollbar">
+            <table class="data-table w-full text-xs">
+              <thead class="bg-gray-50 dark:bg-gray-800/80 sticky top-0 z-10">
+                <tr>
+                  <th class="p-2.5 text-left">Mặt hàng</th>
+                  <th class="p-2.5 text-right w-24">Tồn sổ</th>
+                  <th class="p-2.5 text-center w-28">SL thực tế</th>
+                  <th class="p-2.5 text-right w-24">Chênh lệch</th>
+                  <th class="p-2.5 text-left w-40">Ghi chú dòng</th>
+                </tr>
+              </thead>
+              <tbody id="editCountLinesBody" class="divide-y divide-gray-100 dark:divide-gray-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button type="button" onclick="closeEditCountModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy</button>
+        <button type="button" id="btnSaveEditCount" onclick="saveEditCount()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Lưu thay đổi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XÁC NHẬN XÓA PHIẾU KIỂM KÊ -->
+  <div id="modalConfirmDeleteStockCount" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteCountModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-scale-up p-6 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+        <i data-lucide="trash-2" class="w-7 h-7"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa phiếu kiểm kê?</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Mã phiếu: <b id="confirmDeleteCountCode" class="font-mono text-rose-600"></b></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">Thao tác này sẽ xóa vĩnh viễn phiếu kiểm kê và chi tiết các dòng kiểm kê của đợt này.</p>
+      </div>
+      <div class="flex items-center justify-center gap-2.5 pt-2">
+        <button type="button" onclick="closeDeleteCountModal()" class="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+        <button type="button" id="btnExecuteDeleteCount" onclick="executeDeleteCount()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Xóa phiếu</span>
         </button>
       </div>
     </div>

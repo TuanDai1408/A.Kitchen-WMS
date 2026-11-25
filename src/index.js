@@ -5113,6 +5113,137 @@ export default {
             return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
           }
         }
+
+        // 3.6.1 SỬA PHIẾU KIỂM KÊ: PUT /api/fnb/counts
+        if (request.method === 'PUT') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const p1 = caller.permissions['fnb-counts'];
+            const p2 = caller.permissions['portal-kiemke'];
+            const canEdit = (p1 && p1.canEdit && !p1.isRevoked && p1.canView !== false) ||
+                            (p2 && p2.canEdit && !p2.isRevoked && p2.canView !== false);
+            if (!canEdit) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền CHỈNH SỬA phiếu kiểm kê' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            const body = await request.json();
+            const { id, count_date, count_type, notes = '', lines = [] } = body;
+            if (!id) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu id phiếu kiểm kê cần sửa' }), { status: 400, headers: corsHeaders });
+            }
+
+            const existing = await db.queryOne(env, `SELECT * FROM fnb_stock_counts WHERE id = ?`, [id]);
+            if (!existing) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu kiểm kê' }), { status: 404, headers: corsHeaders });
+            }
+
+            const validDate = count_date || existing.count_date;
+            const validType = count_type || existing.count_type || 'DAILY';
+
+            let matchedItems = 0;
+            let diffItems = 0;
+            let totalDiffVal = 0;
+            for (const item of (lines || [])) {
+              const bookQty = Number(item.book_qty) || 0;
+              const countQty = Number(item.count_qty) || 0;
+              const unitPrice = Number(item.unit_price) || 0;
+              const diff = countQty - bookQty;
+              if (Math.abs(diff) < 0.001) matchedItems++;
+              else diffItems++;
+              totalDiffVal += diff * unitPrice;
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              await tx.exec(`
+                UPDATE fnb_stock_counts
+                SET count_date = ?, count_type = ?, notes = ?, total_items = ?, matched_items = ?, diff_items = ?, total_diff_val = ?
+                WHERE id = ?
+              `, [validDate, validType, notes, lines.length, matchedItems, diffItems, totalDiffVal, id]);
+
+              if (Array.isArray(lines) && lines.length > 0) {
+                await tx.exec(`DELETE FROM fnb_stock_count_lines WHERE count_id = ?`, [id]);
+                for (const item of lines) {
+                  const bookQty = Number(item.book_qty) || 0;
+                  const countQty = Number(item.count_qty) || 0;
+                  const diffQty = countQty - bookQty;
+                  const unitPrice = Number(item.unit_price) || 0;
+                  const diffVal = diffQty * unitPrice;
+
+                  await tx.exec(`
+                    INSERT INTO fnb_stock_count_lines (count_id, item_code, book_qty, count_qty, diff_qty, unit_price, diff_val, note)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                  `, [id, item.item_code, bookQty, countQty, diffQty, unitPrice, diffVal, item.note || '']);
+
+                  await tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET last_count_qty = ?, last_count_date = ?
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [countQty, validDate, item.item_code, existing.site_code]);
+                }
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã cập nhật phiếu kiểm kê ${existing.count_code} thành công!`,
+              data: { id, count_code: existing.count_code, total_diff_val: totalDiffVal }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi cập nhật phiếu kiểm kê: ' + e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
+
+        // 3.6.2 XÓA PHIẾU KIỂM KÊ: DELETE /api/fnb/counts
+        if (request.method === 'DELETE') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const p1 = caller.permissions['fnb-counts'];
+            const p2 = caller.permissions['portal-kiemke'];
+            const canDel = (p1 && p1.canDelete && !p1.isRevoked && p1.canView !== false) ||
+                           (p2 && p2.canDelete && !p2.isRevoked && p2.canView !== false);
+            if (!canDel) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền XÓA phiếu kiểm kê' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            let countId = searchParams.get('id');
+            if (!countId) {
+              try {
+                const body = await request.json();
+                countId = body.id;
+              } catch (_) {}
+            }
+            if (!countId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu id phiếu kiểm kê cần xóa' }), { status: 400, headers: corsHeaders });
+            }
+
+            const existing = await db.queryOne(env, `SELECT * FROM fnb_stock_counts WHERE id = ?`, [countId]);
+            if (!existing) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu kiểm kê' }), { status: 404, headers: corsHeaders });
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              await tx.exec(`DELETE FROM fnb_stock_count_lines WHERE count_id = ?`, [countId]);
+              await tx.exec(`DELETE FROM fnb_stock_counts WHERE id = ?`, [countId]);
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã xóa phiếu kiểm kê ${existing.count_code} thành công!`
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi xóa phiếu kiểm kê: ' + e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
       }
 
       // 3.65 DANH SÁCH ĐƠN ĐẶT HÀNG PO/PR TỪ SAP (CHO NHẬP HÀNG ĐIỂM BÁN)

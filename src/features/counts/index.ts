@@ -13,7 +13,20 @@ import {
   renderFnbCountsTable,
   saveFnbCountAudit
 } from './count-table';
-import { loadFnbCountsHistory, viewCountDetail, closeInvDetailModal } from './history';
+import {
+  loadFnbCountsHistory,
+  renderCountsHistoryInto,
+  viewCountDetail,
+  closeInvDetailModal,
+  openEditCountModal,
+  onEditCountLineQtyChange,
+  onEditCountLineNoteChange,
+  closeEditCountModal,
+  saveEditCount,
+  confirmDeleteCount,
+  closeDeleteCountModal,
+  executeDeleteCount
+} from './history';
 import { exportCountSheetExcel } from './export';
 
 export * from './types';
@@ -95,8 +108,17 @@ win.saveFnbCountAudit = saveFnbCountAudit;
 
 // History & Detail Modal
 win.loadFnbCountsHistory = loadFnbCountsHistory;
+win.renderCountsHistoryInto = renderCountsHistoryInto;
 win.viewCountDetail = viewCountDetail;
 win.closeInvDetailModal = closeInvDetailModal;
+win.openEditCountModal = openEditCountModal;
+win.onEditCountLineQtyChange = onEditCountLineQtyChange;
+win.onEditCountLineNoteChange = onEditCountLineNoteChange;
+win.closeEditCountModal = closeEditCountModal;
+win.saveEditCount = saveEditCount;
+win.confirmDeleteCount = confirmDeleteCount;
+win.closeDeleteCountModal = closeDeleteCountModal;
+win.executeDeleteCount = executeDeleteCount;
 
 // Excel Export
 win.exportCountSheetExcel = exportCountSheetExcel;

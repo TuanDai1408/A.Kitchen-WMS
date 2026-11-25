@@ -61,6 +61,25 @@ export async function loadAudit(): Promise<void> {
       lucide.createIcons();
     }
   }
+  loadPortalAuditHistory(site);
+}
+
+export async function loadPortalAuditHistory(siteArg?: string): Promise<void> {
+  const rawSite = siteArg || (document.getElementById('kkSite') as HTMLSelectElement | null)?.value || localStorage.getItem('orbit_user_site') || 'K001';
+  const siteCode = (typeof extractSiteCode === 'function' ? extractSiteCode(rawSite) : rawSite) || 'K001';
+  try {
+    const res = await fetch(`/api/fnb/counts?site_code=${encodeURIComponent(siteCode)}&no-cache=1`);
+    const json = await res.json();
+    if (json.success && typeof (window as any).renderCountsHistoryInto === 'function') {
+      (window as any).renderCountsHistoryInto(json.data?.counts || [], siteCode, 'kkCountsHistoryBody', 'kkCountsHistoryMobileCards');
+    }
+  } catch (e) {
+    console.error('loadPortalAuditHistory error:', e);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  (window as any).loadPortalAuditHistory = loadPortalAuditHistory;
 }
 
 export function populateAuditFilters(meta?: AuditMeta): void {
