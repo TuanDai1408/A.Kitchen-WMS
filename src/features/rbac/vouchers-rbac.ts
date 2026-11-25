@@ -51,7 +51,8 @@ export function canDeleteVouchers(): boolean {
 }
 
 export async function openEditVoucherModal(maCT: string): Promise<void> {
-  if (!assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ thu chi')) {
+  if (!canEditVouchers()) {
+    assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ thu chi');
     return;
   }
   if (typeof showLoading === 'function') showLoading('Đang tải thông tin chứng từ...');
@@ -217,7 +218,8 @@ export function closeEditVoucherModal(): void {
 }
 
 export async function saveEditVoucher(): Promise<void> {
-  if (!assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ')) {
+  if (!canEditVouchers()) {
+    assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ');
     return;
   }
   const maCT = (document.getElementById('editVoucherCode') as HTMLInputElement | null)?.value;
@@ -302,7 +304,8 @@ export async function saveEditVoucher(): Promise<void> {
 }
 
 export async function confirmDeleteVoucher(maCT: string): Promise<void> {
-  if (!assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi')) {
+  if (!canDeleteVouchers()) {
+    assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi');
     return;
   }
   _pendingDeleteVoucherCode = maCT;
@@ -345,7 +348,8 @@ export async function executeDeleteVoucher(): Promise<void> {
   const maCT = _pendingDeleteVoucherCode;
   if (!maCT) return;
 
-  if (!assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi')) {
+  if (!canDeleteVouchers()) {
+    assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi');
     return;
   }
 

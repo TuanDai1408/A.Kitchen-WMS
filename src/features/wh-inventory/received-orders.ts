@@ -408,7 +408,10 @@ export function onCancelReceiptAckChange(): void {
 }
 
 export async function confirmCancelReceivedOrder(receiptId: string, poNumber: string, receiptCode: string, totalAmount: number): Promise<void> {
-  if (!assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho')) return;
+  if (!canUserDelete('fnb-receipts') && !canUserDelete('wh-inventory')) {
+    assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho');
+    return;
+  }
 
   const codeDisplay = receiptCode || poNumber || 'đơn hàng này';
   const amtDisplay = totalAmount ? (Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫') : '0 ₫';
@@ -545,7 +548,10 @@ export async function confirmCancelReceivedOrder(receiptId: string, poNumber: st
 }
 
 export async function executeCancelReceivedOrder(): Promise<void> {
-  if (!assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho')) return;
+  if (!canUserDelete('fnb-receipts') && !canUserDelete('wh-inventory')) {
+    assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho');
+    return;
+  }
   if (!_pendingCancelReceipt) return;
 
   const { receiptId, poNumber } = _pendingCancelReceipt;

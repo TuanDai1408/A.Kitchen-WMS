@@ -3704,6 +3704,56 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 3.6. Lưu phân quyền chi tiết (Xem / Tạo / Sửa / Xóa) theo từng User và từng Tab
+      if (pathname === '/api/auth/user-permissions/save-granular' && request.method === 'POST') {
+        const caller = await getCallerPermissions(env, request);
+        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+          const p = caller.permissions['user-matrix'];
+          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
+            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền cập nhật phân quyền chi tiết' }), { status: 403, headers: corsHeaders });
+          }
+        }
+
+        await ensureUserPermissionsTable(env);
+        const { userEmail, permissions } = await request.json();
+        if (!userEmail || !Array.isArray(permissions)) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc danh sách permissions' }), { status: 400, headers: corsHeaders });
+        }
+
+        for (const item of permissions) {
+          if (!item || !item.featureCode) continue;
+          const cv = item.canView ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+          const cc = (item.canView && item.canCreate) ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+          const ce = (item.canView && item.canEdit) ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+          const cd = (item.canView && item.canDelete) ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+
+          await db.exec(env, {
+            d1: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+                 ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                   can_view = excluded.can_view,
+                   can_create = excluded.can_create,
+                   can_edit = excluded.can_edit,
+                   can_delete = excluded.can_delete,
+                   updated_at = datetime('now')`,
+            pg: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, now())
+                 ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                   can_view = excluded.can_view,
+                   can_create = excluded.can_create,
+                   can_edit = excluded.can_edit,
+                   can_delete = excluded.can_delete,
+                   updated_at = now()`
+          }, [userEmail, item.featureCode, cv, cc, ce, cd]);
+        }
+
+        invalidateMemoryCache('auth_me_');
+        return new Response(JSON.stringify({
+          success: true,
+          message: `Đã lưu phân quyền chi tiết (Xem/Tạo/Sửa/Xóa) cho ${userEmail}`
+        }), { headers: corsHeaders });
+      }
+
       // 4. Cập nhật Vai trò (Role) cho User
       if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
         const caller = await getCallerPermissions(env, request);

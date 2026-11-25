@@ -9,6 +9,117 @@ declare const lucide: any;
 
 let pendingToggleStatusUser: { email: string; newStatus: string } | null = null;
 
+interface GranularPermRow {
+  featureCode: string;
+  name: string;
+  groupName: string;
+  hasEditDelete: boolean;
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+const FEATURES_WITH_EDIT_DELETE = new Set([
+  'fnb-counts',
+  'portal-kiemke',
+  'fnb-receipts',
+  'wh-stock',
+  'portal-voucher',
+  'portal-search',
+  'portal-order',
+  'portal-history',
+  'user-matrix'
+]);
+
+let _editUserGranularPerms: GranularPermRow[] = [];
+let _editUserGranularFilter = '';
+
+function isTruthyVal(v: any): boolean {
+  return v === 1 || v === true || v === '1' || v === 'true' || v === 't';
+}
+
+export function renderEditUserGranularTable(): void {
+  const tbody = document.getElementById('editUserGranularTableBody');
+  if (!tbody) return;
+
+  const q = (_editUserGranularFilter || '').trim().toLowerCase();
+  const rows = q
+    ? _editUserGranularPerms.filter(
+        r => r.name.toLowerCase().includes(q) || r.featureCode.toLowerCase().includes(q) || r.groupName.toLowerCase().includes(q)
+      )
+    : _editUserGranularPerms;
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Không tìm thấy tab nào phù hợp.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => `
+    <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+      <td class="p-2.5">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="font-semibold text-gray-900 dark:text-white">${escapeHtml(r.name)}</span>
+          ${r.hasEditDelete ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 font-bold">Có Sửa/Xóa</span>' : ''}
+        </div>
+        <div class="text-[10px] text-gray-400 font-mono">${escapeHtml(r.groupName)} • ${escapeHtml(r.featureCode)}</div>
+      </td>
+      <td class="p-2.5 text-center">
+        <input type="checkbox" ${r.canView ? 'checked' : ''} onchange="toggleEditUserGranularFlag('${escapeHtml(r.featureCode)}', 'canView', this.checked)" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+      </td>
+      <td class="p-2.5 text-center">
+        <input type="checkbox" ${r.canCreate ? 'checked' : ''} onchange="toggleEditUserGranularFlag('${escapeHtml(r.featureCode)}', 'canCreate', this.checked)" class="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+      </td>
+      <td class="p-2.5 text-center">
+        <input type="checkbox" ${r.canEdit ? 'checked' : ''} onchange="toggleEditUserGranularFlag('${escapeHtml(r.featureCode)}', 'canEdit', this.checked)" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+      </td>
+      <td class="p-2.5 text-center">
+        <input type="checkbox" ${r.canDelete ? 'checked' : ''} onchange="toggleEditUserGranularFlag('${escapeHtml(r.featureCode)}', 'canDelete', this.checked)" class="w-4 h-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500 cursor-pointer">
+      </td>
+    </tr>
+  `).join('');
+}
+
+export function toggleEditUserGranularFlag(
+  featureCode: string,
+  field: 'canView' | 'canCreate' | 'canEdit' | 'canDelete',
+  checked: boolean
+): void {
+  const row = _editUserGranularPerms.find(r => r.featureCode === featureCode);
+  if (!row) return;
+  row[field] = checked;
+  if (field === 'canView' && !checked) {
+    row.canCreate = false;
+    row.canEdit = false;
+    row.canDelete = false;
+  } else if (field !== 'canView' && checked) {
+    row.canView = true;
+  }
+  renderEditUserGranularTable();
+}
+
+export function bulkToggleEditUserGranularField(
+  field: 'canView' | 'canCreate' | 'canEdit' | 'canDelete',
+  value: boolean
+): void {
+  _editUserGranularPerms.forEach(row => {
+    row[field] = value;
+    if (field === 'canView' && !value) {
+      row.canCreate = false;
+      row.canEdit = false;
+      row.canDelete = false;
+    } else if (field !== 'canView' && value) {
+      row.canView = true;
+    }
+  });
+  renderEditUserGranularTable();
+}
+
+export function filterEditUserGranularList(keyword: string): void {
+  _editUserGranularFilter = keyword || '';
+  renderEditUserGranularTable();
+}
+
 export function openAddUserModal(): void {
   if (!assertPermission('user-matrix', 'create', 'thêm người dùng mới')) return;
   const modal = document.getElementById('addUserModal');
@@ -79,6 +190,52 @@ export function openEditUserModal(userEmail: string): void {
   if (roleSelect) roleSelect.value = user.role_code || 'NHAN_VIEN';
   if (resetPerms) resetPerms.checked = false;
 
+  const searchPermInput = document.getElementById('editUserPermSearch') as HTMLInputElement | null;
+  if (searchPermInput) searchPermInput.value = '';
+  _editUserGranularFilter = '';
+
+  const allFeatures = matrixData.features || [];
+  const rolePerms = matrixData.rolePermissions || [];
+  const userPerms = matrixData.userPermissions || [];
+
+  _editUserGranularPerms = allFeatures.map((f: any) => {
+    const up = userPerms.find((p: any) => p.user_email === user.email && p.feature_code === f.code);
+    const rp = rolePerms.find((p: any) => p.role_code === user.role_code && p.feature_code === f.code);
+    let canView = false;
+    let canCreate = false;
+    let canEdit = false;
+    let canDelete = false;
+
+    if (up) {
+      canView = isTruthyVal(up.can_view);
+      canCreate = canView && isTruthyVal(up.can_create ?? up.can_view);
+      canEdit = canView && isTruthyVal(up.can_edit ?? up.can_view);
+      canDelete = canView && isTruthyVal(up.can_delete ?? false);
+    } else if (user.role_code === 'ADMIN') {
+      canView = true;
+      canCreate = true;
+      canEdit = true;
+      canDelete = true;
+    } else if (rp) {
+      canView = isTruthyVal(rp.can_view);
+      canCreate = canView && isTruthyVal(rp.can_create ?? rp.can_view);
+      canEdit = canView && isTruthyVal(rp.can_edit ?? rp.can_view);
+      canDelete = canView && isTruthyVal(rp.can_delete ?? false);
+    }
+
+    return {
+      featureCode: f.code,
+      name: f.name,
+      groupName: f.groupName || '',
+      hasEditDelete: FEATURES_WITH_EDIT_DELETE.has(f.code),
+      canView,
+      canCreate,
+      canEdit,
+      canDelete
+    };
+  });
+  renderEditUserGranularTable();
+
   const modal = document.getElementById('editUserModal');
   if (modal) modal.classList.remove('hidden');
 }
@@ -105,13 +262,52 @@ export async function submitEditUserRole(e?: Event): Promise<void> {
       body: JSON.stringify({ userEmail, roleCode, resetPermissions })
     });
     const res = await resp.json();
-    if (res.success) {
-      if (typeof showToast === 'function') showToast(res.message || 'Cập nhật vai trò thành công', 'success');
-      closeEditUserModal();
-      await loadUserMatrix();
-    } else {
+    if (!res.success) {
       if (typeof showToast === 'function') showToast(res.error || 'Lỗi khi cập nhật vai trò', 'error');
+      return;
     }
+
+    if (!resetPermissions && _editUserGranularPerms.length > 0) {
+      const gResp = await fetch('/api/auth/user-permissions/save-granular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail,
+          permissions: _editUserGranularPerms.map(r => ({
+            featureCode: r.featureCode,
+            canView: r.canView,
+            canCreate: r.canCreate,
+            canEdit: r.canEdit,
+            canDelete: r.canDelete
+          }))
+        })
+      });
+      const gRes = await gResp.json();
+      if (!gRes.success) {
+        if (typeof showToast === 'function') showToast(gRes.error || 'Lỗi lưu phân quyền chi tiết', 'error');
+        return;
+      }
+    }
+
+    const currentUser = typeof window !== 'undefined' ? (window as any).gCurrentUser : null;
+    if (currentUser && currentUser.email === userEmail && !resetPermissions) {
+      if (!currentUser.permissions) currentUser.permissions = {};
+      _editUserGranularPerms.forEach(r => {
+        currentUser.permissions[r.featureCode] = {
+          canView: r.canView,
+          canCreate: r.canCreate,
+          canEdit: r.canEdit,
+          canDelete: r.canDelete,
+          isCustom: r.canView,
+          isRevoked: !r.canView
+        };
+      });
+      try { localStorage.setItem('orbit_user', JSON.stringify(currentUser)); } catch {}
+    }
+
+    if (typeof showToast === 'function') showToast('Đã lưu vai trò & phân quyền chi tiết theo từng tab!', 'success');
+    closeEditUserModal();
+    await loadUserMatrix();
   } catch {
     if (typeof showToast === 'function') showToast('Lỗi mạng', 'error');
   } finally {

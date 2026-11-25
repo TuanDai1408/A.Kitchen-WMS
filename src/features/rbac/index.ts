@@ -22,6 +22,9 @@ import {
   openEditUserModal,
   closeEditUserModal,
   submitEditUserRole,
+  toggleEditUserGranularFlag,
+  bulkToggleEditUserGranularField,
+  filterEditUserGranularList,
   resetUserAllPermsPrompt,
   resetUserRolePermissions,
   bulkSetUserPermissionsPrompt,
@@ -79,6 +82,9 @@ if (typeof window !== 'undefined') {
   w.openEditUserModal = openEditUserModal;
   w.closeEditUserModal = closeEditUserModal;
   w.submitEditUserRole = submitEditUserRole;
+  w.toggleEditUserGranularFlag = toggleEditUserGranularFlag;
+  w.bulkToggleEditUserGranularField = bulkToggleEditUserGranularField;
+  w.filterEditUserGranularList = filterEditUserGranularList;
   w.resetUserAllPermsPrompt = resetUserAllPermsPrompt;
   w.resetUserRolePermissions = resetUserRolePermissions;
   w.bulkSetUserPermissionsPrompt = bulkSetUserPermissionsPrompt;

@@ -199,8 +199,19 @@ export function closeInvDetailModal(): void {
   document.getElementById('invDetailModal')?.classList.add('hidden');
 }
 
+function canEditAnyCountTab(): boolean {
+  return canUserEdit('fnb-counts') || canUserEdit('portal-kiemke');
+}
+
+function canDeleteAnyCountTab(): boolean {
+  return canUserDelete('fnb-counts') || canUserDelete('portal-kiemke');
+}
+
 export async function openEditCountModal(countId: number | string): Promise<void> {
-  if (!assertPermission('fnb-counts', 'edit', 'chỉnh sửa phiếu kiểm kê')) return;
+  if (!canEditAnyCountTab()) {
+    assertPermission('fnb-counts', 'edit', 'chỉnh sửa phiếu kiểm kê');
+    return;
+  }
   try {
     if (typeof window.showLoading === 'function') window.showLoading('Đang tải phiếu kiểm kê...');
     const res = await fetch(`/api/fnb/counts?id=${countId}&no-cache=1`);
@@ -290,7 +301,10 @@ export function closeEditCountModal(): void {
 }
 
 export async function saveEditCount(): Promise<void> {
-  if (!assertPermission('fnb-counts', 'edit', 'chỉnh sửa phiếu kiểm kê')) return;
+  if (!canEditAnyCountTab()) {
+    assertPermission('fnb-counts', 'edit', 'chỉnh sửa phiếu kiểm kê');
+    return;
+  }
   if (!_editCountData) return;
 
   const countDate = (document.getElementById('editCountDate') as HTMLInputElement | null)?.value || '';
@@ -329,7 +343,10 @@ export async function saveEditCount(): Promise<void> {
 }
 
 export function confirmDeleteCount(countId: number | string, countCode: string): void {
-  if (!assertPermission('fnb-counts', 'delete', 'xóa phiếu kiểm kê')) return;
+  if (!canDeleteAnyCountTab()) {
+    assertPermission('fnb-counts', 'delete', 'xóa phiếu kiểm kê');
+    return;
+  }
   _pendingDeleteCount = { id: countId, code: countCode || `#${countId}` };
   const codeEl = document.getElementById('confirmDeleteCountCode');
   if (codeEl) codeEl.textContent = _pendingDeleteCount.code;
@@ -343,7 +360,10 @@ export function closeDeleteCountModal(): void {
 }
 
 export async function executeDeleteCount(): Promise<void> {
-  if (!assertPermission('fnb-counts', 'delete', 'xóa phiếu kiểm kê')) return;
+  if (!canDeleteAnyCountTab()) {
+    assertPermission('fnb-counts', 'delete', 'xóa phiếu kiểm kê');
+    return;
+  }
   if (!_pendingDeleteCount) return;
 
   const { id } = _pendingDeleteCount;
