@@ -5241,7 +5241,10 @@ export default {
             }
 
             const siteCode = receipt.site_code;
-            const receiptDate = (receipt.receipt_date || '').slice(0, 10) || '1970-01-01';
+            const rawDate = receipt.receipt_date;
+            const receiptDate = rawDate instanceof Date
+              ? rawDate.toISOString().slice(0, 10)
+              : (String(rawDate || '').slice(0, 10) || '1970-01-01');
 
             const { rows: lines } = await db.query(env, `
               SELECT l.*,
