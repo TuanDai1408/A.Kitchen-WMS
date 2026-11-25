@@ -52,10 +52,63 @@ export function resolveVoucherImageThumbUrl(file: {
   return link;
 }
 
+/**
+ * Tự động nén & thu nhỏ kích thước ảnh (max 1600px, quality 0.82) trên trình duyệt
+ * trước khi tải lên Supabase Storage để upload nhanh trên mạng 4G/Mobile.
+ */
+async function compressImageIfNeeded(file: File): Promise<File> {
+  try {
+    const type = (file.type || '').toLowerCase();
+    const isCompressible = type === 'image/jpeg' || type === 'image/jpg' || type === 'image/png' || type === 'image/webp';
+    if (!isCompressible || file.size <= 350 * 1024 || typeof document === 'undefined') {
+      return file;
+    }
+
+    const bitmap = await createImageBitmap(file).catch(() => null);
+    if (!bitmap) return file;
+
+    const maxDim = 1600;
+    let { width, height } = bitmap;
+    if (width > maxDim || height > maxDim) {
+      if (width >= height) {
+        height = Math.round((height * maxDim) / width);
+        width = maxDim;
+      } else {
+        width = Math.round((width * maxDim) / height);
+        height = maxDim;
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const targetType = type === 'image/png' ? 'image/webp' : 'image/jpeg';
+    const blob: Blob | null = await new Promise(resolve => canvas.toBlob(resolve, targetType, 0.82));
+    if (!blob || blob.size >= file.size) {
+      return file;
+    }
+
+    const ext = targetType === 'image/webp' ? '.webp' : '.jpg';
+    const baseName = file.name.replace(/\.[^.]+$/, '');
+    return new File([blob], `${baseName}${ext}`, { type: targetType, lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
+
 export async function uploadVoucherFileToSupabase(
-  file: File,
+  rawFile: File,
   folderPrefix?: string
 ): Promise<UploadedSupabaseFile> {
+  const file = await compressImageIfNeeded(rawFile);
   const now = new Date();
   const dateFolder = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const cleanFolder = sanitizeFileName(folderPrefix || 'chung-tu').replace(/\.+/g, '') || 'chung-tu';

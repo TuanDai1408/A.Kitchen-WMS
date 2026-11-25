@@ -43,6 +43,8 @@ import {
   closeImageLightbox
 } from './mobile-hub';
 
+export * from './ux-enhancements';
+
 import {
   chartInboundOutbound,
   chartSafetyGauge,
