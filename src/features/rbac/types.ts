@@ -21,13 +21,21 @@ export interface UserMatrixFeature {
 export interface RolePermission {
   role_code: string;
   feature_code: string;
-  can_view: number;
+  can_view: number | boolean;
+  can_create?: number | boolean;
+  can_edit?: number | boolean;
+  can_delete?: number | boolean;
 }
 
 export interface UserPermission {
+  id?: string | number;
   user_email: string;
   feature_code: string;
-  can_view: number;
+  can_view: number | boolean;
+  can_create?: number | boolean;
+  can_edit?: number | boolean;
+  can_delete?: number | boolean;
+  updated_at?: string;
 }
 
 export interface UserMatrixData {

@@ -3548,6 +3548,49 @@ export default {
         return new Response(JSON.stringify({ success: true, message: `Đã khôi phục toàn bộ quyền của ${userEmail} về vai trò gốc` }), { headers: corsHeaders });
       }
 
+      // 3.5. Cấp hoặc Khóa / Cắt toàn bộ quyền các tab cho 1 user
+      if (pathname === '/api/auth/user-permissions/bulk-set' && request.method === 'POST') {
+        await ensureUserPermissionsTable(env);
+        const { userEmail, action } = await request.json(); // action: 'REVOKE_ALL' or 'GRANT_ALL'
+        if (!userEmail || !action) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc action' }), { status: 400, headers: corsHeaders });
+        }
+
+        const canView = action === 'GRANT_ALL' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canCreate = action === 'GRANT_ALL' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canEdit = action === 'GRANT_ALL' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+        const canDelete = action === 'GRANT_ALL' ? (db.isPg(env) ? true : 1) : (db.isPg(env) ? false : 0);
+
+        for (const fCode of ALL_SYSTEM_FEATURES) {
+          await db.exec(env, {
+            d1: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+                 ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                   can_view = excluded.can_view,
+                   can_create = excluded.can_create,
+                   can_edit = excluded.can_edit,
+                   can_delete = excluded.can_delete,
+                   updated_at = datetime('now')`,
+            pg: `INSERT INTO user_permissions (user_email, feature_code, can_view, can_create, can_edit, can_delete, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, now())
+                 ON CONFLICT(user_email, feature_code) DO UPDATE SET
+                   can_view = excluded.can_view,
+                   can_create = excluded.can_create,
+                   can_edit = excluded.can_edit,
+                   can_delete = excluded.can_delete,
+                   updated_at = now()`
+          }, [userEmail, fCode, canView, canCreate, canEdit, canDelete]);
+        }
+
+        invalidateMemoryCache('auth_me_');
+        return new Response(JSON.stringify({
+          success: true,
+          message: action === 'GRANT_ALL'
+            ? `Đã CẤP TOÀN BỘ quyền các tab cho ${userEmail}`
+            : `Đã KHÓA / CẮT TOÀN BỘ quyền các tab của ${userEmail}`
+        }), { headers: corsHeaders });
+      }
+
       // 4. Cập nhật Vai trò (Role) cho User
       if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
         const { userEmail, roleCode, resetPermissions } = await request.json();

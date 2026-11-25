@@ -1,4 +1,4 @@
-import { loadUserMatrix } from './user-matrix';
+import { loadUserMatrix, bulkSetUserPermissions } from './user-matrix';
 import { escapeHtml } from '@/ts/utils/formatters';
 
 declare const showLoading: (msg?: string) => void;
@@ -142,6 +142,23 @@ export async function resetUserAllPermsPrompt(): Promise<void> {
   } finally {
     if (typeof hideLoading === 'function') hideLoading();
   }
+}
+
+export const resetUserRolePermissions = resetUserAllPermsPrompt;
+
+export async function bulkSetUserPermissionsPrompt(action: 'REVOKE_ALL' | 'GRANT_ALL'): Promise<void> {
+  const userEmail = (document.getElementById('editUserTargetEmail') as HTMLInputElement | null)?.value;
+  if (!userEmail) return;
+
+  const isRevoke = action === 'REVOKE_ALL';
+  const confirmMsg = isRevoke
+    ? `Bạn có chắc chắn muốn KHÓA / CẮT TOÀN BỘ 20 tab phân quyền của tài khoản ${userEmail}?\n\nSau khi khóa, tài khoản này sẽ bị chặn và không thể xem hay sử dụng bất kỳ tab tính năng nào trên hệ thống.`
+    : `Bạn có chắc chắn muốn CẤP TOÀN BỘ 20 tab phân quyền cho tài khoản ${userEmail}?`;
+
+  if (!confirm(confirmMsg)) return;
+
+  await bulkSetUserPermissions(userEmail, action);
+  closeEditUserModal();
 }
 
 /**

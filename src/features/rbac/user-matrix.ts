@@ -67,18 +67,22 @@ export function filterUserMatrix(): void {
   renderUserMatrixMobile(data);
 }
 
+function isTruthyBool(val: any): boolean {
+  return val === 1 || val === true || val === '1' || val === 'true' || val === 't';
+}
+
 export function resolveUserFeaturePermission(
   user: UserMatrixUser,
   feature: UserMatrixFeature,
   rolePermissions?: RolePermission[],
   userPermissions?: UserPermission[]
 ): ResolvedPermission {
-  // 1. Custom Override
+  // 1. Custom Override (Cấp riêng hoặc Bị khóa)
   const custom = (userPermissions || []).find(
     (up) => up.user_email === user.email && up.feature_code === feature.code
   );
   if (custom) {
-    if (custom.can_view === 1) {
+    if (isTruthyBool(custom.can_view)) {
       return { isGranted: true, type: 'CUSTOM_GRANT', label: 'Cấp riêng', badgeClass: 'bg-brand-500 text-white' };
     } else {
       return { isGranted: false, type: 'CUSTOM_REVOKE', label: 'Bị khóa', badgeClass: 'bg-rose-500 text-white' };
@@ -90,24 +94,42 @@ export function resolveUserFeaturePermission(
     return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
   }
 
-  // 3. Default Kho Trưởng rights
+  // 3. Role Permissions from Database
+  const rolePerm = (rolePermissions || []).find(
+    (rp) => rp.role_code === user.role_code && rp.feature_code === feature.code
+  );
+  if (rolePerm && isTruthyBool(rolePerm.can_view)) {
+    return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+  }
+
+  // 4. Default Role Fallback rights (khi DB chưa nạp role_permissions)
   if (user.role_code === 'KHO_TRUONG') {
     const khoFeatures = [
-      'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites',
+      'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-sites',
       'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
       'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'
     ];
     if (khoFeatures.includes(feature.code)) {
       return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
     }
-  }
-
-  // 4. Role Permissions from Database
-  const rolePerm = (rolePermissions || []).find(
-    (rp) => rp.role_code === user.role_code && rp.feature_code === feature.code
-  );
-  if (rolePerm && rolePerm.can_view === 1) {
-    return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+  } else if (user.role_code === 'BEP_TRUONG') {
+    const bepFeatures = [
+      'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste', 'fnb-sites',
+      'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'
+    ];
+    if (bepFeatures.includes(feature.code)) {
+      return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+    }
+  } else if (user.role_code === 'KE_TOAN') {
+    const keToanFeatures = ['fnb-stock', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'];
+    if (keToanFeatures.includes(feature.code)) {
+      return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+    }
+  } else if (user.role_code === 'NHAN_VIEN') {
+    const nvFeatures = ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
+    if (nvFeatures.includes(feature.code)) {
+      return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+    }
   }
 
   // 5. Default No Access
@@ -393,13 +415,14 @@ export async function toggleUserPermission(
 
     if (gUserMatrixData && gUserMatrixData.userPermissions) {
       const existing = gUserMatrixData.userPermissions.find((p) => p.user_email === userEmail && p.feature_code === featureCode);
+      const newCanView = action === 'GRANT';
       if (existing) {
-        existing.can_view = action === 'GRANT' ? 1 : 0;
+        existing.can_view = newCanView;
       } else {
         gUserMatrixData.userPermissions.push({
           user_email: userEmail,
           feature_code: featureCode,
-          can_view: action === 'GRANT' ? 1 : 0
+          can_view: newCanView
         });
       }
       renderUserMatrixTable(gUserMatrixData);
@@ -439,6 +462,58 @@ export async function toggleUserPermission(
     console.error('Error toggleUserPermission:', err);
     if (typeof showToast === 'function') showToast('Lỗi mạng khi lưu phân quyền', 'error');
     loadUserMatrix();
+  }
+}
+
+export async function bulkSetUserPermissions(
+  userEmail: string,
+  action: 'REVOKE_ALL' | 'GRANT_ALL'
+): Promise<void> {
+  try {
+    const isRevoke = action === 'REVOKE_ALL';
+    if (typeof showLoading === 'function') {
+      showLoading(isRevoke ? `Đang khóa toàn bộ quyền các tab cho ${userEmail}...` : `Đang cấp toàn bộ quyền các tab cho ${userEmail}...`);
+    }
+
+    const resp = await fetch('/api/auth/user-permissions/bulk-set', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail, action })
+    });
+    const res = await resp.json();
+    if (!res.success) {
+      if (typeof showToast === 'function') showToast(res.error || 'Lỗi khi cập nhật phân quyền hàng loạt', 'error');
+      return;
+    }
+
+    if (typeof showToast === 'function') {
+      showToast(res.message || 'Đã cập nhật phân quyền hàng loạt thành công', 'success');
+    }
+
+    // Cập nhật lại phiên làm việc nếu là chính user hiện tại
+    const currentUser = typeof window !== 'undefined' ? (window as any).gCurrentUser : null;
+    if (currentUser && currentUser.email === userEmail) {
+      if (!currentUser.permissions) currentUser.permissions = {};
+      const allFeats = (gUserMatrixData?.features || []).map((f) => f.code);
+      allFeats.forEach((fCode) => {
+        currentUser.permissions[fCode] = isRevoke
+          ? { canView: false, canCreate: false, canEdit: false, canDelete: false, isRevoked: true }
+          : { canView: true, canCreate: true, canEdit: true, canDelete: true, isCustom: true };
+      });
+      try {
+        localStorage.setItem('orbit_user', JSON.stringify(currentUser));
+      } catch {}
+      if (typeof applyUserSessionToUI === 'function') {
+        applyUserSessionToUI();
+      }
+    }
+
+    await loadUserMatrix();
+  } catch (err: any) {
+    console.error('Error bulkSetUserPermissions:', err);
+    if (typeof showToast === 'function') showToast('Lỗi mạng khi lưu phân quyền', 'error');
+  } finally {
+    if (typeof hideLoading === 'function') hideLoading();
   }
 }
 

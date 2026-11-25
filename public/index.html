@@ -1521,18 +1521,50 @@
                 </div>
               </div>
 
-              <div class="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/40 space-y-2">
-                <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs">
-                  <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-                  <span>Khôi phục quyền theo vai trò</span>
+              <!-- Tác vụ phân quyền nhanh -->
+              <div class="space-y-3 pt-1">
+                <label class="block font-semibold text-gray-700 dark:text-gray-300">Tác vụ phân quyền nhanh</label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <!-- Nút Cắt / Khóa toàn bộ quyền -->
+                  <button type="button" onclick="bulkSetUserPermissionsPrompt('REVOKE_ALL')" class="p-3 rounded-2xl bg-rose-50 hover:bg-rose-100/80 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900/40 text-left transition-all group">
+                    <div class="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-bold text-xs">
+                      <i data-lucide="shield-off" class="w-4 h-4 text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform"></i>
+                      <span>Khóa toàn bộ 20 tab</span>
+                    </div>
+                    <p class="text-[11px] text-rose-600/80 dark:text-rose-400/80 mt-1 leading-relaxed">
+                      Cắt quyền tất cả 20 tab. User sẽ không thể truy cập bất kỳ trang nào.
+                    </p>
+                  </button>
+
+                  <!-- Nút Cấp toàn bộ quyền -->
+                  <button type="button" onclick="bulkSetUserPermissionsPrompt('GRANT_ALL')" class="p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/40 text-left transition-all group">
+                    <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-xs">
+                      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                      <span>Cấp toàn bộ 20 tab</span>
+                    </div>
+                    <p class="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 mt-1 leading-relaxed">
+                      Cấp quyền xem và thao tác đầy đủ trên tất cả 20 tab cho tài khoản.
+                    </p>
+                  </button>
                 </div>
-                <p class="text-[11px] text-amber-700/80 dark:text-amber-400/80 leading-relaxed">
-                  Bấm nút bên dưới để đặt lại toàn bộ ma trận phân quyền cá nhân về giá trị mặc định của vai trò đã chọn.
-                </p>
-                <button type="button" onclick="resetUserRolePermissions()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 font-bold text-xs hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5 shadow-2xs">
-                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                  <span>Reset quyền về mặc định</span>
-                </button>
+
+                <!-- Nút Khôi phục về mặc định vai trò -->
+                <div class="p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/40 flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-bold text-xs">
+                      <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                      <span>Khôi phục theo vai trò</span>
+                    </div>
+                    <p class="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-0.5 leading-relaxed truncate">
+                      Xóa toàn bộ cấp riêng / cắt quyền, đưa về vai trò mặc định.
+                    </p>
+                  </div>
+                  <button type="button" onclick="resetUserAllPermsPrompt()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 font-bold text-xs hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors shrink-0 flex items-center gap-1 shadow-2xs">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    <span>Reset</span>
+                  </button>
+                </div>
               </div>
             </div>
 

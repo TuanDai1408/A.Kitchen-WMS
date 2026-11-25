@@ -11,6 +11,7 @@ import {
   renderUserMatrixTable,
   renderUserMatrixMobile,
   toggleUserPermission,
+  bulkSetUserPermissions,
   resetUserFeaturePermission
 } from './user-matrix';
 
@@ -22,6 +23,8 @@ import {
   closeEditUserModal,
   submitEditUserRole,
   resetUserAllPermsPrompt,
+  resetUserRolePermissions,
+  bulkSetUserPermissionsPrompt,
   openConfirmToggleUserStatusModal,
   closeConfirmToggleUserStatusModal,
   executeToggleUserStatus,
@@ -64,6 +67,7 @@ if (typeof window !== 'undefined') {
   w.renderUserMatrixTable = renderUserMatrixTable;
   w.renderUserMatrixMobile = renderUserMatrixMobile;
   w.toggleUserPermission = toggleUserPermission;
+  w.bulkSetUserPermissions = bulkSetUserPermissions;
   w.resetUserFeaturePermission = resetUserFeaturePermission;
 
   // User Modals & Actions
@@ -74,6 +78,8 @@ if (typeof window !== 'undefined') {
   w.closeEditUserModal = closeEditUserModal;
   w.submitEditUserRole = submitEditUserRole;
   w.resetUserAllPermsPrompt = resetUserAllPermsPrompt;
+  w.resetUserRolePermissions = resetUserRolePermissions;
+  w.bulkSetUserPermissionsPrompt = bulkSetUserPermissionsPrompt;
   w.openConfirmToggleUserStatusModal = openConfirmToggleUserStatusModal;
   w.closeConfirmToggleUserStatusModal = closeConfirmToggleUserStatusModal;
   w.executeToggleUserStatus = executeToggleUserStatus;
