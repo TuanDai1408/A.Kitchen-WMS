@@ -1,4 +1,5 @@
 import { formatVND, formatNumber, formatDate } from '@/ts/utils/formatters';
+import { canUserEdit, canUserDelete, isMasterAccount } from '@/features/auth';
 
 declare function cellCode(code: string): string;
 declare function cellDate(dateStr: string): string;
@@ -70,13 +71,16 @@ export function canEditOrders(order?: any): boolean {
   const win = window as any;
   const user = (typeof getAppCurrentUser === 'function' ? getAppCurrentUser() : null) || win.gCurrentUser;
   if (!user) return false;
+
+  // Master Account luôn có quyền
+  if (isMasterAccount(user.email)) return true;
+
+  // Kiểm tra quyền SỬA tập trung
+  const hasEditPerm = canUserEdit('portal-history') || canUserEdit('portal-order');
+  if (!hasEditPerm) return false;
+
   if (user.role === 'ADMIN' || user.role === 'KHO_TRUONG' || user.role === 'SUPER_ADMIN') return true;
-  if (user.permissions && typeof user.permissions === 'object') {
-    const pHistory = user.permissions['portal-history'];
-    const pOrder = user.permissions['portal-order'];
-    if (pHistory && pHistory.canEdit !== undefined) return Boolean(pHistory.canEdit);
-    if (pOrder && pOrder.canEdit !== undefined) return Boolean(pOrder.canEdit);
-  }
+
   if (user.role === 'BEP_TRUONG') {
     if (!order) return true;
     const st = (order.trangThai || order.status || '').toUpperCase();
@@ -89,13 +93,16 @@ export function canDeleteOrders(order?: any): boolean {
   const win = window as any;
   const user = (typeof getAppCurrentUser === 'function' ? getAppCurrentUser() : null) || win.gCurrentUser;
   if (!user) return false;
+
+  // Master Account luôn có quyền
+  if (isMasterAccount(user.email)) return true;
+
+  // QUY TẮC BẢO VỆ: Thao tác XÓA chỉ được thực hiện bởi user được phân quyền Xóa (canDelete: true)
+  const hasDeletePerm = canUserDelete('portal-history') || canUserDelete('portal-order');
+  if (!hasDeletePerm) return false;
+
   if (user.role === 'ADMIN' || user.role === 'KHO_TRUONG' || user.role === 'SUPER_ADMIN') return true;
-  if (user.permissions && typeof user.permissions === 'object') {
-    const pHistory = user.permissions['portal-history'];
-    const pOrder = user.permissions['portal-order'];
-    if (pHistory && pHistory.canDelete !== undefined) return Boolean(pHistory.canDelete);
-    if (pOrder && pOrder.canDelete !== undefined) return Boolean(pOrder.canDelete);
-  }
+
   if (user.role === 'BEP_TRUONG') {
     if (!order) return true;
     const st = (order.trangThai || order.status || '').toUpperCase();

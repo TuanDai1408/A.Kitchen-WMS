@@ -1,5 +1,6 @@
 import type { WhReceivedOrder, WhReceivedOrderLine } from './types';
 import { formatNumber, formatDate, escapeHtml } from '@/ts/utils/formatters';
+import { canUserDelete, assertPermission } from '@/features/auth';
 
 declare const App: { currentBranch?: string; [key: string]: any };
 declare const lucide: any;
@@ -98,6 +99,9 @@ export function renderWhReceivedOrdersTable(): void {
     return;
   }
 
+  // Check permission for delete/cancel received order
+  const canCancel = canUserDelete('fnb-receipts') || canUserDelete('wh-inventory');
+
   // Render Desktop Table
   if (tbody) {
     tbody.innerHTML = list.map((o, idx) => {
@@ -135,9 +139,11 @@ export function renderWhReceivedOrdersTable(): void {
               <button onclick="openWhReceivedOrderDetail('${o.id || ''}', '${escapeHtml(o.po_number || '')}')" class="btn btn-secondary btn-sm" title="Xem chi tiết dòng hàng">
                 <i data-lucide="eye" class="w-3.5 h-3.5"></i> Chi tiết
               </button>
-              <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm" title="Hủy nhập kho và hoàn tác tồn kho">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập
-              </button>
+              ${canCancel ? `
+                <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm" title="Hủy nhập kho và hoàn tác tồn kho">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập
+                </button>
+              ` : ''}
             </div>
           </td>
         </tr>
@@ -189,13 +195,15 @@ export function renderWhReceivedOrdersTable(): void {
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800">
+          <div class="${canCancel ? 'grid grid-cols-2' : 'flex'} gap-2 pt-2 mt-2 border-t border-gray-100 dark:border-gray-800">
             <button onclick="openWhReceivedOrderDetail('${o.id || ''}', '${escapeHtml(o.po_number || '')}')" class="btn btn-secondary btn-sm w-full">
               <i data-lucide="eye" class="w-3.5 h-3.5"></i> Xem chi tiết
             </button>
-            <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm w-full">
-              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập kho
-            </button>
+            ${canCancel ? `
+              <button onclick="confirmCancelReceivedOrder('${o.id || ''}', '${escapeHtml(o.po_number || '')}', '${escapeHtml(o.receipt_code || '')}', ${Number(o.total_amount) || 0})" class="btn btn-danger btn-sm w-full">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Hủy nhập kho
+              </button>
+            ` : ''}
           </div>
         </div>
       `;
@@ -291,6 +299,16 @@ export async function openWhReceivedOrderDetail(receiptId: string, poNumber: str
       gWhCurrentReceivedDetail.totalAmount = orderInfo.total_amount;
     }
 
+    const cancelModalBtn = document.getElementById('whRecModalCancelBtn');
+    if (cancelModalBtn) {
+      const canCancel = canUserDelete('fnb-receipts') || canUserDelete('wh-inventory');
+      if (canCancel) {
+        cancelModalBtn.classList.remove('hidden');
+      } else {
+        cancelModalBtn.classList.add('hidden');
+      }
+    }
+
     let lines: WhReceivedOrderLine[] = [];
     if (receiptId) {
       const res = await fetch(`/api/fnb/receipts?id=${encodeURIComponent(receiptId)}`);
@@ -368,6 +386,8 @@ export function onWhRecModalCancelClick(): void {
 }
 
 export async function confirmCancelReceivedOrder(receiptId: string, poNumber: string, receiptCode: string, totalAmount: number): Promise<void> {
+  if (!assertPermission('fnb-receipts', 'delete', 'hủy nhập kho và hoàn tác tồn kho')) return;
+
   const codeDisplay = receiptCode || poNumber || 'đơn hàng này';
   const amtDisplay = totalAmount ? (Math.round(totalAmount).toLocaleString('vi-VN') + ' ₫') : '';
 

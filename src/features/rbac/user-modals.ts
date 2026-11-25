@@ -1,5 +1,6 @@
 import { loadUserMatrix, bulkSetUserPermissions } from './user-matrix';
 import { escapeHtml } from '@/ts/utils/formatters';
+import { assertPermission } from '@/features/auth';
 
 declare const showLoading: (msg?: string) => void;
 declare const hideLoading: () => void;
@@ -9,6 +10,7 @@ declare const lucide: any;
 let pendingToggleStatusUser: { email: string; newStatus: string } | null = null;
 
 export function openAddUserModal(): void {
+  if (!assertPermission('user-matrix', 'create', 'thêm người dùng mới')) return;
   const modal = document.getElementById('addUserModal');
   if (modal) modal.classList.remove('hidden');
   const emailInput = document.getElementById('addUserInputEmail') as HTMLInputElement | null;
@@ -22,6 +24,7 @@ export function closeAddUserModal(): void {
 
 export async function submitAddUser(e?: Event): Promise<void> {
   if (e) e.preventDefault();
+  if (!assertPermission('user-matrix', 'create', 'thêm người dùng mới')) return;
   const emailInput = document.getElementById('addUserInputEmail') as HTMLInputElement | null;
   const nameInput = document.getElementById('addUserInputName') as HTMLInputElement | null;
   const roleInput = document.getElementById('addUserInputRole') as HTMLSelectElement | null;
@@ -60,6 +63,7 @@ export async function submitAddUser(e?: Event): Promise<void> {
 }
 
 export function openEditUserModal(userEmail: string): void {
+  if (!assertPermission('user-matrix', 'edit', 'sửa vai trò / thông tin người dùng')) return;
   const matrixData = typeof window !== 'undefined' ? (window as any).gUserMatrixData : null;
   if (!matrixData || !matrixData.users) return;
   const user = matrixData.users.find((u: any) => u.email === userEmail);
@@ -86,6 +90,7 @@ export function closeEditUserModal(): void {
 
 export async function submitEditUserRole(e?: Event): Promise<void> {
   if (e) e.preventDefault();
+  if (!assertPermission('user-matrix', 'edit', 'cập nhật vai trò người dùng')) return;
   const userEmail = (document.getElementById('editUserTargetEmail') as HTMLInputElement | null)?.value;
   const roleCode = (document.getElementById('editUserRoleSelect') as HTMLSelectElement | null)?.value;
   const resetPermissions = (document.getElementById('editUserResetPermsToggle') as HTMLInputElement | null)?.checked || false;
@@ -115,6 +120,7 @@ export async function submitEditUserRole(e?: Event): Promise<void> {
 }
 
 export async function resetUserAllPermsPrompt(): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'khôi phục phân quyền mặc định')) return;
   const userEmail = (document.getElementById('editUserTargetEmail') as HTMLInputElement | null)?.value;
   if (!userEmail) return;
 
@@ -147,6 +153,7 @@ export async function resetUserAllPermsPrompt(): Promise<void> {
 export const resetUserRolePermissions = resetUserAllPermsPrompt;
 
 export async function bulkSetUserPermissionsPrompt(action: 'REVOKE_ALL' | 'GRANT_ALL'): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'phân quyền hàng loạt')) return;
   const userEmail = (document.getElementById('editUserTargetEmail') as HTMLInputElement | null)?.value;
   if (!userEmail) return;
 
@@ -165,6 +172,7 @@ export async function bulkSetUserPermissionsPrompt(action: 'REVOKE_ALL' | 'GRANT
  * Mở Popup xác nhận Khóa / Mở khóa tài khoản tại Tab Phân quyền
  */
 export function openConfirmToggleUserStatusModal(userEmail: string, newStatus: string): void {
+  if (!assertPermission('user-matrix', 'edit', 'khóa / mở khóa tài khoản')) return;
   const isLocking = newStatus === 'LOCKED';
 
   // Chặn không cho khóa tài khoản Master Owner trantuandai2508
@@ -252,6 +260,7 @@ export function closeConfirmToggleUserStatusModal(): void {
  * Thực hiện gọi API Khóa / Mở khóa tài khoản sau khi người dùng bấm xác nhận trong Popup
  */
 export async function executeToggleUserStatus(): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'khóa / mở khóa tài khoản')) return;
   if (!pendingToggleStatusUser) return;
   const { email: userEmail, newStatus } = pendingToggleStatusUser;
 

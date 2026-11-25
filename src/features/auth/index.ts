@@ -108,6 +108,15 @@ import {
 
 import { getCleanInitials } from '@/ts/utils/formatters';
 
+import {
+  canUserPerformAction,
+  canUserEdit,
+  canUserDelete,
+  canUserCreate,
+  canUserManageUsers,
+  assertPermission
+} from './action-guards';
+
 export * from './types';
 export * from './constants';
 export * from './accounts';
@@ -117,6 +126,7 @@ export * from './rbac-session';
 export * from './tab-visibility-modal';
 export * from './google-gis';
 export * from './search-filter';
+export * from './action-guards';
 
 // Bind to window for HTML inline event handlers & backwards compatibility
 if (typeof window !== 'undefined') {
@@ -220,6 +230,14 @@ if (typeof window !== 'undefined') {
   // Search & Filter
   w.filterGlobalQuickSearch = filterGlobalQuickSearch;
   w.filterSidebarMenu = filterSidebarMenu;
+
+  // Action Guards (Edit, Delete, Create, Manage Users)
+  w.canUserPerformAction = canUserPerformAction;
+  w.canUserEdit = canUserEdit;
+  w.canUserDelete = canUserDelete;
+  w.canUserCreate = canUserCreate;
+  w.canUserManageUsers = canUserManageUsers;
+  w.assertPermission = assertPermission;
 
   // Wrap switchTab with RBAC access check
   const _origSwitchTab = w.switchTab;

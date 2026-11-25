@@ -1,5 +1,6 @@
 import { CurrentUserSession } from './types';
 import { cellCode, cellDate, cellBadge, cellFiles, cellPerson, cellSite, fmtDate } from '@/features/portal/helpers';
+import { canUserEdit, canUserDelete, isMasterAccount, assertPermission } from '@/features/auth';
 
 export let _pendingDeleteVoucherCode: string | null = null;
 
@@ -29,32 +30,19 @@ export function getAppCurrentUser(): CurrentUserSession | null {
 export function canEditVouchers(): boolean {
   const user = getAppCurrentUser();
   if (!user) return false;
-  if (user.role === 'ADMIN' || user.roleCode === 'ADMIN') return true;
-  if (user.permissions && typeof user.permissions === 'object') {
-    const pSearch = user.permissions['portal-search'];
-    const pVoucher = user.permissions['portal-voucher'];
-    if (pSearch && pSearch.canEdit !== undefined) return Boolean(pSearch.canEdit);
-    if (pVoucher && pVoucher.canEdit !== undefined) return Boolean(pVoucher.canEdit);
-  }
-  return user.role === 'KE_TOAN' || user.roleCode === 'KE_TOAN';
+  if (isMasterAccount(user.email)) return true;
+  return canUserEdit('portal-voucher') || canUserEdit('portal-search');
 }
 
 export function canDeleteVouchers(): boolean {
   const user = getAppCurrentUser();
   if (!user) return false;
-  if (user.role === 'ADMIN' || user.roleCode === 'ADMIN') return true;
-  if (user.permissions && typeof user.permissions === 'object') {
-    const pSearch = user.permissions['portal-search'];
-    const pVoucher = user.permissions['portal-voucher'];
-    if (pSearch && pSearch.canDelete !== undefined) return Boolean(pSearch.canDelete);
-    if (pVoucher && pVoucher.canDelete !== undefined) return Boolean(pVoucher.canDelete);
-  }
-  return user.role === 'KE_TOAN' || user.roleCode === 'KE_TOAN';
+  if (isMasterAccount(user.email)) return true;
+  return canUserDelete('portal-voucher') || canUserDelete('portal-search');
 }
 
 export async function openEditVoucherModal(maCT: string): Promise<void> {
-  if (!canEditVouchers()) {
-    if (typeof showToast === 'function') showToast('Tài khoản của bạn không có quyền chỉnh sửa chứng từ', 'warning');
+  if (!assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ thu chi')) {
     return;
   }
   if (typeof showLoading === 'function') showLoading('Đang tải thông tin chứng từ...');
@@ -142,8 +130,7 @@ export function closeEditVoucherModal(): void {
 }
 
 export async function saveEditVoucher(): Promise<void> {
-  if (!canEditVouchers()) {
-    if (typeof showToast === 'function') showToast('Tài khoản của bạn không có quyền chỉnh sửa chứng từ', 'warning');
+  if (!assertPermission('portal-voucher', 'edit', 'chỉnh sửa chứng từ')) {
     return;
   }
   const maCT = (document.getElementById('editVoucherCode') as HTMLInputElement | null)?.value;
@@ -205,8 +192,7 @@ export async function saveEditVoucher(): Promise<void> {
 }
 
 export async function confirmDeleteVoucher(maCT: string): Promise<void> {
-  if (!canDeleteVouchers()) {
-    if (typeof showToast === 'function') showToast('Tài khoản của bạn không có quyền xóa chứng từ', 'warning');
+  if (!assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi')) {
     return;
   }
   _pendingDeleteVoucherCode = maCT;
@@ -249,8 +235,7 @@ export async function executeDeleteVoucher(): Promise<void> {
   const maCT = _pendingDeleteVoucherCode;
   if (!maCT) return;
 
-  if (!canDeleteVouchers()) {
-    if (typeof showToast === 'function') showToast('Tài khoản của bạn không có quyền xóa chứng từ', 'warning');
+  if (!assertPermission('portal-voucher', 'delete', 'xóa chứng từ thu chi')) {
     return;
   }
 

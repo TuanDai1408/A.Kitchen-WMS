@@ -1,5 +1,6 @@
 import { UserMatrixData, UserMatrixUser, UserMatrixFeature, RolePermission, UserPermission, ResolvedPermission } from './types';
 import { getCleanInitials, escapeHtml } from '@/ts/utils/formatters';
+import { assertPermission, canUserManageUsers } from '@/features/auth';
 
 export let gUserMatrixData: UserMatrixData | null = null;
 
@@ -220,6 +221,8 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
     return;
   }
 
+  const canManage = canUserManageUsers();
+
   tbody.innerHTML = filteredUsers.map((u, idx) => {
     const isLocked = u.status === 'LOCKED';
     const initials = getCleanInitials(u.full_name || u.email);
@@ -247,9 +250,13 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
           </div>
         </td>
         <td class="py-3 px-3 text-center sticky left-[268px] z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
-          <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="hover:scale-105 transition-transform" title="Bấm để đổi vai trò của user này">
-            ${roleBadge}
-          </button>
+          ${canManage ? `
+            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="hover:scale-105 transition-transform" title="Bấm để đổi vai trò của user này">
+              ${roleBadge}
+            </button>
+          ` : `
+            <div>${roleBadge}</div>
+          `}
         </td>
     `;
 
@@ -285,9 +292,9 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
         <td class="py-2.5 px-2 text-center border-l border-gray-100 dark:border-gray-800/60">
           <div class="inline-flex flex-col items-center gap-1">
             <button
-              onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"
-              class="size-7 rounded-lg ${btnBg} flex items-center justify-center transition-all active:scale-90"
-              title="${tooltipText}"
+              ${canManage ? `onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"` : `disabled`}
+              class="size-7 rounded-lg ${btnBg} flex items-center justify-center transition-all ${canManage ? 'active:scale-90' : 'cursor-not-allowed opacity-80'}"
+              title="${canManage ? tooltipText : 'Chỉ Quản trị viên mới có quyền thay đổi phân quyền'}"
             >
               ${icon}
             </button>
@@ -299,14 +306,18 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
 
     rowHtml += `
         <td class="py-3 px-3 text-center border-l border-gray-100 dark:border-gray-800">
-          <div class="flex items-center justify-center gap-1.5">
-            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Chỉnh sửa vai trò & tài khoản">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="toggleUserStatusPrompt('${escapeHtml(u.email)}', '${isLocked ? 'ACTIVE' : 'LOCKED'}')" class="p-1.5 rounded-lg border ${isLocked ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-rose-200 text-rose-600 hover:bg-rose-50'} transition-colors" title="${isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}">
-              <i data-lucide="${isLocked ? 'unlock' : 'lock'}" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
+          ${canManage ? `
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Chỉnh sửa vai trò & tài khoản">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="toggleUserStatusPrompt('${escapeHtml(u.email)}', '${isLocked ? 'ACTIVE' : 'LOCKED'}')" class="p-1.5 rounded-lg border ${isLocked ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-rose-200 text-rose-600 hover:bg-rose-50'} transition-colors" title="${isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}">
+                <i data-lucide="${isLocked ? 'unlock' : 'lock'}" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          ` : `
+            <span class="text-xs text-gray-400 italic">Chỉ xem</span>
+          `}
         </td>
       </tr>
     `;
@@ -346,6 +357,8 @@ export function renderUserMatrixMobile(data: UserMatrixData): void {
     return;
   }
 
+  const canManage = canUserManageUsers();
+
   container.innerHTML = filteredUsers.map((u) => {
     const initials = getCleanInitials(u.full_name || u.email);
     const avatarUrl = (u.avatar_url && !u.avatar_url.includes('ui-avatars.com'))
@@ -364,8 +377,9 @@ export function renderUserMatrixMobile(data: UserMatrixData): void {
             <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">${escapeHtml(f.name)}</span>
           </div>
           <button
-            onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')}"
+            ${canManage ? `onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"` : `disabled`}
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')} ${canManage ? '' : 'cursor-not-allowed opacity-80'}"
+            title="${canManage ? '' : 'Chỉ Quản trị viên mới có quyền thay đổi phân quyền'}"
           >
             <span>${isGranted ? 'BẬT' : 'TẮT'}</span>
             <span class="text-[8px] opacity-80">(${perm.label})</span>
@@ -386,9 +400,11 @@ export function renderUserMatrixMobile(data: UserMatrixData): void {
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             <span class="text-xs px-2 py-0.5 rounded font-semibold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
-            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
-              <i data-lucide="more-vertical" class="w-4 h-4"></i>
-            </button>
+            ${canManage ? `
+              <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
+                <i data-lucide="more-vertical" class="w-4 h-4"></i>
+              </button>
+            ` : ''}
           </div>
         </div>
 
@@ -410,6 +426,7 @@ export async function toggleUserPermission(
   currentlyGranted: boolean,
   _currentType: string
 ): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'thay đổi phân quyền người dùng')) return;
   try {
     const action = currentlyGranted ? 'REVOKE' : 'GRANT';
 
@@ -469,6 +486,7 @@ export async function bulkSetUserPermissions(
   userEmail: string,
   action: 'REVOKE_ALL' | 'GRANT_ALL'
 ): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'phân quyền hàng loạt')) return;
   try {
     const isRevoke = action === 'REVOKE_ALL';
     if (typeof showLoading === 'function') {
