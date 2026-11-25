@@ -1547,6 +1547,44 @@
 
         </div>
       </div>
+
+      <!-- ====================================================================
+           MODAL: XÁC NHẬN KHÓA / MỞ KHÓA TÀI KHOẢN (RBAC USER MATRIX)
+           ==================================================================== -->
+      <div id="modalConfirmToggleUserStatus" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeConfirmToggleUserStatusModal()">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl p-6 sm:p-7 space-y-4 animate-scale-up text-center">
+          
+          <!-- Animated Status Icon -->
+          <div id="confirmToggleStatusIcon" class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-sm">
+            <i data-lucide="lock" class="w-7 h-7"></i>
+          </div>
+
+          <!-- Title & Subtitle -->
+          <div>
+            <h4 id="confirmToggleStatusTitle" class="font-bold text-lg text-gray-900 dark:text-white leading-tight">Xác nhận khóa tài khoản?</h4>
+            <p id="confirmToggleStatusDesc" class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+              Tài khoản này sẽ bị <b>đăng xuất ngay lập tức</b> và bị <b>chặn toàn bộ 20/20 tính năng</b> hệ thống cho đến khi được mở khóa lại.
+            </p>
+          </div>
+
+          <!-- User Card Details -->
+          <div id="confirmToggleStatusUserCard" class="py-1">
+            <!-- Dynamically populated via openConfirmToggleUserStatusModal -->
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 grid grid-cols-2 gap-3">
+            <button type="button" onclick="closeConfirmToggleUserStatusModal()" class="w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              Hủy bỏ
+            </button>
+            <button type="button" id="btnConfirmToggleStatus" onclick="executeToggleUserStatus()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-bold shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+              <span>Xác nhận khóa</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
 <section id="wh-dashboard" class="tab-panel space-y-4">
         <!-- Sub-nav bar -->
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">

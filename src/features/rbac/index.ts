@@ -22,6 +22,9 @@ import {
   closeEditUserModal,
   submitEditUserRole,
   resetUserAllPermsPrompt,
+  openConfirmToggleUserStatusModal,
+  closeConfirmToggleUserStatusModal,
+  executeToggleUserStatus,
   toggleUserStatusPrompt
 } from './user-modals';
 
@@ -71,6 +74,9 @@ if (typeof window !== 'undefined') {
   w.closeEditUserModal = closeEditUserModal;
   w.submitEditUserRole = submitEditUserRole;
   w.resetUserAllPermsPrompt = resetUserAllPermsPrompt;
+  w.openConfirmToggleUserStatusModal = openConfirmToggleUserStatusModal;
+  w.closeConfirmToggleUserStatusModal = closeConfirmToggleUserStatusModal;
+  w.executeToggleUserStatus = executeToggleUserStatus;
   w.toggleUserStatusPrompt = toggleUserStatusPrompt;
 
   // Vouchers RBAC & Management
