@@ -1,6 +1,6 @@
-import { ALL_TAB_GROUPS, isMasterAccount } from './constants';
+import { ALL_TAB_GROUPS, isMasterAccount, loadPersistedUser } from './constants';
 import { gCurrentUser } from './accounts';
-import { gSystemTabVisibility, setSystemTabVisibility, applyUserSessionToUI } from './rbac-session';
+import { gSystemTabVisibility, setSystemTabVisibility, applyUserSessionToUI, syncCurrentUserPermissions } from './rbac-session';
 
 declare const showLoading: (msg?: string) => void;
 declare const hideLoading: () => void;
@@ -35,9 +35,10 @@ export async function loadSystemTabVisibility(): Promise<Record<string, boolean>
  */
 export async function openTabVisibilityModal(): Promise<void> {
   const w = typeof window !== 'undefined' ? (window as any) : {};
-  const curUser = w.gCurrentUser || gCurrentUser;
+  const curUser = w.gCurrentUser || gCurrentUser || loadPersistedUser();
+  const masterEmail = (curUser && (curUser.email || (curUser as any).username)) || '';
 
-  if (!curUser || !isMasterAccount(curUser.email)) {
+  if (!curUser || !isMasterAccount(masterEmail)) {
     if (typeof showToast === 'function') {
       showToast('Tính năng này chỉ dành riêng cho Quản trị viên tối cao (trantuandai2508)!', 'error');
     }
@@ -245,32 +246,35 @@ export function renderTabVisibilityList(): void {
     `;
   }
 
+  const prevScrollTop = container.scrollTop;
   container.innerHTML = html;
+  container.scrollTop = prevScrollTop;
   if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
 
 /**
- * Lưu cấu hình Ẩn/Hiện Tab vào CSDL Cloudflare D1
+ * Lưu cấu hình Ẩn/Hiện Tab vào CSDL Cloudflare D1 / Supabase
  */
 export async function saveSystemTabVisibility(): Promise<void> {
   const w = typeof window !== 'undefined' ? (window as any) : {};
-  const curUser = w.gCurrentUser || gCurrentUser;
+  const curUser = w.gCurrentUser || gCurrentUser || loadPersistedUser();
+  const requestorEmail = (curUser && (curUser.email || (curUser as any).username)) || 'trantuandai2508@gmail.com';
 
-  if (!curUser || !isMasterAccount(curUser.email)) {
+  if (!curUser || !isMasterAccount(curUser || requestorEmail)) {
     if (typeof showToast === 'function') {
       showToast('Chỉ tài khoản trantuandai2508 mới có quyền lưu cấu hình này!', 'error');
     }
     return;
   }
 
-  if (typeof showLoading === 'function') showLoading('Đang lưu cấu hình Ẩn/Hiện Tab vào D1...');
+  if (typeof showLoading === 'function') showLoading('Đang lưu cấu hình Ẩn/Hiện Tab vào CSDL...');
 
   try {
     const res = await fetch('/api/system/tab-visibility', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        requestorEmail: curUser.email,
+        requestorEmail,
         visibility: localTabVisibility,
         bulkUpdates: localTabVisibility
       })
@@ -283,7 +287,13 @@ export async function saveSystemTabVisibility(): Promise<void> {
 
     // Cập nhật trạng thái client
     setSystemTabVisibility(localTabVisibility);
-    applyUserSessionToUI();
+
+    // Đồng bộ lại quyền và làm mới UI
+    if (typeof syncCurrentUserPermissions === 'function') {
+      await syncCurrentUserPermissions();
+    } else {
+      applyUserSessionToUI();
+    }
 
     closeTabVisibilityModal();
 

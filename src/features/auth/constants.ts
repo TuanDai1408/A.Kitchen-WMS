@@ -2,9 +2,15 @@ import { AuthRoleDefinition, FeatureTitleInfo, AuthSiteOption, UserAccount } fro
 
 export const GOOGLE_CLIENT_ID = "241889016372-b7klaa5uff117fck5tl4ajj39ukvfftr.apps.googleusercontent.com";
 
-export function isMasterAccount(email?: string | null): boolean {
-  if (!email) return false;
-  const clean = String(email).toLowerCase().trim();
+export function isMasterAccount(emailOrUser?: any): boolean {
+  if (!emailOrUser) return false;
+  let str = '';
+  if (typeof emailOrUser === 'string') {
+    str = emailOrUser;
+  } else if (typeof emailOrUser === 'object') {
+    str = emailOrUser.email || emailOrUser.username || emailOrUser.user || '';
+  }
+  const clean = String(str).toLowerCase().trim();
   return clean === 'trantuandai2508@gmail.com' || clean.includes('trantuandai2508');
 }
 
@@ -97,6 +103,7 @@ export const FEATURE_TITLES: Record<string, FeatureTitleInfo> = {
   'wh-dashboard': { name: 'Tổng Quan Kho Vận', role: 'KHO_TRUONG', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi' },
   'fnb-counts': { name: 'Kiểm Kê Hằng Ngày', role: 'BEP_TRUONG', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu' },
   'fnb-receipts': { name: 'Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC' },
+  'fnb-kitchen-issue': { name: 'Xuất Kho Sử Dụng', role: 'BEP_TRUONG', desc: 'Xuất kho NVL phục vụ bếp theo ca, trừ tồn kho và in phiếu xuất' },
   'fnb-waste': { name: 'Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế' },
 
   // Nhóm 3: Kho Vận & WMS

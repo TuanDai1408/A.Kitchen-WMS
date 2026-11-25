@@ -357,18 +357,19 @@ async function ensureUserPermissionsTable(env) {
 }
 
 async function ensureSystemTabVisibilityTable(env) {
-  if (db.isPg(env)) return;
+  const isPostgres = db.isPg(env);
+  const timeType = isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
   try {
     await db.exec(env, `
       CREATE TABLE IF NOT EXISTS system_tab_visibility (
         tab_id TEXT PRIMARY KEY,
         is_hidden INTEGER DEFAULT 0,
         updated_by TEXT,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        updated_at ${timeType}
       )
     `);
   } catch (err) {
-    console.error('ensureSystemTabVisibilityTable notice:', err);
+    console.error('ensureSystemTabVisibilityTable error:', err);
   }
 }
 
@@ -538,7 +539,8 @@ async function buildUserPermissions(env, user) {
   // CHỈ RIÊNG TÀI KHOẢN trantuandai2508 MỚI ĐƯỢC PHÉP TRUY CẬP VÀ MỞ LẠI
   const isMasterUser = user && user.email && (user.email.toLowerCase().trim() === 'trantuandai2508@gmail.com' || user.email.toLowerCase().includes('trantuandai2508'));
   try {
-    const { rows: hiddenTabRows } = await db.query(env, `SELECT tab_id FROM system_tab_visibility WHERE is_hidden = 1`).catch(() => ({ rows: [] }));
+    const { rows: tabRows } = await db.query(env, `SELECT tab_id, is_hidden FROM system_tab_visibility`).catch(() => ({ rows: [] }));
+    const hiddenTabRows = (tabRows || []).filter(r => r.is_hidden === 1 || r.is_hidden === true || r.is_hidden === '1');
     if (hiddenTabRows && hiddenTabRows.length > 0) {
       hiddenTabRows.forEach(row => {
         const tId = row.tab_id;
@@ -3590,7 +3592,7 @@ export default {
         const { rows } = await db.query(env, `SELECT tab_id, is_hidden, updated_by, updated_at FROM system_tab_visibility`).catch(() => ({ rows: [] }));
         const visibilityMap = {};
         (rows || []).forEach(r => {
-          visibilityMap[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true;
+          visibilityMap[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true || r.is_hidden === '1';
         });
         return new Response(JSON.stringify({
           success: true,
@@ -3616,26 +3618,30 @@ export default {
 
         if (bulkUpdates && typeof bulkUpdates === 'object') {
           for (const [tId, hiddenVal] of Object.entries(bulkUpdates)) {
-            const hVal = (hiddenVal === true || hiddenVal === 1) ? 1 : 0;
+            const hVal = (hiddenVal === true || hiddenVal === 1 || hiddenVal === '1') ? 1 : 0;
             await db.exec(env, `
               INSERT INTO system_tab_visibility (tab_id, is_hidden, updated_by, updated_at)
-              VALUES (?, ?, ?, datetime('now'))
+              VALUES (?, ?, ?, CURRENT_TIMESTAMP)
               ON CONFLICT(tab_id) DO UPDATE SET
-                is_hidden = excluded.is_hidden,
-                updated_by = excluded.updated_by,
-                updated_at = datetime('now')
-            `, [tId, hVal, requestorEmail]).catch(() => {});
+                is_hidden = EXCLUDED.is_hidden,
+                updated_by = EXCLUDED.updated_by,
+                updated_at = CURRENT_TIMESTAMP
+            `, [tId, hVal, requestorEmail]).catch(err => {
+              console.error(`Error saving tab visibility for ${tId}:`, err);
+            });
           }
         } else if (tabId) {
-          const hVal = (isHidden === true || isHidden === 1) ? 1 : 0;
+          const hVal = (isHidden === true || isHidden === 1 || isHidden === '1') ? 1 : 0;
           await db.exec(env, `
             INSERT INTO system_tab_visibility (tab_id, is_hidden, updated_by, updated_at)
-            VALUES (?, ?, ?, datetime('now'))
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(tab_id) DO UPDATE SET
-              is_hidden = excluded.is_hidden,
-              updated_by = excluded.updated_by,
-              updated_at = datetime('now')
-          `, [tabId, hVal, requestorEmail]).catch(() => {});
+              is_hidden = EXCLUDED.is_hidden,
+              updated_by = EXCLUDED.updated_by,
+              updated_at = CURRENT_TIMESTAMP
+          `, [tabId, hVal, requestorEmail]).catch(err => {
+            console.error(`Error saving tab visibility for ${tabId}:`, err);
+          });
         }
 
         invalidateMemoryCache('auth_me_');
