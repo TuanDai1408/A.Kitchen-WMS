@@ -21,20 +21,20 @@ export const App: AppState = {
 };
 
 export const gFnbSitesList: any[] = [
-  { id: 'K001', code: 'K001', name: 'Điểm Bán K001', region: 'Miền Nam' },
-  { id: 'K002', code: 'K002', name: 'Điểm Bán K002', region: 'Miền Nam' },
-  { id: 'K003', code: 'K003', name: 'Điểm Bán K003', region: 'Miền Nam' },
-  { id: 'K004', code: 'K004', name: 'Điểm Bán K004', region: 'Miền Nam' },
-  { id: 'K005', code: 'K005', name: 'Điểm Bán K005', region: 'Miền Nam' },
-  { id: 'K006', code: 'K006', name: 'Điểm Bán K006', region: 'Miền Nam' },
-  { id: 'R515', code: 'R515', name: 'Điểm Bán R515', region: 'Miền Nam' },
-  { id: 'K800', code: 'K800', name: 'Điểm Bán K800', region: 'Miền Nam' },
-  { id: 'K500', code: 'K500', name: 'Điểm Bán K500', region: 'Miền Bắc' },
-  { id: 'K501', code: 'K501', name: 'Điểm Bán K501', region: 'Miền Bắc' },
-  { id: 'K502', code: 'K502', name: 'Điểm Bán K502', region: 'Miền Bắc' },
-  { id: 'K503', code: 'K503', name: 'Điểm Bán K503', region: 'Miền Bắc' },
-  { id: 'K504', code: 'K504', name: 'Điểm Bán K504', region: 'Miền Bắc' },
-  { id: 'K505', code: 'K505', name: 'Điểm Bán K505', region: 'Miền Bắc' }
+  { id: 'K001', code: 'K001', name: 'K001 - MN Bếp Ăn Đại Học Hùng Vương', region: 'Miền Nam' },
+  { id: 'K002', code: 'K002', name: 'K002 - Bệnh viện Đại Học Quốc Tế Hồng Bàng', region: 'Miền Nam' },
+  { id: 'K003', code: 'K003', name: 'K003 - A.Kitchen - Miền Nam', region: 'Miền Nam' },
+  { id: 'K004', code: 'K004', name: 'K004 - MN A.Kitchen - Thuận An', region: 'Miền Nam' },
+  { id: 'K005', code: 'K005', name: 'K005 - MN A.Kitchen - Hub Thuận An', region: 'Miền Nam' },
+  { id: 'K006', code: 'K006', name: 'K006 - MN A.Kitchen - PTNT Quảng Trực', region: 'Miền Nam' },
+  { id: 'R515', code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam' },
+  { id: 'K800', code: 'K800', name: 'K800 - A.Kitchen - Miền Trung', region: 'Miền Trung' },
+  { id: 'K500', code: 'K500', name: 'K500 - MB A Kitchen Hòa Bình', region: 'Miền Bắc' },
+  { id: 'K501', code: 'K501', name: 'K501 - Công ty TNHH Julie sandlau', region: 'Miền Bắc' },
+  { id: 'K502', code: 'K502', name: 'K502 - A.Kitchen - Miền Bắc', region: 'Miền Bắc' },
+  { id: 'K503', code: 'K503', name: 'K503 - MB A.Kitchen - TTH An Thượng', region: 'Miền Bắc' },
+  { id: 'K504', code: 'K504', name: 'K504 - MB A.Kitchen - Hub An Khánh', region: 'Miền Bắc' },
+  { id: 'K505', code: 'K505', name: 'K505 - MB A.Kitchen - Hub Đa Phúc', region: 'Miền Bắc' }
 ];
 
 export let gFnbAllItems: any[] = [];

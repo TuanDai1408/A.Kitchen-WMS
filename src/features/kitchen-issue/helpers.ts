@@ -1,4 +1,30 @@
 import { gFnbSitesList } from '../app-shell/navigation';
+import { DEFAULT_SITES_LIST } from '../auth/constants';
+
+export function getSiteFullLabel(siteCode?: string): string {
+  if (!siteCode) return 'K001 - MN Bếp Ăn Đại Học Hùng Vương';
+  const cleanCode = siteCode.trim().toUpperCase();
+
+  const matchDef = (DEFAULT_SITES_LIST as any[]).find((s: any) => s.code && s.code.toUpperCase() === cleanCode);
+  if (matchDef) {
+    const rawName = (matchDef.name || matchDef.ten || '').trim();
+    if (rawName.toUpperCase().startsWith(cleanCode)) {
+      return rawName;
+    }
+    return `${cleanCode} - ${rawName}`;
+  }
+
+  const sites = (gFnbSitesList && gFnbSitesList.length > 0 ? gFnbSitesList : DEFAULT_SITES_LIST) as any[];
+  const match = sites.find((s: any) => s.code && s.code.toUpperCase() === cleanCode);
+  if (match) {
+    const rawName = (match.name || match.ten || '').trim();
+    if (rawName.toUpperCase().startsWith(cleanCode)) {
+      return rawName;
+    }
+    return `${cleanCode} - ${rawName}`;
+  }
+  return cleanCode;
+}
 
 export function getActiveKitchenIssueSite(): string {
   const sel = document.getElementById('kitchenIssueSiteSelect') as HTMLSelectElement | null;
