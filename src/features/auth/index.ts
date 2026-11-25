@@ -268,6 +268,13 @@ if (typeof window !== 'undefined') {
           w.showToast('Bạn không có quyền truy cập chức năng này', 'warning');
         }
       }
+      // Nếu user đang đứng ở một tab hợp lệ rồi thì giữ nguyên tab đó, không tự nhảy sang tab khác gây hiểu nhầm
+      const activePanel = document.querySelector('.tab-panel.active');
+      const activeId = activePanel ? activePanel.getAttribute('id') : null;
+      if (activeId && activeId !== tabId && canAccessTab(activeId)) {
+        return;
+      }
+
       const firstAllowedBtn = document.querySelector('#sidebar .nav-btn:not(.hidden)');
       const safeTabId = firstAllowedBtn ? firstAllowedBtn.getAttribute('data-tab') : 'tab-403';
       if (safeTabId && typeof _origSwitchTab === 'function') {
