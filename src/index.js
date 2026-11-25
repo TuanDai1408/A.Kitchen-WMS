@@ -5121,8 +5121,10 @@ export default {
 
           // Lấy chi tiết các dòng nếu cần
           const countId = searchParams.get('id');
+          let countHeader = null;
           let lines = [];
           if (countId) {
+            countHeader = await db.queryOne(env, `SELECT * FROM fnb_stock_counts WHERE id = ?`, [countId]).catch(() => null);
             const { rows: l } = await db.query(env, `
               SELECT l.*, 
                      COALESCE(d.material_desc, i.name, l.item_code) as item_name, 
@@ -5139,6 +5141,7 @@ export default {
           const fnbCountsData = {
             success: true,
             data: {
+              count: countHeader,
               counts: counts || [],
               lines
             }
@@ -5680,6 +5683,12 @@ export default {
                     const invExpDate = expDate || fallbackExp;
 
                     const storageLoc = item.storage_loc || 'Kệ Bếp';
+                    const brRow = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [site_code]).catch(() => null);
+                    const publicBranchId = brRow?.id || site_code.toLowerCase();
+                    await tx.exec(`
+                      INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
                     await tx.exec(`
                       INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
@@ -5689,14 +5698,14 @@ export default {
                   }
                 }
 
-                // Upsert vào fnb_stock_balances để luôn đảm bảo có tồn kho tại điểm bán sau khi nhập
+                // Upsert vào fnb_stock_balances (cộng dồn vào book_qty hiện có để không làm mất các giao dịch Xuất kho sử dụng trước đó)
                 await tx.exec(`
                   INSERT INTO fnb_stock_balances (item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, total_value, updated_at)
                   VALUES (?, ?, 'Miền Nam', 0, ?, 0, 0, ?, ?, NOW())
                   ON CONFLICT (item_code, site_code) DO UPDATE SET
-                    receipt_qty = fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty,
-                    book_qty = fnb_stock_balances.opening_qty + (fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty) - fnb_stock_balances.sales_bom_qty - fnb_stock_balances.waste_qty,
-                    total_value = (fnb_stock_balances.opening_qty + (fnb_stock_balances.receipt_qty + EXCLUDED.receipt_qty) - fnb_stock_balances.sales_bom_qty - fnb_stock_balances.waste_qty) * ?,
+                    receipt_qty = COALESCE(fnb_stock_balances.receipt_qty, 0) + EXCLUDED.receipt_qty,
+                    book_qty = COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty,
+                    total_value = (COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty) * ?,
                     updated_at = NOW()
                 `, [item.item_code, site_code, qty, qty, lineAmount, unitPrice]);
 
@@ -5792,9 +5801,15 @@ export default {
                     WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
                   `, [qty, qty, qty, unitPrice, line.item_code, siteCode]);
 
-                  // Xóa batch nếu có
+                  // Xóa batch nếu có trên cả public.inventory_batches và wms.inventory_batches
                   if (line.batch_code) {
                     try {
+                      const brRow = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]).catch(() => null);
+                      const publicBranchId = brRow?.id || siteCode.toLowerCase();
+                      await tx.exec(`
+                        DELETE FROM inventory_batches
+                        WHERE sku = ? AND (branch_id = ? OR LOWER(branch_id) = ?) AND batch_code = ?
+                      `, [line.item_code, publicBranchId, siteCode.toLowerCase(), line.batch_code]).catch(() => {});
                       await tx.exec(`
                         DELETE FROM wms.inventory_batches
                         WHERE sku = ? AND branch_id = ? AND batch_code = ?
@@ -5938,6 +5953,29 @@ export default {
                       updated_at = NOW()
                   WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
                 `, [qty, qty, qty, unitPrice, item.item_code, site_code]);
+
+                // Đồng bộ trừ lô theo chuẩn FEFO trong inventory_batches khi Hủy hàng
+                try {
+                  const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [site_code]);
+                  if (br && br.id) {
+                    const { rows: batches } = await tx.query(`
+                      SELECT id, qty FROM inventory_batches
+                      WHERE branch_id = ? AND sku = ? AND qty > 0
+                      ORDER BY exp_date ASC
+                    `, [br.id, item.item_code]);
+                    let rem = qty;
+                    for (const b of (batches || [])) {
+                      if (rem <= 0) break;
+                      const deduct = Math.min(Number(b.qty) || 0, rem);
+                      if (deduct > 0) {
+                        await tx.exec(`UPDATE inventory_batches SET qty = qty - ? WHERE id = ?`, [deduct, b.id]);
+                        await tx.exec(`INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?)`,
+                          ['tx_' + Math.random().toString(36).substr(2, 9), br.id, item.item_code, b.id, deduct, `${wasteCode} - ${reason}`]);
+                        rem -= deduct;
+                      }
+                    }
+                  }
+                } catch (eWasteFefo) {}
 
                 await tx.exec(`
                   INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)

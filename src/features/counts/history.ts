@@ -219,7 +219,7 @@ export async function openEditCountModal(countId: number | string): Promise<void
     if (!json.success) throw new Error(json.error || 'Không tải được phiếu kiểm kê');
 
     const counts: any[] = json.data.counts || [];
-    const header = counts.find((c: any) => String(c.id) === String(countId)) || {};
+    const header = json.data.count || counts.find((c: any) => String(c.id) === String(countId)) || {};
     const lines: any[] = json.data.lines || [];
 
     _editCountData = {
