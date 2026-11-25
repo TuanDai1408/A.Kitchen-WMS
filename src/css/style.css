@@ -1661,6 +1661,21 @@ table tbody tr {
   font-size: 14px;
 }
 
+/* Bảo vệ toàn bộ Modal/Popup trên Mobile: không bao giờ bị che nút Lưu/Xác nhận ở Footer */
+[id$="Modal"] form.flex-col,
+[id^="modal"] form.flex-col,
+[id$="Modal"] .overflow-y-auto.flex-1,
+[id^="modal"] .overflow-y-auto.flex-1 {
+  min-height: 0;
+}
+
+@media (max-width: 640px) {
+  [id$="Modal"] > div.flex.flex-col,
+  [id^="modal"] > div.flex.flex-col {
+    max-height: 88dvh !important;
+  }
+}
+
 /* 2. Tiêu đề Modal (Modal Title) - Chuẩn Canteen 16px (text-base), font-extrabold */
 [id$="Modal"] h3,
 [id^="modal"] h3,
