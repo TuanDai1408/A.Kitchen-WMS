@@ -48,6 +48,19 @@ export function initRbacAuth(): void {
 
   renderSitesOptions();
 
+  // Chủ động tải trạng thái ẩn/hiện mới nhất từ CSDL D1 ngay khi khởi động ứng dụng
+  if (typeof fetch === 'function') {
+    fetch('/api/system/tab-visibility')
+      .then(res => res.json())
+      .then(json => {
+        if (json && json.success && json.data) {
+          setSystemTabVisibility(json.data);
+          applyUserSessionToUI();
+        }
+      })
+      .catch(() => {});
+  }
+
   if (!curUser || !curUser.email) {
     w.gCurrentUser = null;
     updateUIForUnauthenticated();
@@ -528,12 +541,11 @@ export function canAccessTab(tabId: string): boolean {
   }
 
   // ĐẶC QUYỀN VÀ KHÓA CHẶN MASTER OWNER (trantuandai2508):
-  // Nếu tab bị Master Owner đánh dấu ẨN (gSystemTabVisibility[tabId] === true),
-  // thì BẤT KỲ AI KHÁC (kể cả role === 'ADMIN') ĐỀU BỊ CẤM TRUY CẬP 100%!
+  // Khi một tab bị đánh dấu ẨN trên toàn hệ thống (gSystemTabVisibility[tabId] === true),
+  // tab đó sẽ bị ẨN HOÀN TOÀN khỏi Sidebar, Menu Hub, Bottom Nav và CHẶN truy cập đối với tất cả người dùng (kể cả ADMIN và Master User khi duyệt giao diện).
+  // Master Owner quản lý bật/tắt hiển thị tab thông qua Modal "👑 Quản lý Ẩn/Hiện Tab Webapp" (từ Profile hoặc User Matrix).
   if (gSystemTabVisibility[tabId] === true) {
-    if (!isMasterAccount(curUser.email)) {
-      return false;
-    }
+    return false;
   }
 
   // Single Source of Truth từ CSDL Backend D1

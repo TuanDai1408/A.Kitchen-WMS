@@ -285,14 +285,13 @@ export async function saveSystemTabVisibility(): Promise<void> {
       throw new Error(json.error || 'Lỗi khi lưu cấu hình');
     }
 
-    // Cập nhật trạng thái client
+    // Cập nhật trạng thái client ngay lập tức
     setSystemTabVisibility(localTabVisibility);
+    applyUserSessionToUI();
 
-    // Đồng bộ lại quyền và làm mới UI
+    // Đồng bộ lại quyền từ CSDL
     if (typeof syncCurrentUserPermissions === 'function') {
       await syncCurrentUserPermissions();
-    } else {
-      applyUserSessionToUI();
     }
 
     closeTabVisibilityModal();

@@ -535,33 +535,23 @@ async function buildUserPermissions(env, user) {
   }
 
   // 5. CƠ CHẾ ẨN / HIỆN TAB TOÀN HỆ THỐNG (DO RIÊNG TÀI KHOẢN trantuandai2508 CẤU HÌNH)
-  // NẾU TAB BỊ ẨN -> KHÔNG MỘT USER NÀO XEM ĐƯỢC KỂ CẢ ADMIN
-  // CHỈ RIÊNG TÀI KHOẢN trantuandai2508 MỚI ĐƯỢC PHÉP TRUY CẬP VÀ MỞ LẠI
-  const isMasterUser = user && user.email && (user.email.toLowerCase().trim() === 'trantuandai2508@gmail.com' || user.email.toLowerCase().includes('trantuandai2508'));
+  // NẾU TAB BỊ ẨN -> KHÔNG MỘT USER NÀO XEM ĐƯỢC KỂ CẢ ADMIN VÀ MASTER USER KHI DUYỆT GIAO DIỆN
+  // CHỈ RIÊNG TÀI KHOẢN trantuandai2508 MỚI ĐƯỢC PHÉP TRUY CẬP VÀO MODAL CẤU HÌNH ĐỂ MỞ LẠI
   try {
     const { rows: tabRows } = await db.query(env, `SELECT tab_id, is_hidden FROM system_tab_visibility`).catch(() => ({ rows: [] }));
     const hiddenTabRows = (tabRows || []).filter(r => r.is_hidden === 1 || r.is_hidden === true || r.is_hidden === '1');
     if (hiddenTabRows && hiddenTabRows.length > 0) {
       hiddenTabRows.forEach(row => {
         const tId = row.tab_id;
-        if (!isMasterUser) {
-          // Bất kỳ user nào khác (kể cả role ADMIN hay vai trò nào) đều bị cắt quyền tuyệt đối
-          permissions[tId] = {
-            canView: false,
-            canCreate: false,
-            canEdit: false,
-            canDelete: false,
-            isRevoked: true,
-            isGloballyHidden: true
-          };
-        } else {
-          // Đối với riêng tài khoản Master trantuandai2508: vẫn có thể xem và quản lý
-          if (permissions[tId]) {
-            permissions[tId].isGloballyHidden = true;
-          } else {
-            permissions[tId] = { canView: true, canCreate: true, canEdit: true, canDelete: true, isGloballyHidden: true };
-          }
-        }
+        // Bất kỳ người dùng nào (kể cả ADMIN và Master User khi duyệt webapp) đều bị ẩn tab
+        permissions[tId] = {
+          canView: false,
+          canCreate: false,
+          canEdit: false,
+          canDelete: false,
+          isRevoked: true,
+          isGloballyHidden: true
+        };
       });
     }
   } catch (err) {
