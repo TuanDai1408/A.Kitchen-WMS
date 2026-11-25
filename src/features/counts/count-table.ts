@@ -71,6 +71,21 @@ export function onFnbCountDateChange(): void {
 
 export function onFnbCountSiteChange(): void {
   const sel = document.getElementById('fnbCountSiteSelect') as HTMLSelectElement | null;
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  const curUser = w.gCurrentUser;
+  const userAssignedSite = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
+
+  if (typeof w.canUserSwitchSite === 'function' && !w.canUserSwitchSite(curUser)) {
+    if (sel) sel.value = userAssignedSite;
+    if (typeof w.openRequestAccessForSite === 'function') {
+      w.openRequestAccessForSite();
+    }
+    if (typeof (window as any).showToast === 'function') {
+      (window as any).showToast(`Điểm bán của bạn được cố định là ${userAssignedSite}. Bạn cần xin cấp quyền để chuyển điểm bán!`, 'warning');
+    }
+    return;
+  }
+
   if (sel && sel.value && sel.value !== 'all') {
     try { localStorage.setItem('orbit_user_site', sel.value); } catch {}
     const gb = document.getElementById('globalBranchSelect') as HTMLSelectElement | null;

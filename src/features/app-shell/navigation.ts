@@ -146,6 +146,11 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
     requestAnimationFrame(() => {
       setTimeout(() => {
         const w = typeof window !== 'undefined' ? (window as any) : {};
+        const savedSite = (w.gCurrentUser && w.gCurrentUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
+        const canSwitch = typeof w.canUserSwitchSite === 'function' ? w.canUserSwitchSite(w.gCurrentUser) : (w.gCurrentUser?.role === 'ADMIN');
+        if (!canSwitch && App.currentBranch !== savedSite.toLowerCase()) {
+          onGlobalBranchChange(savedSite);
+        }
 
         // Orbit Siba F&B Tab Hooks
         if (tabId === 'fnb-chain' && typeof w.loadFnbChain === 'function') w.loadFnbChain();
@@ -195,15 +200,29 @@ export function onGlobalMonthChange(val: string): void {
 }
 
 export function onGlobalBranchChange(code?: string): void {
-  if (!code) code = 'ALL';
-  App.currentBranch = code.toLowerCase();
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  const curUser = w.gCurrentUser;
+  const userAssignedSite = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
+
+  // Kiểm tra quyền hạn chuyển đổi cơ sở
+  const canSwitch = typeof w.canUserSwitchSite === 'function' ? w.canUserSwitchSite(curUser) : (curUser?.role === 'ADMIN');
+  const targetCode = (!canSwitch || !code) ? userAssignedSite : code;
+
+  // Luôn lưu bền vững site vào localStorage
+  if (targetCode && targetCode !== 'ALL') {
+    try {
+      localStorage.setItem('orbit_user_site', targetCode);
+      if (curUser) curUser.assignedSite = targetCode;
+    } catch (e) {}
+  }
+
+  App.currentBranch = targetCode.toLowerCase();
   invalidateTabCache();
 
-  const w = typeof window !== 'undefined' ? (window as any) : {};
   const sites = typeof w.getAppSitesList === 'function' ? w.getAppSitesList() : gFnbSitesList;
-  const siteObj = sites.find((s: any) => s.code.toLowerCase() === code?.toLowerCase());
-  const region = siteObj ? siteObj.region : (code === 'ALL' ? 'Toàn Quốc' : 'Miền Nam');
-  const siteName = siteObj ? siteObj.name : (code === 'ALL' ? 'Tất Cả Điểm Bán (Chuỗi)' : code);
+  const siteObj = sites.find((s: any) => s.code.toLowerCase() === targetCode.toLowerCase());
+  const region = siteObj ? siteObj.region : (targetCode === 'ALL' ? 'Toàn Quốc' : 'Miền Nam');
+  const siteName = siteObj ? siteObj.name : (targetCode === 'ALL' ? 'Tất Cả Điểm Bán (Chuỗi)' : targetCode);
 
   // 1. Update Taskbar Interactive Display Pill
   const taskbarRegion = document.getElementById('taskbarRegionBadge');
@@ -220,19 +239,30 @@ export function onGlobalBranchChange(code?: string): void {
     taskbarName.textContent = siteName;
   }
 
+  // Update header control title based on permission
+  const headerSiteControl = taskbarName?.closest('.header-control');
+  if (headerSiteControl) {
+    if (!canSwitch) {
+      headerSiteControl.setAttribute('title', `Điểm bán phụ trách: ${siteName} (Cố định theo tài khoản - Click để xin đổi cơ sở)`);
+    } else {
+      headerSiteControl.setAttribute('title', 'Bấm để đổi Điểm bán & Vùng miền phụ trách');
+    }
+  }
+
   // 2. Sync hidden #globalBranchSelect
   const branchSel = document.getElementById('globalBranchSelect') as HTMLSelectElement | null;
   if (branchSel) {
-    branchSel.innerHTML = `<option value="${code}" selected>${code}</option>`;
-    branchSel.value = code;
+    branchSel.innerHTML = `<option value="${targetCode}" selected>${targetCode}</option>`;
+    branchSel.value = targetCode;
   }
 
-  // 2b. Sync Site Selectors across Stock, Counts, Receipts, Waste, Wh-Inventory, Wh-ReceivedOrders
-  const targetSite = (code && code !== 'ALL') ? code : (localStorage.getItem('orbit_user_site') || 'K001');
+  // 2b. Sync Site Selectors across Stock, Counts, Receipts, Waste, Wh-Inventory, Wh-ReceivedOrders, Kitchen-Issue, etc.
+  const targetSite = (targetCode && targetCode !== 'ALL') ? targetCode : userAssignedSite;
   const allSiteSelectIds = [
     'fnbStockFilterSite', 'fnbCountSiteSelect', 'fnbReceiptFilterSite', 
     'fnbWasteFilterSite', 'receiptModalSite', 'wasteModalSite',
-    'whInvSiteSelect', 'whReceivedOrdersSiteFilter'
+    'whInvSiteSelect', 'whReceivedOrdersSiteFilter',
+    'kitchenIssueSiteSelect', 'ctSite', 'scSite', 'orderSite', 'hsSite', 'bcSite', 'kkSite'
   ];
   allSiteSelectIds.forEach(id => {
     const el = document.getElementById(id) as HTMLSelectElement | null;
@@ -258,6 +288,7 @@ export function onGlobalBranchChange(code?: string): void {
       }
     }
   });
+
   if (w.gFnbStockFilter) w.gFnbStockFilter.site = targetSite.toUpperCase();
 
   // Sync site badges in page headers
@@ -269,6 +300,13 @@ export function onGlobalBranchChange(code?: string): void {
   if (ropBadge) ropBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
   const hsBadge = document.getElementById('hsCurrentSiteBadge');
   if (hsBadge) hsBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
+
+  // Sync tab Xuất kho sử dụng badge
+  const kitchenBadge = document.getElementById('kitchenIssueCurrentSiteBadge');
+  if (kitchenBadge) {
+    const label = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
+    kitchenBadge.textContent = label.startsWith(targetSite) ? label : `${targetSite} - ${label}`;
+  }
 
   // 3. Update all tab badges
   document.querySelectorAll('.global-tab-region-badge').forEach(el => {

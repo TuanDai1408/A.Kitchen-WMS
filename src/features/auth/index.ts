@@ -36,7 +36,8 @@ import {
   updateSelectedSiteLabel,
   checkAndPromptUserSite,
   openSiteSelectorModal,
-  saveSiteSelection
+  saveSiteSelection,
+  canUserSwitchSite
 } from './sites-modal';
 
 import {
@@ -45,6 +46,7 @@ import {
   pendingRequestFeatureName,
   openRequestAccessModal,
   closeRequestAccessModal,
+  openRequestAccessForSite,
   submitRequestAccess,
   checkPendingAccessRequests,
   openAdminApprovalModal,
@@ -156,6 +158,7 @@ if (typeof window !== 'undefined') {
   w.checkAndPromptUserSite = checkAndPromptUserSite;
   w.openSiteSelectorModal = openSiteSelectorModal;
   w.saveSiteSelection = saveSiteSelection;
+  w.canUserSwitchSite = canUserSwitchSite;
 
   // Access Requests & Admin Approval
   w.cachedAccessRequests = cachedAccessRequests;
@@ -163,6 +166,7 @@ if (typeof window !== 'undefined') {
   w.pendingRequestFeatureName = pendingRequestFeatureName;
   w.openRequestAccessModal = openRequestAccessModal;
   w.closeRequestAccessModal = closeRequestAccessModal;
+  w.openRequestAccessForSite = openRequestAccessForSite;
   w.submitRequestAccess = submitRequestAccess;
   w.checkPendingAccessRequests = checkPendingAccessRequests;
   w.openAdminApprovalModal = openAdminApprovalModal;

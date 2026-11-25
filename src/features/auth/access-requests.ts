@@ -46,6 +46,44 @@ export function closeRequestAccessModal(): void {
   document.getElementById('requestAccessModal')?.classList.add('hidden');
 }
 
+export function openRequestAccessForSite(targetSite?: string): void {
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  const curUser = w.gCurrentUser || gCurrentUser;
+  if (!curUser) {
+    if (typeof w.openGoogleAuthModal === 'function') {
+      w.openGoogleAuthModal(true);
+    }
+    return;
+  }
+
+  const currentSite = localStorage.getItem('orbit_user_site') || curUser.assignedSite || 'K001';
+  pendingRequestFeature = 'switch_site';
+  pendingRequestFeatureName = 'Chuyển Đổi Điểm Bán / Quản Lý Đa Site';
+
+  const featEl = document.getElementById('reqFeatureName');
+  const descEl = document.getElementById('reqFeatureDesc');
+  const roleSel = document.getElementById('reqRoleSelect') as HTMLSelectElement | null;
+  const userEl = document.getElementById('reqUserName');
+  const emailEl = document.getElementById('reqUserEmail');
+  const reasonEl = document.getElementById('reqReasonInput') as HTMLTextAreaElement | null;
+
+  if (featEl) featEl.textContent = 'Quyền Chuyển Đổi Điểm Bán / Đa Cơ Sở';
+  if (descEl) {
+    descEl.textContent = `Tài khoản của bạn đang được cố định tại điểm bán [${currentSite}]. Để đổi sang cơ sở khác hoặc thao tác trên nhiều điểm bán, bạn cần gửi yêu cầu để Admin phê duyệt cấp quyền.`;
+  }
+  if (roleSel) roleSel.value = curUser.role || 'BEP_TRUONG';
+  if (userEl) userEl.textContent = curUser.fullName || 'Người dùng';
+  if (emailEl) emailEl.textContent = curUser.email;
+  if (reasonEl) {
+    reasonEl.value = targetSite 
+      ? `Xin cấp quyền chuyển sang cơ sở phụ trách: ${targetSite}`
+      : `Xin cấp quyền chuyển đổi điểm bán phụ trách để thực hiện xuất nhập kho và kiểm kê.`;
+  }
+
+  document.getElementById('requestAccessModal')?.classList.remove('hidden');
+  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+}
+
 export async function submitRequestAccess(): Promise<void> {
   if (!gCurrentUser) return;
   const roleSel = document.getElementById('reqRoleSelect') as HTMLSelectElement | null;

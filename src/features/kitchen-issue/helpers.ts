@@ -28,18 +28,38 @@ export function getSiteFullLabel(siteCode?: string): string {
 }
 
 export function getActiveKitchenIssueSite(): string {
-  const sel = document.getElementById('kitchenIssueSiteSelect') as HTMLSelectElement | null;
-  if (sel && sel.value) return sel.value;
-
   try {
     const saved = localStorage.getItem('orbit_user_site');
-    if (saved) return saved.toUpperCase();
+    if (saved && saved.trim()) return saved.trim().toUpperCase();
   } catch (e) {}
+
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (w.gCurrentUser && w.gCurrentUser.assignedSite) {
+    return w.gCurrentUser.assignedSite.trim().toUpperCase();
+  }
+
+  const sel = document.getElementById('kitchenIssueSiteSelect') as HTMLSelectElement | null;
+  if (sel && sel.value) return sel.value.trim().toUpperCase();
 
   return 'K001';
 }
 
+export function updateKitchenIssueSiteDisplay(siteCode?: string): void {
+  const code = (siteCode || getActiveKitchenIssueSite()).toUpperCase();
+  const label = getSiteFullLabel(code);
+  const badgeEl = document.getElementById('kitchenIssueCurrentSiteBadge');
+  if (badgeEl) {
+    badgeEl.textContent = label;
+  }
+  const sel = document.getElementById('kitchenIssueSiteSelect') as HTMLSelectElement | null;
+  if (sel) {
+    sel.innerHTML = `<option value="${code}" selected>${code}</option>`;
+    sel.value = code;
+  }
+}
+
 export function populateKitchenIssueSiteDropdown(): void {
+  updateKitchenIssueSiteDisplay();
   const sel = document.getElementById('kitchenIssueSiteSelect') as HTMLSelectElement | null;
   if (!sel) return;
 

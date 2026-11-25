@@ -1,6 +1,7 @@
 import { AuthSiteOption } from './types';
-import { DEFAULT_SITES_LIST } from './constants';
+import { DEFAULT_SITES_LIST, isMasterAccount } from './constants';
 import { gCurrentUser, saveAccountToList } from './accounts';
+import { openRequestAccessForSite } from './access-requests';
 
 export let selectedModalRegion: string = 'ALL';
 export let tempSelectedSite: string = 'K001';
@@ -151,31 +152,60 @@ export function updateSelectedSiteLabel(siteCode: string): void {
   lbl.textContent = siteObj ? `Đã chọn: [${siteObj.region}] ${siteObj.name}` : `Đã chọn: ${siteCode}`;
 }
 
-export function checkAndPromptUserSite(forceOpen: boolean = false): void {
-  let savedSite = localStorage.getItem('orbit_user_site');
-  if (!savedSite && gCurrentUser && gCurrentUser.assignedSite) {
-    savedSite = gCurrentUser.assignedSite;
-    try { localStorage.setItem('orbit_user_site', savedSite); } catch (e) {}
+/**
+ * Kiểm tra quyền hạn chuyển đổi cơ sở phụ trách của user:
+ * Chỉ Admin (trantuandai2508@gmail.com hoặc role ADMIN) hoặc tài khoản có quyền all_sites/switch_site mới được đổi.
+ */
+export function canUserSwitchSite(user?: any): boolean {
+  const curUser = user || (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
+  if (!curUser) return false;
+  if (isMasterAccount(curUser.email)) return true;
+  if (curUser.role === 'ADMIN') return true;
+  if (curUser.permissions && (curUser.permissions['all_sites']?.canView || curUser.permissions['switch_site']?.canView || curUser.permissions['chuyen_site']?.canView)) {
+    return true;
   }
+  return false;
+}
+
+/**
+ * Khởi tạo & kiểm tra site khi user đăng nhập hoặc truy cập webapp:
+ * Luôn nạp đúng site đã gán cho tài khoản để không bị nhầm lẫn.
+ */
+export function checkAndPromptUserSite(forceOpen: boolean = false): void {
+  const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
+  let savedSite = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site');
   if (!savedSite) {
     savedSite = 'K001';
-    try { localStorage.setItem('orbit_user_site', savedSite); } catch (e) {}
   }
+  try {
+    localStorage.setItem('orbit_user_site', savedSite);
+    if (curUser) curUser.assignedSite = savedSite;
+  } catch (e) {}
 
-  if (forceOpen) {
+  if (forceOpen && canUserSwitchSite(curUser)) {
     openSiteSelectorModal();
   } else {
-    const branchSel = document.getElementById('globalBranchSelect') as HTMLSelectElement | null;
-    if (branchSel && branchSel.value !== savedSite) {
-      branchSel.value = savedSite;
-      if (typeof onGlobalBranchChange === 'function') {
-        onGlobalBranchChange(savedSite);
-      }
+    if (typeof onGlobalBranchChange === 'function') {
+      onGlobalBranchChange(savedSite);
     }
   }
 }
 
+/**
+ * Mở modal chọn điểm bán:
+ * Nếu là user không có quyền -> Chuyển sang modal xin cấp quyền chuyển cơ sở.
+ */
 export function openSiteSelectorModal(): void {
+  const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
+  if (!canUserSwitchSite(curUser)) {
+    const assigned = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
+    openRequestAccessForSite();
+    if (typeof showToast === 'function') {
+      showToast(`Điểm bán của bạn đã được cố định là [${assigned}]. Vui lòng gửi yêu cầu nếu bạn cần chuyển cơ sở!`, 'warning');
+    }
+    return;
+  }
+
   const modal = document.getElementById('siteSelectorModal');
   if (!modal) return;
   renderSitesOptions();
@@ -183,20 +213,31 @@ export function openSiteSelectorModal(): void {
   if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
 
+/**
+ * Lưu điểm bán khi Admin / người có quyền chọn đổi:
+ * Tự động cập nhật localStorage và đồng bộ tất cả bộ lọc các tab.
+ */
 export function saveSiteSelection(): void {
   const site = tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
   localStorage.setItem('orbit_user_site', site);
   if (gCurrentUser) {
     gCurrentUser.assignedSite = site;
     saveAccountToList(gCurrentUser);
+    try {
+      localStorage.setItem('orbit_user', JSON.stringify(gCurrentUser));
+    } catch (e) {}
+  }
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (w.gCurrentUser) {
+    w.gCurrentUser.assignedSite = site;
   }
 
   const branchSel = document.getElementById('globalBranchSelect') as HTMLSelectElement | null;
   if (branchSel) {
     branchSel.value = site;
-    if (typeof onGlobalBranchChange === 'function') {
-      onGlobalBranchChange(site);
-    }
+  }
+  if (typeof onGlobalBranchChange === 'function') {
+    onGlobalBranchChange(site);
   }
 
   document.getElementById('siteSelectorModal')?.classList.add('hidden');
