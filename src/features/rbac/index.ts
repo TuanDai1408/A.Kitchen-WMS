@@ -38,6 +38,8 @@ import {
   canDeleteVouchers,
   openEditVoucherModal,
   closeEditVoucherModal,
+  onSelectEditVoucherFiles,
+  removeEditVoucherFile,
   saveEditVoucher,
   confirmDeleteVoucher,
   closeDeleteVoucherModal,
@@ -92,6 +94,8 @@ if (typeof window !== 'undefined') {
   w.canDeleteVouchers = canDeleteVouchers;
   w.openEditVoucherModal = openEditVoucherModal;
   w.closeEditVoucherModal = closeEditVoucherModal;
+  w.onSelectEditVoucherFiles = onSelectEditVoucherFiles;
+  w.removeEditVoucherFile = removeEditVoucherFile;
   w.saveEditVoucher = saveEditVoucher;
   w.confirmDeleteVoucher = confirmDeleteVoucher;
   w.closeDeleteVoucherModal = closeDeleteVoucherModal;

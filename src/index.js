@@ -2700,7 +2700,7 @@ export default {
         }
 
         const body = await request.json();
-        const { maCT, site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu } = body;
+        const { maCT, site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu, files, updateFiles } = body;
         if (!maCT) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu mã chứng từ cần cập nhật' }), { status: 400, headers: corsHeaders });
         }
@@ -2710,28 +2710,57 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ trong hệ thống' }), { status: 404, headers: corsHeaders });
         }
 
-        await db.query(env, `
-          UPDATE chung_tu SET
-            site_name = COALESCE(?, site_name),
-            invoice_type = COALESCE(?, invoice_type),
-            invoice_date = COALESCE(?, invoice_date),
-            receive_date = COALESCE(?, receive_date),
-            supplier_name = ?,
-            deliverer_name = ?,
-            receiver_name = ?,
-            note = ?
-          WHERE voucher_code = ?
-        `, [
-          site || null,
-          loaiHoaDon || null,
-          ngayXuat || null,
-          ngayNhan || null,
-          nhaCungCap !== undefined ? nhaCungCap : '',
-          nguoiGiao !== undefined ? nguoiGiao : '',
-          nguoiNhan !== undefined ? nguoiNhan : '',
-          ghiChu !== undefined ? ghiChu : '',
-          maCT
-        ]);
+        const nowStr = formatDate(new Date());
+        const shouldUpdateFiles = updateFiles === true || Array.isArray(files);
+        const normalizedFiles = Array.isArray(files) ? files.filter(f => f && (f.url || f.file_link)) : [];
+        const firstLink = normalizedFiles.length > 0 ? (normalizedFiles[0].url || normalizedFiles[0].file_link || '') : '';
+
+        await db.withTransaction(env, async (tx) => {
+          await tx.exec(`
+            UPDATE chung_tu SET
+              site_name = COALESCE(?, site_name),
+              invoice_type = COALESCE(?, invoice_type),
+              invoice_date = COALESCE(?, invoice_date),
+              receive_date = COALESCE(?, receive_date),
+              supplier_name = ?,
+              deliverer_name = ?,
+              receiver_name = ?,
+              note = ?
+              ${shouldUpdateFiles ? ', attachment_link = ?' : ''}
+            WHERE voucher_code = ?
+          `, shouldUpdateFiles ? [
+            site || null,
+            loaiHoaDon || null,
+            ngayXuat || null,
+            ngayNhan || null,
+            nhaCungCap !== undefined ? nhaCungCap : '',
+            nguoiGiao !== undefined ? nguoiGiao : '',
+            nguoiNhan !== undefined ? nguoiNhan : '',
+            ghiChu !== undefined ? ghiChu : '',
+            firstLink,
+            maCT
+          ] : [
+            site || null,
+            loaiHoaDon || null,
+            ngayXuat || null,
+            ngayNhan || null,
+            nhaCungCap !== undefined ? nhaCungCap : '',
+            nguoiGiao !== undefined ? nguoiGiao : '',
+            nguoiNhan !== undefined ? nguoiNhan : '',
+            ghiChu !== undefined ? ghiChu : '',
+            maCT
+          ]);
+
+          if (shouldUpdateFiles) {
+            await tx.exec(`DELETE FROM chung_tu_file WHERE voucher_code = ?`, [maCT]);
+            for (const f of normalizedFiles) {
+              await tx.exec(`
+                INSERT INTO chung_tu_file (voucher_code, file_name, file_link, file_type, upload_date)
+                VALUES (?, ?, ?, ?, ?)
+              `, [maCT, f.name || f.file_name || 'Tài liệu', f.url || f.file_link || '', f.type || f.file_type || 'IMAGE', nowStr]);
+            }
+          }
+        });
 
         invalidateMemoryCache('/api/vouchers');
         return new Response(JSON.stringify({ success: true, message: 'Đã cập nhật chứng từ thành công', data: { maCT } }), { headers: corsHeaders });

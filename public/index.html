@@ -5079,12 +5079,19 @@
           <textarea id="editVoucherGhiChu" rows="2" placeholder="Ghi chú thêm về chứng từ..." class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
         </div>
 
-        <div id="editVoucherFilesSection" class="pt-3 border-t border-gray-100 dark:border-gray-800">
-          <div class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
-            <span>Tệp đính kèm hiện có</span>
-            <span id="editVoucherFilesCount" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">0 tệp</span>
+        <div id="editVoucherFilesSection" class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2.5">
+          <div class="font-semibold text-gray-700 dark:text-gray-300 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span>Ảnh & Tệp đính kèm (Supabase Storage)</span>
+              <span id="editVoucherFilesCount" class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">0 tệp</span>
+            </div>
+            <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 text-brand-700 dark:text-brand-300 font-bold text-xs border border-brand-200 dark:border-brand-800 transition-colors">
+              <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
+              <span>Thêm ảnh / tệp</span>
+              <input type="file" id="editVoucherNewFilesInput" multiple accept="image/*,.pdf" class="hidden" onchange="onSelectEditVoucherFiles(this)">
+            </label>
           </div>
-          <div id="editVoucherFilesList" class="space-y-1.5 max-h-36 overflow-y-auto custom-scrollbar">
+          <div id="editVoucherFilesList" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar">
           </div>
         </div>
       </div>

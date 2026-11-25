@@ -1,8 +1,17 @@
 import { CurrentUserSession } from './types';
 import { cellCode, cellDate, cellBadge, cellFiles, cellPerson, cellSite, fmtDate } from '@/features/portal/helpers';
 import { canUserEdit, canUserDelete, isMasterAccount, assertPermission } from '@/features/auth';
+import { uploadVoucherFileToSupabase, resolveVoucherImageThumbUrl, isImageFile } from '@/features/portal/supabase-storage';
 
 export let _pendingDeleteVoucherCode: string | null = null;
+export let _editVoucherFiles: Array<{
+  file_name: string;
+  file_link: string;
+  file_type: string;
+  file?: File;
+  previewUrl?: string;
+  isNew?: boolean;
+}> = [];
 
 declare const showLoading: (msg?: string) => void;
 declare const hideLoading: () => void;
@@ -94,22 +103,16 @@ export async function openEditVoucherModal(maCT: string): Promise<void> {
     const ghiChuEl = document.getElementById('editVoucherGhiChu') as HTMLInputElement | null;
     if (ghiChuEl) ghiChuEl.value = v.note || '';
 
-    const filesCountEl = document.getElementById('editVoucherFilesCount');
-    const filesListEl = document.getElementById('editVoucherFilesList');
     const files = v.files || [];
-    if (filesCountEl) filesCountEl.textContent = `${files.length} tệp`;
-    if (filesListEl) {
-      if (!files.length) {
-        filesListEl.innerHTML = '<div class="text-gray-400 italic text-[11px] py-1">Không có tệp đính kèm nào</div>';
-      } else {
-        filesListEl.innerHTML = files.map((f: any) => `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-xs">
-            <span class="truncate text-gray-700 dark:text-gray-300 font-medium" title="${f.file_name}">${f.file_name}</span>
-            <a href="${f.file_link}" target="_blank" class="text-brand-600 hover:underline shrink-0 ml-2 font-medium">Xem</a>
-          </div>
-        `).join('');
-      }
-    }
+    _editVoucherFiles = files.map((f: any) => ({
+      file_name: f.file_name || 'Tệp đính kèm',
+      file_link: f.file_link || '',
+      file_type: f.file_type || '',
+      isNew: false
+    }));
+    const newFilesInput = document.getElementById('editVoucherNewFilesInput') as HTMLInputElement | null;
+    if (newFilesInput) newFilesInput.value = '';
+    renderEditVoucherFilesList();
 
     const modal = document.getElementById('modalEditVoucher');
     if (modal) modal.classList.remove('hidden');
@@ -124,7 +127,91 @@ export async function openEditVoucherModal(maCT: string): Promise<void> {
   }
 }
 
+export function renderEditVoucherFilesList(): void {
+  const filesCountEl = document.getElementById('editVoucherFilesCount');
+  const filesListEl = document.getElementById('editVoucherFilesList');
+  if (filesCountEl) filesCountEl.textContent = `${_editVoucherFiles.length} tệp`;
+  if (!filesListEl) return;
+
+  if (!_editVoucherFiles.length) {
+    filesListEl.innerHTML = '<div class="text-gray-400 italic text-[11px] py-2 text-center border border-dashed border-gray-200 dark:border-gray-700 rounded-xl">Chưa có ảnh hoặc tệp đính kèm nào. Bấm "Thêm ảnh / tệp" để tải lên Supabase.</div>';
+    return;
+  }
+
+  filesListEl.innerHTML = _editVoucherFiles.map((f, idx) => {
+    const thumb = f.previewUrl || resolveVoucherImageThumbUrl(f);
+    const viewHref = f.previewUrl || f.file_link;
+    return `
+      <div class="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-xs gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0">
+          ${thumb ? `
+            <img src="${thumb}" alt="${f.file_name}" class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700 shrink-0 cursor-pointer" onclick="openImageLightbox('${viewHref}', '${f.file_name}', '${f.file_type || 'image/jpeg'}')">
+          ` : `
+            <div class="w-10 h-10 rounded-lg bg-gray-200/70 dark:bg-gray-700 flex items-center justify-center shrink-0">
+              <i data-lucide="file-text" class="w-4 h-4 text-gray-500"></i>
+            </div>
+          `}
+          <div class="min-w-0">
+            <div class="truncate text-gray-700 dark:text-gray-200 font-semibold" title="${f.file_name}">${f.file_name}</div>
+            <div class="text-[10px] ${f.isNew ? 'text-brand-600 dark:text-brand-400 font-bold' : 'text-gray-400'}">
+              ${f.isNew ? 'Ảnh/tệp mới (chờ lưu lên Supabase)' : 'Đã lưu trên hệ thống'}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          ${viewHref ? `<button type="button" onclick="openImageLightbox('${viewHref}', '${f.file_name}', '${f.file_type || 'image/jpeg'}')" class="text-brand-600 hover:underline font-bold">Xem</button>` : ''}
+          <button type="button" onclick="removeEditVoucherFile(${idx})" class="text-rose-600 hover:text-rose-700 font-bold px-1.5 py-0.5 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40">Xóa</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+    lucide.createIcons();
+  }
+}
+
+export function onSelectEditVoucherFiles(input: HTMLInputElement): void {
+  const files = Array.from(input.files || []);
+  const maxBytes = 20 * 1024 * 1024; // 20MB
+  files.forEach((f) => {
+    if (f.size > maxBytes) {
+      if (typeof showToast === 'function') {
+        showToast(`File "${f.name}" vượt quá 20MB, vui lòng chọn file nhỏ hơn.`, 'warning');
+      }
+      return;
+    }
+    const isImg = isImageFile(f.name, f.type);
+    const previewUrl = isImg ? URL.createObjectURL(f) : undefined;
+    _editVoucherFiles.push({
+      file_name: f.name,
+      file_link: '',
+      file_type: f.type || 'application/octet-stream',
+      file: f,
+      previewUrl,
+      isNew: true
+    });
+  });
+  renderEditVoucherFilesList();
+  input.value = '';
+}
+
+export function removeEditVoucherFile(idx: number): void {
+  const removed = _editVoucherFiles[idx];
+  if (removed && removed.previewUrl && removed.previewUrl.startsWith('blob:')) {
+    try { URL.revokeObjectURL(removed.previewUrl); } catch {}
+  }
+  _editVoucherFiles.splice(idx, 1);
+  renderEditVoucherFilesList();
+}
+
 export function closeEditVoucherModal(): void {
+  _editVoucherFiles.forEach((f) => {
+    if (f.previewUrl && f.previewUrl.startsWith('blob:')) {
+      try { URL.revokeObjectURL(f.previewUrl); } catch {}
+    }
+  });
+  _editVoucherFiles = [];
   const modal = document.getElementById('modalEditVoucher');
   if (modal) modal.classList.add('hidden');
 }
@@ -155,6 +242,27 @@ export async function saveEditVoucher(): Promise<void> {
   }
 
   try {
+    const finalFiles: Array<{ name: string; url: string; type: string }> = [];
+    const newFilesCount = _editVoucherFiles.filter(f => f.isNew && f.file).length;
+    let uploadedIdx = 0;
+
+    for (const item of _editVoucherFiles) {
+      if (item.isNew && item.file) {
+        uploadedIdx++;
+        if (saveBtn) {
+          saveBtn.innerHTML = `<span class="inline-block animate-spin mr-1">⌛</span> Đang tải ảnh (${uploadedIdx}/${newFilesCount})...`;
+        }
+        const uploaded = await uploadVoucherFileToSupabase(item.file, site || 'chung-tu');
+        finalFiles.push({ name: uploaded.name, url: uploaded.url, type: uploaded.type });
+      } else if (item.file_link) {
+        finalFiles.push({
+          name: item.file_name,
+          url: item.file_link,
+          type: item.file_type || 'IMAGE'
+        });
+      }
+    }
+
     const res = await fetch('/api/voucher', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -167,7 +275,9 @@ export async function saveEditVoucher(): Promise<void> {
         nhaCungCap,
         nguoiGiao,
         nguoiNhan,
-        ghiChu
+        ghiChu,
+        updateFiles: true,
+        files: finalFiles
       })
     });
     const json = await res.json();
@@ -415,12 +525,7 @@ export async function viewVoucherDetail(maCT: string): Promise<void> {
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               ${v.files.map((f: any) => {
-                const driveMatch = f.file_link && f.file_link.match(/\/d\/([^/?]+)/);
-                const driveId = driveMatch ? driveMatch[1] : null;
-                const isImg = (f.file_type && f.file_type.startsWith('image/')) ||
-                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_name || '') ||
-                              /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.file_link || '');
-                const thumbUrl = (driveId && isImg) ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w600` : '';
+                const thumbUrl = resolveVoucherImageThumbUrl(f);
 
                 return `
                   <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 flex flex-col justify-between gap-2 shadow-2xs">
@@ -442,7 +547,7 @@ export async function viewVoucherDetail(maCT: string): Promise<void> {
                         <button onclick="openImageLightbox('${f.file_link}', '${f.file_name}', '${f.file_type}')" class="btn btn-sm btn-primary">
                           Xem
                         </button>
-                        <a href="${f.file_link}" target="_blank" class="btn btn-sm btn-secondary p-1" title="Mở Drive tab mới">
+                        <a href="${f.file_link}" target="_blank" class="btn btn-sm btn-secondary p-1" title="Mở tệp trong tab mới">
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                         </a>
                       </div>

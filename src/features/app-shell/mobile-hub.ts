@@ -174,8 +174,8 @@ export function openImageLightbox(fileLink: string, fileName?: string, fileType?
   const driveId = driveMatch ? driveMatch[1] : null;
 
   const isImg = (fileType && fileType.startsWith('image/')) ||
-    /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileName || '') ||
-    /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(fileLink || '');
+    /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i.test(fileName || '') ||
+    /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i.test(fileLink || '');
 
   if (driveId) {
     if (isImg) {

@@ -4,6 +4,7 @@ export interface VoucherFileItem {
   type?: string;
   url?: string;
   previewUrl?: string;
+  file?: File;
 }
 
 export interface VoucherPayload {
