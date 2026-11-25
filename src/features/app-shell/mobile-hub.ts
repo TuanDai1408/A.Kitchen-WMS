@@ -128,6 +128,31 @@ export function switchFromHub(tabId: string): void {
   }
 }
 
+const MOBILE_GROUP_TABS: Record<string, string[]> = {
+  'fnb': ['fnb-chain', 'fnb-pl', 'fnb-pos'],
+  'kho-van': ['wh-dashboard', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-counts', 'fnb-stock', 'fnb-waste', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap'],
+  'chung-tu': ['portal-voucher', 'portal-search'],
+  'suat-an': ['portal-baocao', 'portal-order', 'portal-history', 'portal-kiemke']
+};
+
+export function switchMobileGroupTab(groupKey: string): void {
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  const candidates = MOBILE_GROUP_TABS[groupKey] || [];
+  const canAccess = typeof w.canAccessTab === 'function' ? w.canAccessTab : () => true;
+  const target = candidates.find(t => canAccess(t));
+
+  if (target) {
+    if (typeof w.switchTab === 'function') {
+      w.switchTab(target);
+    }
+    return;
+  }
+
+  if (typeof w.showToast === 'function') {
+    w.showToast('Bạn không có quyền truy cập nhóm chức năng này', 'warning');
+  }
+}
+
 export function updateMobileNavState(tabId: string): void {
   // Update mobile header title badge
   const titleEl = document.getElementById('mobileHeaderTitle');
@@ -228,6 +253,7 @@ export function closeImageLightbox(): void {
 }
 
 if (typeof window !== 'undefined') {
+  (window as any).switchMobileGroupTab = switchMobileGroupTab;
   window.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       const hub = document.getElementById('mobileMenuHub');
