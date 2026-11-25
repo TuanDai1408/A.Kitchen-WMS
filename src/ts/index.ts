@@ -7,6 +7,7 @@ export * from '@/ts/utils/formatters';
 export * from '@/ts/api/client';
 export * from '@/features/receipts';
 export * from '@/features/waste';
+export * from '@/features/kitchen-issue';
 export * from '@/features/counts';
 export * from '@/features/stock';
 export * from '@/features/portal-order';

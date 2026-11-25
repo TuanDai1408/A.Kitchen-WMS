@@ -154,6 +154,7 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
         if (tabId === 'fnb-stock' && typeof w.loadFnbStock === 'function') w.loadFnbStock();
         if (tabId === 'fnb-counts' && typeof w.loadFnbCounts === 'function') w.loadFnbCounts();
         if (tabId === 'fnb-receipts' && typeof w.loadFnbReceipts === 'function') w.loadFnbReceipts();
+        if (tabId === 'fnb-kitchen-issue' && typeof w.loadFnbKitchenIssue === 'function') w.loadFnbKitchenIssue();
         if (tabId === 'fnb-waste' && typeof w.loadFnbWaste === 'function') w.loadFnbWaste();
         if (tabId === 'fnb-sites' && typeof w.loadFnbSites === 'function') w.loadFnbSites();
         if (tabId === 'user-matrix' && typeof w.loadUserMatrix === 'function') w.loadUserMatrix();

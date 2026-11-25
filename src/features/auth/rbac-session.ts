@@ -561,16 +561,16 @@ export function canAccessTab(tabId: string): boolean {
   if (financeTabs.includes(tabId)) return false;
 
   if (curUser.role === 'KHO_TRUONG') {
-    return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].includes(tabId);
+    return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].includes(tabId);
   }
   if (curUser.role === 'BEP_TRUONG') {
-    return ['wh-dashboard', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].includes(tabId);
+    return ['wh-dashboard', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].includes(tabId);
   }
   if (curUser.role === 'KE_TOAN') {
     return ['wh-dashboard', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
   }
   if (curUser.role === 'NHAN_VIEN') {
-    return ['wh-dashboard', 'fnb-counts', 'portal-baocao', 'portal-order'].includes(tabId);
+    return ['wh-dashboard', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].includes(tabId);
   }
 
   return false;

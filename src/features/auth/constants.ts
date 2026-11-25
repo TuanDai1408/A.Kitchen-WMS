@@ -37,6 +37,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
       { id: 'wh-dashboard', name: 'Tổng Quan Kho Vận', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi', icon: 'layout-dashboard' },
       { id: 'fnb-counts', name: 'Kiểm Kê Hằng Ngày', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu', icon: 'clipboard-check' },
       { id: 'fnb-receipts', name: 'Nhập Hàng Điểm Bán', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC', icon: 'package-plus' },
+      { id: 'fnb-kitchen-issue', name: 'Xuất Kho Sử Dụng', desc: 'Xuất kho NVL phục vụ bếp theo ca, trừ tồn kho và in phiếu xuất', icon: 'cooking-pot' },
       { id: 'fnb-waste', name: 'Hủy Hàng & Hao Hụt', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế', icon: 'trash-2' }
     ]
   },

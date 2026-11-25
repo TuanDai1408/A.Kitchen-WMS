@@ -104,6 +104,8 @@ const FEATURE_NAME_TO_CODE = {
   'Kiểm kê': 'fnb-counts',
   'fnb-receipts': 'fnb-receipts',
   'Quản Lý Nhập Hàng Điểm Bán': 'fnb-receipts',
+  'fnb-kitchen-issue': 'fnb-kitchen-issue',
+  'Xuất Kho Sử Dụng': 'fnb-kitchen-issue',
   'fnb-waste': 'fnb-waste',
   'Biên Bản Hủy Hàng & Hao Hụt': 'fnb-waste',
   'wh-dashboard': 'wh-dashboard',
@@ -372,7 +374,7 @@ async function ensureSystemTabVisibilityTable(env) {
 
 
 const ALL_SYSTEM_FEATURES = [
-  'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste',
+  'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste',
   'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
   'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
   'fnb-sites', 'user-matrix'
@@ -417,13 +419,13 @@ async function buildUserPermissions(env, user) {
 
     // Quyền cơ bản nếu chưa có trong role_permissions
     if (user.role_code === 'KHO_TRUONG') {
-      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].forEach(f => {
+      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-sites', 'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap', 'portal-kiemke', 'portal-history', 'portal-order', 'portal-baocao'].forEach(f => {
         if (!permissions[f] || !permissions[f].canView) {
           permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
         }
       });
     } else if (user.role_code === 'BEP_TRUONG') {
-      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].forEach(f => {
+      ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste', 'fnb-sites', 'portal-baocao', 'portal-order', 'portal-kiemke', 'portal-history'].forEach(f => {
         if (!permissions[f] || !permissions[f].canView) {
           permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
         }
@@ -435,7 +437,7 @@ async function buildUserPermissions(env, user) {
         }
       });
     } else if (user.role_code === 'NHAN_VIEN') {
-      ['fnb-stock', 'fnb-counts', 'portal-baocao', 'portal-order'].forEach(f => {
+      ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].forEach(f => {
         if (!permissions[f] || !permissions[f].canView) {
           permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
         }
@@ -5347,6 +5349,172 @@ export default {
         }
       }
 
+
+      // 3.9 XUẤT KHO SỬ DỤNG BẾP: GET & POST /api/fnb/kitchen-issues
+      if ((pathname === '/api/fnb/kitchen-issues' || pathname === '/fnb/kitchen-issues')) {
+        // Tự động đảm bảo bảng CSDL tồn tại trên cả Postgres (Supabase) và Cloudflare D1
+        const isPostgres = db.isPg(env);
+        const idType = isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+        const timeType = isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
+
+        try {
+          await db.exec(env, `
+            CREATE TABLE IF NOT EXISTS fnb_kitchen_issues (
+              id ${idType},
+              issue_code TEXT UNIQUE NOT NULL,
+              site_code TEXT NOT NULL,
+              issue_date TEXT NOT NULL,
+              meal_shift TEXT DEFAULT 'Nấu ăn ca trưa',
+              issuer_name TEXT NOT NULL,
+              receiver_name TEXT NOT NULL,
+              total_items INTEGER DEFAULT 0,
+              total_qty REAL DEFAULT 0,
+              total_amount REAL DEFAULT 0,
+              notes TEXT,
+              created_at ${timeType}
+            )
+          `).catch(() => {});
+
+          await db.exec(env, `
+            CREATE TABLE IF NOT EXISTS fnb_kitchen_issue_lines (
+              id ${idType},
+              issue_id INTEGER NOT NULL,
+              item_code TEXT NOT NULL,
+              item_name TEXT NOT NULL,
+              unit TEXT NOT NULL,
+              stock_before REAL DEFAULT 0,
+              qty REAL NOT NULL,
+              unit_price REAL DEFAULT 0,
+              amount REAL DEFAULT 0,
+              notes TEXT,
+              created_at ${timeType}
+            )
+          `).catch(() => {});
+
+          await db.exec(env, 'CREATE INDEX IF NOT EXISTS idx_kissue_site_date ON fnb_kitchen_issues(site_code, issue_date)').catch(() => {});
+          await db.exec(env, 'CREATE INDEX IF NOT EXISTS idx_kissue_lines_iid ON fnb_kitchen_issue_lines(issue_id)').catch(() => {});
+        } catch (e) {}
+
+        if (request.method === 'GET') {
+          const siteCode = searchParams.get('site_code');
+          const issueId = searchParams.get('id');
+
+          if (issueId) {
+            const { rows: issues } = await db.query(env, `SELECT * FROM fnb_kitchen_issues WHERE id = ?`, [issueId]);
+            const issue = issues && issues[0] ? issues[0] : null;
+            if (!issue) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu xuất kho' }), { headers: corsHeaders, status: 404 });
+            }
+            const { rows: lines } = await db.query(env, `SELECT * FROM fnb_kitchen_issue_lines WHERE issue_id = ? ORDER BY id ASC`, [issueId]);
+            return new Response(JSON.stringify({
+              success: true,
+              data: { issue, lines: lines || [] }
+            }), { headers: corsHeaders });
+          }
+
+          let q = `SELECT * FROM fnb_kitchen_issues`;
+          let b = [];
+          if (siteCode && siteCode !== 'all') {
+            q += ` WHERE UPPER(site_code) = UPPER(?)`;
+            b.push(siteCode);
+          }
+          q += ` ORDER BY issue_date DESC, id DESC LIMIT 100`;
+          const { rows: issues } = await db.query(env, q, b);
+
+          return new Response(JSON.stringify({
+            success: true,
+            data: { issues: issues || [] }
+          }), { headers: corsHeaders });
+        }
+
+        if (request.method === 'POST') {
+          try {
+            const body = await request.json();
+            const {
+              site_code,
+              issue_date,
+              meal_shift = 'Nấu ăn ca trưa',
+              issuer_name = 'Bếp trưởng',
+              receiver_name = 'Ca trưởng bếp',
+              notes = '',
+              lines = []
+            } = body;
+
+            if (!site_code || !lines || lines.length === 0) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán hoặc danh sách hàng xuất' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const validIssueDate = issue_date || new Date().toISOString().split('T')[0];
+            const randSuffix = Math.floor(1000 + Math.random() * 9000);
+            const issueCode = `XKSD-${validIssueDate.replace(/-/g, '')}-${randSuffix}`;
+
+            let totalQty = 0;
+            let totalAmount = 0;
+            for (const item of lines) {
+              const q = Number(item.qty) || 0;
+              const p = Number(item.unit_price) || 0;
+              totalQty += q;
+              totalAmount += (q * p);
+            }
+
+            // Insert Header
+            const insertH = await db.queryOne(env, `
+              INSERT INTO fnb_kitchen_issues (issue_code, site_code, issue_date, meal_shift, issuer_name, receiver_name, total_items, total_qty, total_amount, notes)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            `, [issueCode, site_code, validIssueDate, meal_shift, issuer_name, receiver_name, lines.length, totalQty, totalAmount, notes]);
+
+            const issueId = insertH.id;
+
+            // Batch insert lines & update balances in transaction
+            await db.withTransaction(env, async (tx) => {
+              for (const item of lines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
+                const stockBefore = Number(item.stock_before) || 0;
+
+                await tx.exec(`
+                  INSERT INTO fnb_kitchen_issue_lines (issue_id, item_code, item_name, unit, stock_before, qty, unit_price, amount, notes)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [issueId, item.item_code, item.item_name || item.item_code, item.unit || 'Phần', stockBefore, qty, unitPrice, lineAmount, item.notes || '']);
+
+                // Trừ tồn kho hiện hành trong fnb_stock_balances
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                      total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [qty, qty, unitPrice, item.item_code, site_code]);
+
+                // Ghi nhận lịch sử giao dịch biến động kho
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'XUAT_BEP', ?, ?, ?, ?, ?, ?, ?)
+                `, [issueCode, item.item_code, site_code, -qty, unitPrice, -lineAmount, `Xuất kho sử dụng: ${meal_shift} (Nhận: ${receiver_name})`, issuer_name]);
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'Tạo phiếu xuất kho sử dụng thành công!',
+              data: {
+                issue_id: issueId,
+                issue_code: issueCode,
+                total_items: lines.length,
+                total_qty: totalQty,
+                total_amount: totalAmount
+              }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('kitchen-issues POST error:', e);
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+      }
 
       // Fallback: Static Assets
       if (env.ASSETS) {
