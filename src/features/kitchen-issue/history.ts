@@ -15,7 +15,6 @@ export let gKitchenIssueSlips: KitchenIssueSlip[] = [];
 export async function loadKitchenIssueHistory(siteCode?: string): Promise<void> {
   const site = (siteCode || getActiveKitchenIssueSite()).toUpperCase();
   const tbody = document.getElementById('kitchenIssueHistoryBody');
-  const mobileContainer = document.getElementById('kitchenIssueHistoryMobile');
 
   if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 text-xs">Đang tải lịch sử phiếu xuất kho...</td></tr>`;
 

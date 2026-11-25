@@ -1,25 +1,24 @@
 import fs from 'fs';
 
 const html = fs.readFileSync('public/index.html', 'utf8');
+const lines = html.split('\n');
 
-const targetModals = [
-  'generalModal',
-  'createReceiptModal',
-  'modalManualReceipt',
-  'createWasteModal',
-  'modalInventoryDetail',
-  'modalWhItemHistory',
-  'modalWhItemBatches',
-  'modalEditItem',
-  'siteSelectorModal',
-  'addUserModal',
-  'adminApprovalModal'
-];
+const modals = [];
+lines.forEach((line, idx) => {
+  if (line.includes('fixed inset-0') && line.includes('id=')) {
+    const idMatch = line.match(/id="([^"]+)"/);
+    const id = idMatch ? idMatch[1] : 'unknown';
+    // look ahead for inner modal card
+    let innerCard = '';
+    for (let j = idx + 1; j < Math.min(idx + 10, lines.length); j++) {
+      if (lines[j].includes('max-w-')) {
+        innerCard = lines[j].trim();
+        break;
+      }
+    }
+    const maxW = innerCard.match(/max-w-[a-zA-Z0-9_-]+/)?.[0] || 'no max-w';
+    modals.push({ line: idx + 1, id, maxW, innerCard: innerCard.slice(0, 100) });
+  }
+});
 
-for (const id of targetModals) {
-  const p = html.indexOf('id="' + id + '"');
-  if (p === -1) continue;
-  // Get first 1500 chars of this modal
-  console.log(`\n================== ${id} ==================`);
-  console.log(html.slice(p, p + 1200));
-}
+console.log(JSON.stringify(modals, null, 2));

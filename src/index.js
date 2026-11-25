@@ -103,6 +103,8 @@ const FEATURE_NAME_TO_CODE = {
   'Kiểm Kê Điểm Bán': 'fnb-counts',
   'Kiểm kê': 'fnb-counts',
   'fnb-receipts': 'fnb-receipts',
+  'Nhập kho tại site': 'fnb-receipts',
+  'Quản Lý Nhập Kho Tại Site': 'fnb-receipts',
   'Quản Lý Nhập Hàng Điểm Bán': 'fnb-receipts',
   'fnb-kitchen-issue': 'fnb-kitchen-issue',
   'Xuất Kho Sử Dụng': 'fnb-kitchen-issue',
@@ -3459,7 +3461,8 @@ export default {
           // Nhóm 2: Bếp & Tồn Kho Điểm Bán
           { code: 'fnb-stock', name: 'Ma Trận Tồn Kho', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'boxes', color: 'emerald' },
           { code: 'fnb-counts', name: 'Kiểm Kê Hằng Ngày', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'clipboard-check', color: 'emerald' },
-          { code: 'fnb-receipts', name: 'Nhập Hàng Điểm Bán', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'package-plus', color: 'emerald' },
+          { code: 'fnb-receipts', name: 'Nhập kho tại site', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'package-plus', color: 'emerald' },
+          { code: 'fnb-kitchen-issue', name: 'Xuất Kho Sử Dụng', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'cooking-pot', color: 'emerald' },
           { code: 'fnb-waste', name: 'Hủy Hàng & Hao Hụt', group: 'fnb-inventory', groupName: 'Bếp & Tồn Kho Điểm Bán', icon: 'trash-2', color: 'emerald' },
           
           // Nhóm 3: Kho Tổng WMS

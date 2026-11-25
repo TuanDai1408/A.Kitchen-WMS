@@ -1,5 +1,6 @@
 import { gFnbSitesList } from '../app-shell/navigation';
 import { DEFAULT_SITES_LIST } from '../auth/constants';
+export { formatVND, formatNumber } from '../../ts/utils/formatters';
 
 export function getSiteFullLabel(siteCode?: string): string {
   if (!siteCode) return 'K001 - MN Bếp Ăn Đại Học Hùng Vương';
@@ -52,12 +53,4 @@ export function populateKitchenIssueSiteDropdown(): void {
   });
 
   sel.innerHTML = html;
-}
-
-export function formatVND(amount: number): string {
-  return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0)) + ' ₫';
-}
-
-export function formatNumber(val: number): string {
-  return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(val || 0);
 }

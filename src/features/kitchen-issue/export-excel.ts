@@ -182,7 +182,7 @@ async function exportWithExcelJS(issue: KitchenIssueSlip, fileName: string, site
   [8, 9, 10].forEach(rIdx => {
     const row = ws.getRow(rIdx);
     row.height = 20;
-    row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+    row.eachCell({ includeEmpty: false }, (cell: any, colNumber: number) => {
       cell.font = { name: 'Aptos', size: 10 };
       cell.alignment = { vertical: 'middle' };
       if ([1, 5, 8].includes(colNumber)) {
@@ -230,7 +230,7 @@ async function exportWithExcelJS(issue: KitchenIssueSlip, fileName: string, site
     right: { style: 'thin', color: { argb: 'FFD1D5DB' } }
   };
 
-  headerRow.eachCell((cell) => {
+  headerRow.eachCell((cell: any) => {
     cell.fill = headerFill as any;
     cell.font = headerFont;
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
@@ -249,7 +249,8 @@ async function exportWithExcelJS(issue: KitchenIssueSlip, fileName: string, site
     right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
   };
 
-  issue.lines.forEach((item, idx) => {
+  const lines = issue.lines || [];
+  lines.forEach((item, idx) => {
     const qty = Number(item.qty) || 0;
     const unitPrice = Number(item.unit_price) || 0;
     const amount = Number(item.amount) || (qty * unitPrice);
@@ -305,7 +306,7 @@ async function exportWithExcelJS(issue: KitchenIssueSlip, fileName: string, site
   totalRow.values = [
     'TỔNG CỘNG',
     '',
-    `Tổng cộng ${issue.lines.length} mặt hàng xuất kho`,
+    `Tổng cộng ${(issue.lines || []).length} mặt hàng xuất kho`,
     '',
     '',
     sumQty,
@@ -388,7 +389,7 @@ async function exportWithExcelJS(issue: KitchenIssueSlip, fileName: string, site
   [signRow, signRow + 1, signRow + 5].forEach((r, offset) => {
     const row = ws.getRow(r);
     row.height = offset === 0 ? 20 : offset === 1 ? 16 : 22;
-    row.eachCell({ includeEmpty: false }, (cell) => {
+    row.eachCell({ includeEmpty: false }, (cell: any) => {
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       if (offset === 0) cell.font = { name: 'Aptos', size: 10, bold: true, color: { argb: 'FF1F4E79' } };
       else if (offset === 1) cell.font = { name: 'Aptos', size: 9, italic: true, color: { argb: 'FF6B7280' } };
@@ -455,7 +456,8 @@ function exportWithXlsxFallback(issue: KitchenIssueSlip, fileName: string, siteF
 
   let sumQty = 0;
   let sumAmount = 0;
-  issue.lines.forEach((item, idx) => {
+  const fallbackLines = issue.lines || [];
+  fallbackLines.forEach((item, idx) => {
     const qty = Number(item.qty) || 0;
     const unitPrice = Number(item.unit_price) || 0;
     const amount = Number(item.amount) || (qty * unitPrice);
@@ -466,11 +468,10 @@ function exportWithXlsxFallback(issue: KitchenIssueSlip, fileName: string, siteF
   });
 
   const totalRowIndex = aoa.length;
-  aoa.push(['TỔNG CỘNG', '', `Tổng cộng ${issue.lines.length} mặt hàng xuất kho`, '', '', sumQty, '', sumAmount, '']);
+  aoa.push(['TỔNG CỘNG', '', `Tổng cộng ${fallbackLines.length} mặt hàng xuất kho`, '', '', sumQty, '', sumAmount, '']);
   aoa.push([]);
   aoa.push([]);
 
-  const signHeaderRow = aoa.length;
   aoa.push(['NGƯỜI LẬP PHIẾU', '', 'NGƯỜI NHẬN HÀNG', '', '', 'THỦ KHO ĐIỂM BÁN', '', 'BẾP TRƯỞNG / QUẢN LÝ SITE', '']);
   aoa.push(['(Ký, ghi rõ họ tên)', '', '(Ký, ghi rõ họ tên)', '', '', '(Ký, ghi rõ họ tên)', '', '(Ký, đóng dấu duyệt)', '']);
   aoa.push([]);

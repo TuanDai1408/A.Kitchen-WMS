@@ -6,7 +6,6 @@ import {
   gSystemTabOrder,
   setSystemTabOrder,
   applyCustomTabOrderToUI,
-  applyUserSessionToUI,
   syncCurrentUserPermissions,
   CustomTabGroupOrder
 } from './rbac-session';

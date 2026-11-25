@@ -13,7 +13,8 @@ export const TAB_META: Record<string, TabMetadata> = {
   // Nhóm 2: Vận Hành Kho Bếp -> mobTab: 'wh-dashboard'
   'wh-dashboard': { title: 'Tổng Quan Kho Vận', mobTab: 'wh-dashboard' },
   'fnb-counts': { title: 'Kiểm Kê Hằng Ngày', mobTab: 'wh-dashboard' },
-  'fnb-receipts': { title: 'Nhập Hàng Điểm Bán', mobTab: 'wh-dashboard' },
+  'fnb-receipts': { title: 'Nhập kho tại site', mobTab: 'wh-dashboard' },
+  'fnb-kitchen-issue': { title: 'Xuất Kho Sử Dụng', mobTab: 'wh-dashboard' },
   'fnb-waste': { title: 'Hủy Hàng & Hao Hụt', mobTab: 'wh-dashboard' },
 
   // Nhóm 3: Kho Vận & WMS -> mobTab: 'wh-dashboard'

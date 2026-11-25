@@ -42,7 +42,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     tabs: [
       { id: 'wh-dashboard', name: 'Tổng Quan Kho Vận', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi', icon: 'layout-dashboard' },
       { id: 'fnb-counts', name: 'Kiểm Kê Hằng Ngày', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu', icon: 'clipboard-check' },
-      { id: 'fnb-receipts', name: 'Nhập Hàng Điểm Bán', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC', icon: 'package-plus' },
+      { id: 'fnb-receipts', name: 'Nhập kho tại site', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC', icon: 'package-plus' },
       { id: 'fnb-kitchen-issue', name: 'Xuất Kho Sử Dụng', desc: 'Xuất kho NVL phục vụ bếp theo ca, trừ tồn kho và in phiếu xuất', icon: 'cooking-pot' },
       { id: 'fnb-waste', name: 'Hủy Hàng & Hao Hụt', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế', icon: 'trash-2' }
     ]
@@ -102,7 +102,7 @@ export const FEATURE_TITLES: Record<string, FeatureTitleInfo> = {
   // Nhóm 2: Vận Hành Kho Bếp
   'wh-dashboard': { name: 'Tổng Quan Kho Vận', role: 'KHO_TRUONG', desc: 'Trung tâm điều hành và cân đối kho vận toàn chuỗi' },
   'fnb-counts': { name: 'Kiểm Kê Hằng Ngày', role: 'BEP_TRUONG', desc: 'Kiểm đếm thực tế ca sáng/tối và đối soát nguyên vật liệu' },
-  'fnb-receipts': { name: 'Nhập Hàng Điểm Bán', role: 'BEP_TRUONG', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC' },
+  'fnb-receipts': { name: 'Nhập kho tại site', role: 'BEP_TRUONG', desc: 'Kiểm đếm và nhập kho nguyên vật liệu từ đơn PO / NCC' },
   'fnb-kitchen-issue': { name: 'Xuất Kho Sử Dụng', role: 'BEP_TRUONG', desc: 'Xuất kho NVL phục vụ bếp theo ca, trừ tồn kho và in phiếu xuất' },
   'fnb-waste': { name: 'Hủy Hàng & Hao Hụt', role: 'BEP_TRUONG', desc: 'Ghi nhận hàng hỏng, quá hạn, tự động giảm tồn kho thực tế' },
 

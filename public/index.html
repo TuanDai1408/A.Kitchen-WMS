@@ -228,7 +228,7 @@
               <button onclick="switchTab('fnb-receipts', this)" data-tab="fnb-receipts" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="package-plus" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
-                  <span class="truncate">Nhập Hàng Điểm Bán</span>
+                  <span class="truncate">Nhập kho tại site</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -1414,7 +1414,7 @@
            MODAL: THÊM TÀI KHOẢN MỚI
            ==================================================================== -->
       <div id="addUserModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAddUserModal()">
-        <div class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-xl sm:max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
           
           <!-- Header -->
           <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -1484,7 +1484,7 @@
            MODAL: CHỈNH SỬA VAI TRÒ & RESET QUYỀN USER
            ==================================================================== -->
       <div id="editUserModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditUserModal()">
-        <div class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-xl sm:max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
           
           <!-- Header -->
           <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -1631,7 +1631,7 @@
           </button>
           <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
             <i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i>
-            <span>Nhập hàng điểm bán</span>
+            <span>Nhập kho tại site</span>
           </button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
             <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
@@ -1922,7 +1922,7 @@
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="clipboard-check" class="w-4 h-4 text-white"></i><span>Kiểm kê hằng ngày</span></button>
-          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập kho tại site</span></button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
@@ -2122,21 +2122,21 @@
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
-          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="package-plus" class="w-4 h-4 text-white"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="package-plus" class="w-4 h-4 text-white"></i><span>Nhập kho tại site</span></button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
         <!-- Page Header -->
         <div class="page-header">
           <div>
-            <h1 class="page-title">Nhập hàng điểm bán</h1>
+            <h1 class="page-title">Nhập kho tại site</h1>
             <p class="page-subtitle">Tiếp nhận đơn hàng PO/PR từ nhà cung cấp &amp; bếp trung tâm, kiểm đếm thực tế và cập nhật tồn kho</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <select id="fnbReceiptFilterSite" class="hidden"><option value="K001">K001</option></select>
-            <button onclick="openManualReceiptModal()" class="btn btn-primary" title="Tạo phiếu nhập hàng thủ công cho các mặt hàng chưa có PO/PR">
+            <button onclick="openManualReceiptModal()" class="btn btn-primary" title="Tạo phiếu nhập kho thủ công cho các mặt hàng chưa có PO/PR">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              <span>Nhập hàng thủ công</span>
+              <span>Nhập kho thủ công</span>
             </button>
           </div>
         </div>
@@ -2150,7 +2150,7 @@
           </button>
           <button id="fnbReceiptTabBtnHistory" onclick="switchFnbReceiptSubView('history')" class="btn btn-secondary btn-sm">
             <i data-lucide="history" class="w-4 h-4"></i>
-            <span>Lịch sử phiếu nhập kho điểm bán</span>
+            <span>Lịch sử phiếu nhập kho tại site</span>
             <span id="fnbReceiptBadgeHistoryCount" class="ml-1 badge badge-neutral px-1.5 py-0.2 num">0</span>
           </button>
         </div>
@@ -2520,7 +2520,7 @@
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
           <button onclick="switchTab('wh-dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i><span>Tổng quan kho</span></button>
           <button onclick="switchTab('fnb-counts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="clipboard-check" class="w-4 h-4 text-brand-600"></i><span>Kiểm kê hằng ngày</span></button>
-          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập hàng</span></button>
+          <button onclick="switchTab('fnb-receipts')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shrink-0 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"><i data-lucide="package-plus" class="w-4 h-4 text-indigo-500"></i><span>Nhập kho tại site</span></button>
           <button onclick="switchTab('fnb-waste')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500"><i data-lucide="trash-2" class="w-4 h-4 text-white"></i><span>Hủy hàng &amp; hao hụt</span></button>
         </div>
 
@@ -4418,7 +4418,7 @@
                 <i data-lucide="package-plus" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
               </div>
               <div class="min-w-0 flex-1">
-                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Nhập Hàng Điểm Bán</div>
+                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Nhập kho tại site</div>
                 <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Đơn PO &amp; Phiếu nhập</div>
               </div>
             </button>
@@ -4645,8 +4645,8 @@
 
   
   <!-- MODAL: TẠO PHIẾU NHẬP HÀNG -->
-  <div id="createReceiptModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+  <div id="createReceiptModal" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 select-none" onclick="if(event.target===this)closeCreateReceiptModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-[98vw] 2xl:max-w-[1600px] xl:max-w-[1450px] lg:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -4701,7 +4701,7 @@
           <div class="flex items-center justify-between mb-2">
             <span class="font-semibold text-xs text-gray-800 dark:text-gray-200">Danh Sách Mặt Hàng Theo PO (<span id="receiptModalLineCount" class="tabular-nums">0</span> mã)</span>
           </div>
-          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs"> rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
+          <div class="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 shadow-xs">
             <table class="data-table">
               <thead class="bg-gray-50 dark:bg-white/3 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 font-semibold">
                 <tr>
@@ -4754,7 +4754,7 @@
 
   <!-- MODAL: NHẬP HÀNG THỦ CÔNG (NGOÀI PO / PR) -->
   <div id="modalManualReceipt" style="z-index: 100004;" class="fixed inset-0 hidden bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 select-none" onclick="if(event.target===this)closeManualReceiptModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-6xl xl:max-w-7xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-[98vw] 2xl:max-w-[1650px] xl:max-w-[1500px] lg:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
       <!-- Modal Header -->
       <div class="px-5 py-3.5 sm:px-6 sm:py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -4839,7 +4839,7 @@
         <!-- Section 2: Chọn mặt hàng & Chi tiết nhập (2 Columns) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           <!-- Cột Trái: Danh mục mặt hàng của Site đó (với tìm kiếm theo tên) -->
-          <div class="lg:col-span-5 bg-gray-50/70 dark:bg-gray-800/30 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
+          <div class="lg:col-span-4 xl:col-span-3 bg-gray-50/70 dark:bg-gray-800/30 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <i data-lucide="boxes" class="w-3.5 h-3.5 text-emerald-500"></i>
@@ -4868,13 +4868,13 @@
             </div>
 
             <!-- Scrollable Items List -->
-            <div id="manualCatalogListContainer" class="max-h-[360px] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
+            <div id="manualCatalogListContainer" class="max-h-[460px] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
               <div class="p-6 text-center text-gray-400 text-xs">Đang tải danh mục mặt hàng của site...</div>
             </div>
           </div>
 
           <!-- Cột Phải: Bảng chi tiết mặt hàng đã thêm vào phiếu -->
-          <div class="lg:col-span-7 bg-white dark:bg-gray-900 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
+          <div class="lg:col-span-8 xl:col-span-9 bg-white dark:bg-gray-900 p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 space-y-2.5">
             <div class="flex items-center justify-between pb-1 border-b border-gray-100 dark:border-gray-800">
               <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-brand-500"></i>
@@ -4894,19 +4894,19 @@
             </div>
 
             <!-- Lines Table -->
-            <div id="manualLinesTableWrapper" class="hidden overflow-x-auto max-h-[360px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
-              <table class="data-table">
+            <div id="manualLinesTableWrapper" class="hidden overflow-x-auto max-h-[460px] overflow-y-auto custom-scrollbar rounded-xl border border-gray-200 dark:border-gray-800">
+              <table class="data-table w-full">
                 <thead class="bg-gray-50 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 text-xs">
                   <tr>
-                    <th class="py-2 px-2 text-center w-8">STT</th>
-                    <th class="py-2 px-2.5 min-w-[130px]">Mặt Hàng & SKU</th>
-                    <th class="py-2 px-2 text-center w-20">Số Lượng</th>
-                    <th class="py-2 px-2 text-right min-w-[90px]">Đơn Giá</th>
-                    <th class="py-2 px-2 text-right min-w-[100px]">Thành Tiền</th>
-                    <th class="py-2 px-2 text-center min-w-[110px]">Số Lô (Batch)</th>
-                    <th class="py-2 px-2 text-center min-w-[170px]">Hạn Dùng (EXP)</th>
-                    <th class="py-2 px-2 text-center w-24">Vị Trí Kho</th>
-                    <th class="py-2 px-2 text-center w-8"></th>
+                    <th class="py-2.5 px-2 text-center w-8">STT</th>
+                    <th class="py-2.5 px-3 min-w-[170px]">Mặt Hàng & SKU</th>
+                    <th class="py-2.5 px-2 text-center w-24">Số Lượng</th>
+                    <th class="py-2.5 px-2.5 text-right min-w-[100px]">Đơn Giá</th>
+                    <th class="py-2.5 px-2.5 text-right min-w-[110px]">Thành Tiền</th>
+                    <th class="py-2.5 px-2 text-center min-w-[110px]">Số Lô (Batch)</th>
+                    <th class="py-2.5 px-2 text-center min-w-[150px]">Hạn Dùng (EXP)</th>
+                    <th class="py-2.5 px-2 text-center min-w-[100px]">Vị Trí Kho</th>
+                    <th class="py-2.5 px-2 text-center w-8"></th>
                   </tr>
                 </thead>
                 <tbody id="manualLinesTableBody" class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -5006,7 +5006,7 @@
 
   <!-- MODAL CHỈNH SỬA CHỨNG TỪ (RBAC) -->
   <div id="modalEditVoucher" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditVoucherModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl xl:max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -5131,7 +5131,7 @@
 
   <!-- MODAL CHỈNH SỬA ĐƠN HÀNG (RBAC) -->
   <div id="modalEditOrder" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeEditOrderModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[94vh] animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-5xl xl:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[94vh] animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -5265,7 +5265,7 @@
 
   <!-- MODAL THEO DÕI & XÁC THỰC HÀNH TRÌNH ĐƠN HÀNG (7 BƯỚC TIÊU CHUẨN) -->
   <div id="modalOrderJourney" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeOrderJourneyModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl sm:max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -5381,7 +5381,7 @@
 
   <!-- MODAL: GHI BIÊN BẢN HỦY HÀNG -->
   <div id="createWasteModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeCreateWasteModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl xl:max-w-5xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -5467,7 +5467,7 @@
 
   <!-- MODAL: XEM CHI TIẾT PHIẾU (RECEIPT / WASTE / COUNT DETAIL) -->
   <div id="invDetailModal" style="z-index: 100015;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeInvDetailModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl xl:max-w-5xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm shrink-0">
@@ -5720,7 +5720,7 @@
        POPUP 1: CHỌN SITE PHỤ TRÁCH KHI USER ĐĂNG NHẬP (LƯU LOCALSTORAGE CÁ NHÂN)
        ===================================================================== -->
   <div id="siteSelectorModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl sm:max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-5 sm:p-6 pb-4 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
@@ -5859,7 +5859,7 @@
        POPUP 3: ADMIN PHÊ DUYỆT CẤP QUYỀN (DÀNH CHO ADMIN)
        ===================================================================== -->
   <div id="adminApprovalModal" style="z-index: 100010;" class="fixed inset-0 hidden bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeAdminApprovalModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-5xl xl:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[90vh]">
       
       <!-- Header -->
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -5933,7 +5933,7 @@
   </div>
 
   <div id="generalModal" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeGeneralModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl xl:max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-up">
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <h3 id="modalTitle" class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chi tiết</h3>
         <button onclick="closeGeneralModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
@@ -5952,7 +5952,7 @@
   
   <!-- Modal Chi Tiết Mã Hàng (Inventory Detail Modal - Modern Canteen Style) -->
   <div id="modalInventoryDetail" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalInventoryDetail')">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-5xl xl:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -6053,7 +6053,7 @@
 
   <!-- Modal 1: Thẻ Kho & Lịch Sử Biến Động Xuất Nhập (WMS Ledger History Modal) -->
   <div id="modalWhItemHistory" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalWhItemHistory')">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-5xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -6144,7 +6144,7 @@
 
   <!-- Modal 2: Chi Tiết Các Lô Hàng Đã Nhập (WMS Batches Modal) -->
   <div id="modalWhItemBatches" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalWhItemBatches')">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-4xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-5xl xl:max-w-6xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -6206,7 +6206,7 @@
 
   <!-- Modal Chỉnh Sửa Định Mức & Thông Số Kho (TailAdmin Style) -->
   <div id="modalEditItem" style="z-index: 100015;" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeModal('modalEditItem')">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl max-w-xl sm:max-w-2xl w-full border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
@@ -6374,7 +6374,7 @@
 
   <!-- Modal: Chi tiết đơn hàng đã nhập kho & Hủy nhập kho -->
   <div id="whReceivedOrderDetailModal" style="z-index: 100015;" class="modal-backdrop hidden fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeWhReceivedOrderDetailModal()">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] max-h-[92vh] flex flex-col overflow-hidden animate-scale-up">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 shrink-0">
         <div>
@@ -6478,7 +6478,7 @@
        Khi ẩn một tab, toàn bộ người dùng (kể cả ADMIN) đều bị chặn truy cập.
        ===================================================================== -->
   <div id="tabVisibilityModal" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeTabVisibilityModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[92vh]">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-3xl xl:max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden animate-scale-up max-h-[92vh]">
       
       <!-- Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -6557,7 +6557,7 @@
        Chuẩn giao diện Canteen Order System & Nút Xuất Excel Font Aptos
        ===================================================================== -->
   <div id="modalKitchenIssueDetail" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none" onclick="if(event.target===this)closeKitchenIssueDetailModal()">
-    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-5xl xl:max-w-6xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
       
       <!-- Modal Header -->
       <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0 bg-gray-50/50 dark:bg-gray-800/40">

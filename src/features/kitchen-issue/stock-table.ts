@@ -1,6 +1,5 @@
 import { KitchenStockItem, KitchenIssueLine } from './types';
 import { formatVND, formatNumber, getActiveKitchenIssueSite } from './helpers';
-import { exportKitchenIssueExcel } from './export-excel';
 import { loadKitchenIssueHistory } from './history';
 
 declare const showToast: (msg: string, type?: string) => void;
@@ -199,7 +198,7 @@ export function toggleKitchenItemSelection(code: string, isChecked: boolean): vo
 
   if (isChecked) {
     if (!gKitchenSelectedLines.has(code)) {
-      const defaultQty = item.issueQty > 0 ? item.issueQty : 1;
+      const defaultQty: number = (item.issueQty && item.issueQty > 0) ? item.issueQty : 1;
       gKitchenSelectedLines.set(code, {
         item_code: item.code,
         item_name: item.name,

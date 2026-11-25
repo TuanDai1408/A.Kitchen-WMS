@@ -275,46 +275,46 @@ export function renderManualReceiptLinesTable(): void {
 
       return `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="py-2 px-2 text-center text-gray-400 tabular-nums font-mono text-xs">${idx + 1}</td>
-          <td class="py-2 px-2.5 min-w-[130px]">
-            <div class="font-bold text-gray-900 dark:text-white text-xs truncate max-w-[150px]" title="${escapeHtml(item.item_name)}">
+          <td class="py-2.5 px-2 text-center text-gray-400 tabular-nums font-mono text-xs">${idx + 1}</td>
+          <td class="py-2.5 px-3 min-w-[170px]">
+            <div class="font-bold text-gray-900 dark:text-white text-xs truncate max-w-[240px]" title="${escapeHtml(item.item_name)}">
               ${escapeHtml(item.item_name)}
             </div>
             <div class="text-xs text-gray-400 font-mono flex items-center gap-1.5 mt-0.5">
-              <span class="text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
+              <span class="text-brand-600 dark:text-brand-400 font-semibold">${escapeHtml(item.item_code)}</span>
               <span>•</span>
               <span class="font-sans font-medium text-gray-600 dark:text-gray-300">${escapeHtml(item.unit || '')}</span>
             </div>
           </td>
-          <td class="py-2 px-2 text-center w-20">
+          <td class="py-2.5 px-2 text-center w-24">
             <input type="number" step="0.01" min="0.01" value="${item.qty}" 
                    oninput="onManualLineQtyChange(${idx}, this.value)" 
-                   class="w-20 text-center py-1 px-1.5 rounded-lg border border-brand-300 dark:border-brand-700 bg-brand-50/30 dark:bg-brand-950/20 font-bold font-mono text-xs tabular-nums text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-brand-500">
+                   class="w-20 text-center py-1.5 px-1.5 rounded-lg border border-brand-300 dark:border-brand-700 bg-brand-50/30 dark:bg-brand-950/20 font-bold font-mono text-xs tabular-nums text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-brand-500">
           </td>
-          <td class="py-2 px-2 text-right w-24">
+          <td class="py-2.5 px-2 text-right w-28">
             <input type="number" step="100" min="0" value="${item.unit_price}" 
                    oninput="onManualLinePriceChange(${idx}, this.value)" 
-                   class="w-24 text-right py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs tabular-nums text-gray-900 dark:text-white outline-none focus:border-brand-500">
+                   class="w-24 text-right py-1.5 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs tabular-nums text-gray-900 dark:text-white outline-none focus:border-brand-500">
           </td>
-          <td id="manualLineTotal_${idx}" class="py-2 px-2 text-right font-mono font-bold text-xs tabular-nums text-brand-600 dark:text-brand-400 whitespace-nowrap">
+          <td id="manualLineTotal_${idx}" class="py-2.5 px-2.5 text-right font-mono font-bold text-xs tabular-nums text-brand-600 dark:text-brand-400 whitespace-nowrap">
             ${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' đ' : '0 đ'}
           </td>
-          <td class="py-2 px-2 text-center">
+          <td class="py-2.5 px-2 text-center">
             <input type="text" value="${escapeHtml(item.batch_code || '')}" placeholder="Lô..." 
                    oninput="onManualLineBatchChange(${idx}, this.value)" 
-                   class="w-24 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                   class="w-24 text-center py-1.5 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center">
+          <td class="py-2.5 px-2 text-center">
             <input type="date" value="${item.exp_date || ''}" 
                    onchange="onManualLineExpChange(${idx}, this.value)" 
-                   class="w-32 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                   class="w-32 text-center py-1.5 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center">
+          <td class="py-2.5 px-2 text-center">
             <input type="text" value="${escapeHtml(item.storage_loc || '')}" placeholder="Vị trí..." 
                    oninput="onManualLineLocChange(${idx}, this.value)" 
-                   class="w-20 text-center py-1 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
+                   class="w-20 text-center py-1.5 px-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-mono text-xs text-gray-800 dark:text-gray-200 outline-none focus:border-brand-500">
           </td>
-          <td class="py-2 px-2 text-center">
+          <td class="py-2.5 px-2 text-center">
             <button type="button" onclick="removeManualReceiptLine(${idx})" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa mặt hàng này">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
