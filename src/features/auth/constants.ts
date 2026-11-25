@@ -35,7 +35,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     ]
   },
   {
-    groupId: 'wh-kitchen',
+    groupId: 'fnb-inventory',
     groupName: 'Vận Hành Kho Bếp',
     icon: 'utensils',
     color: 'emerald',
@@ -60,7 +60,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     ]
   },
   {
-    groupId: 'portal',
+    groupId: 'portal-ops',
     groupName: 'Cổng Thông Tin & Đặt Hàng',
     icon: 'file-text',
     color: 'blue',
@@ -74,7 +74,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     ]
   },
   {
-    groupId: 'system',
+    groupId: 'sys-admin',
     groupName: 'Hệ Thống & Danh Mục',
     icon: 'settings',
     color: 'purple',

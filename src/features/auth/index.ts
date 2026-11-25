@@ -62,6 +62,10 @@ import {
   gSystemTabVisibility,
   setSystemTabVisibility,
   loadPersistedTabVisibility,
+  gSystemTabOrder,
+  setSystemTabOrder,
+  loadPersistedTabOrder,
+  applyCustomTabOrderToUI,
   renderRoleSwitcherModal,
   openRoleSwitcherModal,
   closeRoleSwitcherModal,
@@ -76,6 +80,9 @@ import {
   closeTabVisibilityModal,
   toggleTabVisibilityItem,
   setAllTabsVisible,
+  moveTabItem,
+  moveTabGroup,
+  resetTabOrderToDefault,
   filterTabVisibility,
   onTabVisSearch,
   renderTabVisibilityList,
@@ -176,15 +183,22 @@ if (typeof window !== 'undefined') {
   w.switchRoleAction = switchRoleAction;
   w.renderLoginRoleSelection = renderLoginRoleSelection;
 
-  // Master Tab Visibility Operations (trantuandai2508 exclusive)
+  // Master Tab Visibility & Reorder Operations (trantuandai2508 exclusive)
   w.gSystemTabVisibility = gSystemTabVisibility;
   w.setSystemTabVisibility = setSystemTabVisibility;
   w.loadPersistedTabVisibility = loadPersistedTabVisibility;
+  w.gSystemTabOrder = gSystemTabOrder;
+  w.setSystemTabOrder = setSystemTabOrder;
+  w.loadPersistedTabOrder = loadPersistedTabOrder;
+  w.applyCustomTabOrderToUI = applyCustomTabOrderToUI;
   w.loadSystemTabVisibility = loadSystemTabVisibility;
   w.openTabVisibilityModal = openTabVisibilityModal;
   w.closeTabVisibilityModal = closeTabVisibilityModal;
   w.toggleTabVisibilityItem = toggleTabVisibilityItem;
   w.setAllTabsVisible = setAllTabsVisible;
+  w.moveTabItem = moveTabItem;
+  w.moveTabGroup = moveTabGroup;
+  w.resetTabOrderToDefault = resetTabOrderToDefault;
   w.filterTabVisibility = filterTabVisibility;
   w.onTabVisSearch = onTabVisSearch;
   w.renderTabVisibilityList = renderTabVisibilityList;

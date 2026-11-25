@@ -4390,6 +4390,15 @@
                 <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Đơn PO &amp; Phiếu nhập</div>
               </div>
             </button>
+            <button onclick="switchFromHub('fnb-kitchen-issue')" data-tab="fnb-kitchen-issue" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
+              <div class="hub-icon-wrap w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
+                <i data-lucide="cooking-pot" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Xuất Kho Sử Dụng</div>
+                <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Xuất NVL bếp &amp; in phiếu</div>
+              </div>
+            </button>
             <button onclick="switchFromHub('fnb-waste')" data-tab="fnb-waste" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
               <div class="hub-icon-wrap w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0 transition-colors">
                 <i data-lucide="trash-2" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
@@ -6447,12 +6456,12 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Ẩn / Hiện Tab Toàn Webapp</h3>
+              <h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Ẩn / Hiện & Đổi Vị Trí Tab Webapp</h3>
               <span class="text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
                 👑 trantuandai2508 Only
               </span>
             </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tab bị ẩn sẽ KHÔNG hiển thị và BỊ CHẶN 100% đối với toàn bộ người dùng (kể cả ADMIN)</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Bấm nút ↑ / ↓ để thay đổi vị trí tab hoặc nhóm. Sau khi Lưu, thanh Sidebar trên Mobile &amp; PC sẽ thay đổi theo.</p>
           </div>
         </div>
         <button onclick="closeTabVisibilityModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
@@ -6467,7 +6476,7 @@
           <input id="tabVisSearchInput" type="text" placeholder="Tìm nhanh tên tab, tab id, chức năng..." oninput="onTabVisSearch(this.value)" class="w-full pl-9 pr-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
           <div class="flex items-center p-0.5 bg-gray-200/70 dark:bg-gray-800 rounded-xl text-xs">
             <button id="tabVisFilterBtn_all" onclick="filterTabVisibility('all')" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-xs">Tất cả</button>
             <button id="tabVisFilterBtn_hidden" onclick="filterTabVisibility('hidden')" class="px-3 py-1.5 rounded-xl font-semibold text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Đang ẩn</button>
@@ -6476,6 +6485,10 @@
           <button onclick="setAllTabsVisible()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 text-gray-700 dark:text-gray-300 font-semibold text-xs flex items-center gap-1 transition-colors" title="Bật hiển thị tất cả tab">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
             <span class="hidden sm:inline">Hiện tất cả</span>
+          </button>
+          <button onclick="resetTabOrderToDefault()" class="px-2.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 text-gray-700 dark:text-gray-300 font-semibold text-xs flex items-center gap-1 transition-colors" title="Khôi phục thứ tự các tab về mặc định ban đầu">
+            <i data-lucide="arrow-down-up" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Thứ tự gốc</span>
           </button>
         </div>
       </div>
@@ -6500,7 +6513,7 @@
         </button>
         <button onclick="saveSystemTabVisibility()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-indigo-500/20 flex items-center gap-1.5 transition-all">
           <i data-lucide="save" class="w-4 h-4"></i>
-          <span>Lưu Cấu Hình Vào CSDL D1</span>
+          <span>Lưu Cấu Hình &amp; Vị Trí Vào CSDL D1</span>
         </button>
       </div>
 

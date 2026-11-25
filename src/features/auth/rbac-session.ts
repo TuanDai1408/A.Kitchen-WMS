@@ -12,7 +12,13 @@ declare const TAB_META: any;
 
 let lastFocusSyncTime = Date.now();
 
+export interface CustomTabGroupOrder {
+  groupId: string;
+  tabs: string[];
+}
+
 export let gSystemTabVisibility: Record<string, boolean> = {};
+export let gSystemTabOrder: CustomTabGroupOrder[] | null = null;
 
 export function loadPersistedTabVisibility(): Record<string, boolean> {
   try {
@@ -37,8 +43,94 @@ export function setSystemTabVisibility(vis: Record<string, boolean>): void {
   } catch (e) {}
 }
 
+export function loadPersistedTabOrder(): CustomTabGroupOrder[] | null {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem('orbit_tab_order');
+      if (raw) {
+        gSystemTabOrder = JSON.parse(raw);
+        return gSystemTabOrder;
+      }
+    }
+  } catch (e) {}
+  gSystemTabOrder = null;
+  return null;
+}
+
+export function setSystemTabOrder(order: CustomTabGroupOrder[] | null): void {
+  gSystemTabOrder = order;
+  try {
+    if (typeof localStorage !== 'undefined') {
+      if (order && Array.isArray(order)) {
+        localStorage.setItem('orbit_tab_order', JSON.stringify(order));
+      } else {
+        localStorage.removeItem('orbit_tab_order');
+      }
+    }
+  } catch (e) {}
+}
+
+/**
+ * Cập nhật thứ tự hiển thị các Tab và Nhóm Tab trên cả PC (Sidebar) và Mobile (Hub Menu)
+ */
+export function applyCustomTabOrderToUI(customStructure?: CustomTabGroupOrder[]): void {
+  const structure = customStructure || gSystemTabOrder;
+  if (!structure || !Array.isArray(structure) || structure.length === 0) return;
+
+  // 1. Sắp xếp lại Sidebar trên Desktop (#sidebar nav)
+  const nav = document.querySelector('#sidebar nav');
+  if (nav) {
+    structure.forEach(group => {
+      const catEl = nav.querySelector(`.sidebar-category[data-cat="${group.groupId}"]`);
+      if (catEl) {
+        nav.appendChild(catEl); // Đưa nhóm category theo thứ tự
+
+        const ul = catEl.querySelector('ul');
+        if (ul && Array.isArray(group.tabs)) {
+          group.tabs.forEach(tabId => {
+            const btn = document.querySelector(`#sidebar .nav-btn[data-tab="${tabId}"]`);
+            if (btn) {
+              const li = btn.closest('li');
+              if (li) {
+                ul.appendChild(li); // Đưa tab theo đúng thứ tự mới
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  // 2. Sắp xếp lại Menu Hub trên Mobile (#mobileHubScrollArea)
+  const hubScroll = document.getElementById('mobileHubScrollArea');
+  if (hubScroll) {
+    structure.forEach(group => {
+      const mobCat = hubScroll.querySelector(`.mobile-hub-category[data-cat="${group.groupId}"]`);
+      if (mobCat) {
+        hubScroll.appendChild(mobCat);
+
+        const grid = mobCat.querySelector('.grid');
+        if (grid && Array.isArray(group.tabs)) {
+          group.tabs.forEach(tabId => {
+            const hubItem = document.querySelector(`#mobileHubScrollArea .hub-item[data-tab="${tabId}"]`);
+            if (hubItem) {
+              grid.appendChild(hubItem);
+            }
+          });
+        }
+      }
+    });
+  }
+
+  // Tái áp dụng quyền và trạng thái hiển thị / ẩn
+  applyUserSessionToUI();
+}
+
 export function initRbacAuth(): void {
   loadPersistedTabVisibility();
+  loadPersistedTabOrder();
+  applyCustomTabOrderToUI();
+
   const w = typeof window !== 'undefined' ? (window as any) : {};
   let curUser = w.gCurrentUser || gCurrentUser;
   if (!curUser) {
@@ -48,14 +140,21 @@ export function initRbacAuth(): void {
 
   renderSitesOptions();
 
-  // Chủ động tải trạng thái ẩn/hiện mới nhất từ CSDL D1 ngay khi khởi động ứng dụng
+  // Chủ động tải trạng thái ẩn/hiện và thứ tự tab mới nhất từ CSDL D1 ngay khi khởi động
   if (typeof fetch === 'function') {
     fetch('/api/system/tab-visibility')
       .then(res => res.json())
       .then(json => {
-        if (json && json.success && json.data) {
-          setSystemTabVisibility(json.data);
-          applyUserSessionToUI();
+        if (json && json.success) {
+          if (json.data) {
+            setSystemTabVisibility(json.data);
+          }
+          if (json.tabOrder && Array.isArray(json.tabOrder)) {
+            setSystemTabOrder(json.tabOrder);
+            applyCustomTabOrderToUI(json.tabOrder);
+          } else {
+            applyUserSessionToUI();
+          }
         }
       })
       .catch(() => {});
@@ -111,6 +210,10 @@ export async function syncCurrentUserPermissions(): Promise<void> {
     if (json.success && json.data) {
       if (json.data.tabVisibility && typeof json.data.tabVisibility === 'object') {
         setSystemTabVisibility(json.data.tabVisibility);
+      }
+      if (json.data.tabOrder && Array.isArray(json.data.tabOrder)) {
+        setSystemTabOrder(json.data.tabOrder);
+        applyCustomTabOrderToUI(json.data.tabOrder);
       }
       curUser.status = (json.data.user && json.data.user.status) || json.data.status || 'ACTIVE';
       curUser.permissions = json.data.permissions || {};

@@ -368,6 +368,14 @@ async function ensureSystemTabVisibilityTable(env) {
         updated_at ${timeType}
       )
     `);
+    await db.exec(env, `
+      CREATE TABLE IF NOT EXISTS system_tab_order (
+        id TEXT PRIMARY KEY,
+        structure_json TEXT,
+        updated_by TEXT,
+        updated_at ${timeType}
+      )
+    `);
   } catch (err) {
     console.error('ensureSystemTabVisibilityTable error:', err);
   }
@@ -3000,6 +3008,14 @@ export default {
             tabVisibility[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true;
           });
 
+          const orderRow = await db.queryOne(env, `SELECT structure_json FROM system_tab_order WHERE id = 'GLOBAL_ORDER' LIMIT 1`).catch(() => null);
+          let tabOrder = null;
+          if (orderRow && orderRow.structure_json) {
+            try {
+              tabOrder = JSON.parse(orderRow.structure_json);
+            } catch (e) {}
+          }
+
           const authResponseData = {
             success: true,
             data: {
@@ -3019,7 +3035,8 @@ export default {
               approvedRoles,
               permissions,
               isMasterOwner: isMaster,
-              tabVisibility
+              tabVisibility,
+              tabOrder
             }
           };
           setMemoryCache(authCacheKey, authResponseData, 60);
@@ -3584,9 +3601,20 @@ export default {
         (rows || []).forEach(r => {
           visibilityMap[r.tab_id] = r.is_hidden === 1 || r.is_hidden === true || r.is_hidden === '1';
         });
+
+        // Lấy thứ tự các tab đã lưu trong CSDL D1
+        const orderRow = await db.queryOne(env, `SELECT structure_json FROM system_tab_order WHERE id = 'GLOBAL_ORDER' LIMIT 1`).catch(() => null);
+        let tabOrder = null;
+        if (orderRow && orderRow.structure_json) {
+          try {
+            tabOrder = JSON.parse(orderRow.structure_json);
+          } catch (e) {}
+        }
+
         return new Response(JSON.stringify({
           success: true,
           data: visibilityMap,
+          tabOrder,
           masterEmail: 'trantuandai2508@gmail.com'
         }), { headers: corsHeaders });
       }
@@ -3594,7 +3622,7 @@ export default {
       if (pathname === '/api/system/tab-visibility' && request.method === 'POST') {
         await ensureSystemTabVisibilityTable(env);
         const body = await request.json().catch(() => ({}));
-        const { requestorEmail, tabId, isHidden } = body;
+        const { requestorEmail, tabId, isHidden, tabOrder } = body;
         const bulkUpdates = body.bulkUpdates || body.visibility;
 
         // BẢO MẬT TUYỆT ĐỐI: CHỈ DUY NHẤT TÀI KHOẢN trantuandai2508 ĐƯỢC PHÉP CẤU HÌNH
@@ -3634,10 +3662,24 @@ export default {
           });
         }
 
+        // Lưu cấu trúc thứ tự vị trí các tab nếu có truyền vào
+        if (tabOrder && Array.isArray(tabOrder)) {
+          await db.exec(env, `
+            INSERT INTO system_tab_order (id, structure_json, updated_by, updated_at)
+            VALUES ('GLOBAL_ORDER', ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+              structure_json = EXCLUDED.structure_json,
+              updated_by = EXCLUDED.updated_by,
+              updated_at = CURRENT_TIMESTAMP
+          `, [JSON.stringify(tabOrder), requestorEmail]).catch(err => {
+            console.error('Error saving system_tab_order:', err);
+          });
+        }
+
         invalidateMemoryCache('auth_me_');
         return new Response(JSON.stringify({
           success: true,
-          message: 'Đã cập nhật trạng thái ẩn/hiện tab hệ thống thành công!'
+          message: 'Đã cập nhật trạng thái ẩn/hiện và thứ tự vị trí các tab hệ thống thành công!'
         }), { headers: corsHeaders });
       }
 
