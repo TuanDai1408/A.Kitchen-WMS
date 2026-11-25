@@ -357,8 +357,11 @@ export async function submitCreateKitchenIssue(): Promise<void> {
     // Tải lại tồn kho mới nhất
     await loadKitchenStockForIssue(siteCode);
 
-    // Tải lại lịch sử phiếu
+    // Tải lại lịch sử phiếu & đồng bộ tồn FEFO
     loadKitchenIssueHistory(siteCode);
+    const winSync = typeof window !== 'undefined' ? (window as any) : {};
+    if (typeof winSync.loadStockFEFO === 'function') winSync.loadStockFEFO();
+    if (typeof winSync.loadWhInventory === 'function') winSync.loadWhInventory();
 
     // Tạo object phiếu hoàn chỉnh để mở modal xem trước & xuất Excel
     const completedIssue: any = {

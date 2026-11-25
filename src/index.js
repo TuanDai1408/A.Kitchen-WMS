@@ -1296,13 +1296,18 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Nhập kho thành công', batch_id: batchId }), { headers: corsHeaders });
       }
 
-      // 1.5 POST /api/stock/issue
+      // 1.5 POST /api/stock/issue (Đồng bộ 2 chiều FEFO + Xuất kho sử dụng + fnb_stock_balances)
       if (pathname === '/api/stock/issue' && request.method === 'POST') {
         const body = await request.json();
         const { branch_code, sku, qty_needed, note } = body;
-        const branch = await db.queryOne(env, 'SELECT id FROM branches WHERE code = ?', [branch_code.toUpperCase()]);
+        const safeBranchCode = (!branch_code || String(branch_code).toUpperCase() === 'ALL') ? 'K001' : String(branch_code).toUpperCase();
+        const branch = await db.queryOne(env, 'SELECT id, code FROM branches WHERE UPPER(code) = UPPER(?)', [safeBranchCode]);
         if (!branch) return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chi nhánh' }), { status: 400, headers: corsHeaders });
-        let remain = parseFloat(qty_needed);
+        const qtyNum = parseFloat(qty_needed);
+        if (!sku || isNaN(qtyNum) || qtyNum <= 0) {
+          return new Response(JSON.stringify({ success: false, error: 'Số lượng xuất phải lớn hơn 0' }), { status: 400, headers: corsHeaders });
+        }
+        let remain = qtyNum;
 
         const { rows: batches } = await db.query(env, {
           d1: `
@@ -1333,17 +1338,69 @@ export default {
         }
 
         if (remain > 0) {
-          return new Response(JSON.stringify({ success: false, error: `Tồn kho không đủ (thiếu ${remain.toFixed(1)})` }), { status: 400, headers: corsHeaders });
+          return new Response(JSON.stringify({ success: false, error: `Tồn kho lô FEFO không đủ (thiếu ${remain.toFixed(1)})` }), { status: 400, headers: corsHeaders });
         }
+
+        const itemInfo = await db.queryOne(env, `
+          SELECT COALESCE(d.material_desc, i.name, ?) as item_name,
+                 COALESCE(d.entry_unit, i.unit, 'Phần') as unit,
+                 COALESCE(d.price, i.unit_price, 0) as unit_price,
+                 COALESCE(bal.book_qty, 0) as book_qty
+          FROM (SELECT ? as code) s
+          LEFT JOIN dim_article_stock d ON d.material = s.code
+          LEFT JOIN fnb_stock_items i ON i.code = s.code
+          LEFT JOIN fnb_stock_balances bal ON bal.item_code = s.code AND UPPER(bal.site_code) = UPPER(?)
+          LIMIT 1
+        `, [sku, sku, safeBranchCode]).catch(() => ({ item_name: sku, unit: 'Phần', unit_price: 0, book_qty: 0 }));
+
+        const unitPrice = Number(itemInfo?.unit_price) || 0;
+        const lineAmount = qtyNum * unitPrice;
+        const stockBefore = Number(itemInfo?.book_qty) || 0;
+        const validDate = new Date().toISOString().split('T')[0];
+        const issueCode = `XKSD-FEFO-${validDate.replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
 
         await db.withTransaction(env, async (tx) => {
           for (const op of ops) {
             await tx.exec(op.updateSql, op.updateParams);
             await tx.exec(op.insertSql, op.insertParams);
           }
+
+          // Đồng bộ trừ tồn kho fnb_stock_balances
+          await tx.exec(`
+            UPDATE fnb_stock_balances
+            SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                updated_at = NOW()
+            WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+          `, [qtyNum, qtyNum, unitPrice, sku, safeBranchCode]);
+
+          // Đồng bộ tạo phiếu sang tab Xuất kho sử dụng (fnb_kitchen_issues)
+          try {
+            const insertH = await tx.queryOne(`
+              INSERT INTO fnb_kitchen_issues (issue_code, site_code, issue_date, meal_shift, issuer_name, receiver_name, total_items, total_qty, total_amount, notes)
+              VALUES (?, ?, ?, 'Xuất bếp FEFO', 'Thủ kho / FEFO', 'Bếp ca nấu', 1, ?, ?, ?) RETURNING id
+            `, [issueCode, safeBranchCode, validDate, qtyNum, lineAmount, note || 'Xuất bếp trực tiếp từ tab Tồn kho FEFO']);
+            if (insertH && insertH.id) {
+              await tx.exec(`
+                INSERT INTO fnb_kitchen_issue_lines (issue_id, item_code, item_name, unit, stock_before, qty, unit_price, amount, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              `, [insertH.id, sku, itemInfo?.item_name || sku, itemInfo?.unit || 'Phần', stockBefore, qtyNum, unitPrice, lineAmount, note || 'Xuất bếp FEFO']);
+            }
+          } catch (eKi) {}
+
+          try {
+            await tx.exec(`
+              INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+              VALUES (?, 'XUAT_BEP', ?, ?, ?, ?, ?, ?, 'Thủ kho / FEFO')
+            `, [issueCode, sku, safeBranchCode, -qtyNum, unitPrice, -lineAmount, note || 'Xuất bếp chuẩn FEFO']);
+          } catch (eTx) {}
         });
 
-        return new Response(JSON.stringify({ success: true, message: 'Đã xuất kho chuẩn FEFO thành công' }), { headers: corsHeaders });
+        invalidateMemoryCache('/api/fnb');
+        invalidateMemoryCache('/api/stock');
+        invalidateMemoryCache('/api/wh');
+
+        return new Response(JSON.stringify({ success: true, message: `Đã xuất kho chuẩn FEFO & đồng bộ phiếu ${issueCode} thành công` }), { headers: corsHeaders });
       }
 
       // 1.6 GET /api/reorder - Cảnh báo đặt hàng ROP từ fnb_stock_balances
@@ -6040,6 +6097,29 @@ export default {
                       updated_at = NOW()
                   WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
                 `, [qty, qty, unitPrice, item.item_code, site_code]);
+
+                // Đồng bộ trừ lô theo chuẩn FEFO trong inventory_batches
+                try {
+                  const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [site_code]);
+                  if (br && br.id) {
+                    const { rows: batches } = await tx.query(`
+                      SELECT id, qty FROM inventory_batches
+                      WHERE branch_id = ? AND sku = ? AND qty > 0
+                      ORDER BY exp_date ASC
+                    `, [br.id, item.item_code]);
+                    let rem = qty;
+                    for (const b of (batches || [])) {
+                      if (rem <= 0) break;
+                      const deduct = Math.min(Number(b.qty) || 0, rem);
+                      if (deduct > 0) {
+                        await tx.exec(`UPDATE inventory_batches SET qty = qty - ? WHERE id = ?`, [deduct, b.id]);
+                        await tx.exec(`INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)`,
+                          ['tx_' + Math.random().toString(36).substr(2, 9), br.id, item.item_code, b.id, deduct, `${issueCode} - ${meal_shift}`]);
+                        rem -= deduct;
+                      }
+                    }
+                  }
+                } catch (eFefo) {}
 
                 // Ghi nhận lịch sử giao dịch biến động kho
                 await tx.exec(`

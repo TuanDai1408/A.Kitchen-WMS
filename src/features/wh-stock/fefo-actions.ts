@@ -110,7 +110,9 @@ export async function submitReceiptToBackend(): Promise<void> {
 export async function submitIssueToBackend(): Promise<void> {
   if (typeof showLoading === 'function') showLoading('Đang thực hiện xuất kho FEFO...');
   try {
-    const branch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch : 'ALL';
+    const savedSite = localStorage.getItem('orbit_user_site');
+    const rawBranch = (typeof App !== 'undefined' && App.currentBranch) ? App.currentBranch : 'K001';
+    const branch = (!rawBranch || rawBranch.toUpperCase() === 'ALL') ? (savedSite || 'K001') : rawBranch;
     const skuEl = document.getElementById('issueSku') as HTMLInputElement | null;
     const qtyEl = document.getElementById('issueQty') as HTMLInputElement | null;
     const noteEl = document.getElementById('issueNote') as HTMLInputElement | null;
@@ -130,9 +132,13 @@ export async function submitIssueToBackend(): Promise<void> {
     const json = await res.json();
     if (json.success) {
       closeModal('modalFastIssue');
-      if (typeof showToast === 'function') showToast('Xuất kho chuẩn FEFO thành công!');
+      if (typeof showToast === 'function') showToast(json.message || 'Xuất kho chuẩn FEFO thành công!');
       if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
       loadStockFEFO();
+      const w = typeof window !== 'undefined' ? (window as any) : {};
+      if (typeof w.loadKitchenIssueStock === 'function') w.loadKitchenIssueStock(branch);
+      if (typeof w.loadKitchenIssueHistory === 'function') w.loadKitchenIssueHistory(branch);
+      if (typeof w.loadWhInventory === 'function') w.loadWhInventory();
     } else {
       if (typeof showToast === 'function') showToast('Lỗi: ' + json.error);
     }
