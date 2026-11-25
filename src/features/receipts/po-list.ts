@@ -61,6 +61,27 @@ export function onFnbPoSearchInput(val: string): void {
   renderFnbPoTable(val);
 }
 
+export function populateFnbPoSupplierFilter(poList: any[]): void {
+  const sel = document.getElementById('fnbPoSupplierFilter') as HTMLSelectElement | null;
+  if (!sel) return;
+  const currentVal = sel.value || '';
+  const suppliers = Array.from(
+    new Set(
+      (poList || [])
+        .map((p: any) => (p.supplier_name || 'Bếp Trung Tâm Siba').trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b, 'vi'));
+
+  sel.innerHTML =
+    '<option value="">Tất cả nhà cung cấp</option>' +
+    suppliers.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+
+  if (currentVal && suppliers.includes(currentVal)) {
+    sel.value = currentVal;
+  }
+}
+
 export async function loadFnbPoList(siteCodeArg?: string): Promise<void> {
   const siteCode = siteCodeArg || getActiveFnbReceiptSite();
   const statusEl = document.getElementById('fnbPoStatusFilter') as HTMLSelectElement | null;
@@ -73,6 +94,7 @@ export async function loadFnbPoList(siteCodeArg?: string): Promise<void> {
     const json = await res.json();
     if (json.success && json.data) {
       window.gFnbPoList = json.data;
+      populateFnbPoSupplierFilter(window.gFnbPoList);
       const searchVal = (document.getElementById('fnbPoSearchInput') as HTMLInputElement | null)?.value || '';
       renderFnbPoTable(searchVal);
 
@@ -93,18 +115,14 @@ export function renderFnbPoTable(query: string = ''): void {
   const tbody = document.getElementById('fnbPoTableBody');
   const mob = document.getElementById('fnbPoMobileCards');
   const sumEl = document.getElementById('fnbPoSummaryText');
-  const supplierFilter = ((document.getElementById('fnbPoSupplierFilter') as HTMLSelectElement | null)?.value || '').toLowerCase();
+  const supplierFilter = ((document.getElementById('fnbPoSupplierFilter') as HTMLSelectElement | null)?.value || '').trim().toLowerCase();
   const q = (query || '').toLowerCase().trim();
 
   let list: any[] = window.gFnbPoList || [];
   if (supplierFilter) {
     list = list.filter(p => {
-      const sup = (p.supplier_name || '').toLowerCase();
-      if (supplierFilter === 'siba') return sup.includes('siba') || sup.includes('bếp trung tâm') || sup.includes('trung tâm');
-      if (supplierFilter === 'baf') return sup.includes('baf') || sup.includes('thịt');
-      if (supplierFilter === 'spice') return sup.includes('gia vị') || sup.includes('đường') || sup.includes('unilever') || sup.includes('cholimex') || sup.includes('muối');
-      if (supplierFilter === 'veg') return sup.includes('rau') || sup.includes('đà lạt') || sup.includes('củ');
-      return true;
+      const sup = (p.supplier_name || 'Bếp Trung Tâm Siba').trim().toLowerCase();
+      return sup === supplierFilter || sup.includes(supplierFilter);
     });
   }
   if (q) {

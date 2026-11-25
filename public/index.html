@@ -2172,13 +2172,9 @@
               </select>
             </div>
 
-            <div class="field w-48">
+            <div class="field w-56">
               <select id="fnbPoSupplierFilter" onchange="renderFnbPoTable(document.getElementById('fnbPoSearchInput')?.value || '')" class="select">
-                <option value="">Tất cả nguồn hàng</option>
-                <option value="SIBA">Bếp Trung Tâm Siba</option>
-                <option value="BAF">BaF Meat / MeatDeli</option>
-                <option value="SPICE">Gia vị &amp; Hàng khô</option>
-                <option value="VEG">Rau củ Đà Lạt</option>
+                <option value="">Tất cả nhà cung cấp</option>
               </select>
             </div>
 
@@ -2223,9 +2219,17 @@
         <div id="fnbReceiptHistoryView" class="space-y-4 hidden">
           <!-- Toolbar -->
           <div class="filter-bar">
-            <div class="text-xs text-gray-500 dark:text-gray-400 flex-1">
-              Danh sách phiếu đã nhập kho tại điểm bán (nhập theo PO và nhập thủ công ngoài đơn).
+            <div class="relative flex-1 min-w-[220px]">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="fnbReceiptHistorySearchInput" oninput="renderFnbReceiptsHistoryTable()" placeholder="Tìm mã phiếu nhập, số PO/HĐ, nhà cung cấp..." class="input pl-9 w-full">
             </div>
+
+            <div class="field w-56">
+              <select id="fnbReceiptHistorySupplierFilter" onchange="renderFnbReceiptsHistoryTable()" class="select">
+                <option value="">Tất cả nhà cung cấp</option>
+              </select>
+            </div>
+
             <div class="flex items-center gap-2">
               <button onclick="loadFnbReceiptsHistory()" class="btn btn-secondary">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Làm mới

@@ -12,7 +12,7 @@ import {
   openCreateReceiptModal,
   submitCreateReceipt
 } from './po-modal';
-import { loadFnbReceiptsHistory, viewReceiptDetail } from './history';
+import { loadFnbReceiptsHistory, renderFnbReceiptsHistoryTable, viewReceiptDetail } from './history';
 import {
   openManualReceiptModal,
   closeManualReceiptModal,
@@ -79,6 +79,7 @@ win.submitCreateReceipt = submitCreateReceipt;
 
 // History & Detail
 win.loadFnbReceiptsHistory = loadFnbReceiptsHistory;
+win.renderFnbReceiptsHistoryTable = renderFnbReceiptsHistoryTable;
 win.viewReceiptDetail = viewReceiptDetail;
 
 // Manual Receipt Modal

@@ -3,67 +3,114 @@ import { formatReceiptDateYMD, getActiveFnbReceiptSite } from './helpers';
 
 declare const window: any;
 
-export async function loadFnbReceiptsHistory(siteCodeArg?: string): Promise<void> {
-  const siteCode = siteCodeArg || getActiveFnbReceiptSite();
+export function populateReceiptsHistorySupplierFilter(receipts: any[]): void {
+  const sel = document.getElementById('fnbReceiptHistorySupplierFilter') as HTMLSelectElement | null;
+  if (!sel) return;
+  const currentVal = sel.value || '';
+  const suppliers = Array.from(
+    new Set(
+      (receipts || [])
+        .map((r: any) => (r.supplier || 'Bếp Trung Tâm Siba').trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b, 'vi'));
+
+  sel.innerHTML =
+    '<option value="">Tất cả nhà cung cấp</option>' +
+    suppliers.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+
+  if (currentVal && suppliers.includes(currentVal)) {
+    sel.value = currentVal;
+  }
+}
+
+export function renderFnbReceiptsHistoryTable(): void {
+  const siteCode = getActiveFnbReceiptSite();
   const tbody = document.getElementById('fnbReceiptsTableBody');
   const mob = document.getElementById('fnbReceiptsMobileCards');
+  const supplierFilter = ((document.getElementById('fnbReceiptHistorySupplierFilter') as HTMLSelectElement | null)?.value || '').trim().toLowerCase();
+  const searchQuery = ((document.getElementById('fnbReceiptHistorySearchInput') as HTMLInputElement | null)?.value || '').trim().toLowerCase();
+
+  let receipts: any[] = window.gFnbReceiptsHistory || [];
+  if (supplierFilter) {
+    receipts = receipts.filter(r => {
+      const sup = (r.supplier || 'Bếp Trung Tâm Siba').trim().toLowerCase();
+      return sup === supplierFilter || sup.includes(supplierFilter);
+    });
+  }
+  if (searchQuery) {
+    receipts = receipts.filter(r =>
+      (r.receipt_code || '').toLowerCase().includes(searchQuery) ||
+      (r.invoice_no || '').toLowerCase().includes(searchQuery) ||
+      (r.supplier || '').toLowerCase().includes(searchQuery) ||
+      (r.created_by || '').toLowerCase().includes(searchQuery)
+    );
+  }
+
+  if (tbody) {
+    if (!receipts.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không tìm thấy phiếu nhập kho nào phù hợp cho điểm bán ${escapeHtml(siteCode)}.</td></tr>`;
+    } else {
+      tbody.innerHTML = receipts.map(r => `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</td>
+          <td class="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(r.site_code)}</td>
+          <td class="py-3 px-3 tabular-nums font-mono text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(formatReceiptDateYMD(r.receipt_date))}</td>
+          <td class="py-3 px-4 font-medium text-gray-900 dark:text-white text-xs">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</td>
+          <td class="py-3 px-3 font-mono font-medium text-gray-600 dark:text-gray-400 text-xs">${escapeHtml(r.invoice_no || '—')}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
+          <td class="py-3 px-3 text-gray-500 text-xs">${escapeHtml(r.created_by || 'Thủ kho')}</td>
+          <td class="py-3 px-3 text-center">
+            <button type="button" onclick="viewReceiptDetail(${r.id})" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  if (mob) {
+    if (!receipts.length) {
+      mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy phiếu nhập kho nào phù hợp.</div>`;
+    } else {
+      mob.innerHTML = receipts.map(r => `
+        <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</span>
+              <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</h4>
+              <div class="text-xs text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(formatReceiptDateYMD(r.receipt_date))} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
+            </div>
+            <div class="text-right">
+              <span class="font-bold text-xs text-gray-900 dark:text-white tabular-nums block">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</span>
+              <span class="text-xs text-gray-400">${escapeHtml(r.created_by || 'Thủ kho')}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+export async function loadFnbReceiptsHistory(siteCodeArg?: string): Promise<void> {
+  const siteCode = siteCodeArg || getActiveFnbReceiptSite();
 
   try {
     const res = await fetch(`/api/fnb/receipts?site_code=${encodeURIComponent(siteCode)}&no-cache=1`);
     const json = await res.json();
     if (json.success && json.data) {
       const receipts: any[] = json.data.receipts || [];
+      window.gFnbReceiptsHistory = receipts;
 
       // Update badge
       const bHist = document.getElementById('fnbReceiptBadgeHistoryCount');
       if (bHist) bHist.textContent = String(receipts.length);
 
-      if (tbody) {
-        if (!receipts.length) {
-          tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Chưa có phiếu nhập kho nào cho điểm bán ${escapeHtml(siteCode)}.</td></tr>`;
-        } else {
-          tbody.innerHTML = receipts.map(r => `
-            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="py-3 px-4 font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</td>
-              <td class="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(r.site_code)}</td>
-              <td class="py-3 px-3 tabular-nums font-mono text-gray-600 dark:text-gray-300 text-xs">${escapeHtml(formatReceiptDateYMD(r.receipt_date))}</td>
-              <td class="py-3 px-4 font-medium text-gray-900 dark:text-white text-xs">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</td>
-              <td class="py-3 px-3 font-mono font-medium text-gray-600 dark:text-gray-400 text-xs">${escapeHtml(r.invoice_no || '—')}</td>
-              <td class="py-3 px-4 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</td>
-              <td class="py-3 px-3 text-gray-500 text-xs">${escapeHtml(r.created_by || 'Thủ kho')}</td>
-              <td class="py-3 px-3 text-center">
-                <button type="button" onclick="viewReceiptDetail(${r.id})" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">
-                  <i data-lucide="eye" class="w-4 h-4"></i>
-                </button>
-              </td>
-            </tr>
-          `).join('');
-        }
-      }
-
-      if (mob) {
-        if (!receipts.length) {
-          mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có phiếu nhập kho nào.</div>`;
-        } else {
-          mob.innerHTML = receipts.map(r => `
-            <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</span>
-                  <h4 class="font-bold text-sm text-gray-900 dark:text-white mt-0.5">${escapeHtml(r.supplier || 'Bếp Trung Tâm Siba')}</h4>
-                  <div class="text-xs text-gray-400 tabular-nums">Ngày nhập: ${escapeHtml(formatReceiptDateYMD(r.receipt_date))} • PO: ${escapeHtml(r.invoice_no || '—')}</div>
-                </div>
-                <div class="text-right">
-                  <span class="font-bold text-xs text-gray-900 dark:text-white tabular-nums block">${Math.round(r.total_amount || 0).toLocaleString('vi-VN')} đ</span>
-                  <span class="text-xs text-gray-400">${escapeHtml(r.created_by || 'Thủ kho')}</span>
-                </div>
-              </div>
-            </div>
-          `).join('');
-        }
-      }
-
-      if (window.lucide) window.lucide.createIcons();
+      populateReceiptsHistorySupplierFilter(receipts);
+      renderFnbReceiptsHistoryTable();
     }
   } catch (err) {
     console.error('loadFnbReceiptsHistory error:', err);
