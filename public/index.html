@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1440">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1445">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1440"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1445"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -457,40 +457,17 @@
         <span id="mobileHeaderTitle" class="hidden"></span>
       </div>
 
-      <!-- Center: Global Quick Search -->
-      <div class="hidden lg:block flex-1 max-w-md xl:max-w-xl mx-2 xl:mx-4">
-        <div data-slot="input-group" class="header-control group/input-group relative flex w-full min-w-0 items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-theme-xs outline-hidden transition-colors has-[input:focus]:border-brand-300 has-[input:focus]:ring-4 has-[input:focus]:ring-brand-500/10">
-          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 ps-3 text-sm font-medium text-gray-400 select-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" class="size-4.5 text-gray-400">
-              <path d="M14.382 14.383l3.325 3.326m-1.249-8.334a7.082 7.082 0 01-7.083 7.081 7.082 7.082 0 110-14.163 7.082 7.082 0 017.083 7.082z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <input
-            id="globalHeaderSearch"
-            oninput="filterGlobalQuickSearch(this.value)"
-            type="text"
-            placeholder="Tìm chức năng, SKU, hàng hóa... (F2)"
-            class="h-full flex-1 rounded-none border-0 bg-transparent px-2.5 text-sm text-gray-900 shadow-none ring-0 outline-hidden placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden dark:text-white dark:placeholder:text-gray-500"
-          />
-          <div class="flex h-auto cursor-text items-center justify-center gap-2 py-1.5 pe-3 text-xs font-medium text-gray-400 select-none">
-            <span onclick="document.getElementById('globalHeaderSearch').focus()" class="inline-flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-xs font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:border-gray-300 transition-colors">
-              F2
-            </span>
-          </div>
-        </div>
-      </div>
-
       <!-- Right: Controls, Filters & User Profile -->
-      <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 shrink-0">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 lg:gap-3 shrink-0 ml-auto">
         
         <!-- Global Branch & Region Taskbar Display (Interactive Pill) -->
-        <div onclick="openSiteSelectorModal()" class="header-control rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-3 flex items-center gap-2 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
+        <div onclick="openSiteSelectorModal()" class="header-control rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-3.5 flex items-center gap-2.5 shadow-theme-xs shrink-0 cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
           <div class="w-5 h-5 rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center shrink-0">
             <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
           </div>
-          <div class="flex items-center gap-1.5 min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
             <span id="taskbarRegionBadge" class="hidden xs:inline-block text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
-            <span id="taskbarSiteName" class="font-medium text-xs text-gray-800 dark:text-gray-100 max-w-[85px] xs:max-w-[120px] sm:max-w-[180px] lg:max-w-[220px] truncate">K001 - Bếp ĐH Hùng Vương</span>
+            <span id="taskbarSiteName" class="font-medium text-xs text-gray-800 dark:text-gray-100 max-w-[140px] sm:max-w-[260px] lg:max-w-[340px] truncate">K001 - Bếp ĐH Hùng Vương</span>
           </div>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
           <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
@@ -503,7 +480,7 @@
             type="text"
             id="globalDateRangePicker"
             placeholder="2 tháng gần nhất..."
-            class="header-control pl-9 pr-3 w-56 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-mono font-medium shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer outline-none focus:border-brand-500"
+            class="header-control pl-9 pr-3.5 w-64 lg:w-72 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-mono font-medium shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer outline-none focus:border-brand-500"
             readonly
           />
           <input type="hidden" id="globalMonthPicker" value="2026-11">
@@ -3928,14 +3905,6 @@
           <div class="field">
             <label for="scLoai" class="field-label">Loại hóa đơn</label>
             <select id="scLoai" onchange="searchVouchers()" class="select"></select>
-          </div>
-          <div class="field">
-            <label for="scTu" class="field-label">Từ ngày</label>
-            <input type="date" id="scTu" onchange="searchVouchers()" class="input">
-          </div>
-          <div class="field">
-            <label for="scDen" class="field-label">Đến ngày</label>
-            <input type="date" id="scDen" onchange="searchVouchers()" class="input">
           </div>
           <div class="flex items-center gap-2">
             <button onclick="exportVouchersExcel()" class="btn btn-secondary w-full sm:w-auto" title="Xuất danh sách chứng từ ra file Excel">

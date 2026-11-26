@@ -395,8 +395,10 @@ export async function searchVouchers(): Promise<void> {
   const siteInput = document.getElementById('scSite') as HTMLSelectElement | null;
   const site = activeSite || (siteInput ? siteInput.value : '');
   const loai = (document.getElementById('scLoai') as HTMLSelectElement | null)?.value || '';
-  const tuNgay = (document.getElementById('scTu') as HTMLInputElement | null)?.value || '';
-  const denNgay = (document.getElementById('scDen') as HTMLInputElement | null)?.value || '';
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  const globalRange = typeof w.getGlobalDateRange === 'function' ? w.getGlobalDateRange() : null;
+  const tuNgay = globalRange?.startDate || '';
+  const denNgay = globalRange?.endDate || '';
   const auditFilter = (document.getElementById('scAuditFilter') as HTMLSelectElement | null)?.value || '';
 
   if (typeof showLoading === 'function') showLoading('Tra cứu chứng từ...');
