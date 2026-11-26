@@ -11,23 +11,18 @@ export function switchFnbReceiptSubView(view: ReceiptSubView): void {
   const poView = document.getElementById('fnbPoListView');
   const histView = document.getElementById('fnbReceiptHistoryView');
 
+  const activeCls = 'pb-2.5 pt-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold text-xs flex items-center gap-2 shrink-0 transition-all';
+  const inactiveCls = 'pb-2.5 pt-1 border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium text-xs flex items-center gap-2 shrink-0 transition-all';
+
   if (view === 'po') {
-    if (poBtn) {
-      poBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 bg-brand-500 text-white shadow-theme-xs';
-    }
-    if (histBtn) {
-      histBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-300/80 dark:border-gray-700 bg-gray-100 dark:bg-gray-800';
-    }
+    if (poBtn) poBtn.className = activeCls;
+    if (histBtn) histBtn.className = inactiveCls;
     if (poView) poView.classList.remove('hidden');
     if (histView) histView.classList.add('hidden');
     loadFnbPoList();
   } else {
-    if (histBtn) {
-      histBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 bg-brand-500 text-white shadow-theme-xs';
-    }
-    if (poBtn) {
-      poBtn.className = 'px-4 py-2 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2 border border-gray-300/80 dark:border-gray-700 bg-gray-100 dark:bg-gray-800';
-    }
+    if (histBtn) histBtn.className = activeCls;
+    if (poBtn) poBtn.className = inactiveCls;
     if (histView) histView.classList.remove('hidden');
     if (poView) poView.classList.add('hidden');
     if (typeof window.loadFnbReceiptsHistory === 'function') {

@@ -29,22 +29,17 @@ export function switchFnbWasteSubView(view: WasteSubView): void {
   const secStock = document.getElementById('fnbWasteSubViewStock');
   const secHistory = document.getElementById('fnbWasteSubViewHistory');
 
+  const activeCls = 'pb-2.5 pt-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold text-xs flex items-center gap-2 shrink-0 transition-all';
+  const inactiveCls = 'pb-2.5 pt-1 border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium text-xs flex items-center gap-2 shrink-0 transition-all';
+
   if (view === 'history') {
-    if (btnStock) {
-      btnStock.className = 'btn btn-secondary btn-sm';
-    }
-    if (btnHistory) {
-      btnHistory.className = 'btn btn-primary btn-sm';
-    }
+    if (btnStock) btnStock.className = inactiveCls;
+    if (btnHistory) btnHistory.className = activeCls;
     if (secStock) secStock.classList.add('hidden');
     if (secHistory) secHistory.classList.remove('hidden');
   } else {
-    if (btnStock) {
-      btnStock.className = 'btn btn-primary btn-sm';
-    }
-    if (btnHistory) {
-      btnHistory.className = 'btn btn-secondary btn-sm';
-    }
+    if (btnStock) btnStock.className = activeCls;
+    if (btnHistory) btnHistory.className = inactiveCls;
     if (secStock) secStock.classList.remove('hidden');
     if (secHistory) secHistory.classList.add('hidden');
   }

@@ -82,26 +82,19 @@ export function switchKitchenIssueSubView(mode: 'create' | 'history'): void {
   const btnCreate = document.getElementById('btnSubTabKitchenCreate');
   const btnHistory = document.getElementById('btnSubTabKitchenHistory');
 
+  const activeCls = 'pb-2.5 pt-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold text-xs flex items-center gap-2 shrink-0 transition-all';
+  const inactiveCls = 'pb-2.5 pt-1 border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium text-xs flex items-center gap-2 shrink-0 transition-all';
+
   if (mode === 'create') {
     if (createView) createView.classList.remove('hidden');
     if (historyView) historyView.classList.add('hidden');
-
-    if (btnCreate) {
-      btnCreate.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white';
-    }
-    if (btnHistory) {
-      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800';
-    }
+    if (btnCreate) btnCreate.className = activeCls;
+    if (btnHistory) btnHistory.className = inactiveCls;
   } else {
     if (createView) createView.classList.add('hidden');
     if (historyView) historyView.classList.remove('hidden');
-
-    if (btnCreate) {
-      btnCreate.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800';
-    }
-    if (btnHistory) {
-      btnHistory.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white';
-    }
+    if (btnCreate) btnCreate.className = inactiveCls;
+    if (btnHistory) btnHistory.className = activeCls;
 
     const siteCode = getActiveKitchenIssueSite();
     loadKitchenIssueHistory(siteCode);
