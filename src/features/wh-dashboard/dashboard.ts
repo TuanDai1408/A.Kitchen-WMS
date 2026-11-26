@@ -325,6 +325,11 @@ export async function loadDashboardSummary(): Promise<void> {
 
       const brEl = document.getElementById('badgeRopNav');
       if (brEl) brEl.textContent = String(d.rop_reorder_count || 0);
+
+      const w = typeof window !== 'undefined' ? (window as any) : {};
+      if (typeof w.updateHeaderQuickAlerts === 'function') {
+        w.updateHeaderQuickAlerts(d.rop_reorder_count || 0, d.critical_exp_count || 0);
+      }
     }
   } catch (e) {
     console.error('Error loading dashboard summary:', e);

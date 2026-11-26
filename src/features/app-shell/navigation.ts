@@ -210,6 +210,7 @@ function getDefaultTwoMonthRange(): { startDate: string; endDate: string } {
 
 let gGlobalDateRange = getDefaultTwoMonthRange();
 let gDateFetchInterceptorInstalled = false;
+let gGlobalFlatpickrInstance: any = null;
 
 export function getGlobalDateRange(): { startDate: string; endDate: string; month: string } {
   return {
@@ -268,19 +269,80 @@ export function initGlobalDateRangePicker(): void {
   const hiddenMonth = document.getElementById('globalMonthPicker') as HTMLInputElement | null;
   if (hiddenMonth) hiddenMonth.value = gGlobalDateRange.endDate.slice(0, 7);
 
-  flatpickr(el, {
+  gGlobalFlatpickrInstance = flatpickr(el, {
     mode: 'range',
     dateFormat: 'd/m/Y',
     defaultDate: [startDt, endDt],
     locale: (flatpickr.l10ns && flatpickr.l10ns.vn) ? flatpickr.l10ns.vn : ((flatpickr.l1ons && flatpickr.l1ons.vn) ? flatpickr.l1ons.vn : 'default'),
     onChange: (selectedDates: Date[]) => {
       if (selectedDates && selectedDates.length === 2) {
+        document.querySelectorAll('.global-date-preset').forEach(b => {
+          b.classList.remove('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
+          b.classList.add('text-gray-600', 'dark:text-gray-300', 'font-medium');
+        });
         const sIso = formatIsoDate(selectedDates[0]);
         const eIso = formatIsoDate(selectedDates[1]);
         onGlobalDateRangeChange(sIso, eIso);
       }
     }
   });
+}
+
+export function applyGlobalDatePreset(preset: '7d' | '30d' | '2m' | 'this_month', btn?: HTMLElement): void {
+  const end = new Date();
+  let start = new Date();
+  if (preset === '7d') {
+    start = new Date(end.getTime() - 6 * 86400000);
+  } else if (preset === '30d') {
+    start = new Date(end.getTime() - 29 * 86400000);
+  } else if (preset === 'this_month') {
+    start = new Date(end.getFullYear(), end.getMonth(), 1);
+  } else {
+    start = new Date(end.getFullYear(), end.getMonth() - 2, end.getDate());
+  }
+
+  document.querySelectorAll('.global-date-preset').forEach(b => {
+    b.classList.remove('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
+    b.classList.add('text-gray-600', 'dark:text-gray-300', 'font-medium');
+  });
+  const targetBtn = btn || document.querySelector(`.global-date-preset[data-preset="${preset}"]`);
+  if (targetBtn) {
+    targetBtn.classList.add('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
+    targetBtn.classList.remove('text-gray-600', 'dark:text-gray-300', 'font-medium');
+  }
+
+  if (gGlobalFlatpickrInstance && typeof gGlobalFlatpickrInstance.setDate === 'function') {
+    gGlobalFlatpickrInstance.setDate([start, end], false);
+  }
+  onGlobalDateRangeChange(formatIsoDate(start), formatIsoDate(end));
+}
+
+export function refreshCurrentTab(): void {
+  const icon = document.getElementById('headerSyncIcon');
+  if (icon) {
+    icon.classList.add('animate-spin');
+    setTimeout(() => icon.classList.remove('animate-spin'), 700);
+  }
+  invalidateTabCache();
+  const activeTab = localStorage.getItem('orbit_active_tab') || 'wh-dashboard';
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (typeof w.switchTab === 'function') {
+    w.switchTab(activeTab, undefined, true);
+  }
+  if (typeof w.loadDashboardSummary === 'function' && activeTab !== 'wh-dashboard') {
+    w.loadDashboardSummary();
+  }
+  showToast('Đã làm mới dữ liệu trang hiện tại!');
+}
+
+export function updateHeaderQuickAlerts(ropCount: number, criticalCount: number): void {
+  const total = (Number(ropCount) || 0) + (Number(criticalCount) || 0);
+  const badge = document.getElementById('headerQuickAlertCount');
+  const btn = document.getElementById('headerQuickAlertBtn');
+  if (badge) badge.textContent = String(total);
+  if (btn) {
+    btn.setAttribute('title', `${ropCount || 0} mã dưới ROP • ${criticalCount || 0} mã cận date/tồn âm (Click để xem chi tiết)`);
+  }
 }
 
 export function onGlobalDateRangeChange(startIso: string, endIso: string): void {

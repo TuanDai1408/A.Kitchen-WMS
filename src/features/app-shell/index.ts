@@ -77,6 +77,9 @@ import {
   switchTab,
   onGlobalMonthChange,
   onGlobalDateRangeChange,
+  applyGlobalDatePreset,
+  refreshCurrentTab,
+  updateHeaderQuickAlerts,
   getGlobalDateRange,
   initGlobalDateRangePicker,
   onGlobalBranchChange,
@@ -164,6 +167,9 @@ if (typeof window !== 'undefined') {
   w.switchTab = switchTab;
   w.onGlobalMonthChange = onGlobalMonthChange;
   w.onGlobalDateRangeChange = onGlobalDateRangeChange;
+  w.applyGlobalDatePreset = applyGlobalDatePreset;
+  w.refreshCurrentTab = refreshCurrentTab;
+  w.updateHeaderQuickAlerts = updateHeaderQuickAlerts;
   w.getGlobalDateRange = getGlobalDateRange;
   w.initGlobalDateRangePicker = initGlobalDateRangePicker;
   w.onGlobalBranchChange = onGlobalBranchChange;
