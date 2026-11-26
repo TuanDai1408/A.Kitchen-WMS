@@ -4824,6 +4824,23 @@ export default {
         }
 
         const eType = String(logRow.entity_type || '').toUpperCase();
+        const isPgRestore = db.isPg(env);
+        const safeTxStep = async (tx, fn) => {
+          if (!isPgRestore) {
+            try { return await fn(); } catch (_) { return null; }
+          }
+          const sp = 'sp_' + Math.random().toString(36).slice(2, 10);
+          await tx.exec(`SAVEPOINT ${sp}`);
+          try {
+            const res = await fn();
+            await tx.exec(`RELEASE SAVEPOINT ${sp}`);
+            return res;
+          } catch (err) {
+            await tx.exec(`ROLLBACK TO SAVEPOINT ${sp}`).catch(() => {});
+            await tx.exec(`RELEASE SAVEPOINT ${sp}`).catch(() => {});
+            return null;
+          }
+        };
         const insertDynamic = async (tx, tableName, obj, excludeCols = ['id'], returningId = false) => {
           const keys = Object.keys(obj || {}).filter(k => !excludeCols.includes(k) && obj[k] !== undefined);
           if (!keys.length) return null;
