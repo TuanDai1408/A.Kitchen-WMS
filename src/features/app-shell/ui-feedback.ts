@@ -143,7 +143,7 @@ export function showToast(msg: string): void {
   }
 }
 
-export function showLoading(msg: string = 'Đang xử lý...'): void {
+export function showLoading(msg: string = 'Đang đồng bộ dữ liệu hệ thống...'): void {
   const loadingEl = document.getElementById('loading');
   const msgEl = document.getElementById('loadingMsg');
   if (msgEl) msgEl.textContent = msg;

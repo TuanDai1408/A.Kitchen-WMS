@@ -1,5 +1,5 @@
 import type { PortalOrderItem } from './types';
-import { safeCellCode, safeCellBadge, fmtVND, fmtNum } from './helpers';
+import { safeCellCode, safeCellBadge, safeEscapeHtml, fmtVND, fmtNum } from './helpers';
 
 declare const lucide: any;
 
@@ -239,4 +239,70 @@ export function calcBudget(forcedBudget?: number, forcedDaDat?: number): void {
       if (budNote) budNote.textContent = `Ngân sách an toàn (${pct}%).`;
     }
   }
+  renderOrderCartSummary();
+}
+
+export function renderOrderCartSummary(): void {
+  const card = document.getElementById('orderCartSummaryCard');
+  const tbody = document.getElementById('orderCartSummaryBody');
+  const countEl = document.getElementById('orderCartItemCount');
+  const qtyEl = document.getElementById('orderCartTotalQty');
+  const amtEl = document.getElementById('orderCartTotalAmount');
+  if (!card || !tbody) return;
+
+  const selected = getAppItems().filter(i => (Number(i.soLuongDat) || 0) > 0);
+  if (!selected.length) {
+    card.classList.add('hidden');
+    tbody.innerHTML = '';
+    return;
+  }
+
+  card.classList.remove('hidden');
+  const totalQty = selected.reduce((s, it) => s + (Number(it.soLuongDat) || 0), 0);
+  const totalAmt = selected.reduce((s, it) => s + ((Number(it.soLuongDat) || 0) * (Number(it.donGia) || 0)), 0);
+
+  if (countEl) countEl.textContent = String(selected.length);
+  if (qtyEl) qtyEl.textContent = String(Math.round(totalQty * 10) / 10);
+  if (amtEl) amtEl.textContent = fmtVND(totalAmt);
+
+  tbody.innerHTML = selected.map((it, idx) => {
+    const qty = Number(it.soLuongDat) || 0;
+    const price = Number(it.donGia) || 0;
+    const lineAmt = qty * price;
+    return `
+      <tr class="hover:bg-white/60 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="p-3 text-center font-mono text-xs text-gray-400">${idx + 1}</td>
+        <td class="p-3 font-mono text-xs font-bold text-gray-800 dark:text-gray-200 whitespace-nowrap">${safeEscapeHtml(it.maHang)}</td>
+        <td class="p-3 text-xs font-semibold text-gray-900 dark:text-white">${safeEscapeHtml(it.tenSP)}</td>
+        <td class="p-3 text-xs text-gray-600 dark:text-gray-300">${safeEscapeHtml(it.dvt || '')}</td>
+        <td class="p-3 text-right font-mono text-xs text-gray-600 dark:text-gray-300">${fmtVND(price)}</td>
+        <td class="p-3 text-right font-mono text-xs font-bold text-brand-600 dark:text-brand-400">${qty}</td>
+        <td class="p-3 text-right font-mono text-xs font-bold text-gray-900 dark:text-white">${fmtVND(lineAmt)}</td>
+        <td class="p-3 text-center">
+          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (w.lucide && typeof w.lucide.createIcons === 'function') {
+    w.lucide.createIcons({ root: card });
+  }
+}
+
+export function removeOrderCartItem(sku: string): void {
+  onQtyChange(sku, '0');
+  document.querySelectorAll<HTMLInputElement>(`input[oninput*="'${sku}'"]`).forEach(inp => {
+    inp.value = '';
+  });
+}
+
+export function clearOrderCart(): void {
+  const items = getAppItems();
+  items.forEach(it => { it.soLuongDat = 0; });
+  renderOrderTable();
+  calcBudget();
 }

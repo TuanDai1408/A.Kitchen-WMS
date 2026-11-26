@@ -90,7 +90,7 @@ export async function loadQuota(): Promise<void> {
   } catch (err: any) {
     if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + (err?.message || err));
   } finally {
-    // Background fetch complete
+    if (typeof hideLoading === 'function') hideLoading();
   }
 }
 
@@ -161,7 +161,7 @@ export async function submitOrder(): Promise<void> {
   const orderNoteEl = document.getElementById('orderNote') as HTMLTextAreaElement | null;
   const ghiChu = orderNoteEl ? orderNoteEl.value : '';
 
-  if (typeof showLoading === 'function') showLoading('Lưu đơn hàng vào Cloudflare D1...');
+  if (typeof showLoading === 'function') showLoading('Đang gửi đơn đặt hàng...');
   try {
     const payload: CreateOrderPayload = {
       site,
@@ -188,13 +188,13 @@ export async function submitOrder(): Promise<void> {
       if (typeof closeGeneralModal === 'function') closeGeneralModal();
       if (typeof showToast === 'function') showToast(`Đã tạo đơn hàng thành công! Mã: ${json.data.maDon}`);
       items.forEach(i => { i.soLuongDat = 0; });
-      loadQuota();
+      await loadQuota();
     } else {
       if (typeof showToast === 'function') showToast('Lỗi: ' + json.error);
     }
   } catch (err: any) {
     if (typeof showToast === 'function') showToast('Lỗi: ' + (err?.message || err));
   } finally {
-    // Background fetch complete
+    if (typeof hideLoading === 'function') hideLoading();
   }
 }

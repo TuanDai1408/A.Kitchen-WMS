@@ -67,7 +67,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     tabs: [
       { id: 'portal-voucher', name: 'Tạo & Duyệt Chứng Từ', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán', icon: 'file-text' },
       { id: 'portal-search', name: 'Tra Cứu Chứng Từ', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều', icon: 'search' },
-      { id: 'portal-order', name: 'Đặt Hàng Vật Tư Bếp', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán', icon: 'shopping-bag' },
+      { id: 'portal-order', name: 'Đặt Hàng Vật Tư', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán', icon: 'shopping-bag' },
       { id: 'portal-history', name: 'Lịch Sử Đặt Hàng', desc: 'Nhật ký thẻ kho và giao dịch kho tổng', icon: 'history' },
       { id: 'portal-baocao', name: 'Báo Cáo Suất Ăn Ca', desc: 'Báo cáo suất ăn và chi phí phát sinh', icon: 'bar-chart-2' },
       { id: 'portal-kiemke', name: 'Kiểm Kê Tồn Kho Kỳ', desc: 'Đối soát và cân chỉnh tồn kho tổng', icon: 'check-square' }
@@ -115,7 +115,7 @@ export const FEATURE_TITLES: Record<string, FeatureTitleInfo> = {
   // Nhóm 4: Cổng Thông Tin & Đặt Hàng
   'portal-voucher': { name: 'Tạo & Duyệt Chứng Từ', role: 'KE_TOAN', desc: 'Quản lý hóa đơn thuế, chứng từ thanh toán' },
   'portal-search': { name: 'Tra Cứu Chứng Từ', role: 'KE_TOAN', desc: 'Tìm kiếm số liệu kế toán và phân tích đa chiều' },
-  'portal-order': { name: 'Đặt Hàng Vật Tư Bếp', role: 'NHAN_VIEN', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán' },
+  'portal-order': { name: 'Đặt Hàng Vật Tư', role: 'NHAN_VIEN', desc: 'Tạo đơn đặt nguyên vật liệu giao về điểm bán' },
   'portal-history': { name: 'Lịch Sử Đặt Hàng', role: 'KHO_TRUONG', desc: 'Nhật ký thẻ kho và giao dịch kho tổng' },
   'portal-baocao': { name: 'Báo Cáo Suất Ăn Ca', role: 'NHAN_VIEN', desc: 'Báo cáo suất ăn và chi phí phát sinh' },
   'portal-kiemke': { name: 'Kiểm Kê Tồn Kho Kỳ', role: 'KHO_TRUONG', desc: 'Đối soát và cân chỉnh tồn kho tổng' },

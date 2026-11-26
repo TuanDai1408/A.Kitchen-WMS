@@ -26,7 +26,7 @@ export const TAB_META: Record<string, TabMetadata> = {
   // Nhóm 4: Cổng Thông Tin & Đặt Hàng -> mobTab: 'portal-voucher' hoặc 'portal-baocao'
   'portal-voucher': { title: 'Tạo & Duyệt Chứng Từ', mobTab: 'portal-voucher' },
   'portal-search': { title: 'Tra Cứu Chứng Từ', mobTab: 'portal-voucher' },
-  'portal-order': { title: 'Đặt Hàng Vật Tư Bếp', mobTab: 'portal-voucher' },
+  'portal-order': { title: 'Đặt Hàng Vật Tư', mobTab: 'portal-voucher' },
   'portal-history': { title: 'Lịch Sử Đặt Hàng', mobTab: 'portal-voucher' },
   'portal-baocao': { title: 'Báo Cáo Suất Ăn Ca', mobTab: 'portal-baocao' },
   'portal-kiemke': { title: 'Kiểm Kê Tồn Kho Kỳ', mobTab: 'portal-voucher' },

@@ -4,7 +4,10 @@ import {
   renderOrderTable,
   filterItems,
   onQtyChange,
-  calcBudget
+  calcBudget,
+  renderOrderCartSummary,
+  removeOrderCartItem,
+  clearOrderCart
 } from './order-table';
 import {
   loadQuota,
@@ -24,6 +27,9 @@ win.renderOrderTable = renderOrderTable;
 win.filterItems = filterItems;
 win.onQtyChange = onQtyChange;
 win.calcBudget = calcBudget;
+win.renderOrderCartSummary = renderOrderCartSummary;
+win.removeOrderCartItem = removeOrderCartItem;
+win.clearOrderCart = clearOrderCart;
 win.reviewOrder = reviewOrder;
 win.submitOrder = submitOrder;
 win.getAppOrderItems = getAppItems;

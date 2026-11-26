@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1525">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1530">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1525"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1530"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -326,7 +326,7 @@
               <button onclick="switchTab('portal-order', this)" data-tab="portal-order" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
                 <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="shopping-cart" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
-                  <span class="truncate">Đặt Hàng Vật Tư Bếp</span>
+                  <span class="truncate">Đặt Hàng Vật Tư</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -1949,7 +1949,7 @@
               <option value="WASTE">Hủy hàng &amp; hao hụt</option>
               <option value="COUNT">Kiểm kê hằng ngày</option>
               <option value="RECEIPT">Nhập kho tại site</option>
-              <option value="ORDER">Đặt hàng vật tư bếp</option>
+              <option value="ORDER">Đặt Hàng Vật Tư</option>
               <option value="VOUCHER">Chứng từ kế toán</option>
             </select>
             <button type="button" onclick="loadDeletedRecords()" class="btn btn-secondary text-xs shrink-0">
@@ -3968,7 +3968,7 @@
 <section id="portal-order" class="tab-panel space-y-5">
         <div class="page-header">
           <div>
-            <h1 class="page-title">Đặt hàng vật tư bếp</h1>
+            <h1 class="page-title">Đặt Hàng Vật Tư</h1>
             <p class="page-subtitle">Tạo đơn đặt nguyên vật liệu, kiểm soát hạn mức ngân sách và gửi duyệt theo kỳ</p>
           </div>
         </div>
@@ -4157,6 +4157,51 @@
           </div>
           <!-- Native Mobile Card View -->
           <div id="orderMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+        </div>
+
+        <!-- Bảng con tổng hợp các mặt hàng đã chọn đặt -->
+        <div id="orderCartSummaryCard" class="hidden table-card p-5 border-2 border-brand-200 dark:border-brand-800/60 bg-brand-50/20 dark:bg-brand-950/10 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200/80 dark:border-gray-800">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <div class="w-8 h-8 rounded-xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Tổng hợp mặt hàng đã đặt</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Đã chọn <span id="orderCartItemCount" class="font-mono font-bold text-brand-600 dark:text-brand-400">0</span> mã •
+                  Tổng SL: <span id="orderCartTotalQty" class="font-mono font-bold text-gray-800 dark:text-gray-200">0</span> •
+                  Ước tính: <span id="orderCartTotalAmount" class="font-mono font-bold text-emerald-600 dark:text-emerald-400">0 đ</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" onclick="clearOrderCart()" class="btn btn-secondary text-xs">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Xóa tất cả
+              </button>
+              <button type="button" onclick="reviewOrder()" class="btn btn-primary text-xs">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i> Xác nhận gửi đơn hàng
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="text-center w-12">STT</th>
+                  <th class="col-code">Mã hàng</th>
+                  <th>Tên sản phẩm</th>
+                  <th>ĐVT</th>
+                  <th class="col-num text-right">Đơn giá</th>
+                  <th class="col-num text-right">SL đặt</th>
+                  <th class="col-num text-right">Thành tiền</th>
+                  <th class="text-center w-16">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="orderCartSummaryBody" class="divide-y divide-gray-100 dark:divide-gray-800"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 <section id="portal-history" class="tab-panel space-y-5">
@@ -5128,7 +5173,7 @@
                 <i data-lucide="shopping-cart" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
               </div>
               <div class="min-w-0 flex-1">
-                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Đặt Hàng Vật Tư Bếp</div>
+                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Đặt Hàng Vật Tư</div>
                 <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Đặt hàng kho tổng</div>
               </div>
             </button>
@@ -7859,9 +7904,18 @@
   </div>
 
   <!-- Loading Overlay -->
-  <div id="loading" style="z-index: 100050;" class="fixed inset-0 bg-white/70 dark:bg-gray-900/80 backdrop-blur-xs flex flex-col items-center justify-center gap-3 hidden">
-    <div class="w-9 h-9 border-3 border-gray-200 dark:border-gray-800 border-t-brand-600 rounded-full animate-spin"></div>
-    <span class="text-xs font-bold text-gray-700 dark:text-gray-200" id="loadingMsg">Đang tải dữ liệu Cloudflare D1...</span>
+  <div id="loading" style="z-index: 100050;" class="fixed inset-0 bg-slate-900/35 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl px-6 py-5 flex flex-col items-center gap-3 min-w-[240px]">
+      <div class="relative w-12 h-12 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border-3 border-brand-100 dark:border-brand-950"></div>
+        <div class="absolute inset-0 rounded-full border-3 border-transparent border-t-brand-600 dark:border-t-brand-400 animate-spin"></div>
+        <i data-lucide="package-check" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+      </div>
+      <div class="text-center">
+        <div class="text-xs font-bold text-gray-900 dark:text-white">A.Kitchen WMS</div>
+        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5 block" id="loadingMsg">Đang đồng bộ dữ liệu hệ thống...</span>
+      </div>
+    </div>
   </div>
 
   <!-- ========================================================================
