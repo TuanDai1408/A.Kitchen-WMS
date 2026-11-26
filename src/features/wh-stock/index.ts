@@ -2,6 +2,7 @@ import {
   renderFefoRows,
   filterFefoLive,
   changeStockPage,
+  changeStockPageSize,
   sortStockBy,
   resetFefoFilters,
   toggleSelectAllStock,
@@ -32,6 +33,8 @@ import {
   switchWhStockSubView,
   loadBatchManager,
   renderBatchManagerTable,
+  openBatchItemsDetailModal,
+  closeBatchItemsDetailModal,
   openCreateBatchModal,
   openEditBatchModal,
   closeBatchManageModal,
@@ -54,6 +57,7 @@ if (typeof window !== 'undefined') {
   w.renderFefoRows = renderFefoRows;
   w.filterFefoLive = filterFefoLive;
   w.changeStockPage = changeStockPage;
+  w.changeStockPageSize = changeStockPageSize;
   w.sortStockBy = sortStockBy;
   w.resetFefoFilters = resetFefoFilters;
   w.toggleSelectAllStock = toggleSelectAllStock;
@@ -81,6 +85,8 @@ if (typeof window !== 'undefined') {
   w.switchWhStockSubView = switchWhStockSubView;
   w.loadBatchManager = loadBatchManager;
   w.renderBatchManagerTable = renderBatchManagerTable;
+  w.openBatchItemsDetailModal = openBatchItemsDetailModal;
+  w.closeBatchItemsDetailModal = closeBatchItemsDetailModal;
   w.openCreateBatchModal = openCreateBatchModal;
   w.openEditBatchModal = openEditBatchModal;
   w.closeBatchManageModal = closeBatchManageModal;

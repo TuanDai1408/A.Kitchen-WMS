@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1150">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1200">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1150"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1200"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -2791,19 +2791,21 @@
                 <span>Quản lý lô hàng</span>
               </button>
             </div>
-            <button onclick="exportFefoToExcel()" class="btn btn-secondary">
-              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
-            </button>
-            <button onclick="openReceiptModal()" class="btn btn-primary">
-              <i data-lucide="plus" class="w-4 h-4"></i> Nhập lô mới
-            </button>
+            <div id="whStockFefoHeaderActions" class="flex items-center gap-2">
+              <button onclick="exportFefoToExcel()" class="btn btn-secondary">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+              </button>
+              <button onclick="openReceiptModal()" class="btn btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nhập lô mới
+              </button>
+            </div>
           </div>
         </div>
 
         <div id="whStockSubViewFefo" class="space-y-4">
         <!-- Filter Bar -->
-        <div class="filter-bar">
-          <div class="relative flex-1 min-w-[220px]">
+        <div class="filter-bar grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-2.5">
+          <div class="relative sm:col-span-2 lg:flex-1 lg:min-w-[220px]">
             <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             <input 
               type="text" 
@@ -2814,8 +2816,8 @@
             />
           </div>
 
-          <div class="w-full sm:w-44">
-            <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select">
+          <div class="w-full lg:w-44">
+            <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select w-full">
               <option value="">Tất cả nhóm hàng</option>
               <option value="Gia vị">Gia vị</option>
               <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
@@ -2823,14 +2825,14 @@
             </select>
           </div>
 
-          <div class="w-full sm:w-44">
-            <select id="fefoBatchFilter" onchange="filterFefoLive()" class="select font-mono">
+          <div class="w-full lg:w-44">
+            <select id="fefoBatchFilter" onchange="filterFefoLive()" class="select font-mono w-full">
               <option value="">Tất cả lô hàng</option>
             </select>
           </div>
 
-          <div class="w-full sm:w-48">
-            <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select">
+          <div class="w-full lg:w-44">
+            <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select w-full">
               <option value="">Tất cả trạng thái</option>
               <option value="safe">An toàn</option>
               <option value="yellow">Cận Date (≤ 15 ngày)</option>
@@ -2838,9 +2840,17 @@
             </select>
           </div>
 
-          <button onclick="resetFefoFilters()" class="btn btn-secondary btn-icon" title="Đặt lại bộ lọc">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-          </button>
+          <div class="flex items-center gap-2 lg:w-auto">
+            <select id="fefoPageSizeSelect" onchange="changeStockPageSize(this.value)" class="select font-mono w-full lg:w-32" title="Số dòng hiển thị mỗi trang">
+              <option value="10">10 dòng</option>
+              <option value="25" selected>25 dòng</option>
+              <option value="50">50 dòng</option>
+              <option value="100">100 dòng</option>
+            </select>
+            <button onclick="resetFefoFilters()" class="btn btn-secondary btn-icon shrink-0" title="Đặt lại bộ lọc">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Bulk Selection Indicator -->
@@ -2905,32 +2915,29 @@
         </div>
         </div><!-- End whStockSubViewFefo -->
 
-        <!-- SUB-VIEW 2: QUẢN LÝ LÔ HÀNG (THÊM / SỬA / XÓA ĐỒNG BỘ TỒN KHO & RBAC) -->
+        <!-- SUB-VIEW 2: QUẢN LÝ LÔ HÀNG (HIỂN THỊ THEO LÔ - CLICK ĐỂ XEM MẶT HÀNG TRONG LÔ) -->
         <div id="whStockSubViewBatches" class="hidden space-y-4">
-          <div class="filter-bar">
+          <div class="filter-bar flex flex-col sm:flex-row sm:items-center gap-2.5">
             <div class="relative flex-1 min-w-[220px]">
               <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <input type="text" id="batchManageSearchInput" oninput="renderBatchManagerTable()" placeholder="Tìm theo mã lô, SKU, tên hàng..." class="input pl-9 w-full">
+              <input type="text" id="batchManageSearchInput" oninput="renderBatchManagerTable()" placeholder="Tìm theo mã lô, SKU, tên mặt hàng..." class="input pl-9 w-full">
             </div>
             <div class="w-full sm:w-52">
-              <select id="batchManageSiteFilter" onchange="loadBatchManager()" class="select">
-                <option value="ALL">Tất cả điểm bán</option>
-              </select>
-            </div>
-            <div class="w-full sm:w-44">
-              <select id="batchManageStatusFilter" onchange="renderBatchManagerTable()" class="select">
-                <option value="">Tất cả HSD</option>
+              <select id="batchManageStatusFilter" onchange="renderBatchManagerTable()" class="select w-full">
+                <option value="">Tất cả trạng thái HSD</option>
                 <option value="red">Cận / Hết hạn (≤ 7 ngày)</option>
                 <option value="yellow">Sắp hết hạn (8 - 15 ngày)</option>
                 <option value="safe">An toàn (&gt; 15 ngày)</option>
               </select>
             </div>
-            <button type="button" onclick="loadBatchManager()" class="btn btn-secondary btn-icon" title="Làm mới danh sách lô">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-            </button>
-            <button type="button" id="btnOpenAddBatchModal" onclick="openCreateBatchModal()" class="btn btn-primary">
-              <i data-lucide="plus" class="w-4 h-4"></i> Thêm lô mới
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="loadBatchManager()" class="btn btn-secondary btn-icon" title="Làm mới danh sách lô">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+              <button type="button" id="btnOpenAddBatchModal" onclick="openCreateBatchModal()" class="btn btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i> Thêm lô mới
+              </button>
+            </div>
           </div>
 
           <div class="table-card p-5">
@@ -2939,18 +2946,16 @@
                 <thead>
                   <tr>
                     <th class="text-center w-12">#</th>
-                    <th class="col-code">Mã lô</th>
-                    <th>Điểm bán</th>
-                    <th>Mặt hàng (SKU)</th>
-                    <th class="col-date text-center">Ngày SX</th>
-                    <th class="col-date text-center">Hạn dùng (EXP)</th>
-                    <th class="col-num text-right">SL Tồn Lô</th>
-                    <th class="text-center">Trạng thái &amp; Vị trí</th>
-                    <th class="col-actions text-center w-28">Thao tác</th>
+                    <th class="col-code">Mã lô &amp; Vị trí</th>
+                    <th class="text-center w-36">Số mặt hàng</th>
+                    <th class="col-num text-right w-36">Tổng SL tồn lô</th>
+                    <th class="col-date text-center w-36">HSD sớm nhất</th>
+                    <th class="text-center w-36">Trạng thái HSD</th>
+                    <th class="col-actions text-center w-40">Chi tiết</th>
                   </tr>
                 </thead>
                 <tbody id="batchManageTableBody">
-                  <tr><td colspan="9" class="p-8 text-center text-gray-400 text-xs">Đang tải danh sách lô hàng...</td></tr>
+                  <tr><td colspan="7" class="p-8 text-center text-gray-400 text-xs">Đang tải danh sách lô hàng...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -7236,6 +7241,53 @@
           <i data-lucide="x-circle" class="w-4 h-4"></i>
           <span>Hủy phiếu</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHI TIẾT CÁC MẶT HÀNG TRONG LÔ -->
+  <div id="modalBatchItemsDetail" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeBatchItemsDetailModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="batchDetailModalTitle" class="font-bold text-base text-gray-900 dark:text-white leading-tight">Chi tiết lô hàng</h3>
+            <p id="batchDetailModalSub" class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnAddItemToBatchDetail" onclick="openCreateBatchModal()" class="btn btn-primary btn-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm mặt hàng vào lô
+          </button>
+          <button type="button" onclick="closeBatchItemsDetailModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 overflow-y-auto custom-scrollbar flex-1 space-y-3">
+        <div class="hidden sm:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800">
+          <table class="data-table w-full text-xs">
+            <thead class="bg-gray-50 dark:bg-gray-800/80">
+              <tr>
+                <th class="p-2.5 text-center w-10">#</th>
+                <th class="p-2.5 text-left">Mặt hàng (SKU)</th>
+                <th class="p-2.5 text-center w-24">Điểm bán</th>
+                <th class="p-2.5 text-center w-32">NSX / HSD</th>
+                <th class="p-2.5 text-right w-28">SL Tồn</th>
+                <th class="p-2.5 text-left w-28">Vị trí</th>
+                <th class="p-2.5 text-center w-24">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="batchDetailItemsBody" class="divide-y divide-gray-100 dark:divide-gray-800"></tbody>
+          </table>
+        </div>
+        <div id="batchDetailItemsMobile" class="block sm:hidden space-y-2.5"></div>
+      </div>
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex justify-end shrink-0">
+        <button type="button" onclick="closeBatchItemsDetailModal()" class="px-5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Đóng</button>
       </div>
     </div>
   </div>

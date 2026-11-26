@@ -16,7 +16,7 @@ declare const lucide: any;
 declare const App: { fefoItems?: StockFefoItem[]; currentBranch?: string; [key: string]: any };
 
 let stockCurrentPage = 1;
-const stockPageSize = 10;
+let stockPageSize = 25;
 let stockSortColumn: StockSortColumn = 'fefo_priority';
 let stockSortOrder: StockSortOrder = 'asc';
 export const selectedStockSkus = new Set<string>();
@@ -248,6 +248,13 @@ export function filterFefoLive(): void {
 
 export function changeStockPage(delta: number): void {
   stockCurrentPage += delta;
+  filterFefoLive();
+}
+
+export function changeStockPageSize(size: number | string): void {
+  const parsed = Number(size);
+  stockPageSize = parsed > 0 ? parsed : 25;
+  stockCurrentPage = 1;
   filterFefoLive();
 }
 
