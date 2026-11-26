@@ -1,6 +1,7 @@
 import { KitchenStockItem, KitchenIssueLine } from './types';
 import { formatVND, formatNumber, getActiveKitchenIssueSite } from './helpers';
 import { loadKitchenIssueHistory } from './history';
+import { assertPermission } from '@/features/auth';
 
 declare const showToast: (msg: string, type?: string) => void;
 declare const showLoading: (msg?: string) => void;
@@ -303,6 +304,7 @@ export function resetKitchenIssueForm(): void {
  * Xác nhận và gửi dữ liệu tạo phiếu xuất kho lên backend
  */
 export async function submitCreateKitchenIssue(): Promise<void> {
+  if (!assertPermission('fnb-kitchen-issue', 'create', 'tạo phiếu xuất kho sử dụng')) return;
   const siteCode = getActiveKitchenIssueSite();
   const dateInput = (document.getElementById('kitchenIssueDate') as HTMLInputElement | null)?.value || new Date().toISOString().split('T')[0];
   const mealShift = (document.getElementById('kitchenIssueMealShift') as HTMLSelectElement | null)?.value || 'Nấu ăn ca trưa';

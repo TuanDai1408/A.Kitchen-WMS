@@ -12,7 +12,16 @@ import {
 import {
   loadKitchenIssueHistory,
   renderKitchenIssueHistoryTable,
-  exportKitchenIssueById
+  exportKitchenIssueById,
+  openEditKitchenIssueModal,
+  onEditKitchenIssueQtyChange,
+  onEditKitchenIssueNoteChange,
+  removeEditKitchenIssueLine,
+  closeEditKitchenIssueModal,
+  saveEditKitchenIssue,
+  confirmDeleteKitchenIssue,
+  closeDeleteKitchenIssueModal,
+  executeDeleteKitchenIssue
 } from './history';
 import {
   viewKitchenIssueDetail,
@@ -168,6 +177,15 @@ win.loadKitchenIssueHistory = loadKitchenIssueHistory;
 win.renderKitchenIssueHistoryTable = renderKitchenIssueHistoryTable;
 win.exportKitchenIssueById = exportKitchenIssueById;
 win.exportKitchenIssueExcel = exportKitchenIssueExcel;
+win.openEditKitchenIssueModal = openEditKitchenIssueModal;
+win.onEditKitchenIssueQtyChange = onEditKitchenIssueQtyChange;
+win.onEditKitchenIssueNoteChange = onEditKitchenIssueNoteChange;
+win.removeEditKitchenIssueLine = removeEditKitchenIssueLine;
+win.closeEditKitchenIssueModal = closeEditKitchenIssueModal;
+win.saveEditKitchenIssue = saveEditKitchenIssue;
+win.confirmDeleteKitchenIssue = confirmDeleteKitchenIssue;
+win.closeDeleteKitchenIssueModal = closeDeleteKitchenIssueModal;
+win.executeDeleteKitchenIssue = executeDeleteKitchenIssue;
 
 // Modal
 win.viewKitchenIssueDetail = viewKitchenIssueDetail;

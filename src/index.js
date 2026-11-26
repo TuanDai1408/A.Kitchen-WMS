@@ -6186,6 +6186,228 @@ export default {
             return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
           }
         }
+
+        // Helper hoàn trả tồn kho & FEFO cho phiếu xuất kho sử dụng (dùng chung cho PUT và DELETE)
+        const revertKitchenIssueEffects = async (tx, issue, oldLines) => {
+          const siteCode = issue.site_code;
+          const issueCode = issue.issue_code;
+          let brId = null;
+          try {
+            const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]);
+            if (br && br.id) brId = br.id;
+          } catch (e) {}
+
+          for (const oldLine of (oldLines || [])) {
+            const oldQty = Number(oldLine.qty) || 0;
+            const oldPrice = Number(oldLine.unit_price) || 0;
+            if (oldQty <= 0) continue;
+
+            await tx.exec(`
+              UPDATE fnb_stock_balances
+              SET book_qty = COALESCE(book_qty, 0) + ?,
+                  total_value = (COALESCE(book_qty, 0) + ?) * COALESCE(NULLIF(unit_price, 0), ?),
+                  updated_at = NOW()
+              WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+            `, [oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
+
+            if (brId) {
+              try {
+                const { rows: txs } = await tx.query(`
+                  SELECT id, batch_id, qty FROM stock_transactions
+                  WHERE branch_id = ? AND sku = ? AND trans_type = 'XUAT_BEP' AND note LIKE ?
+                `, [brId, oldLine.item_code, `${issueCode}%`]);
+
+                if (txs && txs.length > 0) {
+                  for (const st of txs) {
+                    const restoreQty = Number(st.qty) || 0;
+                    if (restoreQty > 0 && st.batch_id) {
+                      await tx.exec(`UPDATE inventory_batches SET qty = qty + ? WHERE id = ?`, [restoreQty, st.batch_id]);
+                    }
+                    await tx.exec(`DELETE FROM stock_transactions WHERE id = ?`, [st.id]);
+                  }
+                } else {
+                  const latestBatch = await tx.queryOne(`
+                    SELECT id FROM inventory_batches
+                    WHERE branch_id = ? AND sku = ?
+                    ORDER BY exp_date DESC LIMIT 1
+                  `, [brId, oldLine.item_code]);
+                  if (latestBatch && latestBatch.id) {
+                    await tx.exec(`UPDATE inventory_batches SET qty = qty + ? WHERE id = ?`, [oldQty, latestBatch.id]);
+                  }
+                }
+              } catch (eFefo) {}
+            }
+          }
+
+          await tx.exec(`
+            DELETE FROM fnb_stock_transactions
+            WHERE trans_code = ? AND UPPER(site_code) = UPPER(?) AND trans_type = 'XUAT_BEP'
+          `, [issueCode, siteCode]);
+        };
+
+        if (request.method === 'PUT') {
+          try {
+            const body = await request.json();
+            const {
+              id,
+              issue_date,
+              meal_shift = 'Nấu ăn ca trưa',
+              issuer_name = 'Bếp trưởng',
+              receiver_name = 'Ca trưởng bếp',
+              notes = '',
+              lines = []
+            } = body;
+
+            const issueId = id || searchParams.get('id');
+            if (!issueId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID phiếu xuất kho' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const validLines = (Array.isArray(lines) ? lines : []).filter(l => (Number(l.qty) || 0) > 0);
+            if (validLines.length === 0) {
+              return new Response(JSON.stringify({ success: false, error: 'Phiếu xuất phải có ít nhất 1 mặt hàng với số lượng > 0' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const { rows: existingIssues } = await db.query(env, `SELECT * FROM fnb_kitchen_issues WHERE id = ?`, [issueId]);
+            const existingIssue = existingIssues && existingIssues[0] ? existingIssues[0] : null;
+            if (!existingIssue) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu xuất kho' }), { headers: corsHeaders, status: 404 });
+            }
+
+            const { rows: oldLines } = await db.query(env, `SELECT * FROM fnb_kitchen_issue_lines WHERE issue_id = ?`, [issueId]);
+
+            const validIssueDate = issue_date || existingIssue.issue_date || new Date().toISOString().split('T')[0];
+            let totalQty = 0;
+            let totalAmount = 0;
+            for (const item of validLines) {
+              const q = Number(item.qty) || 0;
+              const p = Number(item.unit_price) || 0;
+              totalQty += q;
+              totalAmount += (q * p);
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              await revertKitchenIssueEffects(tx, existingIssue, oldLines);
+
+              await tx.exec(`DELETE FROM fnb_kitchen_issue_lines WHERE issue_id = ?`, [issueId]);
+
+              await tx.exec(`
+                UPDATE fnb_kitchen_issues
+                SET issue_date = ?, meal_shift = ?, issuer_name = ?, receiver_name = ?,
+                    total_items = ?, total_qty = ?, total_amount = ?, notes = ?
+                WHERE id = ?
+              `, [validIssueDate, meal_shift, issuer_name, receiver_name, validLines.length, totalQty, totalAmount, notes, issueId]);
+
+              const siteCode = existingIssue.site_code;
+              const issueCode = existingIssue.issue_code;
+
+              for (const item of validLines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
+                const stockBefore = Number(item.stock_before) || 0;
+
+                await tx.exec(`
+                  INSERT INTO fnb_kitchen_issue_lines (issue_id, item_code, item_name, unit, stock_before, qty, unit_price, amount, notes)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [issueId, item.item_code, item.item_name || item.item_code, item.unit || 'Phần', stockBefore, qty, unitPrice, lineAmount, item.notes || '']);
+
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                      total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [qty, qty, unitPrice, item.item_code, siteCode]);
+
+                try {
+                  const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]);
+                  if (br && br.id) {
+                    const { rows: batches } = await tx.query(`
+                      SELECT id, qty FROM inventory_batches
+                      WHERE branch_id = ? AND sku = ? AND qty > 0
+                      ORDER BY exp_date ASC
+                    `, [br.id, item.item_code]);
+                    let rem = qty;
+                    for (const b of (batches || [])) {
+                      if (rem <= 0) break;
+                      const deduct = Math.min(Number(b.qty) || 0, rem);
+                      if (deduct > 0) {
+                        await tx.exec(`UPDATE inventory_batches SET qty = qty - ? WHERE id = ?`, [deduct, b.id]);
+                        await tx.exec(`INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'XUAT_BEP', ?, ?)`,
+                          ['tx_' + Math.random().toString(36).substr(2, 9), br.id, item.item_code, b.id, deduct, `${issueCode} - ${meal_shift}`]);
+                        rem -= deduct;
+                      }
+                    }
+                  }
+                } catch (eFefo) {}
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'XUAT_BEP', ?, ?, ?, ?, ?, ?, ?)
+                `, [issueCode, item.item_code, siteCode, -qty, unitPrice, -lineAmount, `Xuất kho sử dụng: ${meal_shift} (Nhận: ${receiver_name})`, issuer_name]);
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã cập nhật phiếu ${existingIssue.issue_code} thành công!`,
+              data: {
+                issue_id: issueId,
+                issue_code: existingIssue.issue_code,
+                total_items: validLines.length,
+                total_qty: totalQty,
+                total_amount: totalAmount
+              }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('kitchen-issues PUT error:', e);
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
+        if (request.method === 'DELETE') {
+          try {
+            let issueId = searchParams.get('id');
+            if (!issueId) {
+              try {
+                const body = await request.json();
+                issueId = body?.id;
+              } catch (e) {}
+            }
+            if (!issueId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID phiếu xuất kho cần xóa' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const { rows: existingIssues } = await db.query(env, `SELECT * FROM fnb_kitchen_issues WHERE id = ?`, [issueId]);
+            const existingIssue = existingIssues && existingIssues[0] ? existingIssues[0] : null;
+            if (!existingIssue) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu xuất kho' }), { headers: corsHeaders, status: 404 });
+            }
+
+            const { rows: oldLines } = await db.query(env, `SELECT * FROM fnb_kitchen_issue_lines WHERE issue_id = ?`, [issueId]);
+
+            await db.withTransaction(env, async (tx) => {
+              await revertKitchenIssueEffects(tx, existingIssue, oldLines);
+              await tx.exec(`DELETE FROM fnb_kitchen_issue_lines WHERE issue_id = ?`, [issueId]);
+              await tx.exec(`DELETE FROM fnb_kitchen_issues WHERE id = ?`, [issueId]);
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã xóa phiếu ${existingIssue.issue_code} và hoàn trả tồn kho!`
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('kitchen-issues DELETE error:', e);
+            return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
       }
 
       // Fallback: Static Assets
