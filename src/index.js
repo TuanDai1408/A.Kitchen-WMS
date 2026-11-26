@@ -5740,6 +5740,190 @@ export default {
           }
         }
 
+        // 3.7.0b CẬP NHẬT PHIẾU NHẬP KHO: PUT /api/fnb/receipts
+        if (request.method === 'PUT' && !pathname.endsWith('/cancel')) {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const pReceipts = caller.permissions['fnb-receipts'];
+            const pWh = caller.permissions['wh-inventory'];
+            const canEdit = (pReceipts && pReceipts.canEdit) || (pWh && pWh.canEdit);
+            if (!canEdit) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Sửa phiếu nhập kho' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            const body = await request.json();
+            const {
+              id,
+              receipt_date,
+              supplier = '',
+              invoice_no = '',
+              notes = '',
+              created_by = 'Thủ kho / Bếp trưởng',
+              lines = []
+            } = body;
+
+            const receiptId = id || searchParams.get('id');
+            if (!receiptId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID phiếu nhập kho' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const validLines = (Array.isArray(lines) ? lines : []).filter(l => (Number(l.qty) || 0) > 0);
+            if (!validLines.length) {
+              return new Response(JSON.stringify({ success: false, error: 'Phiếu nhập phải có ít nhất 1 mặt hàng với số lượng > 0' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const existingReceipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE id = ?`, [receiptId]);
+            if (!existingReceipt) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu nhập kho' }), { headers: corsHeaders, status: 404 });
+            }
+
+            const { rows: oldLines } = await db.query(env, `SELECT * FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [receiptId]);
+            const siteCode = existingReceipt.site_code;
+            const receiptCode = existingReceipt.receipt_code;
+            const validReceiptDate = receipt_date || existingReceipt.receipt_date || new Date().toISOString().split('T')[0];
+            const finalSupplier = (supplier || existingReceipt.supplier || 'Bếp Trung Tâm Siba').trim();
+            const finalInvoiceNo = (invoice_no ?? existingReceipt.invoice_no ?? '').trim();
+
+            let totalAmount = 0;
+            for (const item of validLines) {
+              totalAmount += (Number(item.qty) || 0) * (Number(item.unit_price) || 0);
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              const brRow = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]).catch(() => null);
+              const publicBranchId = brRow?.id || siteCode.toLowerCase();
+
+              // 1. Hoàn tác tồn kho, batch & PO của các dòng cũ
+              for (const oldLine of (oldLines || [])) {
+                const oldQty = Number(oldLine.qty) || 0;
+                const oldPrice = Number(oldLine.unit_price) || 0;
+                if (oldQty > 0) {
+                  await tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET receipt_qty = GREATEST(0, COALESCE(receipt_qty, 0) - ?),
+                        book_qty = COALESCE(book_qty, 0) - ?,
+                        total_value = (COALESCE(book_qty, 0) - ?) * ?,
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [oldQty, oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
+                }
+
+                if (oldLine.batch_code) {
+                  await tx.exec(`
+                    DELETE FROM inventory_batches
+                    WHERE sku = ? AND (branch_id = ? OR LOWER(branch_id) = ?) AND batch_code = ?
+                  `, [oldLine.item_code, publicBranchId, siteCode.toLowerCase(), oldLine.batch_code]).catch(() => {});
+                  await tx.exec(`
+                    DELETE FROM wms.inventory_batches
+                    WHERE sku = ? AND branch_id = ? AND batch_code = ?
+                  `, [oldLine.item_code, siteCode.toLowerCase(), oldLine.batch_code]).catch(() => {});
+                }
+
+                if (existingReceipt.invoice_no) {
+                  await tx.exec(`
+                    UPDATE wms.sap_po_items
+                    SET received_qty = GREATEST(0, COALESCE(received_qty, 0) - ?),
+                        status = CASE
+                          WHEN GREATEST(0, COALESCE(received_qty, 0) - ?) <= 0 THEN 'OPEN'
+                          WHEN GREATEST(0, COALESCE(received_qty, 0) - ?) >= order_qty THEN 'COMPLETED'
+                          ELSE 'PARTIAL'
+                        END,
+                        updated_at = NOW()
+                    WHERE po_number = ? AND article = ?
+                  `, [oldQty, oldQty, oldQty, existingReceipt.invoice_no, oldLine.item_code]).catch(() => {});
+                }
+              }
+
+              await tx.exec(`
+                DELETE FROM fnb_stock_transactions
+                WHERE trans_code = ? AND UPPER(site_code) = UPPER(?) AND trans_type = 'NHAP_KHO'
+              `, [receiptCode, siteCode]).catch(() => {});
+
+              await tx.exec(`DELETE FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [receiptId]);
+
+              // 2. Cập nhật header & ghi lại các dòng mới
+              await tx.exec(`
+                UPDATE fnb_stock_receipts
+                SET receipt_date = ?, supplier = ?, invoice_no = ?, total_amount = ?, notes = ?, created_by = ?
+                WHERE id = ?
+              `, [validReceiptDate, finalSupplier, finalInvoiceNo, totalAmount, notes, created_by, receiptId]);
+
+              for (const item of validLines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
+                const batchCode = (item.batch_code || '').trim() || `LÔ-${validReceiptDate.replace(/-/g, '').slice(2)}`;
+                const expDate = (item.exp_date || '').trim() || null;
+                const mfgDate = (item.mfg_date || '').trim() || null;
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_receipt_lines (receipt_id, item_code, qty, unit_price, amount, batch_code, exp_date, mfg_date, note)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [receiptId, item.item_code, qty, unitPrice, lineAmount, batchCode, expDate, mfgDate, item.note || '']);
+
+                if (batchCode && qty > 0) {
+                  try {
+                    const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+                    const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
+                    const invExpDate = expDate || fallbackExp;
+                    const storageLoc = item.storage_loc || 'Kệ Bếp';
+
+                    await tx.exec(`
+                      INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
+                    await tx.exec(`
+                      INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    `, [batchId, item.item_code, siteCode.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
+                  } catch (batErr) {}
+                }
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_balances (item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, total_value, updated_at)
+                  VALUES (?, ?, 'Miền Nam', 0, ?, 0, 0, ?, ?, NOW())
+                  ON CONFLICT (item_code, site_code) DO UPDATE SET
+                    receipt_qty = COALESCE(fnb_stock_balances.receipt_qty, 0) + EXCLUDED.receipt_qty,
+                    book_qty = COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty,
+                    total_value = (COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty) * ?,
+                    updated_at = NOW()
+                `, [item.item_code, siteCode, qty, qty, lineAmount, unitPrice]);
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'NHAP_KHO', ?, ?, ?, ?, ?, ?, ?)
+                `, [receiptCode, item.item_code, siteCode, qty, unitPrice, lineAmount, `Nhập từ ${finalSupplier} (Số HĐ/PO: ${finalInvoiceNo || 'N/A'})`, created_by]);
+
+                if (finalInvoiceNo) {
+                  await tx.exec(`
+                    UPDATE wms.sap_po_items
+                    SET received_qty = COALESCE(received_qty, 0) + ?,
+                        status = CASE WHEN (COALESCE(received_qty, 0) + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
+                        updated_at = NOW()
+                    WHERE po_number = ? AND article = ?
+                  `, [qty, qty, finalInvoiceNo, item.item_code]).catch(() => {});
+                }
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+            invalidateMemoryCache('/api/wh');
+            invalidateMemoryCache('/api/po-sap');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã cập nhật phiếu nhập ${receiptCode} thành công!`,
+              data: { receipt_id: receiptId, receipt_code: receiptCode, total_amount: totalAmount }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('Update receipt error:', e);
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi cập nhật phiếu nhập: ' + e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
         // 3.7.1 HỦY NHẬP KHO: DELETE /api/fnb/receipts hoặc POST /api/fnb/receipts/cancel
         if (request.method === 'DELETE' || pathname.endsWith('/cancel')) {
           const caller = await getCallerPermissions(env, request);
@@ -5994,6 +6178,232 @@ export default {
             }), { headers: corsHeaders });
           } catch (e) {
             return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
+        // Helper hoàn trả tồn kho & FEFO cho biên bản hủy hàng (dùng chung cho PUT & DELETE)
+        const revertWasteEffects = async (tx, existingWaste, oldLines) => {
+          const siteCode = existingWaste.site_code;
+          const wasteCode = existingWaste.waste_code;
+          let brId = null;
+          try {
+            const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]);
+            if (br && br.id) brId = br.id;
+          } catch (e) {}
+
+          for (const oldLine of (oldLines || [])) {
+            const oldQty = Number(oldLine.qty) || 0;
+            const oldPrice = Number(oldLine.unit_price) || 0;
+            if (oldQty <= 0) continue;
+
+            await tx.exec(`
+              UPDATE fnb_stock_balances
+              SET waste_qty = GREATEST(0, COALESCE(waste_qty, 0) - ?),
+                  book_qty = COALESCE(book_qty, 0) + ?,
+                  total_value = (COALESCE(book_qty, 0) + ?) * COALESCE(NULLIF(unit_price, 0), ?),
+                  updated_at = NOW()
+              WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+            `, [oldQty, oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
+
+            if (brId) {
+              try {
+                const { rows: txs } = await tx.query(`
+                  SELECT id, batch_id, qty FROM stock_transactions
+                  WHERE branch_id = ? AND sku = ? AND trans_type = 'HUY_HANG' AND note LIKE ?
+                `, [brId, oldLine.item_code, `${wasteCode}%`]);
+
+                if (txs && txs.length > 0) {
+                  for (const st of txs) {
+                    const restoreQty = Number(st.qty) || 0;
+                    if (restoreQty > 0 && st.batch_id) {
+                      await tx.exec(`UPDATE inventory_batches SET qty = qty + ? WHERE id = ?`, [restoreQty, st.batch_id]);
+                    }
+                    await tx.exec(`DELETE FROM stock_transactions WHERE id = ?`, [st.id]);
+                  }
+                } else {
+                  const latestBatch = await tx.queryOne(`
+                    SELECT id FROM inventory_batches
+                    WHERE branch_id = ? AND sku = ?
+                    ORDER BY exp_date DESC LIMIT 1
+                  `, [brId, oldLine.item_code]);
+                  if (latestBatch && latestBatch.id) {
+                    await tx.exec(`UPDATE inventory_batches SET qty = qty + ? WHERE id = ?`, [oldQty, latestBatch.id]);
+                  }
+                }
+              } catch (eFefo) {}
+            }
+          }
+
+          await tx.exec(`
+            DELETE FROM fnb_stock_transactions
+            WHERE trans_code = ? AND UPPER(site_code) = UPPER(?) AND trans_type = 'HUY_HANG'
+          `, [wasteCode, siteCode]).catch(() => {});
+        };
+
+        if (request.method === 'PUT') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const pWaste = caller.permissions['fnb-waste'];
+            const canEdit = pWaste && pWaste.canEdit;
+            if (!canEdit) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Sửa biên bản hủy hàng' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            const body = await request.json();
+            const {
+              id,
+              waste_date,
+              reason = 'Hàng hỏng / rách',
+              confirmed_by = 'Bếp trưởng',
+              notes = '',
+              created_by = 'Bếp trưởng',
+              lines = []
+            } = body;
+
+            const wasteId = id || searchParams.get('id');
+            if (!wasteId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID biên bản hủy' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const validLines = (Array.isArray(lines) ? lines : []).filter(l => (Number(l.qty) || 0) > 0);
+            if (!validLines.length) {
+              return new Response(JSON.stringify({ success: false, error: 'Biên bản phải có ít nhất 1 mặt hàng với số lượng > 0' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const existingWaste = await db.queryOne(env, `SELECT * FROM fnb_stock_wastes WHERE id = ?`, [wasteId]);
+            if (!existingWaste) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy biên bản hủy' }), { headers: corsHeaders, status: 404 });
+            }
+
+            const { rows: oldLines } = await db.query(env, `SELECT * FROM fnb_stock_waste_lines WHERE waste_id = ?`, [wasteId]);
+            const siteCode = existingWaste.site_code;
+            const wasteCode = existingWaste.waste_code;
+            const validWasteDate = waste_date || existingWaste.waste_date || new Date().toISOString().split('T')[0];
+
+            let totalAmount = 0;
+            for (const item of validLines) {
+              totalAmount += (Number(item.qty) || 0) * (Number(item.unit_price) || 0);
+            }
+
+            await db.withTransaction(env, async (tx) => {
+              await revertWasteEffects(tx, existingWaste, oldLines);
+              await tx.exec(`DELETE FROM fnb_stock_waste_lines WHERE waste_id = ?`, [wasteId]);
+
+              await tx.exec(`
+                UPDATE fnb_stock_wastes
+                SET waste_date = ?, reason = ?, confirmed_by = ?, total_amount = ?, notes = ?
+                WHERE id = ?
+              `, [validWasteDate, reason, confirmed_by, totalAmount, notes, wasteId]);
+
+              for (const item of validLines) {
+                const qty = Number(item.qty) || 0;
+                const unitPrice = Number(item.unit_price) || 0;
+                const lineAmount = qty * unitPrice;
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_waste_lines (waste_id, item_code, qty, unit_price, amount, reason_detail)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                `, [wasteId, item.item_code, qty, unitPrice, lineAmount, item.reason_detail || reason]);
+
+                await tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET waste_qty = COALESCE(waste_qty, 0) + ?,
+                      book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                      total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [qty, qty, qty, unitPrice, item.item_code, siteCode]);
+
+                try {
+                  const br = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]);
+                  if (br && br.id) {
+                    const { rows: batches } = await tx.query(`
+                      SELECT id, qty FROM inventory_batches
+                      WHERE branch_id = ? AND sku = ? AND qty > 0
+                      ORDER BY exp_date ASC
+                    `, [br.id, item.item_code]);
+                    let rem = qty;
+                    for (const b of (batches || [])) {
+                      if (rem <= 0) break;
+                      const deduct = Math.min(Number(b.qty) || 0, rem);
+                      if (deduct > 0) {
+                        await tx.exec(`UPDATE inventory_batches SET qty = qty - ? WHERE id = ?`, [deduct, b.id]);
+                        await tx.exec(`INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note) VALUES (?, ?, ?, ?, 'HUY_HANG', ?, ?)`,
+                          ['tx_' + Math.random().toString(36).substr(2, 9), br.id, item.item_code, b.id, deduct, `${wasteCode} - ${reason}`]);
+                        rem -= deduct;
+                      }
+                    }
+                  }
+                } catch (eWasteFefo) {}
+
+                await tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'HUY_HANG', ?, ?, ?, ?, ?, ?, ?)
+                `, [wasteCode, item.item_code, siteCode, -qty, unitPrice, -lineAmount, `Hủy hàng: ${item.reason_detail || reason} (Xác nhận: ${confirmed_by})`, created_by]);
+              }
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã cập nhật biên bản hủy ${wasteCode} thành công!`,
+              data: { waste_id: wasteId, waste_code: wasteCode, total_amount: totalAmount }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('Update waste error:', e);
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi cập nhật biên bản hủy: ' + e.message }), { headers: corsHeaders, status: 500 });
+          }
+        }
+
+        if (request.method === 'DELETE') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const pWaste = caller.permissions['fnb-waste'];
+            const canDel = pWaste && pWaste.canDelete;
+            if (!canDel) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Xóa biên bản hủy hàng' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            let wasteId = searchParams.get('id');
+            if (!wasteId) {
+              try {
+                const body = await request.json();
+                wasteId = body?.id;
+              } catch (_) {}
+            }
+            if (!wasteId) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID biên bản hủy cần xóa' }), { headers: corsHeaders, status: 400 });
+            }
+
+            const existingWaste = await db.queryOne(env, `SELECT * FROM fnb_stock_wastes WHERE id = ?`, [wasteId]);
+            if (!existingWaste) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy biên bản hủy' }), { headers: corsHeaders, status: 404 });
+            }
+
+            const { rows: oldLines } = await db.query(env, `SELECT * FROM fnb_stock_waste_lines WHERE waste_id = ?`, [wasteId]);
+
+            await db.withTransaction(env, async (tx) => {
+              await revertWasteEffects(tx, existingWaste, oldLines);
+              await tx.exec(`DELETE FROM fnb_stock_waste_lines WHERE waste_id = ?`, [wasteId]);
+              await tx.exec(`DELETE FROM fnb_stock_wastes WHERE id = ?`, [wasteId]);
+            });
+
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/stock');
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã xóa biên bản hủy ${existingWaste.waste_code} và hoàn trả tồn kho!`
+            }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('Delete waste error:', e);
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi xóa biên bản hủy: ' + e.message }), { headers: corsHeaders, status: 500 });
           }
         }
       }

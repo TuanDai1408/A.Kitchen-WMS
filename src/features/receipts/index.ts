@@ -12,7 +12,22 @@ import {
   openCreateReceiptModal,
   submitCreateReceipt
 } from './po-modal';
-import { loadFnbReceiptsHistory, renderFnbReceiptsHistoryTable, viewReceiptDetail } from './history';
+import {
+  loadFnbReceiptsHistory,
+  renderFnbReceiptsHistoryTable,
+  viewReceiptDetail,
+  openEditReceiptModal,
+  onEditReceiptLineQtyChange,
+  onEditReceiptLinePriceChange,
+  onEditReceiptLineBatchChange,
+  onEditReceiptLineExpChange,
+  removeEditReceiptLine,
+  closeEditReceiptModal,
+  saveEditReceipt,
+  confirmDeleteReceipt,
+  closeDeleteReceiptModal,
+  executeDeleteReceipt
+} from './history';
 import {
   openManualReceiptModal,
   closeManualReceiptModal,
@@ -81,6 +96,17 @@ win.submitCreateReceipt = submitCreateReceipt;
 win.loadFnbReceiptsHistory = loadFnbReceiptsHistory;
 win.renderFnbReceiptsHistoryTable = renderFnbReceiptsHistoryTable;
 win.viewReceiptDetail = viewReceiptDetail;
+win.openEditReceiptModal = openEditReceiptModal;
+win.onEditReceiptLineQtyChange = onEditReceiptLineQtyChange;
+win.onEditReceiptLinePriceChange = onEditReceiptLinePriceChange;
+win.onEditReceiptLineBatchChange = onEditReceiptLineBatchChange;
+win.onEditReceiptLineExpChange = onEditReceiptLineExpChange;
+win.removeEditReceiptLine = removeEditReceiptLine;
+win.closeEditReceiptModal = closeEditReceiptModal;
+win.saveEditReceipt = saveEditReceipt;
+win.confirmDeleteReceipt = confirmDeleteReceipt;
+win.closeDeleteReceiptModal = closeDeleteReceiptModal;
+win.executeDeleteReceipt = executeDeleteReceipt;
 
 // Manual Receipt Modal
 win.openManualReceiptModal = openManualReceiptModal;

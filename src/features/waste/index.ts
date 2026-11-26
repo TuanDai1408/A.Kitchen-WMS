@@ -13,7 +13,20 @@ import {
   updateWasteKPIs,
   submitDirectWaste
 } from './stock-table';
-import { switchFnbWasteSubView, loadFnbWasteHistory, viewWasteDetail } from './history';
+import {
+  switchFnbWasteSubView,
+  loadFnbWasteHistory,
+  viewWasteDetail,
+  openEditWasteModal,
+  onEditWasteLineQtyChange,
+  onEditWasteLineReasonChange,
+  removeEditWasteLine,
+  closeEditWasteModal,
+  saveEditWaste,
+  confirmDeleteWaste,
+  closeDeleteWasteModal,
+  executeDeleteWaste
+} from './history';
 import {
   openCreateWasteModal,
   closeCreateWasteModal,
@@ -103,6 +116,15 @@ win.submitDirectWaste = submitDirectWaste;
 // History & Detail
 win.loadFnbWasteHistory = loadFnbWasteHistory;
 win.viewWasteDetail = viewWasteDetail;
+win.openEditWasteModal = openEditWasteModal;
+win.onEditWasteLineQtyChange = onEditWasteLineQtyChange;
+win.onEditWasteLineReasonChange = onEditWasteLineReasonChange;
+win.removeEditWasteLine = removeEditWasteLine;
+win.closeEditWasteModal = closeEditWasteModal;
+win.saveEditWaste = saveEditWaste;
+win.confirmDeleteWaste = confirmDeleteWaste;
+win.closeDeleteWasteModal = closeDeleteWasteModal;
+win.executeDeleteWaste = executeDeleteWaste;
 
 // Modal Standalone
 win.openCreateWasteModal = openCreateWasteModal;
