@@ -54,8 +54,11 @@ export function renderSitesOptions(): void {
 
   const sites = getAppSitesList();
   const currentRegion = selectedModalRegion || 'ALL';
+  const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
+  const canSwitch = canUserSwitchSite(curUser);
 
   const filtered = sites.filter(s => {
+    if (!canSwitch && s.code === 'ALL') return false;
     if (currentRegion === 'ALL') return true;
     return s.code === 'ALL' || s.region === currentRegion;
   });
@@ -174,6 +177,18 @@ export function canUserSwitchSite(user?: any): boolean {
  */
 export function checkAndPromptUserSite(forceOpen: boolean = false): void {
   const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
+  const hasAssignedSite = Boolean(curUser && curUser.assignedSite && String(curUser.assignedSite).trim() !== '');
+  const canSwitch = canUserSwitchSite(curUser);
+
+  // User mới đăng nhập lần đầu chưa có assigned_site trong DB -> bắt buộc mở modal chọn site 1 lần duy nhất
+  if (curUser && curUser.email && !hasAssignedSite && !canSwitch) {
+    if (typeof onGlobalBranchChange === 'function') {
+      onGlobalBranchChange('K001');
+    }
+    openSiteSelectorModal('K001');
+    return;
+  }
+
   let savedSite = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site');
   if (!savedSite) {
     savedSite = 'K001';
@@ -183,7 +198,7 @@ export function checkAndPromptUserSite(forceOpen: boolean = false): void {
     if (curUser) curUser.assignedSite = savedSite;
   } catch (e) {}
 
-  if (forceOpen && canUserSwitchSite(curUser)) {
+  if (forceOpen && canSwitch) {
     openSiteSelectorModal();
   } else {
     if (typeof onGlobalBranchChange === 'function') {
@@ -195,11 +210,14 @@ export function checkAndPromptUserSite(forceOpen: boolean = false): void {
 /**
  * Mở modal chọn điểm bán:
  * - Admin / người có quyền switch_site: chọn và đổi site ngay lập tức.
- * - User thường: vẫn được mở danh sách site để chọn site muốn chuyển và gửi yêu cầu chờ Admin duyệt.
+ * - User mới chưa có site cố định: chọn site làm việc lần đầu (lưu vĩnh viễn cho các lần sau).
+ * - User thường đã có site cố định: mở danh sách để gửi yêu cầu đổi site chờ Admin duyệt.
  */
 export function openSiteSelectorModal(preselectSite?: string): void {
   const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
   const canSwitch = canUserSwitchSite(curUser);
+  const hasAssignedSite = Boolean(curUser && curUser.assignedSite && String(curUser.assignedSite).trim() !== '');
+  const isFirstTimeSelection = Boolean(curUser && curUser.email && !canSwitch && !hasAssignedSite);
   const assigned = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
 
   if (preselectSite) {
@@ -227,6 +245,13 @@ export function openSiteSelectorModal(preselectSite?: string): void {
     if (reasonWrap) reasonWrap.classList.add('hidden');
     if (submitLabel) submitLabel.textContent = 'Xác Nhận & Tiếp Tục';
     if (closeBtn) closeBtn.classList.remove('hidden');
+  } else if (isFirstTimeSelection) {
+    if (titleEl) titleEl.textContent = 'Chọn Điểm Bán Làm Việc (Lần Đầu)';
+    if (subEl) subEl.textContent = 'Chọn đúng điểm bán bạn phụ trách. Hệ thống sẽ lưu cố định site này cho các lần đăng nhập sau.';
+    if (noticeEl) noticeEl.classList.add('hidden');
+    if (reasonWrap) reasonWrap.classList.add('hidden');
+    if (submitLabel) submitLabel.textContent = 'Xác Nhận Site Làm Việc';
+    if (closeBtn) closeBtn.classList.add('hidden');
   } else {
     if (titleEl) titleEl.textContent = 'Yêu Cầu Đổi Điểm Bán / Site';
     if (subEl) subEl.textContent = `Site cố định hiện tại: ${assigned} • Chọn site mới để gửi Quản trị viên duyệt`;
@@ -250,15 +275,55 @@ export function closeSiteSelectorModal(): void {
 }
 
 /**
- * Lưu điểm bán (nếu có quyền) hoặc gửi yêu cầu đổi site chờ Admin duyệt (nếu là user thường).
+ * Lưu điểm bán (lần đầu hoặc có quyền switch) hoặc gửi yêu cầu đổi site chờ Admin duyệt.
  */
 export async function saveSiteSelection(): Promise<void> {
   const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
   const site = tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
+  const hasAssignedSite = Boolean(curUser && curUser.assignedSite && String(curUser.assignedSite).trim() !== '');
 
   if (!canUserSwitchSite(curUser)) {
     if (!curUser || !curUser.email) {
-      if (typeof showToast === 'function') showToast('Vui lòng đăng nhập để gửi yêu cầu đổi site!', 'warning');
+      if (typeof showToast === 'function') showToast('Vui lòng đăng nhập để chọn hoặc đổi site!', 'warning');
+      return;
+    }
+
+    // Lần đăng nhập đầu tiên chưa có assignedSite -> Lưu cố định vào CSDL 1 lần duy nhất
+    if (!hasAssignedSite) {
+      if (site.toUpperCase() === 'ALL') {
+        if (typeof showToast === 'function') showToast('Vui lòng chọn một điểm bán cụ thể!', 'warning');
+        return;
+      }
+      try {
+        if (typeof showLoading === 'function') showLoading(`Đang lưu điểm bán mặc định [${site}]...`);
+        const resp = await fetch('/api/auth/set-initial-site', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Email': curUser.email
+          },
+          body: JSON.stringify({ email: curUser.email, siteCode: site })
+        });
+        const json = await resp.json();
+        if (!resp.ok || !json.success) {
+          if (typeof showToast === 'function') showToast(json.error || 'Không thể lưu site làm việc!', 'error');
+          return;
+        }
+        curUser.assignedSite = site;
+        try {
+          localStorage.setItem('orbit_user_site', site);
+          localStorage.setItem('orbit_user', JSON.stringify(curUser));
+          if (typeof window !== 'undefined') (window as any).gCurrentUser = curUser;
+        } catch (e) {}
+
+        closeSiteSelectorModal();
+        if (typeof onGlobalBranchChange === 'function') onGlobalBranchChange(site);
+        if (typeof showToast === 'function') showToast(`Đã lưu điểm bán mặc định [${site}] cho các lần đăng nhập sau!`, 'success');
+      } catch (err: any) {
+        if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + (err?.message || err), 'error');
+      } finally {
+        if (typeof hideLoading === 'function') hideLoading();
+      }
       return;
     }
 

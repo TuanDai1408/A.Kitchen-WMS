@@ -4765,6 +4765,56 @@ export default {
       }
 
       // ======================================================================
+      // 2.11.SITE CHỌN SITE LẦN ĐĂNG NHẬP ĐẦU TIÊN (MỖI USER CHỈ CHỌN 1 LẦN)
+      // ======================================================================
+      if (pathname === '/api/auth/set-initial-site' && request.method === 'POST') {
+        const caller = await getCallerPermissions(env, request);
+        const body = await request.json().catch(() => ({}));
+        const targetEmail = (caller?.user?.email || body.email || request.headers.get('X-User-Email') || '').trim();
+        const siteCode = String(body.siteCode || body.site || '').trim().toUpperCase();
+
+        if (!targetEmail || !siteCode || siteCode === 'ALL') {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Thiếu thông tin email hoặc mã điểm bán hợp lệ (không chọn ALL).'
+          }), { status: 400, headers: corsHeaders });
+        }
+
+        await db.exec(env, `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS assigned_site TEXT`).catch(() => {});
+        const userRow = await db.queryOne(env, `SELECT id, email, role_code, assigned_site FROM app_users WHERE LOWER(email) = LOWER(?) LIMIT 1`, [targetEmail]).catch(() => null);
+        if (!userRow) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy tài khoản người dùng.' }), { status: 404, headers: corsHeaders });
+        }
+
+        const isAdminOrMaster = (caller && (caller.isMaster || caller.user?.role_code === 'ADMIN')) || userRow.role_code === 'ADMIN';
+        if (userRow.assigned_site && String(userRow.assigned_site).trim() !== '' && !isAdminOrMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: `Tài khoản của bạn đã được cố định tại site [${userRow.assigned_site}]. Vui lòng gửi yêu cầu đổi site để Quản trị viên duyệt!`
+          }), { status: 403, headers: corsHeaders });
+        }
+
+        await db.exec(env, `UPDATE app_users SET assigned_site = ? WHERE LOWER(email) = LOWER(?)`, [siteCode, targetEmail]);
+        invalidateMemoryCache('auth_me_');
+
+        await writeAuditLog(env, request, {
+          userEmail: targetEmail,
+          action: 'SET_INITIAL_SITE',
+          entityType: 'USER_SITE',
+          entityId: String(userRow.id),
+          siteCode,
+          summary: `Người dùng chọn điểm bán làm việc mặc định lần đầu: ${siteCode}`,
+          newData: { email: targetEmail, assigned_site: siteCode }
+        });
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: { assignedSite: siteCode },
+          message: `Đã lưu điểm bán mặc định [${siteCode}] cho tài khoản của bạn!`
+        }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
       // 2.11.CFG CẤU HÌNH THAM SỐ HỆ THỐNG (ĐỌC PUBLIC ĐỂ ÁP DỤNG, GHI CHỈ trantuandai2508)
       // ======================================================================
       if (pathname === '/api/system/config' && request.method === 'GET') {
