@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1305">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1310">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1305"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1310"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -2868,83 +2868,69 @@
         </div>
       </section>
 <section id="wh-stock" class="tab-panel space-y-4">
-        <!-- Page Header -->
+        <!-- Page Header (Tiêu đề + Mô tả bên trái, Action Buttons bên phải) -->
         <div class="page-header">
-          <div>
+          <div class="min-w-0">
             <h1 class="page-title">Hạn dùng &amp; xuất FEFO</h1>
             <p class="page-subtitle">Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn an toàn thực phẩm.</p>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
-              <button id="btnSubTabWhFefo" type="button" onclick="switchWhStockSubView('fefo')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5">
-                <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
-                <span>Hạn dùng &amp; FEFO</span>
-              </button>
-              <button id="btnSubTabWhBatches" type="button" onclick="switchWhStockSubView('batches')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5">
-                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                <span>Quản lý lô hàng</span>
-              </button>
-            </div>
-            <div id="whStockFefoHeaderActions" class="flex items-center gap-2">
-              <button onclick="exportFefoToExcel()" class="btn btn-secondary">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
-              </button>
-              <button onclick="openReceiptModal()" class="btn btn-primary">
-                <i data-lucide="plus" class="w-4 h-4"></i> Nhập lô mới
-              </button>
-            </div>
+          <div id="whStockFefoHeaderActions" class="flex items-center gap-2.5 shrink-0">
+            <button onclick="exportFefoToExcel()" class="btn btn-secondary">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+            </button>
+            <button onclick="openReceiptModal()" class="btn btn-primary">
+              <i data-lucide="plus" class="w-4 h-4"></i> Nhập lô mới
+            </button>
           </div>
         </div>
 
+        <!-- Tabs Bar (Hàng riêng căn trái ngay dưới tiêu đề) -->
+        <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl border border-gray-200 dark:border-gray-700 w-fit">
+          <button id="btnSubTabWhFefo" type="button" onclick="switchWhStockSubView('fefo')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
+            <span>Hạn dùng &amp; FEFO</span>
+          </button>
+          <button id="btnSubTabWhBatches" type="button" onclick="switchWhStockSubView('batches')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+            <span>Quản lý lô hàng</span>
+          </button>
+        </div>
+
         <div id="whStockSubViewFefo" class="space-y-4">
-        <!-- Filter Bar -->
-        <div class="filter-bar grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-2.5">
-          <div class="relative sm:col-span-2 lg:flex-1 lg:min-w-[220px]">
+        <!-- Filter Bar (1 hàng gọn, không giãn trống, đồng bộ font-sans) -->
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 shadow-2xs flex flex-wrap lg:flex-nowrap items-center gap-3">
+          <div class="relative flex-1 min-w-[220px]">
             <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             <input 
               type="text" 
               id="fefoSearchInput" 
               oninput="filterFefoLive()" 
               placeholder="Tìm SKU, tên gia vị, mã lô..." 
-              class="input pl-9 w-full"
+              class="input pl-9 w-full font-sans"
             />
           </div>
 
-          <div class="w-full lg:w-44">
-            <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select w-full">
-              <option value="">Tất cả nhóm hàng</option>
-              <option value="Gia vị">Gia vị</option>
-              <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
-              <option value="CCDC">CCDC</option>
-            </select>
-          </div>
+          <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select font-sans w-full sm:w-auto min-w-fit whitespace-nowrap">
+            <option value="">Tất cả nhóm hàng</option>
+            <option value="Gia vị">Gia vị</option>
+            <option value="Vật tư tiêu hao">Vật tư tiêu hao</option>
+            <option value="CCDC">CCDC</option>
+          </select>
 
-          <div class="w-full lg:w-44">
-            <select id="fefoBatchFilter" onchange="filterFefoLive()" class="select font-mono w-full">
-              <option value="">Tất cả lô hàng</option>
-            </select>
-          </div>
+          <select id="fefoBatchFilter" onchange="filterFefoLive()" class="select font-sans w-full sm:w-auto min-w-fit whitespace-nowrap">
+            <option value="">Tất cả lô hàng</option>
+          </select>
 
-          <div class="w-full lg:w-44">
-            <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select w-full">
-              <option value="">Tất cả trạng thái</option>
-              <option value="safe">An toàn</option>
-              <option value="yellow">Cận Date (≤ 15 ngày)</option>
-              <option value="red">Nguy cơ FEFO (≤ 7 ngày)</option>
-            </select>
-          </div>
+          <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select font-sans w-full sm:w-auto min-w-fit whitespace-nowrap">
+            <option value="">Tất cả trạng thái</option>
+            <option value="safe">An toàn</option>
+            <option value="yellow">Cận Date (≤ 15 ngày)</option>
+            <option value="red">Nguy cơ FEFO (≤ 7 ngày)</option>
+          </select>
 
-          <div class="flex items-center gap-2 lg:w-auto">
-            <select id="fefoPageSizeSelect" onchange="changeStockPageSize(this.value)" class="select font-mono w-full lg:w-32" title="Số dòng hiển thị mỗi trang">
-              <option value="10">10 dòng</option>
-              <option value="25" selected>25 dòng</option>
-              <option value="50">50 dòng</option>
-              <option value="100">100 dòng</option>
-            </select>
-            <button onclick="resetFefoFilters()" class="btn btn-secondary btn-icon shrink-0" title="Đặt lại bộ lọc">
-              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            </button>
-          </div>
+          <button onclick="resetFefoFilters()" class="btn btn-secondary btn-icon shrink-0" title="Đặt lại bộ lọc">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
         </div>
 
         <!-- Bulk Selection Indicator -->
@@ -2990,8 +2976,19 @@
 
           <!-- Pagination Bar -->
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
-            <div id="stockPaginationInfo">
-              Hiển thị <span class="font-bold text-gray-800 dark:text-white num">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white num">10</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
+            <div class="flex flex-wrap items-center gap-3">
+              <div id="stockPaginationInfo">
+                Hiển thị <span class="font-bold text-gray-800 dark:text-white num">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white num">25</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span>Hiển thị:</span>
+                <select id="fefoPageSizeSelect" onchange="changeStockPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                  <option value="10">10 dòng</option>
+                  <option value="25" selected>25 dòng</option>
+                  <option value="50">50 dòng</option>
+                  <option value="100">100 dòng</option>
+                </select>
+              </div>
             </div>
             <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
               <button id="stockPrevBtn" onclick="changeStockPage(-1)" class="btn btn-secondary btn-sm">
