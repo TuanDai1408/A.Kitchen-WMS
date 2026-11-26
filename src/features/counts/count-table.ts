@@ -280,7 +280,7 @@ export function renderFnbCountsTable(): void {
                 <div class="text-xs text-gray-400 tabular-nums"><span class="font-mono text-brand-600 dark:text-brand-400 font-semibold">${escapeHtml(item.code)}</span> • ${Number(item.unit_price).toLocaleString('vi-VN')} đ/${escapeHtml(item.unit || '')}</div>
               </div>
               <div class="text-right">
-                <span class="text-xs text-gray-400">Tồn sách:</span>
+                <span class="text-xs text-gray-400">Số lượng tồn kho:</span>
                 <div class="font-bold tabular-nums text-xs font-mono ${book < 0 ? 'text-rose-600' : 'text-gray-800 dark:text-gray-200'}">${window.gFnbBlindCount ? '••••' : book.toFixed(1)} ${escapeHtml(item.unit || '')}</div>
               </div>
             </div>

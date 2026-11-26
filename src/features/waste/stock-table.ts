@@ -279,7 +279,7 @@ export function onWasteLineQtyChange(code: string, val: string): void {
   } else if (num > maxQty) {
     item.wasteQty = maxQty;
     if (typeof window.showToast === 'function') {
-      window.showToast(`Số lượng hủy không được vượt quá tồn sách (${maxQty})`);
+      window.showToast(`Số lượng hủy không được vượt quá số lượng tồn kho (${maxQty})`);
     }
   } else {
     item.wasteQty = num;
