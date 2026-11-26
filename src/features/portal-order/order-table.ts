@@ -242,6 +242,26 @@ export function calcBudget(forcedBudget?: number, forcedDaDat?: number): void {
   renderOrderCartSummary();
 }
 
+let gOrderCartDrawerOpen = false;
+
+export function toggleOrderCartDrawer(forceState?: boolean): void {
+  const panel = document.getElementById('orderCartDrawerPanel');
+  const btn = document.getElementById('btnToggleOrderCartDrawer');
+  if (!panel) return;
+  gOrderCartDrawerOpen = typeof forceState === 'boolean' ? forceState : !gOrderCartDrawerOpen;
+  panel.classList.toggle('hidden', !gOrderCartDrawerOpen);
+  if (btn) {
+    btn.innerHTML = gOrderCartDrawerOpen
+      ? `<i data-lucide="chevron-down" class="w-3.5 h-3.5"></i><span>Thu gọn</span>`
+      : `<i data-lucide="chevron-up" class="w-3.5 h-3.5"></i><span>Xem chi tiết</span>`;
+  }
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (w.lucide && typeof w.lucide.createIcons === 'function') {
+    const card = document.getElementById('orderCartSummaryCard');
+    if (card) w.lucide.createIcons({ root: card });
+  }
+}
+
 export function renderOrderCartSummary(): void {
   const card = document.getElementById('orderCartSummaryCard');
   const tbody = document.getElementById('orderCartSummaryBody');
@@ -252,6 +272,8 @@ export function renderOrderCartSummary(): void {
 
   const selected = getAppItems().filter(i => (Number(i.soLuongDat) || 0) > 0);
   if (!selected.length) {
+    gOrderCartDrawerOpen = false;
+    document.getElementById('orderCartDrawerPanel')?.classList.add('hidden');
     card.classList.add('hidden');
     tbody.innerHTML = '';
     return;
@@ -270,16 +292,17 @@ export function renderOrderCartSummary(): void {
     const price = Number(it.donGia) || 0;
     const lineAmt = qty * price;
     return `
-      <tr class="hover:bg-white/60 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="p-3 text-center font-mono text-xs text-gray-400">${idx + 1}</td>
-        <td class="p-3 font-mono text-xs font-bold text-gray-800 dark:text-gray-200 whitespace-nowrap">${safeEscapeHtml(it.maHang)}</td>
-        <td class="p-3 text-xs font-semibold text-gray-900 dark:text-white">${safeEscapeHtml(it.tenSP)}</td>
-        <td class="p-3 text-xs text-gray-600 dark:text-gray-300">${safeEscapeHtml(it.dvt || '')}</td>
-        <td class="p-3 text-right font-mono text-xs text-gray-600 dark:text-gray-300">${fmtVND(price)}</td>
-        <td class="p-3 text-right font-mono text-xs font-bold text-brand-600 dark:text-brand-400">${qty}</td>
-        <td class="p-3 text-right font-mono text-xs font-bold text-gray-900 dark:text-white">${fmtVND(lineAmt)}</td>
-        <td class="p-3 text-center">
-          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
+      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+        <td class="py-2.5 px-3 text-center font-mono text-xs text-gray-400">${idx + 1}</td>
+        <td class="py-2.5 px-3">
+          <div class="text-xs font-semibold text-gray-900 dark:text-white leading-snug">${safeEscapeHtml(it.tenSP)}</div>
+          <div class="text-[11px] font-mono text-gray-400 mt-0.5">${safeEscapeHtml(it.maHang)} • ${fmtVND(price)}</div>
+        </td>
+        <td class="py-2.5 px-3 text-center text-xs text-gray-600 dark:text-gray-300">${safeEscapeHtml(it.dvt || '')}</td>
+        <td class="py-2.5 px-3 text-right font-mono text-xs font-bold text-brand-600 dark:text-brand-400">${qty}</td>
+        <td class="py-2.5 px-3 text-right font-mono text-xs font-bold text-gray-900 dark:text-white">${fmtVND(lineAmt)}</td>
+        <td class="py-2.5 px-3 text-center">
+          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </td>
