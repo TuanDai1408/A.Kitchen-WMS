@@ -48,8 +48,8 @@ export function switchWhStockSubView(mode: 'fefo' | 'batches'): void {
   const btnBatches = document.getElementById('btnSubTabWhBatches');
   const fefoActions = document.getElementById('whStockFefoHeaderActions');
 
-  const activeTabClass = 'pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
-  const inactiveTabClass = 'pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+  const activeTabClass = 'pb-2.5 pt-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold text-xs flex items-center gap-2 shrink-0 transition-all';
+  const inactiveTabClass = 'pb-2.5 pt-1 border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium text-xs flex items-center gap-2 shrink-0 transition-all';
 
   if (mode === 'batches') {
     fefoView?.classList.add('hidden');
