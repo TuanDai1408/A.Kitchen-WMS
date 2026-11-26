@@ -401,6 +401,9 @@ export async function submitDirectWaste(): Promise<void> {
     // Refresh waste data and switch to history view to review
     if (typeof window.loadFnbWaste === 'function') await window.loadFnbWaste();
     switchFnbWasteSubView('history');
+    if (json.data?.waste_id && typeof window.viewWasteDetail === 'function') {
+      window.viewWasteDetail(json.data.waste_id);
+    }
 
     // Trigger stock matrix reload in background
     if (typeof window.loadFnbStock === 'function') window.loadFnbStock();

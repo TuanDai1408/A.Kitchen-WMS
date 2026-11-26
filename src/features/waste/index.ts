@@ -17,6 +17,8 @@ import {
   switchFnbWasteSubView,
   loadFnbWasteHistory,
   viewWasteDetail,
+  exportWasteById,
+  exportCurrentWasteDetail,
   openEditWasteModal,
   onEditWasteLineQtyChange,
   onEditWasteLineReasonChange,
@@ -44,6 +46,7 @@ export * from './helpers';
 export * from './stock-table';
 export * from './history';
 export * from './waste-modal';
+export * from './export-excel';
 
 declare const window: any;
 
@@ -124,6 +127,8 @@ win.submitDirectWaste = submitDirectWaste;
 // History & Detail
 win.loadFnbWasteHistory = loadFnbWasteHistory;
 win.viewWasteDetail = viewWasteDetail;
+win.exportWasteById = exportWasteById;
+win.exportCurrentWasteDetail = exportCurrentWasteDetail;
 win.openEditWasteModal = openEditWasteModal;
 win.onEditWasteLineQtyChange = onEditWasteLineQtyChange;
 win.onEditWasteLineReasonChange = onEditWasteLineReasonChange;

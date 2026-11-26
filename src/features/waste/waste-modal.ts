@@ -228,6 +228,9 @@ export async function submitCreateWaste(): Promise<void> {
     closeCreateWasteModal();
     if (typeof window.loadFnbWaste === 'function') await window.loadFnbWaste();
     switchFnbWasteSubView('history');
+    if (json.data?.waste_id && typeof window.viewWasteDetail === 'function') {
+      window.viewWasteDetail(json.data.waste_id);
+    }
 
     if (typeof window.loadFnbStock === 'function') window.loadFnbStock();
     if (typeof window.loadFnbCounts === 'function') window.loadFnbCounts();

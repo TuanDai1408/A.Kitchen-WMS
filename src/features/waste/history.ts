@@ -2,6 +2,7 @@ import { escapeHtml } from '@/ts/utils/formatters';
 import { getActiveFnbWasteSite } from './helpers';
 import type { WasteSubView } from './types';
 import { canUserEdit, canUserDelete, assertPermission } from '@/features/auth';
+import { exportWasteExcel, WasteExportSlip } from './export-excel';
 
 declare const window: any;
 
@@ -84,6 +85,9 @@ export async function loadFnbWasteHistory(siteCodeArg?: string): Promise<void> {
                   <button type="button" onclick="viewWasteDetail(${w.id})" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Xem chi tiết">
                     <i data-lucide="eye" class="w-4 h-4"></i>
                   </button>
+                  <button type="button" onclick="exportWasteById(${w.id})" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 transition-colors" title="Xuất file Excel (Aptos)">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                  </button>
                   ${canEdit ? `
                     <button type="button" onclick="openEditWasteModal(${w.id})" class="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 transition-colors" title="Sửa biên bản hủy">
                       <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -120,6 +124,7 @@ export async function loadFnbWasteHistory(siteCodeArg?: string): Promise<void> {
               </div>
               <div class="flex items-center justify-end gap-1.5 pt-2 border-t border-gray-100 dark:border-gray-800 flex-wrap">
                 <button type="button" onclick="viewWasteDetail(${w.id})" class="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-xs">Xem</button>
+                <button type="button" onclick="exportWasteById(${w.id})" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-xs">Excel</button>
                 ${canEdit ? `
                   <button type="button" onclick="openEditWasteModal(${w.id})" class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-xs">Sửa</button>
                 ` : ''}
@@ -146,14 +151,29 @@ export async function viewWasteDetail(wasteId: number | string): Promise<void> {
     const json = await res.json();
     if (!json.success) throw new Error('Không tải được biên bản hủy');
 
+    const header = (json.data.wastes || []).find((w: any) => String(w.id) === String(wasteId))
+      || (window.gFnbWasteHistoryList || []).find((w: any) => String(w.id) === String(wasteId))
+      || { id: wasteId, waste_code: `BBH-${wasteId}`, site_code: getActiveFnbWasteSite(), waste_date: new Date().toISOString().slice(0, 10) };
     const lines: any[] = json.data.lines || [];
+    window.gCurrentViewingWasteSlip = { ...header, lines };
+
     const modal = document.getElementById('invDetailModal');
     const titleEl = document.getElementById('invDetailModalTitle');
     const subEl = document.getElementById('invDetailModalSub');
-    if (titleEl) titleEl.textContent = `Chi Tiết Biên Bản Hủy #${wasteId}`;
-    if (subEl) subEl.textContent = `${lines.length} mặt hàng bị hủy`;
+    if (titleEl) titleEl.textContent = `Chi Tiết Biên Bản Hủy ${header.waste_code || '#' + wasteId}`;
+    if (subEl) subEl.textContent = `${lines.length} mặt hàng bị hủy • Điểm bán ${header.site_code || ''}`;
 
     const html = `
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          Ngày hủy: <b class="font-mono text-gray-800 dark:text-gray-200">${escapeHtml(String(header.waste_date || '').slice(0, 10))}</b>
+          • Xác nhận: <b class="text-gray-800 dark:text-gray-200">${escapeHtml(header.confirmed_by || 'Bếp trưởng')}</b>
+        </div>
+        <button type="button" onclick="exportCurrentWasteDetail()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+          <span>Xuất File Excel (Aptos)</span>
+        </button>
+      </div>
       <div class="overflow-x-auto">
         <table class="data-table">
           <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
@@ -194,6 +214,39 @@ export async function viewWasteDetail(wasteId: number | string): Promise<void> {
   } finally {
     if (typeof window.hideLoading === 'function') window.hideLoading();
   }
+}
+
+export async function exportWasteById(wasteId: number | string): Promise<void> {
+  if (typeof window.showLoading === 'function') window.showLoading('Đang lấy chi tiết biên bản hủy để xuất Excel...');
+  try {
+    const res = await fetch(`/api/fnb/wastes?id=${encodeURIComponent(String(wasteId))}&no-cache=1`);
+    const json = await res.json();
+    if (!json.success || !json.data) throw new Error(json.error || 'Không tải được biên bản hủy');
+
+    const header = (json.data.wastes || []).find((w: any) => String(w.id) === String(wasteId))
+      || (window.gFnbWasteHistoryList || []).find((w: any) => String(w.id) === String(wasteId));
+    if (!header) throw new Error('Không tìm thấy thông tin biên bản hủy');
+
+    const fullWaste: WasteExportSlip = {
+      ...header,
+      lines: json.data.lines || []
+    };
+    await exportWasteExcel(fullWaste);
+  } catch (err: any) {
+    console.error('exportWasteById error:', err);
+    if (typeof window.showToast === 'function') window.showToast('Lỗi xuất Excel: ' + err.message, 'error');
+  } finally {
+    if (typeof window.hideLoading === 'function') window.hideLoading();
+  }
+}
+
+export async function exportCurrentWasteDetail(): Promise<void> {
+  const slip = window.gCurrentViewingWasteSlip;
+  if (!slip) {
+    if (typeof window.showToast === 'function') window.showToast('Không có dữ liệu biên bản đang mở', 'warning');
+    return;
+  }
+  await exportWasteExcel(slip);
 }
 
 export async function openEditWasteModal(wasteId: number | string): Promise<void> {
