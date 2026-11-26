@@ -383,6 +383,90 @@ async function ensureSystemTabVisibilityTable(env) {
   }
 }
 
+const DEFAULT_SYSTEM_CONFIG = {
+  // 1. Cảnh báo Tồn kho & Điểm đặt hàng (ROP)
+  rop_safety_stock: 5.0,
+  rop_daily_usage: 10.0,
+  rop_threshold_default: 25.0,
+  rop_target_stock_default: 35.0,
+  // 2. Leadtime & SLA Nhà cung cấp
+  leadtime_default_days: 2,
+  leadtime_fresh_days: 1,
+  leadtime_sla_target_hours: 24,
+  // 3. Hạn dùng & Xuất kho FEFO
+  fefo_red_days: 7,
+  fefo_yellow_days: 30,
+  fefo_default_expiry_days: 45,
+  fefo_enforce_strict: true,
+  // 4. Kiểm kê, Hủy hàng & Hiển thị
+  count_variance_alert_pct: 5,
+  waste_require_image: false,
+  default_page_size: 25
+};
+
+let _systemSettingsEnsured = false;
+let _systemConfigCache = null;
+let _systemConfigCacheAt = 0;
+
+function invalidateSystemConfigCache() {
+  _systemConfigCache = null;
+  _systemConfigCacheAt = 0;
+}
+
+async function ensureSystemSettingsTable(env) {
+  if (_systemSettingsEnsured) return;
+  const isPostgres = db.isPg(env);
+  const timeType = isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
+  try {
+    await db.exec(env, `
+      CREATE TABLE IF NOT EXISTS system_settings (
+        setting_key TEXT PRIMARY KEY,
+        setting_value TEXT NOT NULL,
+        value_type TEXT DEFAULT 'number',
+        updated_by TEXT,
+        updated_at ${timeType}
+      )
+    `);
+    _systemSettingsEnsured = true;
+  } catch (err) {
+    console.error('ensureSystemSettingsTable error:', err);
+  }
+}
+
+function parseSettingValue(raw, defaultVal) {
+  if (typeof defaultVal === 'boolean') {
+    if (typeof raw === 'boolean') return raw;
+    return String(raw).toLowerCase() === 'true' || raw === '1' || raw === 1;
+  }
+  if (typeof defaultVal === 'number') {
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : defaultVal;
+  }
+  return raw !== undefined && raw !== null ? String(raw) : defaultVal;
+}
+
+async function getSystemConfig(env) {
+  const now = Date.now();
+  if (_systemConfigCache && (now - _systemConfigCacheAt) < 30000) {
+    return _systemConfigCache;
+  }
+  const cfg = { ...DEFAULT_SYSTEM_CONFIG };
+  try {
+    await ensureSystemSettingsTable(env);
+    const { rows } = await db.query(env, `SELECT setting_key, setting_value FROM system_settings`).catch(() => ({ rows: [] }));
+    for (const r of (rows || [])) {
+      if (Object.prototype.hasOwnProperty.call(DEFAULT_SYSTEM_CONFIG, r.setting_key)) {
+        cfg[r.setting_key] = parseSettingValue(r.setting_value, DEFAULT_SYSTEM_CONFIG[r.setting_key]);
+      }
+    }
+  } catch (err) {
+    console.warn('getSystemConfig fallback to defaults:', err?.message || err);
+  }
+  _systemConfigCache = cfg;
+  _systemConfigCacheAt = now;
+  return cfg;
+}
+
 
 const ALL_SYSTEM_FEATURES = [
   'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste',
@@ -946,6 +1030,11 @@ export default {
         const branchCode = searchParams.get('branch') || 'ALL';
         const upperCode = branchCode.toUpperCase();
         const isPostgres = db.isPg(env);
+        const sysCfg = await getSystemConfig(env);
+        const cfgSafety = Number(sysCfg.rop_safety_stock) || 5.0;
+        const cfgRop = Number(sysCfg.rop_threshold_default) || 25.0;
+        const cfgLeadHours = (Number(sysCfg.leadtime_default_days) || 2) * 24;
+        const cfgFreshHours = (Number(sysCfg.leadtime_fresh_days) || 1) * 24;
 
         let stockRow = null;
         let ropRow = null;
@@ -971,12 +1060,12 @@ export default {
               WHERE (? = 'ALL' OR site_code = ?)
             `, [upperCode, upperCode])) || { total_skus: 0, total_qty: 0, total_value: 0 };
 
-            // 2. ROP (Hết hàng hoặc dưới định mức an toàn)
+            // 2. ROP (Hết hàng hoặc dưới định mức an toàn / ngưỡng ROP)
             ropRow = (await db.queryOne(env, `
               SELECT COUNT(*) as rop_count
               FROM fnb_stock_balances
-              WHERE (? = 'ALL' OR site_code = ?) AND book_qty <= 0
-            `, [upperCode, upperCode])) || { rop_count: 0 };
+              WHERE (? = 'ALL' OR site_code = ?) AND book_qty <= ?
+            `, [upperCode, upperCode, cfgSafety])) || { rop_count: 0 };
 
             // 3. Critical (Tồn âm hoặc chưa có tồn đầu)
             critRow = (await db.queryOne(env, `
@@ -996,10 +1085,10 @@ export default {
             leadRow = (await db.queryOne(env, `
               SELECT 
                 COUNT(DISTINCT po_number) as total_orders,
-                ROUND(AVG(CASE WHEN status = 'COMPLETED' THEN 24.0 ELSE 48.0 END)::numeric, 1) as avg_lead_time
+                ROUND(AVG(CASE WHEN status = 'COMPLETED' THEN ? ELSE ? END)::numeric, 1) as avg_lead_time
               FROM sap_po_items
               WHERE (? = 'ALL' OR site = ?)
-            `, [upperCode, upperCode])) || { total_orders: 0, avg_lead_time: 24.5 };
+            `, [cfgFreshHours, cfgLeadHours, upperCode, upperCode])) || { total_orders: 0, avg_lead_time: cfgFreshHours };
 
             // 6. Stock alerts thực tế từ fnb_stock_balances
             const alertsRes = await db.query(env, `
@@ -1017,20 +1106,20 @@ export default {
                   WHEN b.book_qty <= 0 THEN 0
                   ELSE 7
                 END as days_left,
-                5.0 as safety_stock,
+                ? as safety_stock,
                 CASE 
                   WHEN b.book_qty < 0 THEN 'OUT_OF_STOCK'
-                  WHEN b.book_qty = 0 THEN 'LOW_STOCK'
+                  WHEN b.book_qty <= ? THEN 'LOW_STOCK'
                   WHEN b.no_opening = true THEN 'NEAR_EXPIRY'
                   ELSE 'NORMAL'
                 END as alert_level
               FROM fnb_stock_balances b
               LEFT JOIN (SELECT DISTINCT ON (material) material, material_desc, nhom_hang, entry_unit FROM dim_article_stock) d ON b.item_code = d.material
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit FROM sap_po_items) p ON b.item_code = p.article
-              WHERE (? = 'ALL' OR b.site_code = ?) AND (b.book_qty <= 0 OR b.no_opening = true)
+              WHERE (? = 'ALL' OR b.site_code = ?) AND (b.book_qty <= ? OR b.no_opening = true)
               ORDER BY b.book_qty ASC, b.item_code ASC
               LIMIT 10
-            `, [upperCode, upperCode]);
+            `, [cfgSafety, cfgSafety, upperCode, upperCode, cfgSafety]);
             alertsRows = alertsRes.rows || [];
 
             // 7. Monthly chart thực tế từ sap_po_items & transactions
@@ -1107,6 +1196,11 @@ export default {
       if (pathname === '/api/stock' && request.method === 'GET') {
         const branchParam = searchParams.get('branch') || '';
         const branchCode = (!branchParam || branchParam.toLowerCase() === 'all') ? 'ALL' : branchParam.toUpperCase();
+        const sysCfg = await getSystemConfig(env);
+        const cfgSafety = Number(sysCfg.rop_safety_stock) || 5.0;
+        const cfgRedDays = Number(sysCfg.fefo_red_days) || 7;
+        const cfgYellowDays = Number(sysCfg.fefo_yellow_days) || 30;
+        const cfgDefaultExpDays = Number(sysCfg.fefo_default_expiry_days) || 45;
 
         const isPg = db.isPg(env);
         let results = [];
@@ -1312,19 +1406,20 @@ export default {
           } else if (qty === 0) {
             dangerLevel = 'yellow';
             statusText = 'Hết hàng (ROP)';
-          } else if (days <= 7) {
+          } else if (days <= cfgRedDays) {
             dangerLevel = 'red';
-            statusText = 'Cận Date (≤ 7 ngày)';
-          } else if (days <= 30) {
+            statusText = `Cận Date (≤ ${cfgRedDays} ngày)`;
+          } else if (days <= cfgYellowDays) {
             dangerLevel = 'yellow';
-            statusText = 'Cần dùng sớm (≤ 30 ngày)';
+            statusText = `Cần dùng sớm (≤ ${cfgYellowDays} ngày)`;
           }
 
           return {
             ...r,
             qty: qty,
-            days_left: days,
-            days_remaining: days,
+            safety_stock: r.safety_stock !== undefined && r.safety_stock !== null ? Number(r.safety_stock) : cfgSafety,
+            days_left: days === 45 && cfgDefaultExpDays !== 45 ? cfgDefaultExpDays : days,
+            days_remaining: days === 45 && cfgDefaultExpDays !== 45 ? cfgDefaultExpDays : days,
             batch_no: r.batch_code,
             uom: r.unit,
             fefo_priority: idx + 1,
@@ -1469,6 +1564,13 @@ export default {
       if (pathname === '/api/reorder' && request.method === 'GET') {
         const branchParam = searchParams.get('site') || searchParams.get('branch') || '';
         const branchCode = (!branchParam || branchParam.toLowerCase() === 'all') ? 'ALL' : branchParam.toUpperCase();
+        const sysCfg = await getSystemConfig(env);
+        const cfgDaily = Number(sysCfg.rop_daily_usage) || 10.0;
+        const cfgLeadDays = Number(sysCfg.leadtime_default_days) || 2.0;
+        const cfgLeadHours = cfgLeadDays * 24.0;
+        const cfgSafety = Number(sysCfg.rop_safety_stock) || 5.0;
+        const cfgRop = Number(sysCfg.rop_threshold_default) || (cfgDaily * cfgLeadDays + cfgSafety);
+        const cfgTarget = Number(sysCfg.rop_target_stock_default) || (cfgRop + cfgDaily);
 
         const isPg = db.isPg(env);
         let results = [];
@@ -1481,27 +1583,27 @@ export default {
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as uom,
               COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
-              10.0 as daily_usage,
-              48.0 as lead_time_hours,
-              2.0 as lead_time_days,
-              5.0 as safety_stock,
+              ${cfgDaily} as daily_usage,
+              ${cfgLeadHours} as lead_time_hours,
+              ${cfgLeadDays} as lead_time_days,
+              ${cfgSafety} as safety_stock,
               COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
               ROUND(SUM(b.book_qty)::numeric, 1) as current_stock,
-              25.0 as rop_threshold,
-              25.0 as rop,
+              ${cfgRop} as rop_threshold,
+              ${cfgRop} as rop,
               CASE 
-                WHEN SUM(b.book_qty) < 25.0 
-                THEN ROUND((35.0 - SUM(b.book_qty))::numeric, 0)
+                WHEN SUM(b.book_qty) < ${cfgRop}
+                THEN ROUND((${cfgTarget} - SUM(b.book_qty))::numeric, 0)
                 ELSE 0
               END as suggested_order_qty,
               CASE 
-                WHEN SUM(b.book_qty) < 25.0 
-                THEN ROUND((35.0 - SUM(b.book_qty))::numeric, 0)
+                WHEN SUM(b.book_qty) < ${cfgRop}
+                THEN ROUND((${cfgTarget} - SUM(b.book_qty))::numeric, 0)
                 ELSE 0
               END as suggested_order,
               CASE 
                 WHEN SUM(b.book_qty) <= 0 THEN 'HẾT HÀNG'
-                WHEN SUM(b.book_qty) < 25.0 THEN 'CẦN ĐẶT'
+                WHEN SUM(b.book_qty) < ${cfgRop} THEN 'CẦN ĐẶT'
                 ELSE 'AN TOÀN'
               END as status
             FROM fnb_stock_balances b
@@ -1517,7 +1619,7 @@ export default {
             ) p ON b.item_code = p.article
             WHERE (? = 'ALL' OR UPPER(b.site_code) = ?)
             GROUP BY b.item_code, d.material_desc, p.article_desc, d.entry_unit, p.order_unit, d.nhom_hang, p.merch_category, d.price, p.net_price
-            HAVING SUM(b.book_qty) <= 25.0
+            HAVING SUM(b.book_qty) <= ${cfgRop}
             ORDER BY SUM(b.book_qty) ASC
           `;
           const res = await db.query(env, pgQuery, [branchCode, branchCode]);
@@ -1531,27 +1633,27 @@ export default {
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as uom,
               COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
-              10.0 as daily_usage,
-              48.0 as lead_time_hours,
-              2.0 as lead_time_days,
-              5.0 as safety_stock,
+              ${cfgDaily} as daily_usage,
+              ${cfgLeadHours} as lead_time_hours,
+              ${cfgLeadDays} as lead_time_days,
+              ${cfgSafety} as safety_stock,
               COALESCE(d.price, p.net_price, 0) as standard_cost_sap,
               ROUND(SUM(b.book_qty), 1) as current_stock,
-              25.0 as rop_threshold,
-              25.0 as rop,
+              ${cfgRop} as rop_threshold,
+              ${cfgRop} as rop,
               CASE 
-                WHEN SUM(b.book_qty) < 25.0 
-                THEN ROUND(35.0 - SUM(b.book_qty), 0)
+                WHEN SUM(b.book_qty) < ${cfgRop}
+                THEN ROUND(${cfgTarget} - SUM(b.book_qty), 0)
                 ELSE 0
               END as suggested_order_qty,
               CASE 
-                WHEN SUM(b.book_qty) < 25.0 
-                THEN ROUND(35.0 - SUM(b.book_qty), 0)
+                WHEN SUM(b.book_qty) < ${cfgRop}
+                THEN ROUND(${cfgTarget} - SUM(b.book_qty), 0)
                 ELSE 0
               END as suggested_order,
               CASE 
                 WHEN SUM(b.book_qty) <= 0 THEN 'HẾT HÀNG'
-                WHEN SUM(b.book_qty) < 25.0 THEN 'CẦN ĐẶT'
+                WHEN SUM(b.book_qty) < ${cfgRop} THEN 'CẦN ĐẶT'
                 ELSE 'AN TOÀN'
               END as status
             FROM fnb_stock_balances b
@@ -1559,7 +1661,7 @@ export default {
             LEFT JOIN (SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price FROM sap_po_items GROUP BY article) p ON b.item_code = p.article
             WHERE (? = 'ALL' OR UPPER(b.site_code) = ?)
             GROUP BY b.item_code
-            HAVING SUM(b.book_qty) <= 25.0
+            HAVING SUM(b.book_qty) <= ${cfgRop}
             ORDER BY SUM(b.book_qty) ASC
           `;
           const res = await db.query(env, d1Query, [branchCode, branchCode]);
@@ -1573,6 +1675,10 @@ export default {
       if (pathname === '/api/leadtime' && request.method === 'GET') {
         const site = searchParams.get('site');
         const siteParam = site && site !== 'ALL' ? site.toUpperCase().trim() : '';
+        const sysCfg = await getSystemConfig(env);
+        const cfgLeadDays = Number(sysCfg.leadtime_default_days) || 2;
+        const cfgFreshDays = Number(sysCfg.leadtime_fresh_days) || 1;
+        const cfgSlaHours = Number(sysCfg.leadtime_sla_target_hours) || 24;
 
         const monthRaw = (searchParams.get('month') || searchParams.get('thang') || '').trim();
         let monthParam = '';
@@ -1605,16 +1711,16 @@ export default {
                 ELSE NULL
               END as received_time,
               CASE 
-                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN 1
-                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN 1
-                ELSE 2
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN ${cfgFreshDays}
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN ${cfgFreshDays}
+                ELSE ${cfgLeadDays}
               END as committed_lead_time_days,
               CASE 
-                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN 1
+                WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN ${cfgFreshDays}
                 ELSE NULL
               END as actual_lead_time_days,
-              24.0 as lead_time_hours,
-              24.0 as sla_target_hours,
+              ${cfgSlaHours} as lead_time_hours,
+              ${cfgSlaHours} as sla_target_hours,
               CASE 
                 WHEN MAX(CAST(po.received_qty AS NUMERIC)) > 0 THEN 'ĐÚNG HẠN'
                 ELSE 'ĐANG GIAO'
@@ -1648,19 +1754,19 @@ export default {
                 ELSE NULL
               END as received_time,
               CASE 
-                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN 1
-                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN 1
-                ELSE 2
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') LIKE '%RAU CỦ%' THEN ${cfgFreshDays}
+                WHEN COALESCE(NULLIF(po.supplier_name, ''), '') = '' THEN ${cfgFreshDays}
+                ELSE ${cfgLeadDays}
               END as committed_lead_time_days,
               CASE 
-                WHEN MAX(po.received_qty::numeric) > 0 THEN 1
+                WHEN MAX(po.received_qty::numeric) > 0 THEN ${cfgFreshDays}
                 ELSE NULL
               END as actual_lead_time_days,
-              24.0 as lead_time_hours,
-              24.0 as sla_target_hours,
+              ${cfgSlaHours} as lead_time_hours,
+              ${cfgSlaHours} as sla_target_hours,
               CASE 
                 WHEN MAX(po.received_qty::numeric) > 0 THEN 'ĐÚNG HẠN'
-                WHEN MIN(po.doc_date) >= CURRENT_DATE - INTERVAL '2 days' THEN 'ĐANG GIAO'
+                WHEN MIN(po.doc_date) >= CURRENT_DATE - (${cfgLeadDays} || ' days')::interval THEN 'ĐANG GIAO'
                 ELSE 'TRỄ HẠN'
               END as status,
               CASE 
@@ -4406,6 +4512,122 @@ export default {
         return new Response(JSON.stringify({
           success: true,
           message: 'Đã cập nhật trạng thái ẩn/hiện và thứ tự vị trí các tab hệ thống thành công!'
+        }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // 2.11.CFG CẤU HÌNH THAM SỐ HỆ THỐNG (ĐỌC PUBLIC ĐỂ ÁP DỤNG, GHI CHỈ trantuandai2508)
+      // ======================================================================
+      if (pathname === '/api/system/config' && request.method === 'GET') {
+        const cfg = await getSystemConfig(env);
+        const { rows } = await db.query(env, `SELECT setting_key, updated_by, updated_at FROM system_settings`).catch(() => ({ rows: [] }));
+        const meta = {};
+        (rows || []).forEach(r => {
+          meta[r.setting_key] = { updated_by: r.updated_by, updated_at: r.updated_at };
+        });
+        return new Response(JSON.stringify({
+          success: true,
+          data: cfg,
+          defaults: DEFAULT_SYSTEM_CONFIG,
+          meta
+        }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/system/config' && request.method === 'POST') {
+        await ensureSystemSettingsTable(env);
+        const caller = await getCaller(env, request);
+        const body = await request.json().catch(() => ({}));
+        const requestorEmail = caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
+        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        if (!isMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Từ chối truy cập: Chức năng Cấu hình hệ thống chỉ dành riêng cho tài khoản Quản trị tối cao (trantuandai2508).'
+          }), { status: 403, headers: corsHeaders });
+        }
+
+        const oldCfg = await getSystemConfig(env);
+        const updates = body.settings || body.config || body;
+        const newCfg = { ...oldCfg };
+        const changedKeys = [];
+
+        for (const [key, defVal] of Object.entries(DEFAULT_SYSTEM_CONFIG)) {
+          if (Object.prototype.hasOwnProperty.call(updates, key)) {
+            const parsed = parseSettingValue(updates[key], defVal);
+            // Basic sanity bounds
+            if (typeof defVal === 'number' && parsed < 0) continue;
+            const vType = typeof defVal;
+            await db.exec(env, `
+              INSERT INTO system_settings (setting_key, setting_value, value_type, updated_by, updated_at)
+              VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+              ON CONFLICT(setting_key) DO UPDATE SET
+                setting_value = EXCLUDED.setting_value,
+                value_type = EXCLUDED.value_type,
+                updated_by = EXCLUDED.updated_by,
+                updated_at = CURRENT_TIMESTAMP
+            `, [key, String(parsed), vType, requestorEmail]);
+            if (oldCfg[key] !== parsed) changedKeys.push(key);
+            newCfg[key] = parsed;
+          }
+        }
+
+        invalidateSystemConfigCache();
+        invalidateMemoryCache('/api/stock');
+        invalidateMemoryCache('/api/reorder');
+        invalidateMemoryCache('/api/leadtime');
+        invalidateMemoryCache('/api/wh-dashboard');
+
+        await writeAuditLog(env, request, {
+          userEmail: requestorEmail,
+          action: 'SYSTEM_CONFIG_UPDATE',
+          entityType: 'SYSTEM_SETTINGS',
+          entityId: 'GLOBAL',
+          summary: changedKeys.length
+            ? `Cập nhật ${changedKeys.length} tham số cấu hình hệ thống (${changedKeys.join(', ')})`
+            : 'Lưu cấu hình hệ thống',
+          oldData: oldCfg,
+          newData: newCfg
+        });
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: newCfg,
+          message: 'Đã lưu cấu hình hệ thống và áp dụng toàn chuỗi!'
+        }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/system/config/reset' && request.method === 'POST') {
+        await ensureSystemSettingsTable(env);
+        const caller = await getCaller(env, request);
+        const body = await request.json().catch(() => ({}));
+        const requestorEmail = caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
+        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        if (!isMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Từ chối truy cập: Chỉ tài khoản trantuandai2508 được phép khôi phục cấu hình mặc định.'
+          }), { status: 403, headers: corsHeaders });
+        }
+        const oldCfg = await getSystemConfig(env);
+        await db.exec(env, `DELETE FROM system_settings`);
+        invalidateSystemConfigCache();
+        invalidateMemoryCache('/api/stock');
+        invalidateMemoryCache('/api/reorder');
+        invalidateMemoryCache('/api/leadtime');
+        invalidateMemoryCache('/api/wh-dashboard');
+        await writeAuditLog(env, request, {
+          userEmail: requestorEmail,
+          action: 'SYSTEM_CONFIG_RESET',
+          entityType: 'SYSTEM_SETTINGS',
+          entityId: 'GLOBAL',
+          summary: 'Khôi phục toàn bộ cấu hình hệ thống về giá trị mặc định',
+          oldData: oldCfg,
+          newData: DEFAULT_SYSTEM_CONFIG
+        });
+        return new Response(JSON.stringify({
+          success: true,
+          data: { ...DEFAULT_SYSTEM_CONFIG },
+          message: 'Đã khôi phục toàn bộ cấu hình về mặc định!'
         }), { headers: corsHeaders });
       }
 

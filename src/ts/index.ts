@@ -19,6 +19,7 @@ export * from '@/features/wh-inventory';
 export * from '@/features/chain';
 export * from '@/features/portal';
 export * from '@/features/rbac';
+export * from '@/features/sys-config';
 export * from '@/features/app-shell';
 export * from '@/features/auth';
 

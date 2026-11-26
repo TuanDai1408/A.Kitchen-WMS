@@ -33,7 +33,8 @@ export const TAB_META: Record<string, TabMetadata> = {
 
   // Nhóm 5: Hệ Thống & Danh Mục -> mobTab: 'hub'
   'fnb-sites': { title: 'Danh Mục 14 Điểm Bán', mobTab: 'hub' },
-  'user-matrix': { title: 'Phân Quyền User Matrix', mobTab: 'hub' }
+  'user-matrix': { title: 'Phân Quyền User Matrix', mobTab: 'hub' },
+  'sys-config': { title: 'Cấu Hình Hệ Thống', mobTab: 'hub' }
 };
 
 export function openMobileMenuHub(): void {

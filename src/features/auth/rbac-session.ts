@@ -690,6 +690,11 @@ export function canAccessTab(tabId: string): boolean {
     return false;
   }
 
+  // ĐẶC QUYỀN TUYỆT ĐỐI: Tab Cấu hình hệ thống ('sys-config') CHỈ DÀNH RIÊNG CHO MASTER OWNER (trantuandai2508)
+  if (tabId === 'sys-config') {
+    return isMasterAccount(curUser);
+  }
+
   // ĐẶC QUYỀN VÀ KHÓA CHẶN MASTER OWNER (trantuandai2508):
   // Khi một tab bị đánh dấu ẨN trên toàn hệ thống (gSystemTabVisibility[tabId] === true),
   // tab đó sẽ bị ẨN HOÀN TOÀN khỏi Sidebar, Menu Hub, Bottom Nav và CHẶN truy cập đối với tất cả người dùng (kể cả ADMIN và Master User khi duyệt giao diện).

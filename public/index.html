@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1320">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1325">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1320"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1325"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -383,6 +383,15 @@
                   <span class="truncate">Phân Quyền User Matrix</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('sys-config', this)" data-tab="sys-config" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="sliders-horizontal" class="menu-icon w-5 h-5 shrink-0 text-amber-500 group-hover:text-amber-600 dark:text-amber-400 dark:group-hover:text-amber-300"></i>
+                  <span class="truncate">Cấu hình hệ thống</span>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 font-bold shrink-0">OWNER</span>
               </button>
             </li>
           </ul>
@@ -1650,6 +1659,184 @@
 
         </div>
       </div>
+
+      <!-- TAB: CẤU HÌNH HỆ THỐNG (ĐỘC QUYỀN MASTER OWNER: trantuandai2508) -->
+      <section id="sys-config" class="tab-panel space-y-5">
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Cấu hình hệ thống</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">Độc quyền Master Owner</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 whitespace-normal break-words">
+                Điều chỉnh tập trung các ngưỡng mặc định về cảnh báo tồn kho (ROP), Leadtime NCC, hạn dùng FEFO và quy tắc vận hành toàn chuỗi. Mọi thay đổi được ghi nhận vào Audit Logs.
+              </p>
+              <div id="sysConfigLastUpdated" class="text-xs text-gray-400 dark:text-gray-500 mt-1.5 font-mono">Đang tải thông tin cấu hình...</div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button type="button" onclick="resetSystemConfigToDefault()" class="px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Khôi phục mặc định</span>
+              </button>
+              <button type="button" id="btnSaveSystemConfig" onclick="saveSystemConfig()" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Lưu cấu hình hệ thống</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="sysConfigLockBanner" class="hidden rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 p-6 text-center space-y-2">
+          <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-base font-bold text-rose-800 dark:text-rose-200">Khu vực giới hạn quyền truy cập</h3>
+          <p class="text-xs text-rose-700 dark:text-rose-300 max-w-md mx-auto">Chức năng Cấu hình hệ thống chỉ dành riêng cho tài khoản Quản trị tối cao (<span class="font-mono font-bold">trantuandai2508</span>).</p>
+        </div>
+
+        <div id="sysConfigFormContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Card 1: Cảnh báo Tồn kho & Điểm đặt hàng (ROP) -->
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Cảnh báo Tồn kho &amp; Điểm đặt hàng (ROP)</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Áp dụng cho Dashboard tổng quan, Cảnh báo ROP &amp; gợi ý đặt hàng</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="cfg_rop_safety_stock" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tồn an toàn mặc định (Safety Stock)</label>
+                <input type="number" step="0.5" min="0" id="cfg_rop_safety_stock" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Đơn vị chuẩn; dùng khi SKU chưa khai báo định mức riêng.</p>
+              </div>
+              <div>
+                <label for="cfg_rop_daily_usage" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tiêu thụ bình quân/ngày mặc định</label>
+                <input type="number" step="0.5" min="0" id="cfg_rop_daily_usage" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Daily Usage ước tính để tính điểm đặt hàng ROP.</p>
+              </div>
+              <div>
+                <label for="cfg_rop_threshold_default" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngưỡng điểm đặt hàng (ROP)</label>
+                <input type="number" step="0.5" min="0" id="cfg_rop_threshold_default" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Tồn kho nhỏ hơn ngưỡng này sẽ cảnh báo CẦN ĐẶT.</p>
+              </div>
+              <div>
+                <label for="cfg_rop_target_stock_default" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Mức tồn mục tiêu (Target Stock)</label>
+                <input type="number" step="0.5" min="0" id="cfg_rop_target_stock_default" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">SL Gợi Ý Đặt = Mức mục tiêu − Tồn hiện tại.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Leadtime & SLA Nhà cung cấp -->
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Leadtime &amp; SLA Nhà cung cấp</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Áp dụng cho tab Lead Time &amp; NCC và tính trễ hạn đơn PO</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="cfg_leadtime_default_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Leadtime NCC thường (Ngày)</label>
+                <input type="number" step="1" min="1" id="cfg_leadtime_default_days" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Số ngày giao hàng cam kết cho hàng khô / gia vị.</p>
+              </div>
+              <div>
+                <label for="cfg_leadtime_fresh_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Leadtime Hàng tươi / BTT (Ngày)</label>
+                <input type="number" step="1" min="1" id="cfg_leadtime_fresh_days" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Áp dụng cho nhóm Rau củ &amp; Bếp Trung Tâm.</p>
+              </div>
+              <div class="sm:col-span-2">
+                <label for="cfg_leadtime_sla_target_hours" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Mốc SLA mục tiêu đánh giá giao hàng (Giờ)</label>
+                <input type="number" step="1" min="1" id="cfg_leadtime_sla_target_hours" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Ví dụ: 24 giờ cho giao hàng nội bộ trong ngày.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Hạn dùng & Xuất kho FEFO -->
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Hạn dùng &amp; Xuất kho FEFO</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Ngưỡng tô màu cảnh báo cận date trên bảng FEFO &amp; Lô hàng</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label for="cfg_fefo_red_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Cảnh báo ĐỎ (≤ ngày)</label>
+                <input type="number" step="1" min="1" id="cfg_fefo_red_days" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Cận date khẩn cấp.</p>
+              </div>
+              <div>
+                <label for="cfg_fefo_yellow_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Cảnh báo VÀNG (≤ ngày)</label>
+                <input type="number" step="1" min="1" id="cfg_fefo_yellow_days" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Cần ưu tiên dùng sớm.</p>
+              </div>
+              <div>
+                <label for="cfg_fefo_default_expiry_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">HSD mặc định (ngày)</label>
+                <input type="number" step="1" min="1" id="cfg_fefo_default_expiry_days" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Khi lô chưa có HSD.</p>
+              </div>
+            </div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+              <div>
+                <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Ưu tiên / Cảnh báo xuất theo FEFO</div>
+                <div class="text-[11px] text-gray-500 dark:text-gray-400">Nhắc nhở nhân viên xuất lô có hạn dùng gần nhất trước.</div>
+              </div>
+              <input type="checkbox" id="cfg_fefo_enforce_strict" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+            </label>
+          </div>
+
+          <!-- Card 4: Kiểm kê, Hủy hàng & Hiển thị Vận hành -->
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <i data-lucide="settings-2" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Kiểm kê, Hủy hàng &amp; Hiển thị</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Chuẩn hóa vận hành kiểm kê, biên bản hủy và phân trang bảng</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="cfg_count_variance_alert_pct" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngưỡng chênh lệch kiểm kê (%)</label>
+                <input type="number" step="0.5" min="0" max="100" id="cfg_count_variance_alert_pct" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Cảnh báo khi |Thực tế − Tồn sổ| vượt tỷ lệ này.</p>
+              </div>
+              <div>
+                <label for="cfg_default_page_size" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Số dòng hiển thị mặc định</label>
+                <select id="cfg_default_page_size" class="input w-full font-sans text-sm">
+                  <option value="15">15 dòng / trang</option>
+                  <option value="25">25 dòng / trang</option>
+                  <option value="50">50 dòng / trang</option>
+                  <option value="100">100 dòng / trang</option>
+                </select>
+                <p class="text-[11px] text-gray-400 mt-1">Áp dụng mặc định cho các bảng danh sách kho.</p>
+              </div>
+            </div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+              <div>
+                <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Bắt buộc đính kèm ảnh khi lập phiếu hủy</div>
+                <div class="text-[11px] text-gray-500 dark:text-gray-400">Yêu cầu chứng từ hình ảnh minh chứng cho thao tác hủy hàng &amp; hao hụt.</div>
+              </div>
+              <input type="checkbox" id="cfg_waste_require_image" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+            </label>
+          </div>
+        </div>
+      </section>
+
 <section id="wh-dashboard" class="tab-panel space-y-4">
         <!-- Sub-nav bar -->
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
@@ -4798,6 +4985,15 @@
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Phân Quyền User Matrix</div>
                 <div class="text-xs text-gray-500 leading-tight line-clamp-1 mt-0.5">Ma trận quyền người dùng</div>
+              </div>
+            </button>
+            <button onclick="switchFromHub('sys-config')" data-tab="sys-config" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/50 text-left active:translate-y-px transition-all hover:border-amber-500 min-h-[64px]">
+              <div class="hub-icon-wrap w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 transition-colors">
+                <i data-lucide="sliders-horizontal" class="w-4.5 h-4.5 sm:w-5 sm:h-5"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="font-bold text-gray-900 dark:text-white text-xs leading-snug break-words">Cấu hình hệ thống</div>
+                <div class="text-xs text-amber-700 dark:text-amber-400 leading-tight line-clamp-1 mt-0.5">Tham số tồn kho &amp; SLA</div>
               </div>
             </button>
             <button onclick="handleUserProfileClick(); closeMobileMenuHub();" class="hub-item flex items-center gap-2.5 p-2.5 sm:p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/60 text-left active:translate-y-px transition-all hover:border-brand-500 min-h-[64px]">
