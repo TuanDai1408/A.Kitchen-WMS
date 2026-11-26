@@ -60,28 +60,6 @@ export function createPgClient(env) {
   });
 }
 
-// In-isolate concurrency limiter + retry for Supabase Session Pooler (pool_size: 15)
-const MAX_CONCURRENT_PG = 5;
-let _activePgClients = 0;
-const _pgWaitQueue = [];
-
-function acquirePgSlot() {
-  if (_activePgClients < MAX_CONCURRENT_PG) {
-    _activePgClients++;
-    return Promise.resolve();
-  }
-  return new Promise((resolve) => _pgWaitQueue.push(resolve));
-}
-
-function releasePgSlot() {
-  const next = _pgWaitQueue.shift();
-  if (next) {
-    next();
-  } else {
-    _activePgClients = Math.max(0, _activePgClients - 1);
-  }
-}
-
 function isPoolLimitError(err) {
   const msg = String(err?.message || err || '').toLowerCase();
   const code = String(err?.code || '').toUpperCase();
@@ -94,11 +72,11 @@ function isPoolLimitError(err) {
   );
 }
 
+// Per-request retry with jittered exponential backoff (no cross-request shared Promises in Cloudflare Workers)
 async function runWithPgClient(env, fn) {
   const maxAttempts = 5;
   let lastErr = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await acquirePgSlot();
     const client = createPgClient(env);
     try {
       await client.connect();
@@ -106,14 +84,13 @@ async function runWithPgClient(env, fn) {
     } catch (err) {
       lastErr = err;
       if (isPoolLimitError(err) && attempt < maxAttempts - 1) {
-        const delayMs = 80 * Math.pow(2, attempt) + Math.floor(Math.random() * 80);
+        const delayMs = 80 * Math.pow(2, attempt) + Math.floor(Math.random() * 100);
         await new Promise((r) => setTimeout(r, delayMs));
         continue;
       }
       throw err;
     } finally {
       await client.end().catch(() => {});
-      releasePgSlot();
     }
   }
   throw lastErr;
