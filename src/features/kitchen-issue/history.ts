@@ -110,8 +110,8 @@ export function renderKitchenIssueHistoryTable(): void {
                   </button>
                 ` : ''}
                 ${canDelete ? `
-                  <button onclick="confirmDeleteKitchenIssue('${slip.id}', '${escapeHtml(slip.issue_code)}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 transition-colors" title="Xóa phiếu xuất kho">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  <button onclick="confirmDeleteKitchenIssue('${slip.id}', '${escapeHtml(slip.issue_code)}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 transition-colors" title="Hủy phiếu xuất kho">
+                    <i data-lucide="x-circle" class="w-4 h-4"></i>
                   </button>
                 ` : ''}
               </div>
@@ -147,7 +147,7 @@ export function renderKitchenIssueHistoryTable(): void {
                   <button onclick="openEditKitchenIssueModal('${slip.id}')" class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-xs">Sửa</button>
                 ` : ''}
                 ${canDelete ? `
-                  <button onclick="confirmDeleteKitchenIssue('${slip.id}', '${escapeHtml(slip.issue_code)}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs">Xóa</button>
+                  <button onclick="confirmDeleteKitchenIssue('${slip.id}', '${escapeHtml(slip.issue_code)}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs">Hủy phiếu</button>
                 ` : ''}
               </div>
             </div>
@@ -383,7 +383,7 @@ export async function saveEditKitchenIssue(): Promise<void> {
 }
 
 export function confirmDeleteKitchenIssue(issueId: string | number, issueCode: string): void {
-  if (!assertPermission('fnb-kitchen-issue', 'delete', 'xóa phiếu xuất kho sử dụng')) return;
+  if (!assertPermission('fnb-kitchen-issue', 'delete', 'hủy phiếu xuất kho sử dụng')) return;
   _pendingDeleteKitchenIssue = { id: issueId, code: issueCode || `#${issueId}` };
   const codeEl = document.getElementById('confirmDeleteKitchenIssueCode');
   if (codeEl) codeEl.textContent = _pendingDeleteKitchenIssue.code;
@@ -397,7 +397,7 @@ export function closeDeleteKitchenIssueModal(): void {
 }
 
 export async function executeDeleteKitchenIssue(): Promise<void> {
-  if (!assertPermission('fnb-kitchen-issue', 'delete', 'xóa phiếu xuất kho sử dụng')) return;
+  if (!assertPermission('fnb-kitchen-issue', 'delete', 'hủy phiếu xuất kho sử dụng')) return;
   if (!_pendingDeleteKitchenIssue) return;
 
   const { id } = _pendingDeleteKitchenIssue;
@@ -405,16 +405,16 @@ export async function executeDeleteKitchenIssue(): Promise<void> {
   if (btn) btn.disabled = true;
 
   try {
-    if (typeof showLoading === 'function') showLoading('Đang xóa phiếu xuất & hoàn trả tồn kho...');
+    if (typeof showLoading === 'function') showLoading('Đang hủy phiếu xuất & hoàn trả tồn kho...');
     const res = await fetch(`/api/fnb/kitchen-issues?id=${encodeURIComponent(String(id))}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
     });
     const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Xóa thất bại');
+    if (!json.success) throw new Error(json.error || 'Hủy phiếu thất bại');
 
-    if (typeof showToast === 'function') showToast(json.message || 'Đã xóa phiếu xuất kho!', 'success');
+    if (typeof showToast === 'function') showToast(json.message || 'Đã hủy phiếu xuất kho!', 'success');
     closeDeleteKitchenIssueModal();
     const siteCode = getActiveKitchenIssueSite();
     await loadKitchenIssueHistory(siteCode);
@@ -424,7 +424,7 @@ export async function executeDeleteKitchenIssue(): Promise<void> {
     if (typeof w.loadWhInventory === 'function') w.loadWhInventory();
   } catch (err: any) {
     console.error('executeDeleteKitchenIssue error:', err);
-    if (typeof showToast === 'function') showToast('Lỗi xóa phiếu: ' + err.message, 'error');
+    if (typeof showToast === 'function') showToast('Lỗi hủy phiếu: ' + err.message, 'error');
   } finally {
     if (btn) btn.disabled = false;
     if (typeof hideLoading === 'function') hideLoading();

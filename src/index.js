@@ -6200,7 +6200,7 @@ export default {
               UPDATE fnb_stock_balances
               SET waste_qty = GREATEST(0, COALESCE(waste_qty, 0) - ?),
                   book_qty = COALESCE(book_qty, 0) + ?,
-                  total_value = (COALESCE(book_qty, 0) + ?) * COALESCE(NULLIF(unit_price, 0), ?),
+                  total_value = (COALESCE(book_qty, 0) + ?) * ?,
                   updated_at = NOW()
               WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
             `, [oldQty, oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
@@ -6615,7 +6615,7 @@ export default {
             await tx.exec(`
               UPDATE fnb_stock_balances
               SET book_qty = COALESCE(book_qty, 0) + ?,
-                  total_value = (COALESCE(book_qty, 0) + ?) * COALESCE(NULLIF(unit_price, 0), ?),
+                  total_value = (COALESCE(book_qty, 0) + ?) * ?,
                   updated_at = NOW()
               WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
             `, [oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
@@ -6811,7 +6811,7 @@ export default {
 
             return new Response(JSON.stringify({
               success: true,
-              message: `Đã xóa phiếu ${existingIssue.issue_code} và hoàn trả tồn kho!`
+              message: `Đã hủy phiếu ${existingIssue.issue_code} và hoàn trả tồn kho!`
             }), { headers: corsHeaders });
           } catch (e) {
             console.error('kitchen-issues DELETE error:', e);

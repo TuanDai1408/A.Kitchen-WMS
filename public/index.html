@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_0825">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_0855">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_0825"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_0855"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -6955,22 +6955,22 @@
     </div>
   </div>
 
-  <!-- MODAL XÁC NHẬN XÓA PHIẾU XUẤT KHO SỬ DỤNG -->
+  <!-- MODAL XÁC NHẬN HỦY PHIẾU XUẤT KHO SỬ DỤNG -->
   <div id="modalConfirmDeleteKitchenIssue" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteKitchenIssueModal()">
     <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-scale-up p-6 text-center space-y-4">
       <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
-        <i data-lucide="trash-2" class="w-7 h-7"></i>
+        <i data-lucide="x-circle" class="w-7 h-7"></i>
       </div>
       <div class="space-y-1">
-        <h3 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa phiếu xuất kho?</h3>
+        <h3 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận hủy phiếu xuất kho?</h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">Mã phiếu: <b id="confirmDeleteKitchenIssueCode" class="font-mono text-rose-600"></b></p>
-        <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">Thao tác này sẽ xóa phiếu xuất kho và tự động hoàn trả số lượng tồn kho tương ứng cho điểm bán.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">Thao tác này sẽ hủy phiếu xuất kho và tự động hoàn trả số lượng tồn kho tương ứng cho điểm bán.</p>
       </div>
       <div class="flex items-center justify-center gap-2.5 pt-2">
-        <button type="button" onclick="closeDeleteKitchenIssueModal()" class="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy bỏ</button>
+        <button type="button" onclick="closeDeleteKitchenIssueModal()" class="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Đóng</button>
         <button type="button" id="btnExecuteDeleteKitchenIssue" onclick="executeDeleteKitchenIssue()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          <span>Xóa phiếu</span>
+          <i data-lucide="x-circle" class="w-4 h-4"></i>
+          <span>Hủy phiếu</span>
         </button>
       </div>
     </div>
