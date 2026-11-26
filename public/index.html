@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1612">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1618">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1612"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1618"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1264,6 +1264,10 @@
             <button id="masterTabVisBtn" onclick="openTabVisibilityModal()" class="btn border border-indigo-200 dark:border-indigo-800 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300 font-bold hidden" title="Chỉ dành riêng cho Master Owner trantuandai2508">
               <i data-lucide="sliders-horizontal" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
               <span>👑 Ẩn / Hiện Tab Webapp</span>
+            </button>
+            <button onclick="openNewUserDefaultsModal()" class="btn border border-emerald-200 dark:border-emerald-800 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 dark:text-emerald-300 font-bold" title="Cấu hình tab & quyền mặc định khi User mới đăng nhập lần đầu">
+              <i data-lucide="user-cog" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+              <span>Quyền mặc định User mới</span>
             </button>
             <button onclick="openAddUserModal()" class="btn btn-primary">
               <i data-lucide="user-plus" class="w-4 h-4"></i>
@@ -4835,6 +4839,56 @@
           <div id="kkCountsHistoryMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
       </section>
+      <!-- Modal: Cấu hình quyền mặc định cho User mới -->
+      <div id="modalNewUserDefaultPerms" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <i data-lucide="user-cog" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Phân quyền mặc định cho User mới</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Áp dụng tự động cho tài khoản mới đăng nhập lần đầu (vai trò mặc định: Nhân Viên Vận Hành)</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeNewUserDefaultsModal()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <div class="px-5 py-3 bg-gray-50 dark:bg-gray-950/40 border-b border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div id="newUserDefaultStatusText" class="text-gray-500 dark:text-gray-400">Đang tải cấu hình...</div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="toggleAllNewUserDefaults('clear')" class="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100">Bỏ chọn hết</button>
+              <button type="button" onclick="toggleAllNewUserDefaults('basic')" class="px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold hover:bg-emerald-100">Khôi phục cơ bản (4 tab)</button>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-5">
+            <table class="w-full text-left border-collapse">
+              <thead class="sticky top-0 bg-white dark:bg-gray-900 z-10 border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <tr>
+                  <th class="py-2.5 px-3">Tab / Chức năng</th>
+                  <th class="py-2.5 px-2 text-center w-20">Xem</th>
+                  <th class="py-2.5 px-2 text-center w-20">Tạo</th>
+                  <th class="py-2.5 px-2 text-center w-20">Sửa</th>
+                  <th class="py-2.5 px-2 text-center w-20">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="newUserDefaultsTableBody" class="divide-y divide-gray-100 dark:divide-gray-800/70"></tbody>
+            </table>
+          </div>
+
+          <div class="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-2.5 bg-gray-50/70 dark:bg-gray-950/40">
+            <button type="button" onclick="closeNewUserDefaultsModal()" class="btn btn-secondary text-xs">Đóng</button>
+            <button type="button" id="btnSaveNewUserDefaults" onclick="saveNewUserDefaults()" class="btn btn-primary text-xs">
+              <i data-lucide="save" class="w-4 h-4"></i> Lưu quyền mặc định
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Tab 403: Không Có Quyền Truy Cập (TailAdmin Access Denied Pattern) -->
       <section id="tab-403" class="tab-panel py-16 px-4 text-center">
         <div class="mx-auto max-w-md rounded-2xl border border-amber-200 dark:border-amber-800/60 bg-white dark:bg-white/3 p-8 shadow-theme-xs space-y-4">

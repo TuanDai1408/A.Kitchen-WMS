@@ -1,6 +1,6 @@
 import { loadUserMatrix, bulkSetUserPermissions } from './user-matrix';
 import { escapeHtml } from '@/ts/utils/formatters';
-import { assertPermission } from '@/features/auth';
+import { assertPermission, getCurrentAppUser, ALL_TAB_GROUPS } from '@/features/auth';
 
 declare const showLoading: (msg?: string) => void;
 declare const hideLoading: () => void;
@@ -362,6 +362,152 @@ export async function bulkSetUserPermissionsPrompt(action: 'REVOKE_ALL' | 'GRANT
 
   await bulkSetUserPermissions(userEmail, action);
   closeEditUserModal();
+}
+
+// =========================================================================
+// CẤU HÌNH QUYỀN MẶC ĐỊNH CHO USER MỚI ĐĂNG NHẬP LẦN ĐẦU
+// =========================================================================
+type DefaultPermFlags = { canView: boolean; canCreate: boolean; canEdit: boolean; canDelete: boolean };
+let gNewUserDefaultPermsMap: Record<string, DefaultPermFlags> = {};
+
+function renderNewUserDefaultsTable(): void {
+  const tbody = document.getElementById('newUserDefaultsTableBody');
+  if (!tbody) return;
+
+  const tabGroups = Array.isArray(ALL_TAB_GROUPS) ? ALL_TAB_GROUPS : [];
+  if (!tabGroups.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-xs text-gray-400">Không tìm thấy danh sách nhóm tab.</td></tr>`;
+    return;
+  }
+
+  const rowsHtml: string[] = [];
+  for (const grp of tabGroups) {
+    rowsHtml.push(`
+      <tr class="bg-gray-50/90 dark:bg-gray-800/60">
+        <td colspan="5" class="py-2 px-3 text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">${escapeHtml(grp.groupName || grp.groupId)}</td>
+      </tr>
+    `);
+    for (const tab of (grp.tabs || [])) {
+      const p = gNewUserDefaultPermsMap[tab.id] || { canView: false, canCreate: false, canEdit: false, canDelete: false };
+      rowsHtml.push(`
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-2.5 px-3">
+            <div class="text-xs font-semibold text-gray-900 dark:text-white">${escapeHtml(tab.name)}</div>
+            <div class="text-[11px] text-gray-400 font-mono">${escapeHtml(tab.id)}</div>
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="checkbox" ${p.canView ? 'checked' : ''} onchange="toggleNewUserDefaultFlag('${escapeHtml(tab.id)}', 'canView', this.checked)" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer">
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="checkbox" ${p.canCreate ? 'checked' : ''} onchange="toggleNewUserDefaultFlag('${escapeHtml(tab.id)}', 'canCreate', this.checked)" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer">
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="checkbox" ${p.canEdit ? 'checked' : ''} onchange="toggleNewUserDefaultFlag('${escapeHtml(tab.id)}', 'canEdit', this.checked)" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer">
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="checkbox" ${p.canDelete ? 'checked' : ''} onchange="toggleNewUserDefaultFlag('${escapeHtml(tab.id)}', 'canDelete', this.checked)" class="w-4 h-4 rounded border-gray-300 text-rose-500 focus:ring-rose-500 cursor-pointer">
+          </td>
+        </tr>
+      `);
+    }
+  }
+  tbody.innerHTML = rowsHtml.join('');
+}
+
+export async function openNewUserDefaultsModal(): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'cấu hình quyền mặc định user mới')) return;
+  const modal = document.getElementById('modalNewUserDefaultPerms');
+  const statusEl = document.getElementById('newUserDefaultStatusText');
+  if (modal) modal.classList.remove('hidden');
+  if (statusEl) statusEl.textContent = 'Đang tải cấu hình...';
+
+  try {
+    const resp = await fetch('/api/auth/default-user-permissions');
+    const json = await resp.json();
+    if (json.success && json.data) {
+      gNewUserDefaultPermsMap = json.data;
+      if (statusEl) {
+        statusEl.textContent = json.isCustom
+          ? `Đã tùy chỉnh (${json.updatedAt || ''} • ${json.updatedBy || 'Admin'})`
+          : 'Đang dùng cấu hình mặc định ban đầu (4 tab vận hành cơ bản)';
+      }
+      renderNewUserDefaultsTable();
+    }
+  } catch {
+    if (statusEl) statusEl.textContent = 'Không thể tải cấu hình mặc định.';
+  }
+  if (typeof lucide !== 'undefined' && lucide.createIcons && modal) {
+    lucide.createIcons({ root: modal });
+  }
+}
+
+export function closeNewUserDefaultsModal(): void {
+  document.getElementById('modalNewUserDefaultPerms')?.classList.add('hidden');
+}
+
+export function toggleNewUserDefaultFlag(tabId: string, flag: keyof DefaultPermFlags, checked: boolean): void {
+  if (!gNewUserDefaultPermsMap[tabId]) {
+    gNewUserDefaultPermsMap[tabId] = { canView: false, canCreate: false, canEdit: false, canDelete: false };
+  }
+  gNewUserDefaultPermsMap[tabId][flag] = Boolean(checked);
+  if (flag !== 'canView' && checked) {
+    gNewUserDefaultPermsMap[tabId].canView = true;
+    renderNewUserDefaultsTable();
+  } else if (flag === 'canView' && !checked) {
+    gNewUserDefaultPermsMap[tabId].canCreate = false;
+    gNewUserDefaultPermsMap[tabId].canEdit = false;
+    gNewUserDefaultPermsMap[tabId].canDelete = false;
+    renderNewUserDefaultsTable();
+  }
+}
+
+export function toggleAllNewUserDefaults(mode: 'clear' | 'basic'): void {
+  const tabGroups = Array.isArray(ALL_TAB_GROUPS) ? ALL_TAB_GROUPS : [];
+  const basicTabs = ['fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
+  for (const grp of tabGroups) {
+    for (const tab of (grp.tabs || [])) {
+      const isBasic = mode === 'basic' && basicTabs.includes(tab.id);
+      gNewUserDefaultPermsMap[tab.id] = {
+        canView: isBasic,
+        canCreate: isBasic,
+        canEdit: isBasic,
+        canDelete: false
+      };
+    }
+  }
+  renderNewUserDefaultsTable();
+}
+
+export async function saveNewUserDefaults(): Promise<void> {
+  if (!assertPermission('user-matrix', 'edit', 'lưu quyền mặc định user mới')) return;
+  const btn = document.getElementById('btnSaveNewUserDefaults') as HTMLButtonElement | null;
+  if (btn) btn.disabled = true;
+
+  try {
+    const cur = getCurrentAppUser();
+    const resp = await fetch('/api/auth/default-user-permissions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Email': cur?.email || ''
+      },
+      body: JSON.stringify({
+        requestorEmail: cur?.email || '',
+        permissions: gNewUserDefaultPermsMap
+      })
+    });
+    const json = await resp.json();
+    if (!resp.ok || !json.success) {
+      if (typeof showToast === 'function') showToast(json.error || 'Lưu thất bại!', 'error');
+      return;
+    }
+    if (typeof showToast === 'function') showToast(json.message || 'Đã lưu cấu hình quyền mặc định cho User mới!', 'success');
+    closeNewUserDefaultsModal();
+  } catch {
+    if (typeof showToast === 'function') showToast('Lỗi kết nối khi lưu cấu hình!', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 /**

@@ -584,11 +584,36 @@ async function buildUserPermissions(env, user) {
         }
       });
     } else if (user.role_code === 'NHAN_VIEN') {
-      ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].forEach(f => {
-        if (!permissions[f] || !permissions[f].canView) {
-          permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+      let hasCustomDefault = false;
+      try {
+        await ensureSystemSettingsTable(env);
+        const defRow = await db.queryOne(env, `SELECT setting_value FROM system_settings WHERE setting_key = 'new_user_default_permissions' LIMIT 1`).catch(() => null);
+        if (defRow && defRow.setting_value) {
+          const parsed = JSON.parse(defRow.setting_value);
+          if (parsed && typeof parsed === 'object') {
+            hasCustomDefault = true;
+            ALL_SYSTEM_FEATURES.forEach(f => {
+              const p = parsed[f];
+              if (p) {
+                permissions[f] = {
+                  canView: Boolean(p.canView),
+                  canCreate: Boolean(p.canCreate),
+                  canEdit: Boolean(p.canEdit),
+                  canDelete: Boolean(p.canDelete)
+                };
+              }
+            });
+          }
         }
-      });
+      } catch (_) {}
+
+      if (!hasCustomDefault) {
+        ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].forEach(f => {
+          if (!permissions[f] || !permissions[f].canView) {
+            permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+          }
+        });
+      }
     }
   }
 
@@ -4644,6 +4669,98 @@ export default {
         return new Response(JSON.stringify({
           success: true,
           message: 'Đã cập nhật trạng thái ẩn/hiện và thứ tự vị trí các tab hệ thống thành công!'
+        }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // 2.11.DEF CẤU HÌNH QUYỀN MẶC ĐỊNH CHO USER MỚI (ADMIN / MASTER)
+      // ======================================================================
+      if (pathname === '/api/auth/default-user-permissions' && request.method === 'GET') {
+        await ensureSystemSettingsTable(env);
+        const defRow = await db.queryOne(env, `SELECT setting_value, updated_by, updated_at FROM system_settings WHERE setting_key = 'new_user_default_permissions' LIMIT 1`).catch(() => null);
+        const fallbackPerms = {};
+        const defaultList = ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
+        ALL_SYSTEM_FEATURES.forEach(f => {
+          const isDef = defaultList.includes(f);
+          fallbackPerms[f] = { canView: isDef, canCreate: isDef, canEdit: isDef, canDelete: false };
+        });
+
+        let permsMap = fallbackPerms;
+        let isCustom = false;
+        if (defRow && defRow.setting_value) {
+          try {
+            const parsed = JSON.parse(defRow.setting_value);
+            if (parsed && typeof parsed === 'object') {
+              permsMap = { ...fallbackPerms };
+              ALL_SYSTEM_FEATURES.forEach(f => {
+                if (parsed[f]) {
+                  permsMap[f] = {
+                    canView: Boolean(parsed[f].canView),
+                    canCreate: Boolean(parsed[f].canCreate),
+                    canEdit: Boolean(parsed[f].canEdit),
+                    canDelete: Boolean(parsed[f].canDelete)
+                  };
+                }
+              });
+              isCustom = true;
+            }
+          } catch (_) {}
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: permsMap,
+          isCustom,
+          updatedBy: defRow?.updated_by || null,
+          updatedAt: defRow?.updated_at || null
+        }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/auth/default-user-permissions' && request.method === 'POST') {
+        await ensureSystemSettingsTable(env);
+        const caller = await getCallerPermissions(env, request);
+        if (caller && !caller.isMaster && caller.user?.role_code !== 'ADMIN') {
+          return new Response(JSON.stringify({ success: false, error: 'Chỉ ADMIN hoặc Master Owner được cấu hình quyền mặc định cho User mới' }), { status: 403, headers: corsHeaders });
+        }
+
+        const body = await request.json().catch(() => ({}));
+        const perms = body.permissions || body.data || {};
+        const requestorEmail = caller?.user?.email || body.requestorEmail || request.headers.get('X-User-Email') || 'ADMIN';
+        const cleanMap = {};
+        ALL_SYSTEM_FEATURES.forEach(f => {
+          const p = perms[f] || {};
+          cleanMap[f] = {
+            canView: Boolean(p.canView),
+            canCreate: Boolean(p.canCreate),
+            canEdit: Boolean(p.canEdit),
+            canDelete: Boolean(p.canDelete)
+          };
+        });
+
+        await db.exec(env, `
+          INSERT INTO system_settings (setting_key, setting_value, value_type, updated_by, updated_at)
+          VALUES ('new_user_default_permissions', ?, 'json', ?, CURRENT_TIMESTAMP)
+          ON CONFLICT(setting_key) DO UPDATE SET
+            setting_value = EXCLUDED.setting_value,
+            value_type = EXCLUDED.value_type,
+            updated_by = EXCLUDED.updated_by,
+            updated_at = CURRENT_TIMESTAMP
+        `, [JSON.stringify(cleanMap), requestorEmail]);
+
+        invalidateMemoryCache('auth_me_');
+        await writeAuditLog(env, request, {
+          userEmail: requestorEmail,
+          action: 'UPDATE',
+          entityType: 'NEW_USER_DEFAULT_PERMS',
+          entityId: 'NHAN_VIEN',
+          summary: 'Cập nhật bộ tab và quyền mặc định cho tài khoản User mới',
+          newData: cleanMap
+        });
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: cleanMap,
+          message: 'Đã lưu cấu hình phân quyền mặc định cho User mới!'
         }), { headers: corsHeaders });
       }
 

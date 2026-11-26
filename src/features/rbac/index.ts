@@ -31,7 +31,12 @@ import {
   openConfirmToggleUserStatusModal,
   closeConfirmToggleUserStatusModal,
   executeToggleUserStatus,
-  toggleUserStatusPrompt
+  toggleUserStatusPrompt,
+  openNewUserDefaultsModal,
+  closeNewUserDefaultsModal,
+  toggleNewUserDefaultFlag,
+  toggleAllNewUserDefaults,
+  saveNewUserDefaults
 } from './user-modals';
 
 import {
@@ -92,6 +97,11 @@ if (typeof window !== 'undefined') {
   w.closeConfirmToggleUserStatusModal = closeConfirmToggleUserStatusModal;
   w.executeToggleUserStatus = executeToggleUserStatus;
   w.toggleUserStatusPrompt = toggleUserStatusPrompt;
+  w.openNewUserDefaultsModal = openNewUserDefaultsModal;
+  w.closeNewUserDefaultsModal = closeNewUserDefaultsModal;
+  w.toggleNewUserDefaultFlag = toggleNewUserDefaultFlag;
+  w.toggleAllNewUserDefaults = toggleAllNewUserDefaults;
+  w.saveNewUserDefaults = saveNewUserDefaults;
 
   // Vouchers RBAC & Management
   w._pendingDeleteVoucherCode = _pendingDeleteVoucherCode;
