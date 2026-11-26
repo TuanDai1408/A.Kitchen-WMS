@@ -245,16 +245,56 @@ export async function openItemDetailModal(sku: string): Promise<void> {
     const leadEl = document.getElementById('detailLeadTime');
     if (leadEl) leadEl.textContent = `${item.lead_time_hours || 24}h`;
 
-    // Render mini stock trend chart inside modal
+    // Nạp lịch sử giao dịch thực tế để dựng biểu đồ biến động tồn 30 ngày & bảng giao dịch gần nhất
+    let historyRows: any[] = [];
+    try {
+      const branchCode = (typeof App !== 'undefined' && App.currentBranch && App.currentBranch !== 'ALL')
+        ? App.currentBranch
+        : (item.branch_code || item.site_code || 'ALL');
+      const histRes = await fetch(`/api/wh/item-history?sku=${encodeURIComponent(sku)}&site=${encodeURIComponent(branchCode)}&nocache=1`);
+      const histJson = await histRes.json();
+      if (histJson.success && histJson.data && Array.isArray(histJson.data.history)) {
+        historyRows = histJson.data.history;
+      }
+    } catch (e) {}
+
+    // Render mini stock trend chart inside modal (30 ngày thực tế tính ngược từ tồn hiện tại)
     const chartEl = document.getElementById('itemDetailStockChart');
     if (chartEl && typeof ApexCharts !== 'undefined') {
       if (chartItemDetail) {
         chartItemDetail.destroy();
       }
       const isDark = typeof isDarkModeActive === 'function' ? isDarkModeActive() : false;
-      const numQty = typeof item.qty === 'number' ? item.qty : (parseFloat(String(item.qty)) || 10);
+      const numQty = typeof item.qty === 'number' ? item.qty : (parseFloat(String(item.qty)) || 0);
+
+      const netByDate: Record<string, number> = {};
+      historyRows.forEach((h: any) => {
+        const dStr = h.doc_date ? String(h.doc_date).slice(0, 10) : '';
+        if (!dStr) return;
+        const delta = (parseFloat(String(h.qty_in || 0)) || 0) - (parseFloat(String(h.qty_out || 0)) || 0);
+        netByDate[dStr] = (netByDate[dStr] || 0) + delta;
+      });
+
+      const daysCount = 30;
+      const categories: string[] = new Array(daysCount);
+      const seriesData: number[] = new Array(daysCount);
+      const now = new Date();
+      let runningQty = numQty;
+
+      for (let i = daysCount - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - (daysCount - 1 - i));
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const dateKey = `${yyyy}-${mm}-${dd}`;
+        categories[i] = `${dd}/${mm}`;
+        seriesData[i] = Math.max(0, Math.round(runningQty * 100) / 100);
+        runningQty = runningQty - (netByDate[dateKey] || 0);
+      }
+
       const options = {
-        series: [{ name: 'Tồn kho thực tế', data: [15, 14, 16, 12, 11, 14, 13, 15, 14, 12, numQty] }],
+        series: [{ name: 'Tồn kho thực tế', data: seriesData }],
         colors: ['#19723C'],
         chart: {
           fontFamily: "'Be Vietnam Pro', sans-serif",
@@ -270,7 +310,8 @@ export async function openItemDetailModal(sku: string): Promise<void> {
           gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05, stops: [0, 95, 100] }
         },
         xaxis: {
-          categories: ['09/11', '10/11', '11/11', '12/11', '13/11', '14/11', '15/11', '16/11', '17/11', '18/11', '19/11'],
+          categories,
+          tickAmount: 10,
           labels: { style: { colors: isDark ? '#94A3B8' : '#64748B', fontSize: '10px' } }
         },
         yaxis: {
@@ -284,13 +325,33 @@ export async function openItemDetailModal(sku: string): Promise<void> {
 
     const tbody = document.getElementById('detailTransactionsBody');
     if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" class="py-6 text-center text-gray-400 dark:text-gray-500 text-xs">
-            Chưa có phát sinh giao dịch cho mặt hàng này.
-          </td>
-        </tr>
-      `;
+      if (!historyRows.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-6 text-center text-gray-400 dark:text-gray-500 text-xs">
+              Chưa có phát sinh giao dịch cho mặt hàng này.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = historyRows.slice(0, 12).map((h: any) => {
+          const qIn = parseFloat(String(h.qty_in || 0)) || 0;
+          const qOut = parseFloat(String(h.qty_out || 0)) || 0;
+          const dDisp = h.doc_date ? String(h.doc_date).slice(0, 10) : '—';
+          const qtyDisp = qIn > 0
+            ? `<span class="text-emerald-600 font-bold">+${qIn}</span>`
+            : `<span class="text-rose-600 font-bold">-${qOut}</span>`;
+          return `
+            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 text-xs">
+              <td class="py-2 px-3 font-mono text-gray-500 whitespace-nowrap">${dDisp}</td>
+              <td class="py-2 px-3 font-mono font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">${h.doc_no || '—'}</td>
+              <td class="py-2 px-3 text-gray-700 dark:text-gray-300">${h.trans_name || h.trans_type || '—'}</td>
+              <td class="py-2 px-3 text-right font-mono">${qtyDisp}</td>
+              <td class="py-2 px-3 text-gray-400 truncate max-w-[180px]">${h.notes || h.partner_name || '—'}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
     if (typeof lucide !== 'undefined' && lucide.createIcons) {

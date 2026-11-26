@@ -1854,6 +1854,27 @@ export default {
               UNION ALL
 
               SELECT 
+                ki.issue_date::date as doc_date,
+                ki.issue_code as doc_no,
+                'XUAT_BEP' as trans_type,
+                'Xuất kho sử dụng bếp' as trans_name,
+                ki.site_code,
+                null as batch_code,
+                null as exp_date,
+                0::numeric as qty_in,
+                l.qty::numeric as qty_out,
+                l.unit_price::numeric as unit_price,
+                ROUND((l.qty * l.unit_price)::numeric, 0) as amount,
+                ki.issuer_name as partner_name,
+                COALESCE(l.notes, ki.notes, ki.meal_shift, '') as notes,
+                ki.created_at as sort_time
+              FROM fnb_kitchen_issue_lines l
+              JOIN fnb_kitchen_issues ki ON l.issue_id = ki.id
+              WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(ki.site_code) = UPPER($2))
+
+              UNION ALL
+
+              SELECT 
                 m.posting_date::date as doc_date,
                 m.mat_doc as doc_no,
                 CASE 
