@@ -2594,18 +2594,19 @@ export default {
                 b.id::text,
                 b.sku,
                 b.batch_code,
-                UPPER(b.branch_id) as site_code,
-                b.mfg_date,
-                b.exp_date,
-                b.qty as current_qty,
-                b.qty as initial_qty,
+                UPPER(COALESCE(br.code, b.branch_id)) as site_code,
+                b.mfg_date::text as mfg_date,
+                b.exp_date::text as exp_date,
+                b.qty::numeric as current_qty,
+                b.qty::numeric as initial_qty,
                 COALESCE(b.storage_loc, 'Kệ Bếp') as storage_loc,
                 'inventory_batches' as source,
-                null as receipt_code,
-                null as supplier,
-                b.created_at
+                null::text as receipt_code,
+                null::text as supplier,
+                b.created_at::text as created_at
               FROM inventory_batches b
-              WHERE b.sku = $1 AND ($2 = 'ALL' OR UPPER(b.branch_id) = UPPER($2))
+              LEFT JOIN branches br ON b.branch_id = br.id OR UPPER(br.code) = UPPER(b.branch_id)
+              WHERE b.sku = $1 AND ($2 = 'ALL' OR UPPER(COALESCE(br.code, b.branch_id)) = UPPER($2))
 
               UNION ALL
 
@@ -2616,22 +2617,23 @@ export default {
                 UPPER(r.site_code) as site_code,
                 l.mfg_date::text as mfg_date,
                 l.exp_date::text as exp_date,
-                l.qty as current_qty,
-                l.qty as initial_qty,
+                l.qty::numeric as current_qty,
+                l.qty::numeric as initial_qty,
                 'Kệ Bếp' as storage_loc,
                 'fnb_stock_receipts' as source,
-                r.receipt_code,
-                r.supplier,
-                r.created_at
+                r.receipt_code::text as receipt_code,
+                r.supplier::text as supplier,
+                r.created_at::text as created_at
               FROM fnb_stock_receipt_lines l
               JOIN fnb_stock_receipts r ON l.receipt_id = r.id
               WHERE l.item_code = $1 
                 AND l.batch_code IS NOT NULL AND l.batch_code != ''
                 AND ($2 = 'ALL' OR UPPER(r.site_code) = UPPER($2))
                 AND NOT EXISTS (
-                  SELECT 1 FROM inventory_batches ib 
+                  SELECT 1 FROM inventory_batches ib
+                  LEFT JOIN branches ibr ON ib.branch_id = ibr.id OR UPPER(ibr.code) = UPPER(ib.branch_id)
                   WHERE ib.sku = l.item_code 
-                    AND UPPER(ib.branch_id) = UPPER(r.site_code) 
+                    AND UPPER(COALESCE(ibr.code, ib.branch_id)) = UPPER(r.site_code) 
                     AND ib.batch_code = l.batch_code
                 )
             )
@@ -2648,13 +2650,13 @@ export default {
               receipt_code,
               supplier,
               CASE 
-                WHEN exp_date IS NOT NULL AND exp_date != '' THEN (exp_date::date - CURRENT_DATE)
+                WHEN NULLIF(exp_date, '') IS NOT NULL THEN (NULLIF(exp_date, '')::date - CURRENT_DATE)
                 ELSE 999
               END as days_left,
               CASE 
-                WHEN exp_date IS NULL OR exp_date = '' THEN 'UNKNOWN'
-                WHEN (exp_date::date - CURRENT_DATE) < 0 THEN 'EXPIRED'
-                WHEN (exp_date::date - CURRENT_DATE) <= 30 THEN 'NEAR_EXPIRY'
+                WHEN NULLIF(exp_date, '') IS NULL THEN 'UNKNOWN'
+                WHEN (NULLIF(exp_date, '')::date - CURRENT_DATE) < 0 THEN 'EXPIRED'
+                WHEN (NULLIF(exp_date, '')::date - CURRENT_DATE) <= 30 THEN 'NEAR_EXPIRY'
                 ELSE 'GOOD'
               END as status,
               created_at

@@ -164,9 +164,9 @@ export async function openWhItemBatchesModal(sku: string): Promise<void> {
   const modal = document.getElementById('modalWhItemBatches');
   if (modal) modal.classList.remove('hidden');
 
-  const tbody = document.getElementById('whBatchesTableBody');
-  const mob = document.getElementById('whBatchesMobileCards');
-  if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400">Đang truy vấn danh sách lô date FEFO...</td></tr>';
+  const tbody = document.getElementById('whBatchTableBody');
+  const mob = document.getElementById('whBatchMobileCards');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Đang truy vấn danh sách lô date FEFO...</td></tr>';
   if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Đang truy vấn lô date...</div>';
 
   try {
@@ -196,7 +196,7 @@ export async function openWhItemBatchesModal(sku: string): Promise<void> {
       if (warnEl) warnEl.textContent = formatNumber(warnCount, 0);
 
       if (!batches.length) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-gray-400">Chưa có lô hàng date riêng biệt nào được ghi nhận cho mã này (đang quản lý tồn gộp theo site).</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Chưa có lô hàng date riêng biệt nào được ghi nhận cho mã này (đang quản lý tồn gộp theo site).</td></tr>';
         if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl">Chưa có lô hàng date riêng biệt.</div>';
         return;
       }
@@ -211,35 +211,34 @@ export async function openWhItemBatchesModal(sku: string): Promise<void> {
           } else if (b.status === 'NEAR_EXPIRY') {
             badgeStatus = 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200';
             statusText = 'Cận date (≤ 30 ngày)';
+          } else if (b.status === 'UNKNOWN') {
+            badgeStatus = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 border border-gray-200';
+            statusText = 'Chưa có HSD';
           }
 
           const expDisp = b.exp_date ? String(b.exp_date).split('T')[0] : '—';
-          const daysLeftDisp = b.days_left !== 999 ? `${b.days_left} ngày` : '—';
+          const daysLeftDisp = b.days_left !== 999 ? ` (${b.days_left} ngày)` : '';
+          const createdDisp = (b as any).created_at ? String((b as any).created_at).slice(0, 10) : '—';
 
           return `
             <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-              <td class="p-2.5 whitespace-nowrap font-mono font-bold text-purple-700 dark:text-purple-400">${b.batch_code || 'LÔ-CHUNG'}</td>
-              <td class="p-2.5 whitespace-nowrap text-gray-700 dark:text-gray-300">
-                <span>${b.site_code || ''}</span> • <span class="text-gray-400">${b.storage_loc || 'Kệ Bếp'}</span>
+              <td class="p-3 whitespace-nowrap">
+                <div class="font-mono font-bold text-purple-700 dark:text-purple-400">${b.batch_code || 'LÔ-CHUNG'}</div>
+                ${b.receipt_code ? `<div class="text-[11px] font-mono text-brand-600 mt-0.5">${b.receipt_code}</div>` : ''}
               </td>
-              <td class="p-2.5 text-center whitespace-nowrap font-mono font-semibold text-gray-800 dark:text-gray-200 tabular-nums">${expDisp}</td>
-              <td class="p-2.5 text-center whitespace-nowrap font-mono tabular-nums font-semibold ${
-                b.status === 'EXPIRED' ? 'text-rose-600' : (b.status === 'NEAR_EXPIRY' ? 'text-amber-600' : 'text-emerald-600')
-              }">
-                ${daysLeftDisp}
+              <td class="p-3 whitespace-nowrap font-mono font-semibold text-gray-800 dark:text-gray-200 tabular-nums">
+                ${expDisp}<span class="text-[11px] font-normal text-gray-400">${daysLeftDisp}</span>
               </td>
-              <td class="p-2.5 text-center whitespace-nowrap">
+              <td class="p-3 text-center whitespace-nowrap">
                 <span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeStatus}">${statusText}</span>
               </td>
-              <td class="p-2.5 text-right whitespace-nowrap font-mono text-gray-600 dark:text-gray-300 tabular-nums">
-                ${formatNumber(Number(b.initial_qty) || 0, 1)}
-              </td>
-              <td class="p-2.5 text-right whitespace-nowrap font-mono font-bold text-blue-700 dark:text-blue-400 tabular-nums">
+              <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-blue-700 dark:text-blue-400 tabular-nums">
                 ${formatNumber(Number(b.current_qty) || 0, 1)}
               </td>
-              <td class="p-2.5 whitespace-nowrap font-mono text-gray-500 text-xs">
-                ${b.receipt_code ? `<span class="text-brand-600 font-semibold">${b.receipt_code}</span>` : '—'}
+              <td class="p-3 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                <span>${b.site_code || ''}</span> • <span class="text-gray-400">${b.storage_loc || 'Kệ Bếp'}</span>
               </td>
+              <td class="p-3 whitespace-nowrap font-mono text-gray-500 text-xs">${createdDisp}</td>
             </tr>
           `;
         }).join('');
@@ -268,10 +267,10 @@ export async function openWhItemBatchesModal(sku: string): Promise<void> {
         }).join('');
       }
     } else {
-      if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500">Lỗi: ${json.error}</td></tr>`;
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">Lỗi: ${json.error}</td></tr>`;
     }
   } catch (err: any) {
     console.error('openWhItemBatchesModal error:', err);
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500">Lỗi kết nối: ${err.message}</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">Lỗi kết nối: ${err.message}</td></tr>`;
   }
 }
