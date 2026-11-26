@@ -5720,9 +5720,30 @@ export default {
             `, [receiptCode, site_code, validReceiptDate, supplier, invoice_no, totalAmount, notes, attachment_url, created_by]);
 
             const receiptId = insertH.id;
+            const isPg = db.isPg(env);
+            const safeTxStep = async (tx, fn) => {
+              if (!isPg) {
+                try { return await fn(); } catch (_) { return null; }
+              }
+              const sp = 'sp_' + Math.random().toString(36).slice(2, 10);
+              await tx.exec(`SAVEPOINT ${sp}`);
+              try {
+                const res = await fn();
+                await tx.exec(`RELEASE SAVEPOINT ${sp}`);
+                return res;
+              } catch (err) {
+                await tx.exec(`ROLLBACK TO SAVEPOINT ${sp}`).catch(() => {});
+                await tx.exec(`RELEASE SAVEPOINT ${sp}`).catch(() => {});
+                console.warn('safeTxStep warning:', err?.message || err);
+                return null;
+              }
+            };
 
             // Batch insert lines & update balances in a single transaction (ACID)
             await db.withTransaction(env, async (tx) => {
+              const brRow = await safeTxStep(tx, () => tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [site_code]));
+              const publicBranchId = brRow?.id || site_code.toLowerCase();
+
               for (const item of lines) {
                 const qty = Number(item.qty) || 0;
                 const unitPrice = Number(item.unit_price) || 0;
@@ -5737,25 +5758,20 @@ export default {
                 `, [receiptId, item.item_code, qty, unitPrice, lineAmount, batchCode, expDate, mfgDate, item.note || '']);
 
                 if (batchCode && qty > 0) {
-                  try {
-                    const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
-                    const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
-                    const invExpDate = expDate || fallbackExp;
+                  const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+                  const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
+                  const invExpDate = expDate || fallbackExp;
+                  const storageLoc = item.storage_loc || 'Kệ Bếp';
 
-                    const storageLoc = item.storage_loc || 'Kệ Bếp';
-                    const brRow = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [site_code]).catch(() => null);
-                    const publicBranchId = brRow?.id || site_code.toLowerCase();
-                    await tx.exec(`
-                      INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-                    `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
-                    await tx.exec(`
-                      INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-                    `, [batchId, item.item_code, site_code.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]);
-                  } catch (batErr) {
-                    console.warn('inventory_batches insert warning:', batErr.message);
-                  }
+                  await safeTxStep(tx, () => tx.exec(`
+                    INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                  `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]));
+
+                  await safeTxStep(tx, () => tx.exec(`
+                    INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                  `, [batchId, item.item_code, site_code.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]));
                 }
 
                 // Upsert vào fnb_stock_balances (cộng dồn vào book_qty hiện có để không làm mất các giao dịch Xuất kho sử dụng trước đó)
@@ -5776,13 +5792,13 @@ export default {
 
                 // Nếu có số PO, cập nhật trạng thái đã nhận hàng
                 if (invoice_no) {
-                  await tx.exec(`
+                  await safeTxStep(tx, () => tx.exec(`
                     UPDATE wms.sap_po_items
                     SET received_qty = received_qty + ?,
                         status = CASE WHEN (received_qty + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
                         updated_at = NOW()
                     WHERE po_number = ? AND article = ?
-                  `, [qty, qty, invoice_no, item.item_code]);
+                  `, [qty, qty, invoice_no, item.item_code]));
                 }
               }
             });
@@ -5851,8 +5867,26 @@ export default {
               totalAmount += (Number(item.qty) || 0) * (Number(item.unit_price) || 0);
             }
 
+            const isPg = db.isPg(env);
+            const safeTxStep = async (tx, fn) => {
+              if (!isPg) {
+                try { return await fn(); } catch (_) { return null; }
+              }
+              const sp = 'sp_' + Math.random().toString(36).slice(2, 10);
+              await tx.exec(`SAVEPOINT ${sp}`);
+              try {
+                const res = await fn();
+                await tx.exec(`RELEASE SAVEPOINT ${sp}`);
+                return res;
+              } catch (err) {
+                await tx.exec(`ROLLBACK TO SAVEPOINT ${sp}`).catch(() => {});
+                await tx.exec(`RELEASE SAVEPOINT ${sp}`).catch(() => {});
+                return null;
+              }
+            };
+
             await db.withTransaction(env, async (tx) => {
-              const brRow = await tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]).catch(() => null);
+              const brRow = await safeTxStep(tx, () => tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [siteCode]));
               const publicBranchId = brRow?.id || siteCode.toLowerCase();
 
               // 1. Hoàn tác tồn kho, batch & PO của các dòng cũ
@@ -5871,18 +5905,18 @@ export default {
                 }
 
                 if (oldLine.batch_code) {
-                  await tx.exec(`
+                  await safeTxStep(tx, () => tx.exec(`
                     DELETE FROM inventory_batches
                     WHERE sku = ? AND (branch_id = ? OR LOWER(branch_id) = ?) AND batch_code = ?
-                  `, [oldLine.item_code, publicBranchId, siteCode.toLowerCase(), oldLine.batch_code]).catch(() => {});
-                  await tx.exec(`
+                  `, [oldLine.item_code, publicBranchId, siteCode.toLowerCase(), oldLine.batch_code]));
+                  await safeTxStep(tx, () => tx.exec(`
                     DELETE FROM wms.inventory_batches
                     WHERE sku = ? AND branch_id = ? AND batch_code = ?
-                  `, [oldLine.item_code, siteCode.toLowerCase(), oldLine.batch_code]).catch(() => {});
+                  `, [oldLine.item_code, siteCode.toLowerCase(), oldLine.batch_code]));
                 }
 
                 if (existingReceipt.invoice_no) {
-                  await tx.exec(`
+                  await safeTxStep(tx, () => tx.exec(`
                     UPDATE wms.sap_po_items
                     SET received_qty = GREATEST(0, COALESCE(received_qty, 0) - ?),
                         status = CASE
@@ -5892,14 +5926,14 @@ export default {
                         END,
                         updated_at = NOW()
                     WHERE po_number = ? AND article = ?
-                  `, [oldQty, oldQty, oldQty, existingReceipt.invoice_no, oldLine.item_code]).catch(() => {});
+                  `, [oldQty, oldQty, oldQty, existingReceipt.invoice_no, oldLine.item_code]));
                 }
               }
 
-              await tx.exec(`
+              await safeTxStep(tx, () => tx.exec(`
                 DELETE FROM fnb_stock_transactions
                 WHERE trans_code = ? AND UPPER(site_code) = UPPER(?) AND trans_type = 'NHAP_KHO'
-              `, [receiptCode, siteCode]).catch(() => {});
+              `, [receiptCode, siteCode]));
 
               await tx.exec(`DELETE FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [receiptId]);
 
@@ -5924,21 +5958,19 @@ export default {
                 `, [receiptId, item.item_code, qty, unitPrice, lineAmount, batchCode, expDate, mfgDate, item.note || '']);
 
                 if (batchCode && qty > 0) {
-                  try {
-                    const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
-                    const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
-                    const invExpDate = expDate || fallbackExp;
-                    const storageLoc = item.storage_loc || 'Kệ Bếp';
+                  const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+                  const fallbackExp = new Date(new Date(validReceiptDate).getTime() + 365 * 86400000).toISOString().split('T')[0];
+                  const invExpDate = expDate || fallbackExp;
+                  const storageLoc = item.storage_loc || 'Kệ Bếp';
 
-                    await tx.exec(`
-                      INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-                    `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
-                    await tx.exec(`
-                      INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-                    `, [batchId, item.item_code, siteCode.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]).catch(() => {});
-                  } catch (batErr) {}
+                  await safeTxStep(tx, () => tx.exec(`
+                    INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                  `, [batchId, item.item_code, publicBranchId, batchCode, mfgDate, invExpDate, qty, storageLoc]));
+                  await safeTxStep(tx, () => tx.exec(`
+                    INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                  `, [batchId, item.item_code, siteCode.toLowerCase(), batchCode, mfgDate, invExpDate, qty, storageLoc]));
                 }
 
                 await tx.exec(`
@@ -5957,13 +5989,13 @@ export default {
                 `, [receiptCode, item.item_code, siteCode, qty, unitPrice, lineAmount, `Nhập từ ${finalSupplier} (Số HĐ/PO: ${finalInvoiceNo || 'N/A'})`, created_by]);
 
                 if (finalInvoiceNo) {
-                  await tx.exec(`
+                  await safeTxStep(tx, () => tx.exec(`
                     UPDATE wms.sap_po_items
                     SET received_qty = COALESCE(received_qty, 0) + ?,
                         status = CASE WHEN (COALESCE(received_qty, 0) + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
                         updated_at = NOW()
                     WHERE po_number = ? AND article = ?
-                  `, [qty, qty, finalInvoiceNo, item.item_code]).catch(() => {});
+                  `, [qty, qty, finalInvoiceNo, item.item_code]));
                 }
               }
             });
