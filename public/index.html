@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1335">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1345">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1335"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1345"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -3122,11 +3122,27 @@
         </div>
       </section>
 <section id="wh-stock" class="tab-panel space-y-4">
+        <!-- Top Page-Switching Segmented Pill Bar (Kho vận & WMS) -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-stock')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Hạn dùng &amp; xuất FEFO
+          </button>
+          <button onclick="switchTab('wh-reorder')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Cảnh báo tồn ROP
+          </button>
+          <button onclick="switchTab('wh-leadtime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="truck" class="w-3.5 h-3.5"></i> Lead Time &amp; NCC
+          </button>
+          <button onclick="switchTab('wh-posap')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="boxes" class="w-3.5 h-3.5"></i> Tồn kho
+          </button>
+        </div>
+
         <!-- Page Header (Tiêu đề + Mô tả bên trái, Action Buttons bên phải) -->
         <div class="page-header">
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <h1 class="page-title">Hạn dùng &amp; xuất FEFO</h1>
-            <p class="page-subtitle">Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn an toàn thực phẩm.</p>
+            <p class="page-subtitle whitespace-normal break-words">Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn an toàn thực phẩm.</p>
           </div>
           <div id="whStockFefoHeaderActions" class="flex items-center gap-2.5 shrink-0">
             <button onclick="exportFefoToExcel()" class="btn btn-secondary">
@@ -3138,13 +3154,13 @@
           </div>
         </div>
 
-        <!-- Tabs Bar (Hàng riêng căn trái ngay dưới tiêu đề) -->
-        <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl border border-gray-200 dark:border-gray-700 w-fit">
-          <button id="btnSubTabWhFefo" type="button" onclick="switchWhStockSubView('fefo')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5 whitespace-nowrap">
+        <!-- Underline Sub-tabs (Phân cấp rõ với thanh tab chuyển trang phía trên) -->
+        <div class="flex items-center gap-6 border-b border-gray-200 dark:border-gray-800 overflow-x-auto select-none">
+          <button id="btnSubTabWhFefo" type="button" onclick="switchWhStockSubView('fefo')" class="pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
             <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
             <span>Hạn dùng &amp; FEFO</span>
           </button>
-          <button id="btnSubTabWhBatches" type="button" onclick="switchWhStockSubView('batches')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5 whitespace-nowrap">
+          <button id="btnSubTabWhBatches" type="button" onclick="switchWhStockSubView('batches')" class="pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
             <i data-lucide="layers" class="w-3.5 h-3.5"></i>
             <span>Quản lý lô hàng</span>
           </button>
@@ -3309,16 +3325,32 @@
         </div>
       </section>
 <section id="wh-reorder" class="tab-panel space-y-4">
+        <!-- Top Page-Switching Segmented Pill Bar (Kho vận & WMS) -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-stock')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Hạn dùng &amp; xuất FEFO
+          </button>
+          <button onclick="switchTab('wh-reorder')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Cảnh báo tồn ROP
+          </button>
+          <button onclick="switchTab('wh-leadtime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="truck" class="w-3.5 h-3.5"></i> Lead Time &amp; NCC
+          </button>
+          <button onclick="switchTab('wh-posap')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="boxes" class="w-3.5 h-3.5"></i> Tồn kho
+          </button>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
-          <div>
-            <div class="flex items-center gap-2.5">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
               <h1 class="page-title">Cảnh báo tồn ROP</h1>
               <span id="whRopCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">K001</span>
             </div>
-            <p class="page-subtitle">Công thức tính tự động: <code>ROP = (Mức tiêu thụ/ngày × Lead time) + Tồn an toàn</code></p>
+            <p class="page-subtitle whitespace-normal break-words">Công thức tính tự động: <code>ROP = (Mức tiêu thụ/ngày × Lead time) + Tồn an toàn</code></p>
           </div>
-          <button onclick="downloadRopExcel()" class="btn btn-secondary">
+          <button onclick="downloadRopExcel()" class="btn btn-secondary shrink-0">
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel đề xuất
           </button>
         </div>
@@ -3350,11 +3382,27 @@
         </div>
       </section>
 <section id="wh-leadtime" class="tab-panel space-y-4">
+        <!-- Top Page-Switching Segmented Pill Bar (Kho vận & WMS) -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-stock')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Hạn dùng &amp; xuất FEFO
+          </button>
+          <button onclick="switchTab('wh-reorder')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Cảnh báo tồn ROP
+          </button>
+          <button onclick="switchTab('wh-leadtime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500">
+            <i data-lucide="truck" class="w-3.5 h-3.5"></i> Lead Time &amp; NCC
+          </button>
+          <button onclick="switchTab('wh-posap')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="boxes" class="w-3.5 h-3.5"></i> Tồn kho
+          </button>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
-          <div>
+          <div class="min-w-0 flex-1">
             <h1 class="page-title">Lead Time &amp; NCC</h1>
-            <p class="page-subtitle">Theo dõi thời gian giao hàng nhà cung cấp và đánh giá cam kết SLA</p>
+            <p class="page-subtitle whitespace-normal break-words">Theo dõi thời gian giao hàng nhà cung cấp và đánh giá cam kết SLA</p>
           </div>
         </div>
 
@@ -3402,16 +3450,32 @@
         </div>
       </section>
 <section id="wh-posap" class="tab-panel space-y-4">
+        <!-- Top Page-Switching Segmented Pill Bar (Kho vận & WMS) -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 w-fit max-w-full overflow-x-auto shadow-theme-xs select-none">
+          <button onclick="switchTab('wh-stock')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Hạn dùng &amp; xuất FEFO
+          </button>
+          <button onclick="switchTab('wh-reorder')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Cảnh báo tồn ROP
+          </button>
+          <button onclick="switchTab('wh-leadtime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-white/5">
+            <i data-lucide="truck" class="w-3.5 h-3.5"></i> Lead Time &amp; NCC
+          </button>
+          <button onclick="switchTab('wh-posap')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shrink-0 bg-brand-500 text-white shadow-xs border border-brand-500">
+            <i data-lucide="boxes" class="w-3.5 h-3.5"></i> Tồn kho
+          </button>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
-          <div>
-            <div class="flex items-center gap-2.5">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
               <h1 class="page-title">Tồn kho</h1>
               <span id="whInvCurrentSiteBadge" class="badge badge-brand text-xs font-semibold px-2.5 py-0.5">K001</span>
             </div>
-            <p class="page-subtitle">Theo dõi số lượng hàng hóa đã nhập kho, tồn kho thực tế, tra cứu thẻ kho và chi tiết các lô hàng</p>
+            <p class="page-subtitle whitespace-normal break-words">Theo dõi số lượng hàng hóa đã nhập kho, tồn kho thực tế, tra cứu thẻ kho và chi tiết các lô hàng</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 shrink-0">
             <button onclick="exportWhInventoryToExcel()" class="btn btn-secondary">
               <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel tồn kho
             </button>
@@ -3420,14 +3484,14 @@
             </button>
           </div>
         </div>
-        <!-- Sub-view navigation tabs: Cân đối tồn kho vs Đơn hàng PO/PR đã nhập -->
-        <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
-          <button id="whInvTabBtnBalance" onclick="switchWhInvSubView('balance')" class="btn btn-primary h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-2">
-            <i data-lucide="boxes" class="w-4 h-4"></i>
+        <!-- Sub-view underline tabs: Cân đối tồn kho vs Đơn hàng PO/PR đã nhập -->
+        <div class="flex items-center gap-6 border-b border-gray-200 dark:border-gray-800 overflow-x-auto select-none">
+          <button id="whInvTabBtnBalance" onclick="switchWhInvSubView('balance')" class="pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
+            <i data-lucide="boxes" class="w-3.5 h-3.5"></i>
             <span>Cân đối tồn kho vật tư</span>
           </button>
-          <button id="whInvTabBtnReceipts" onclick="switchWhInvSubView('receipts')" class="btn btn-secondary h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-2">
-            <i data-lucide="package-check" class="w-4 h-4"></i>
+          <button id="whInvTabBtnReceipts" onclick="switchWhInvSubView('receipts')" class="pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
+            <i data-lucide="package-check" class="w-3.5 h-3.5"></i>
             <span>Danh sách đơn hàng PO / PR đã nhập kho</span>
             <span id="whInvBadgeReceiptsCount" class="badge badge-brand text-[11px] px-1.5 py-0.2">0</span>
           </button>

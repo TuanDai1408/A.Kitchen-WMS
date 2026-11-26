@@ -48,19 +48,22 @@ export function switchWhStockSubView(mode: 'fefo' | 'batches'): void {
   const btnBatches = document.getElementById('btnSubTabWhBatches');
   const fefoActions = document.getElementById('whStockFefoHeaderActions');
 
+  const activeTabClass = 'pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+  const inactiveTabClass = 'pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+
   if (mode === 'batches') {
     fefoView?.classList.add('hidden');
     batchesView?.classList.remove('hidden');
     fefoActions?.classList.add('hidden');
-    if (btnFefo) btnFefo.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5';
-    if (btnBatches) btnBatches.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5';
+    if (btnFefo) btnFefo.className = inactiveTabClass;
+    if (btnBatches) btnBatches.className = activeTabClass;
     loadBatchManager();
   } else {
     fefoView?.classList.remove('hidden');
     batchesView?.classList.add('hidden');
     fefoActions?.classList.remove('hidden');
-    if (btnFefo) btnFefo.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5';
-    if (btnBatches) btnBatches.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5';
+    if (btnFefo) btnFefo.className = activeTabClass;
+    if (btnBatches) btnBatches.className = inactiveTabClass;
   }
   if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }

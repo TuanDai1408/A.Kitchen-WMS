@@ -21,14 +21,17 @@ export function switchWhInvSubView(view: 'balance' | 'receipts'): void {
   const viewBalance = document.getElementById('whInvBalanceView');
   const viewReceipts = document.getElementById('whInvReceiptsView');
 
+  const activeTabClass = 'pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+  const inactiveTabClass = 'pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+
   if (view === 'balance') {
-    if (btnBalance) btnBalance.className = 'btn btn-primary btn-sm';
-    if (btnReceipts) btnReceipts.className = 'btn btn-secondary btn-sm';
+    if (btnBalance) btnBalance.className = activeTabClass;
+    if (btnReceipts) btnReceipts.className = inactiveTabClass;
     if (viewBalance) viewBalance.classList.remove('hidden');
     if (viewReceipts) viewReceipts.classList.add('hidden');
   } else {
-    if (btnBalance) btnBalance.className = 'btn btn-secondary btn-sm';
-    if (btnReceipts) btnReceipts.className = 'btn btn-primary btn-sm';
+    if (btnBalance) btnBalance.className = inactiveTabClass;
+    if (btnReceipts) btnReceipts.className = activeTabClass;
     if (viewBalance) viewBalance.classList.add('hidden');
     if (viewReceipts) viewReceipts.classList.remove('hidden');
     loadWhReceivedOrders();
