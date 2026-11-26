@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1518">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1525">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1518"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1525"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -457,18 +457,18 @@
         <span id="mobileHeaderTitle" class="hidden"></span>
       </div>
 
-      <!-- Right: Controls, Filters & User Profile (Auto-fill full header width) -->
-      <div class="flex flex-1 items-center justify-end lg:justify-between gap-1.5 sm:gap-2.5 lg:gap-3 min-w-0 ml-2 sm:ml-3">
+      <!-- Right: Controls, Filters & User Profile (Auto-fill full header width without overlap) -->
+      <div class="flex flex-1 items-center justify-end lg:justify-between gap-1.5 sm:gap-2 min-w-0 ml-2 sm:ml-3">
         
-        <!-- Global Filter Group (Auto-expands when Duyệt Quyền is hidden) -->
-        <div class="flex flex-1 items-center gap-1.5 sm:gap-2.5 min-w-0">
+        <!-- Global Filter Group (Auto-expands when Duyệt Quyền is hidden; min-w-0 + overflow-hidden prevents overlap when sidebar is open) -->
+        <div class="flex flex-1 items-center gap-1.5 sm:gap-2 min-w-0 overflow-hidden">
           <!-- Global Branch & Region Taskbar Display (Interactive Pill) -->
-          <div onclick="openSiteSelectorModal()" class="header-control flex-1 min-w-[140px] rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-3.5 flex items-center justify-between gap-2.5 shadow-theme-xs cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
-            <div class="flex items-center gap-2 min-w-0 flex-1">
+          <div onclick="openSiteSelectorModal()" class="header-control flex-1 min-w-0 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-brand-500/50 hover:bg-brand-50/30 dark:hover:bg-brand-950/20 px-2.5 sm:px-3 flex items-center justify-between gap-2 shadow-theme-xs cursor-pointer transition-all group" title="Bấm để đổi Điểm bán & Vùng miền phụ trách">
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
               <div class="w-5 h-5 rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center shrink-0">
                 <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
               </div>
-              <span id="taskbarRegionBadge" class="hidden xs:inline-block text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
+              <span id="taskbarRegionBadge" class="hidden 2xl:inline-block text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 shrink-0">Miền Nam</span>
               <span id="taskbarSiteName" class="font-medium text-xs text-gray-800 dark:text-gray-100 truncate">K001 - Bếp ĐH Hùng Vương</span>
             </div>
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400 group-hover:text-brand-500 transition-colors shrink-0"></i>
@@ -476,24 +476,24 @@
           </div>
 
           <!-- Global Date Range Picker (Mặc định 2 tháng gần nhất để tối ưu hiệu suất) -->
-          <div class="hidden md:flex flex-1 max-w-xs items-center relative min-w-[205px]" title="Chọn khoảng thời gian lọc dữ liệu toàn hệ thống (mặc định 2 tháng gần nhất)">
-            <i data-lucide="calendar" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10"></i>
+          <div class="hidden md:flex flex-1 max-w-[235px] items-center relative min-w-[145px]" title="Chọn khoảng thời gian lọc dữ liệu toàn hệ thống (mặc định 2 tháng gần nhất)">
+            <i data-lucide="calendar" class="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10"></i>
             <input
               type="text"
               id="globalDateRangePicker"
               placeholder="2 tháng gần nhất..."
-              class="header-control pl-9 pr-3 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-mono font-medium shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer outline-none focus:border-brand-500"
+              class="header-control pl-8 pr-2.5 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-mono font-medium shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer outline-none focus:border-brand-500"
               readonly
             />
             <input type="hidden" id="globalMonthPicker" value="2026-11">
           </div>
 
           <!-- Quick Date Presets -->
-          <div class="hidden xl:flex items-center gap-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0 select-none" title="Chọn nhanh mốc thời gian">
-            <button type="button" data-preset="7d" onclick="applyGlobalDatePreset('7d', this)" class="global-date-preset px-2.5 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all">7 ngày</button>
-            <button type="button" data-preset="30d" onclick="applyGlobalDatePreset('30d', this)" class="global-date-preset px-2.5 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all">30 ngày</button>
-            <button type="button" data-preset="2m" onclick="applyGlobalDatePreset('2m', this)" class="global-date-preset active px-2.5 py-1 rounded-md text-xs font-bold bg-brand-500 text-white shadow-2xs transition-all">2 tháng</button>
-            <button type="button" data-preset="this_month" onclick="applyGlobalDatePreset('this_month', this)" class="global-date-preset px-2.5 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all">Tháng này</button>
+          <div class="hidden xl:flex items-center gap-0.5 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0 select-none" title="Chọn nhanh mốc thời gian">
+            <button type="button" data-preset="7d" onclick="applyGlobalDatePreset('7d', this)" class="global-date-preset px-2 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all whitespace-nowrap"><span class="2xl:hidden">7N</span><span class="hidden 2xl:inline">7 ngày</span></button>
+            <button type="button" data-preset="30d" onclick="applyGlobalDatePreset('30d', this)" class="global-date-preset px-2 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all whitespace-nowrap"><span class="2xl:hidden">30N</span><span class="hidden 2xl:inline">30 ngày</span></button>
+            <button type="button" data-preset="2m" onclick="applyGlobalDatePreset('2m', this)" class="global-date-preset active px-2 py-1 rounded-md text-xs font-bold bg-brand-500 text-white shadow-2xs transition-all whitespace-nowrap"><span class="2xl:hidden">2T</span><span class="hidden 2xl:inline">2 tháng</span></button>
+            <button type="button" data-preset="this_month" onclick="applyGlobalDatePreset('this_month', this)" class="global-date-preset px-2 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all whitespace-nowrap"><span class="2xl:hidden">Tháng</span><span class="hidden 2xl:inline">Tháng này</span></button>
           </div>
         </div>
 
@@ -513,7 +513,7 @@
           <!-- Admin Pending Requests Button (Visible for Admin) -->
           <button id="adminPendingReqBtn" onclick="openAdminApprovalModal()" class="header-control hidden px-2.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center gap-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 shadow-theme-xs active:translate-y-px transition-all shrink-0" title="Duyệt yêu cầu cấp quyền từ nhân viên">
             <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-            <span class="hidden xl:inline">Duyệt Quyền</span>
+            <span class="hidden 2xl:inline">Duyệt Quyền</span>
             <span id="adminPendingReqCount" class="px-1.5 py-0.2 rounded-full text-xs font-semibold bg-rose-600 text-white">0</span>
           </button>
 
