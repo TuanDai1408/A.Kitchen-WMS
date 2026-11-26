@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1325">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1335">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1325"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1335"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1729,6 +1729,25 @@
                 <p class="text-[11px] text-gray-400 mt-1">SL Gợi Ý Đặt = Mức mục tiêu − Tồn hiện tại.</p>
               </div>
             </div>
+            <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-3">
+              <div>
+                <label for="cfg_rop_calc_mode" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Chế độ tính Daily Usage &amp; ROP</label>
+                <select id="cfg_rop_calc_mode" onchange="onRopCalcModeChange()" class="input w-full font-sans text-sm">
+                  <option value="fixed">Cố định theo tham số mặc định ở trên</option>
+                  <option value="auto_history">Tự động theo bình quân xuất thực tế (Auto-ROP)</option>
+                </select>
+              </div>
+              <div id="cfgRopAutoHistoryBox" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/50">
+                <div>
+                  <label for="cfg_rop_history_days" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Chu kỳ lịch sử (Ngày)</label>
+                  <input type="number" step="1" min="1" max="90" id="cfg_rop_history_days" class="input w-full font-mono text-sm">
+                </div>
+                <div>
+                  <label for="cfg_rop_peak_multiplier" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Hệ số dự phòng cao điểm</label>
+                  <input type="number" step="0.1" min="0.5" max="3" id="cfg_rop_peak_multiplier" class="input w-full font-mono text-sm">
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Card 2: Leadtime & SLA Nhà cung cấp -->
@@ -1816,6 +1835,21 @@
                 <p class="text-[11px] text-gray-400 mt-1">Cảnh báo khi |Thực tế − Tồn sổ| vượt tỷ lệ này.</p>
               </div>
               <div>
+                <label for="cfg_daily_count_cutoff_time" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Giờ chốt kiểm kê hằng ngày</label>
+                <input type="time" id="cfg_daily_count_cutoff_time" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Mốc nhắc nhở khóa sổ kiểm kê cuối ngày.</p>
+              </div>
+              <div>
+                <label for="cfg_waste_approval_amount_threshold" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngưỡng duyệt phiếu hủy (VNĐ)</label>
+                <input type="number" step="50000" min="0" id="cfg_waste_approval_amount_threshold" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Phiếu vượt mức này gắn cờ Chờ Quản lý duyệt.</p>
+              </div>
+              <div>
+                <label for="cfg_waste_approval_pct_threshold" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngưỡng hao hụt cần duyệt (%)</label>
+                <input type="number" step="0.5" min="0" max="100" id="cfg_waste_approval_pct_threshold" class="input w-full font-mono text-sm">
+                <p class="text-[11px] text-gray-400 mt-1">Tỷ lệ hủy vượt % này sẽ cảnh báo kiểm tra.</p>
+              </div>
+              <div class="sm:col-span-2">
                 <label for="cfg_default_page_size" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Số dòng hiển thị mặc định</label>
                 <select id="cfg_default_page_size" class="input w-full font-sans text-sm">
                   <option value="15">15 dòng / trang</option>
@@ -1823,16 +1857,64 @@
                   <option value="50">50 dòng / trang</option>
                   <option value="100">100 dòng / trang</option>
                 </select>
-                <p class="text-[11px] text-gray-400 mt-1">Áp dụng mặc định cho các bảng danh sách kho.</p>
               </div>
             </div>
-            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
-              <div>
-                <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Bắt buộc đính kèm ảnh khi lập phiếu hủy</div>
-                <div class="text-[11px] text-gray-500 dark:text-gray-400">Yêu cầu chứng từ hình ảnh minh chứng cho thao tác hủy hàng &amp; hao hụt.</div>
+            <div class="space-y-2.5">
+              <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Mặc định bật Kiểm kê mù (Blind Count)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Ẩn cột Tồn sổ sách khi nhân viên mở tab Kiểm kê hằng ngày.</div>
+                </div>
+                <input type="checkbox" id="cfg_blind_count_default" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+              <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Cho phép xuất âm kho (Negative Stock)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Nếu tắt, hệ thống chặn phiếu xuất bếp có số lượng lớn hơn tồn hiện tại.</div>
+                </div>
+                <input type="checkbox" id="cfg_allow_negative_stock" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+              <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Bắt buộc đính kèm ảnh khi lập phiếu hủy</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Yêu cầu chứng từ hình ảnh minh chứng cho thao tác hủy hàng &amp; hao hụt.</div>
+                </div>
+                <input type="checkbox" id="cfg_waste_require_image" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+            </div>
+          </div>
+
+          <!-- Card 5: Quy tắc riêng theo Nhóm hàng (Full-width) -->
+          <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Quy tắc riêng theo Nhóm hàng (FEFO &amp; Leadtime Override)</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Ưu tiên áp dụng thay cho ngưỡng mặc định khi mặt hàng thuộc nhóm tương ứng (khớp theo từ khóa tên nhóm hàng).</p>
+                </div>
               </div>
-              <input type="checkbox" id="cfg_waste_require_image" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-            </label>
+              <button type="button" onclick="addCategoryRuleRow()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Thêm nhóm hàng</span>
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <th class="p-2.5 min-w-[200px]">Từ khóa Nhóm hàng</th>
+                    <th class="p-2.5 text-right w-36">FEFO Đỏ (≤ ngày)</th>
+                    <th class="p-2.5 text-right w-36">FEFO Vàng (≤ ngày)</th>
+                    <th class="p-2.5 text-right w-36">Leadtime (Ngày)</th>
+                    <th class="p-2.5 text-center w-16">Xóa</th>
+                  </tr>
+                </thead>
+                <tbody id="cfgCategoryRulesBody" class="divide-y divide-gray-100 dark:divide-gray-800/70"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

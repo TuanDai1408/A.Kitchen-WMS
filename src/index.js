@@ -383,12 +383,22 @@ async function ensureSystemTabVisibilityTable(env) {
   }
 }
 
+const DEFAULT_CATEGORY_RULES = [
+  { category: 'Rau củ', fefo_red_days: 2, fefo_yellow_days: 5, leadtime_days: 1 },
+  { category: 'Thịt cá & Hải sản', fefo_red_days: 2, fefo_yellow_days: 7, leadtime_days: 1 },
+  { category: 'Gia vị & Đồ khô', fefo_red_days: 14, fefo_yellow_days: 45, leadtime_days: 2 },
+  { category: 'Bao bì & Vật tư', fefo_red_days: 30, fefo_yellow_days: 90, leadtime_days: 3 }
+];
+
 const DEFAULT_SYSTEM_CONFIG = {
   // 1. Cảnh báo Tồn kho & Điểm đặt hàng (ROP)
   rop_safety_stock: 5.0,
   rop_daily_usage: 10.0,
   rop_threshold_default: 25.0,
   rop_target_stock_default: 35.0,
+  rop_calc_mode: 'fixed', // 'fixed' | 'auto_history'
+  rop_history_days: 14,
+  rop_peak_multiplier: 1.0,
   // 2. Leadtime & SLA Nhà cung cấp
   leadtime_default_days: 2,
   leadtime_fresh_days: 1,
@@ -400,9 +410,34 @@ const DEFAULT_SYSTEM_CONFIG = {
   fefo_enforce_strict: true,
   // 4. Kiểm kê, Hủy hàng & Hiển thị
   count_variance_alert_pct: 5,
+  blind_count_default: false,
+  daily_count_cutoff_time: '22:00',
+  allow_negative_stock: false,
   waste_require_image: false,
-  default_page_size: 25
+  waste_approval_amount_threshold: 500000,
+  waste_approval_pct_threshold: 3,
+  default_page_size: 25,
+  // 5. Quy tắc riêng theo Nhóm hàng
+  category_rules_json: JSON.stringify(DEFAULT_CATEGORY_RULES)
 };
+
+function getCategoryRules(cfg) {
+  try {
+    const raw = cfg?.category_rules_json;
+    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (Array.isArray(arr)) return arr;
+  } catch (e) {}
+  return DEFAULT_CATEGORY_RULES;
+}
+
+function matchCategoryRule(categoryName, rules) {
+  if (!categoryName || !Array.isArray(rules) || !rules.length) return null;
+  const cat = String(categoryName).toLowerCase().trim();
+  return rules.find(r => {
+    const rc = String(r?.category || '').toLowerCase().trim();
+    return rc && (cat.includes(rc) || rc.includes(cat));
+  }) || null;
+}
 
 let _systemSettingsEnsured = false;
 let _systemConfigCache = null;
@@ -1394,11 +1429,15 @@ export default {
           }
         }
 
+        const catRules = getCategoryRules(sysCfg);
         const enriched = (results || []).map((r, idx) => {
           let dangerLevel = 'green';
           let statusText = 'An toàn';
           const qty = parseFloat(r.qty) || 0;
           const days = parseInt(r.days_remaining, 10) || 0;
+          const catRule = matchCategoryRule(r.category, catRules);
+          const effRedDays = catRule && Number(catRule.fefo_red_days) > 0 ? Number(catRule.fefo_red_days) : cfgRedDays;
+          const effYellowDays = catRule && Number(catRule.fefo_yellow_days) > 0 ? Number(catRule.fefo_yellow_days) : cfgYellowDays;
           
           if (qty < 0) {
             dangerLevel = 'red';
@@ -1406,12 +1445,12 @@ export default {
           } else if (qty === 0) {
             dangerLevel = 'yellow';
             statusText = 'Hết hàng (ROP)';
-          } else if (days <= cfgRedDays) {
+          } else if (days <= effRedDays) {
             dangerLevel = 'red';
-            statusText = `Cận Date (≤ ${cfgRedDays} ngày)`;
-          } else if (days <= cfgYellowDays) {
+            statusText = `Cận Date (≤ ${effRedDays} ngày)`;
+          } else if (days <= effYellowDays) {
             dangerLevel = 'yellow';
-            statusText = `Cần dùng sớm (≤ ${cfgYellowDays} ngày)`;
+            statusText = `Cần dùng sớm (≤ ${effYellowDays} ngày)`;
           }
 
           return {
@@ -1571,6 +1610,10 @@ export default {
         const cfgSafety = Number(sysCfg.rop_safety_stock) || 5.0;
         const cfgRop = Number(sysCfg.rop_threshold_default) || (cfgDaily * cfgLeadDays + cfgSafety);
         const cfgTarget = Number(sysCfg.rop_target_stock_default) || (cfgRop + cfgDaily);
+        const calcMode = sysCfg.rop_calc_mode === 'auto_history' ? 'auto_history' : 'fixed';
+        const histDays = Math.max(1, Number(sysCfg.rop_history_days) || 14);
+        const peakMult = Math.max(0.5, Number(sysCfg.rop_peak_multiplier) || 1.0);
+        const catRules = getCategoryRules(sysCfg);
 
         const isPg = db.isPg(env);
         let results = [];
@@ -1583,6 +1626,7 @@ export default {
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as unit,
               COALESCE(d.entry_unit, p.order_unit, 'Phần') as uom,
               COALESCE(d.nhom_hang, p.merch_category, 'Hàng hóa') as category,
+              COALESCE(NULLIF(ROUND((SUM(COALESCE(b.sales_bom_qty, 0)) / ${histDays})::numeric, 2), 0), ${cfgDaily}) as hist_daily_usage,
               ${cfgDaily} as daily_usage,
               ${cfgLeadHours} as lead_time_hours,
               ${cfgLeadDays} as lead_time_days,
@@ -1619,7 +1663,7 @@ export default {
             ) p ON b.item_code = p.article
             WHERE (? = 'ALL' OR UPPER(b.site_code) = ?)
             GROUP BY b.item_code, d.material_desc, p.article_desc, d.entry_unit, p.order_unit, d.nhom_hang, p.merch_category, d.price, p.net_price
-            HAVING SUM(b.book_qty) <= ${cfgRop}
+            HAVING SUM(b.book_qty) <= ${cfgRop} OR '${calcMode}' = 'auto_history'
             ORDER BY SUM(b.book_qty) ASC
           `;
           const res = await db.query(env, pgQuery, [branchCode, branchCode]);
@@ -1667,6 +1711,33 @@ export default {
           const res = await db.query(env, d1Query, [branchCode, branchCode]);
           results = res.rows || [];
         }
+
+        // Apply dynamic category rules & auto_history ROP formula if configured
+        results = (results || []).map(r => {
+          const catRule = matchCategoryRule(r.category, catRules);
+          const effLeadDays = catRule && Number(catRule.leadtime_days) > 0 ? Number(catRule.leadtime_days) : cfgLeadDays;
+          const effDaily = calcMode === 'auto_history'
+            ? Math.round((Number(r.hist_daily_usage || cfgDaily) * peakMult) * 10) / 10
+            : cfgDaily;
+          const effRop = calcMode === 'auto_history'
+            ? Math.round((effDaily * effLeadDays + cfgSafety) * 10) / 10
+            : cfgRop;
+          const curStock = Number(r.current_stock) || 0;
+          const effTarget = calcMode === 'auto_history' ? Math.round((effRop + effDaily * effLeadDays) * 10) / 10 : cfgTarget;
+          const effSuggested = curStock < effRop ? Math.max(0, Math.round(effTarget - curStock)) : 0;
+          const effStatus = curStock <= 0 ? 'HẾT HÀNG' : (curStock < effRop ? 'CẦN ĐẶT' : 'AN TOÀN');
+          return {
+            ...r,
+            daily_usage: effDaily,
+            lead_time_days: effLeadDays,
+            lead_time_hours: effLeadDays * 24,
+            rop_threshold: effRop,
+            rop: effRop,
+            suggested_order_qty: effSuggested,
+            suggested_order: effSuggested,
+            status: effStatus
+          };
+        }).filter(r => calcMode === 'auto_history' ? (Number(r.current_stock) <= Number(r.rop)) : true);
 
         return createCachedResponse({ success: true, data: results }, 60, corsHeaders, isNoCache, url, request, ctx, url.toString());
       }
@@ -6915,6 +6986,14 @@ export default {
               return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán hoặc danh sách hàng hủy' }), { headers: corsHeaders, status: 400 });
             }
 
+            const sysCfg = await getSystemConfig(env);
+            if (sysCfg.waste_require_image && (!attachment_url || !String(attachment_url).trim())) {
+              return new Response(JSON.stringify({
+                success: false,
+                error: 'Cấu hình hệ thống yêu cầu bắt buộc đính kèm hình ảnh minh chứng khi lập phiếu hủy!'
+              }), { headers: corsHeaders, status: 400 });
+            }
+
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const wasteCode = `BBH-${(waste_date || '').replace(/-/g, '')}-${randSuffix}`;
             const validWasteDate = waste_date || new Date().toISOString().split('T')[0];
@@ -6926,11 +7005,17 @@ export default {
               totalAmount += (qty * price);
             }
 
+            const approvalThreshold = Number(sysCfg.waste_approval_amount_threshold) || 500000;
+            const requiresApproval = totalAmount > approvalThreshold;
+            const finalNotes = requiresApproval
+              ? `[CHỜ DUYỆT > ${Math.round(approvalThreshold).toLocaleString('vi-VN')}đ] ${notes || ''}`.trim()
+              : notes;
+
             // Insert Header
             const insertH = await db.queryOne(env, `
               INSERT INTO fnb_stock_wastes (waste_code, site_code, waste_date, reason, confirmed_by, total_amount, notes, attachment_url, created_by)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-            `, [wasteCode, site_code, validWasteDate, reason, confirmed_by, totalAmount, notes, attachment_url, created_by]);
+            `, [wasteCode, site_code, validWasteDate, reason, confirmed_by, totalAmount, finalNotes, attachment_url, created_by]);
 
             const wasteId = insertH.id;
 
@@ -7353,6 +7438,26 @@ export default {
               return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin điểm bán hoặc danh sách hàng xuất' }), { headers: corsHeaders, status: 400 });
             }
 
+            const sysCfg = await getSystemConfig(env);
+            const allowNegative = Boolean(sysCfg.allow_negative_stock);
+            if (!allowNegative) {
+              for (const item of lines) {
+                const reqQty = Number(item.qty) || 0;
+                if (reqQty <= 0) continue;
+                const bal = await db.queryOne(env, `
+                  SELECT COALESCE(book_qty, 0) as book_qty FROM fnb_stock_balances
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?) LIMIT 1
+                `, [item.item_code, site_code]).catch(() => null);
+                const curQty = bal ? Number(bal.book_qty) || 0 : Number(item.stock_before || 0);
+                if (reqQty > curQty + 0.0001) {
+                  return new Response(JSON.stringify({
+                    success: false,
+                    error: `Không thể xuất vượt tồn kho cho mã ${item.item_code} (Tồn: ${curQty}, Yêu cầu: ${reqQty}). Cấu hình hệ thống đang tắt chế độ cho phép xuất âm.`
+                  }), { headers: corsHeaders, status: 400 });
+                }
+              }
+            }
+
             const validIssueDate = issue_date || new Date().toISOString().split('T')[0];
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
             const issueCode = `XKSD-${validIssueDate.replace(/-/g, '')}-${randSuffix}`;
@@ -7388,13 +7493,23 @@ export default {
                 `, [issueId, item.item_code, item.item_name || item.item_code, item.unit || 'Phần', stockBefore, qty, unitPrice, lineAmount, item.notes || '']);
 
                 // Trừ tồn kho hiện hành trong fnb_stock_balances
-                await tx.exec(`
-                  UPDATE fnb_stock_balances
-                  SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
-                      total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
-                      updated_at = NOW()
-                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
-                `, [qty, qty, unitPrice, item.item_code, site_code]);
+                if (allowNegative) {
+                  await tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET book_qty = COALESCE(book_qty, 0) - ?,
+                        total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [qty, qty, unitPrice, item.item_code, site_code]);
+                } else {
+                  await tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                        total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [qty, qty, unitPrice, item.item_code, site_code]);
+                }
 
                 // Đồng bộ trừ lô theo chuẩn FEFO trong inventory_batches
                 try {

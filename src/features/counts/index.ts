@@ -55,6 +55,19 @@ export async function loadFnbCounts(): Promise<void> {
   const dp = document.getElementById('fnbCountDatePicker') as HTMLInputElement | null;
   if (dp && !dp.value) dp.value = new Date().toISOString().slice(0, 10);
 
+  // Apply blind_count_default from System Config on first open
+  try {
+    if (typeof window.preloadSystemConfig === 'function') {
+      const sysCfg = await window.preloadSystemConfig();
+      if (!window.__fnbBlindCountInitialized && sysCfg && typeof sysCfg.blind_count_default === 'boolean') {
+        window.__fnbBlindCountInitialized = true;
+        window.gFnbBlindCount = sysCfg.blind_count_default;
+        const chk = document.getElementById('fnbBlindCountToggle') as HTMLInputElement | null;
+        if (chk) chk.checked = Boolean(sysCfg.blind_count_default);
+      }
+    }
+  } catch {}
+
   try {
     if (typeof window.showLoading === 'function') window.showLoading('Tải danh mục kiểm kê của ' + siteCode + '...');
     const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}&no-cache=1`);

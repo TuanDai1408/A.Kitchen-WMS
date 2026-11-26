@@ -4,11 +4,21 @@ import { getCurrentAppUser } from '@/features/auth/action-guards';
 declare const showToast: (msg: string, type?: string) => void;
 declare const lucide: any;
 
+export interface CategoryRule {
+  category: string;
+  fefo_red_days: number;
+  fefo_yellow_days: number;
+  leadtime_days: number;
+}
+
 export interface SystemConfigData {
   rop_safety_stock: number;
   rop_daily_usage: number;
   rop_threshold_default: number;
   rop_target_stock_default: number;
+  rop_calc_mode: 'fixed' | 'auto_history';
+  rop_history_days: number;
+  rop_peak_multiplier: number;
   leadtime_default_days: number;
   leadtime_fresh_days: number;
   leadtime_sla_target_hours: number;
@@ -17,15 +27,31 @@ export interface SystemConfigData {
   fefo_default_expiry_days: number;
   fefo_enforce_strict: boolean;
   count_variance_alert_pct: number;
+  blind_count_default: boolean;
+  daily_count_cutoff_time: string;
+  allow_negative_stock: boolean;
   waste_require_image: boolean;
+  waste_approval_amount_threshold: number;
+  waste_approval_pct_threshold: number;
   default_page_size: number;
+  category_rules_json: string;
 }
+
+export const DEFAULT_CATEGORY_RULES_UI: CategoryRule[] = [
+  { category: 'Rau củ', fefo_red_days: 2, fefo_yellow_days: 5, leadtime_days: 1 },
+  { category: 'Thịt cá & Hải sản', fefo_red_days: 2, fefo_yellow_days: 7, leadtime_days: 1 },
+  { category: 'Gia vị & Đồ khô', fefo_red_days: 14, fefo_yellow_days: 45, leadtime_days: 2 },
+  { category: 'Bao bì & Vật tư', fefo_red_days: 30, fefo_yellow_days: 90, leadtime_days: 3 }
+];
 
 export const DEFAULT_SYSTEM_CONFIG_UI: SystemConfigData = {
   rop_safety_stock: 5,
   rop_daily_usage: 10,
   rop_threshold_default: 25,
   rop_target_stock_default: 35,
+  rop_calc_mode: 'fixed',
+  rop_history_days: 14,
+  rop_peak_multiplier: 1.0,
   leadtime_default_days: 2,
   leadtime_fresh_days: 1,
   leadtime_sla_target_hours: 24,
@@ -34,12 +60,19 @@ export const DEFAULT_SYSTEM_CONFIG_UI: SystemConfigData = {
   fefo_default_expiry_days: 45,
   fefo_enforce_strict: true,
   count_variance_alert_pct: 5,
+  blind_count_default: false,
+  daily_count_cutoff_time: '22:00',
+  allow_negative_stock: false,
   waste_require_image: false,
-  default_page_size: 25
+  waste_approval_amount_threshold: 500000,
+  waste_approval_pct_threshold: 3,
+  default_page_size: 25,
+  category_rules_json: JSON.stringify(DEFAULT_CATEGORY_RULES_UI)
 };
 
 let gSystemConfigCache: SystemConfigData = { ...DEFAULT_SYSTEM_CONFIG_UI };
 let gSystemConfigLoaded = false;
+let gEditableCategoryRules: CategoryRule[] = [...DEFAULT_CATEGORY_RULES_UI];
 
 export function getCachedSystemConfig(): SystemConfigData {
   return gSystemConfigCache;
@@ -65,7 +98,7 @@ export async function preloadSystemConfig(force = false): Promise<SystemConfigDa
   return gSystemConfigCache;
 }
 
-function setInputVal(id: string, val: number | boolean): void {
+function setInputVal(id: string, val: number | boolean | string): void {
   const el = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null;
   if (!el) return;
   if (el instanceof HTMLInputElement && el.type === 'checkbox') {
@@ -82,9 +115,86 @@ function getNumberInputVal(id: string, fallback: number): number {
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
+function getStringInputVal(id: string, fallback: string): string {
+  const el = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null;
+  return el && el.value ? String(el.value).trim() : fallback;
+}
+
 function getCheckboxVal(id: string, fallback: boolean): boolean {
   const el = document.getElementById(id) as HTMLInputElement | null;
   return el ? Boolean(el.checked) : fallback;
+}
+
+function escapeAttr(val: string): string {
+  return String(val || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export function onRopCalcModeChange(): void {
+  const mode = getStringInputVal('cfg_rop_calc_mode', 'fixed');
+  const autoBox = document.getElementById('cfgRopAutoHistoryBox');
+  if (autoBox) {
+    autoBox.classList.toggle('hidden', mode !== 'auto_history');
+  }
+}
+
+export function renderCategoryRulesTable(): void {
+  const tbody = document.getElementById('cfgCategoryRulesBody');
+  if (!tbody) return;
+  if (!gEditableCategoryRules.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-400">Chưa có quy tắc nhóm hàng nào. Nhấn "+ Thêm nhóm hàng" để tạo.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = gEditableCategoryRules.map((r, idx) => `
+    <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40">
+      <td class="p-2.5">
+        <input type="text" value="${escapeAttr(r.category)}" oninput="updateCategoryRuleField(${idx}, 'category', this.value)" placeholder="Tên nhóm hàng (VD: Rau củ)" class="input w-full text-xs py-1.5 px-2.5 font-sans">
+      </td>
+      <td class="p-2.5">
+        <input type="number" min="1" step="1" value="${r.fefo_red_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_red_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+      </td>
+      <td class="p-2.5">
+        <input type="number" min="1" step="1" value="${r.fefo_yellow_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_yellow_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+      </td>
+      <td class="p-2.5">
+        <input type="number" min="1" step="1" value="${r.leadtime_days}" oninput="updateCategoryRuleField(${idx}, 'leadtime_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+      </td>
+      <td class="p-2.5 text-center">
+        <button type="button" onclick="removeCategoryRuleRow(${idx})" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    lucide.createIcons({ root: tbody });
+  }
+}
+
+export function addCategoryRuleRow(): void {
+  gEditableCategoryRules.push({
+    category: '',
+    fefo_red_days: 7,
+    fefo_yellow_days: 30,
+    leadtime_days: 2
+  });
+  renderCategoryRulesTable();
+}
+
+export function removeCategoryRuleRow(idx: number): void {
+  gEditableCategoryRules.splice(idx, 1);
+  renderCategoryRulesTable();
+}
+
+export function updateCategoryRuleField(idx: number, field: keyof CategoryRule, val: string): void {
+  const row = gEditableCategoryRules[idx];
+  if (!row) return;
+  if (field === 'category') {
+    row.category = val;
+  } else {
+    const n = Number(val);
+    row[field] = Number.isFinite(n) && n > 0 ? n : 1;
+  }
 }
 
 export async function loadSystemConfig(): Promise<void> {
@@ -116,6 +226,10 @@ export async function loadSystemConfig(): Promise<void> {
       setInputVal('cfg_rop_daily_usage', cfg.rop_daily_usage);
       setInputVal('cfg_rop_threshold_default', cfg.rop_threshold_default);
       setInputVal('cfg_rop_target_stock_default', cfg.rop_target_stock_default);
+      setInputVal('cfg_rop_calc_mode', cfg.rop_calc_mode || 'fixed');
+      setInputVal('cfg_rop_history_days', cfg.rop_history_days || 14);
+      setInputVal('cfg_rop_peak_multiplier', cfg.rop_peak_multiplier || 1.0);
+      onRopCalcModeChange();
 
       setInputVal('cfg_leadtime_default_days', cfg.leadtime_default_days);
       setInputVal('cfg_leadtime_fresh_days', cfg.leadtime_fresh_days);
@@ -127,10 +241,22 @@ export async function loadSystemConfig(): Promise<void> {
       setInputVal('cfg_fefo_enforce_strict', cfg.fefo_enforce_strict);
 
       setInputVal('cfg_count_variance_alert_pct', cfg.count_variance_alert_pct);
+      setInputVal('cfg_blind_count_default', cfg.blind_count_default);
+      setInputVal('cfg_daily_count_cutoff_time', cfg.daily_count_cutoff_time || '22:00');
+      setInputVal('cfg_allow_negative_stock', cfg.allow_negative_stock);
       setInputVal('cfg_waste_require_image', cfg.waste_require_image);
+      setInputVal('cfg_waste_approval_amount_threshold', cfg.waste_approval_amount_threshold ?? 500000);
+      setInputVal('cfg_waste_approval_pct_threshold', cfg.waste_approval_pct_threshold ?? 3);
       setInputVal('cfg_default_page_size', cfg.default_page_size);
 
-      // Update last updated badge if meta exists
+      try {
+        const parsedRules = JSON.parse(cfg.category_rules_json || '[]');
+        gEditableCategoryRules = Array.isArray(parsedRules) ? parsedRules : [...DEFAULT_CATEGORY_RULES_UI];
+      } catch {
+        gEditableCategoryRules = [...DEFAULT_CATEGORY_RULES_UI];
+      }
+      renderCategoryRulesTable();
+
       const metaEl = document.getElementById('sysConfigLastUpdated');
       if (metaEl && json.meta && typeof json.meta === 'object') {
         const entries = Object.values(json.meta) as { updated_by?: string; updated_at?: string }[];
@@ -176,11 +302,23 @@ export async function saveSystemConfig(): Promise<void> {
     return;
   }
 
+  const cleanRules = gEditableCategoryRules
+    .filter(r => String(r.category || '').trim().length > 0)
+    .map(r => ({
+      category: String(r.category).trim(),
+      fefo_red_days: Math.max(1, Number(r.fefo_red_days) || 7),
+      fefo_yellow_days: Math.max(1, Number(r.fefo_yellow_days) || 30),
+      leadtime_days: Math.max(1, Number(r.leadtime_days) || 2)
+    }));
+
   const payload: SystemConfigData = {
     rop_safety_stock: getNumberInputVal('cfg_rop_safety_stock', 5),
     rop_daily_usage: getNumberInputVal('cfg_rop_daily_usage', 10),
     rop_threshold_default: ropThresh,
     rop_target_stock_default: ropTarget,
+    rop_calc_mode: getStringInputVal('cfg_rop_calc_mode', 'fixed') === 'auto_history' ? 'auto_history' : 'fixed',
+    rop_history_days: Math.max(1, getNumberInputVal('cfg_rop_history_days', 14)),
+    rop_peak_multiplier: Math.max(0.5, getNumberInputVal('cfg_rop_peak_multiplier', 1.0)),
     leadtime_default_days: getNumberInputVal('cfg_leadtime_default_days', 2),
     leadtime_fresh_days: getNumberInputVal('cfg_leadtime_fresh_days', 1),
     leadtime_sla_target_hours: getNumberInputVal('cfg_leadtime_sla_target_hours', 24),
@@ -189,8 +327,14 @@ export async function saveSystemConfig(): Promise<void> {
     fefo_default_expiry_days: getNumberInputVal('cfg_fefo_default_expiry_days', 45),
     fefo_enforce_strict: getCheckboxVal('cfg_fefo_enforce_strict', true),
     count_variance_alert_pct: getNumberInputVal('cfg_count_variance_alert_pct', 5),
+    blind_count_default: getCheckboxVal('cfg_blind_count_default', false),
+    daily_count_cutoff_time: getStringInputVal('cfg_daily_count_cutoff_time', '22:00'),
+    allow_negative_stock: getCheckboxVal('cfg_allow_negative_stock', false),
     waste_require_image: getCheckboxVal('cfg_waste_require_image', false),
-    default_page_size: getNumberInputVal('cfg_default_page_size', 25)
+    waste_approval_amount_threshold: getNumberInputVal('cfg_waste_approval_amount_threshold', 500000),
+    waste_approval_pct_threshold: getNumberInputVal('cfg_waste_approval_pct_threshold', 3),
+    default_page_size: getNumberInputVal('cfg_default_page_size', 25),
+    category_rules_json: JSON.stringify(cleanRules)
   };
 
   const btn = document.getElementById('btnSaveSystemConfig') as HTMLButtonElement | null;
@@ -268,4 +412,8 @@ if (typeof window !== 'undefined') {
   w.resetSystemConfigToDefault = resetSystemConfigToDefault;
   w.preloadSystemConfig = preloadSystemConfig;
   w.getCachedSystemConfig = getCachedSystemConfig;
+  w.onRopCalcModeChange = onRopCalcModeChange;
+  w.addCategoryRuleRow = addCategoryRuleRow;
+  w.removeCategoryRuleRow = removeCategoryRuleRow;
+  w.updateCategoryRuleField = updateCategoryRuleField;
 }
