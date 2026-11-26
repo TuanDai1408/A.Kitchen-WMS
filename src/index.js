@@ -612,6 +612,68 @@ const MASTER_14_SITES_FALLBACK = [
 
 
 // ============================================================================
+// AUDIT LOGS: LƯU VẾT TOÀN BỘ THAO TÁC TẠO / SỬA / HỦY PHIẾU TRONG DATABASE
+// ============================================================================
+let _auditLogsEnsured = false;
+async function ensureAuditLogsTable(env) {
+  if (_auditLogsEnsured) return;
+  try {
+    const isPg = db.isPg(env);
+    const idType = isPg ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const timeType = isPg ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
+    await db.exec(env, `
+      CREATE TABLE IF NOT EXISTS audit_logs (
+        id ${idType},
+        user_email TEXT,
+        action TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT,
+        doc_code TEXT,
+        site_code TEXT,
+        summary TEXT,
+        old_data TEXT,
+        new_data TEXT,
+        created_at ${timeType}
+      )
+    `);
+    await db.exec(env, `CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, created_at)`).catch(() => {});
+    await db.exec(env, `CREATE INDEX IF NOT EXISTS idx_audit_logs_doc ON audit_logs(doc_code)`).catch(() => {});
+    _auditLogsEnsured = true;
+  } catch (e) {
+    console.warn('ensureAuditLogsTable warning:', e?.message || e);
+  }
+}
+
+async function writeAuditLog(env, request, entry) {
+  try {
+    await ensureAuditLogsTable(env);
+    const callerEmail = entry.userEmail
+      || request?.headers?.get('X-User-Email')
+      || request?.headers?.get('x-user-email')
+      || 'system';
+    const oldStr = entry.oldData !== undefined && entry.oldData !== null ? JSON.stringify(entry.oldData) : null;
+    const newStr = entry.newData !== undefined && entry.newData !== null ? JSON.stringify(entry.newData) : null;
+
+    await db.exec(env, `
+      INSERT INTO audit_logs (user_email, action, entity_type, entity_id, doc_code, site_code, summary, old_data, new_data)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      String(callerEmail || 'system'),
+      String(entry.action || 'UPDATE'),
+      String(entry.entityType || 'SYSTEM'),
+      entry.entityId !== undefined && entry.entityId !== null ? String(entry.entityId) : null,
+      entry.docCode || null,
+      entry.siteCode || null,
+      entry.summary || null,
+      oldStr,
+      newStr
+    ]);
+  } catch (e) {
+    console.warn('writeAuditLog warning:', e?.message || e);
+  }
+}
+
+// ============================================================================
 // PERFORMANCE & D1 QUOTA OPTIMIZATION: IN-MEMORY CACHE & AUTO-INDEXES
 // ============================================================================
 const MEMORY_CACHE = new Map();
@@ -5291,6 +5353,17 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              userEmail: created_by,
+              action: 'CREATE',
+              entityType: 'COUNT',
+              entityId: countId,
+              docCode: countCode,
+              siteCode: site_code,
+              summary: `Tạo phiếu kiểm kê ${countCode} (${lines.length} dòng, chênh lệch ${Math.round(totalDiffVal).toLocaleString('vi-VN')} đ)`,
+              newData: { count_date: validCountDate, count_type, notes, lines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: 'Lưu phiếu kiểm kê thành công!',
@@ -5375,6 +5448,17 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              action: 'UPDATE',
+              entityType: 'COUNT',
+              entityId: id,
+              docCode: existing.count_code,
+              siteCode: existing.site_code,
+              summary: `Sửa phiếu kiểm kê ${existing.count_code} (${lines.length} dòng, chênh lệch ${Math.round(totalDiffVal).toLocaleString('vi-VN')} đ)`,
+              oldData: existing,
+              newData: { count_date: validDate, count_type: validType, notes, lines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: `Đã cập nhật phiếu kiểm kê ${existing.count_code} thành công!`,
@@ -5422,6 +5506,16 @@ export default {
 
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
+
+            await writeAuditLog(env, request, {
+              action: 'CANCEL',
+              entityType: 'COUNT',
+              entityId: countId,
+              docCode: existing.count_code,
+              siteCode: existing.site_code,
+              summary: `Xóa/hủy phiếu kiểm kê ${existing.count_code}`,
+              oldData: existing
+            });
 
             return new Response(JSON.stringify({
               success: true,
@@ -5827,6 +5921,17 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              userEmail: created_by,
+              action: 'CREATE',
+              entityType: 'RECEIPT',
+              entityId: receiptId,
+              docCode: receiptCode,
+              siteCode: site_code,
+              summary: `Tạo phiếu nhập kho ${receiptCode} (${lines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              newData: { receipt_date: validReceiptDate, supplier, invoice_no, notes, lines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: 'Nhập hàng vào kho thành công!',
@@ -6026,6 +6131,18 @@ export default {
             invalidateMemoryCache('/api/wh');
             invalidateMemoryCache('/api/po-sap');
 
+            await writeAuditLog(env, request, {
+              userEmail: created_by,
+              action: 'UPDATE',
+              entityType: 'RECEIPT',
+              entityId: receiptId,
+              docCode: receiptCode,
+              siteCode: siteCode,
+              summary: `Sửa phiếu nhập kho ${receiptCode} (${validLines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              oldData: { header: existingReceipt, lines: oldLines },
+              newData: { receipt_date: validReceiptDate, supplier: finalSupplier, invoice_no: finalInvoiceNo, notes, lines: validLines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: `Đã cập nhật phiếu nhập ${receiptCode} thành công!`,
@@ -6155,6 +6272,16 @@ export default {
             invalidateMemoryCache('/api/stock');
             invalidateMemoryCache('/api/wh');
             invalidateMemoryCache('/api/po-sap');
+
+            await writeAuditLog(env, request, {
+              action: 'CANCEL',
+              entityType: 'RECEIPT',
+              entityId: receipt?.id || receiptId || poNumber,
+              docCode: receipt?.receipt_code || poNumber,
+              siteCode: receipt?.site_code || null,
+              summary: `Hủy phiếu nhập kho ${receipt?.receipt_code || poNumber}`,
+              oldData: receipt || { po_number: poNumber }
+            });
 
             return new Response(JSON.stringify({
               success: true,
@@ -6287,6 +6414,17 @@ export default {
 
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
+
+            await writeAuditLog(env, request, {
+              userEmail: created_by,
+              action: 'CREATE',
+              entityType: 'WASTE',
+              entityId: wasteId,
+              docCode: wasteCode,
+              siteCode: site_code,
+              summary: `Tạo biên bản hủy hàng ${wasteCode} (${lines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              newData: { waste_date: validWasteDate, reason, confirmed_by, notes, lines }
+            });
 
             return new Response(JSON.stringify({
               success: true,
@@ -6465,6 +6603,18 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              userEmail: created_by,
+              action: 'UPDATE',
+              entityType: 'WASTE',
+              entityId: wasteId,
+              docCode: wasteCode,
+              siteCode: siteCode,
+              summary: `Sửa biên bản hủy hàng ${wasteCode} (${validLines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              oldData: { header: existingWaste, lines: oldLines },
+              newData: { waste_date: validWasteDate, reason, confirmed_by, notes, lines: validLines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: `Đã cập nhật biên bản hủy ${wasteCode} thành công!`,
@@ -6513,6 +6663,16 @@ export default {
 
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
+
+            await writeAuditLog(env, request, {
+              action: 'CANCEL',
+              entityType: 'WASTE',
+              entityId: wasteId,
+              docCode: existingWaste.waste_code,
+              siteCode: existingWaste.site_code,
+              summary: `Hủy biên bản hủy hàng ${existingWaste.waste_code} và hoàn trả tồn kho`,
+              oldData: { header: existingWaste, lines: oldLines }
+            });
 
             return new Response(JSON.stringify({
               success: true,
@@ -6697,6 +6857,17 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              userEmail: issuer_name,
+              action: 'CREATE',
+              entityType: 'KITCHEN_ISSUE',
+              entityId: issueId,
+              docCode: issueCode,
+              siteCode: site_code,
+              summary: `Tạo phiếu xuất kho sử dụng ${issueCode} (${lines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              newData: { issue_date: validIssueDate, meal_shift, issuer_name, receiver_name, notes, lines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: 'Tạo phiếu xuất kho sử dụng thành công!',
@@ -6879,6 +7050,18 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              userEmail: issuer_name,
+              action: 'UPDATE',
+              entityType: 'KITCHEN_ISSUE',
+              entityId: issueId,
+              docCode: existingIssue.issue_code,
+              siteCode: existingIssue.site_code,
+              summary: `Sửa phiếu xuất kho sử dụng ${existingIssue.issue_code} (${validLines.length} dòng, ${Math.round(totalAmount).toLocaleString('vi-VN')} đ)`,
+              oldData: { header: existingIssue, lines: oldLines },
+              newData: { issue_date: validIssueDate, meal_shift, issuer_name, receiver_name, notes, lines: validLines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: `Đã cập nhật phiếu ${existingIssue.issue_code} thành công!`,
@@ -6926,6 +7109,16 @@ export default {
             invalidateMemoryCache('/api/fnb');
             invalidateMemoryCache('/api/stock');
 
+            await writeAuditLog(env, request, {
+              action: 'CANCEL',
+              entityType: 'KITCHEN_ISSUE',
+              entityId: issueId,
+              docCode: existingIssue.issue_code,
+              siteCode: existingIssue.site_code,
+              summary: `Hủy phiếu xuất kho sử dụng ${existingIssue.issue_code} và hoàn trả tồn kho`,
+              oldData: { header: existingIssue, lines: oldLines }
+            });
+
             return new Response(JSON.stringify({
               success: true,
               message: `Đã hủy phiếu ${existingIssue.issue_code} và hoàn trả tồn kho!`
@@ -6935,6 +7128,35 @@ export default {
             return new Response(JSON.stringify({ success: false, error: e.message }), { headers: corsHeaders, status: 500 });
           }
         }
+      }
+
+      // 3.10 AUDIT LOGS: GET /api/audit-logs
+      if (pathname === '/api/audit-logs' && request.method === 'GET') {
+        await ensureAuditLogsTable(env);
+        const entityType = searchParams.get('entity_type');
+        const action = searchParams.get('action');
+        const siteCode = searchParams.get('site_code');
+        const limit = Math.min(200, Math.max(1, Number(searchParams.get('limit')) || 100));
+
+        let q = `SELECT * FROM audit_logs WHERE 1=1`;
+        const b = [];
+        if (entityType && entityType !== 'ALL') {
+          q += ` AND UPPER(entity_type) = UPPER(?)`;
+          b.push(entityType);
+        }
+        if (action && action !== 'ALL') {
+          q += ` AND UPPER(action) = UPPER(?)`;
+          b.push(action);
+        }
+        if (siteCode && siteCode !== 'ALL') {
+          q += ` AND UPPER(site_code) = UPPER(?)`;
+          b.push(siteCode);
+        }
+        q += ` ORDER BY id DESC LIMIT ?`;
+        b.push(limit);
+
+        const { rows } = await db.query(env, q, b);
+        return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
       }
 
       // Fallback: Static Assets
