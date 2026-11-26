@@ -3172,10 +3172,12 @@ export default {
                 role: user.role_code,
                 roleName: roleInfo?.role_name || user.role_code,
                 status: user.status,
+                assignedSite: user.assigned_site || null,
                 approvedRoles
               },
               role: user.role_code,
               roleName: roleInfo?.role_name || user.role_code,
+              assignedSite: user.assigned_site || null,
               badgeColor: roleInfo?.badge_color || 'bg-brand-500',
               approvedRoles,
               permissions,
@@ -3350,6 +3352,7 @@ export default {
               role: user.role_code,
               roleName: roleInfo.role_name,
               badgeColor: roleInfo.badge_color,
+              assignedSite: user.assigned_site || null,
               authProvider: user.auth_provider,
               approvedRoles,
               permissions
@@ -3587,7 +3590,9 @@ export default {
       if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
         const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
         const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
-        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`);
+        const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, assigned_site, last_login, created_at FROM app_users ORDER BY id ASC`).catch(async () => {
+          return await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`);
+        });
         const { rows: userPerms } = await db.query(env, `SELECT * FROM user_permissions`);
 
         const users = (rawUsers || []).map(u => {
@@ -4022,18 +4027,31 @@ export default {
 
       // 2.11.4 YÊU CẦU CẤP QUYỀN TRUY CẬP (/api/auth/request-access)
       if (pathname === '/api/auth/request-access' && request.method === 'POST') {
-        const { email, fullName, requestedRole, requestedFeature, reason } = await request.json();
+        const { email, fullName, requestedRole, requestedFeature, requestedSite, reason } = await request.json();
         if (!email) {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu email người yêu cầu' }), { status: 400, headers: corsHeaders });
         }
-        await db.exec(env, `
-          INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, reason, status, created_at)
-          VALUES (?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
-        `, [email, fullName || '', requestedRole || 'BEP_TRUONG', requestedFeature || '', reason || '']);
+        await db.exec(env, `ALTER TABLE access_requests ADD COLUMN IF NOT EXISTS requested_site TEXT`).catch(() => {});
+
+        const cleanSite = (requestedSite || '').trim();
+        const featureText = requestedFeature || (cleanSite ? `Đổi Site → ${cleanSite}` : '');
+        try {
+          await db.exec(env, `
+            INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, requested_site, reason, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
+          `, [email, fullName || '', requestedRole || 'NHAN_VIEN', featureText, cleanSite || null, reason || '']);
+        } catch (_) {
+          await db.exec(env, `
+            INSERT INTO access_requests (user_email, user_name, requested_role, requested_feature, reason, status, created_at)
+            VALUES (?, ?, ?, ?, ?, 'PENDING', CURRENT_TIMESTAMP)
+          `, [email, fullName || '', requestedRole || 'NHAN_VIEN', featureText, reason || '']);
+        }
 
         return new Response(JSON.stringify({
           success: true,
-          message: 'Yêu cầu cấp quyền đã được gửi thành công đến Quản Trị Viên!'
+          message: cleanSite
+            ? `Đã gửi yêu cầu chuyển sang site [${cleanSite}] đến Quản Trị Viên!`
+            : 'Yêu cầu cấp quyền đã được gửi thành công đến Quản Trị Viên!'
         }), { headers: corsHeaders });
       }
 
@@ -4061,37 +4079,71 @@ export default {
           WHERE id = ?
         `, [newStatus, reviewedBy || 'Admin', requestId]);
 
+        let approvedSiteMsg = '';
         if (action === 'APPROVE') {
-          const currentUser = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [req.user_email]);
-          if (currentUser) {
-            const roleHierarchy = {
-              'ADMIN': 100,
-              'KHO_TRUONG': 50,
-              'BEP_TRUONG': 40,
-              'KE_TOAN': 40,
-              'NHAN_VIEN': 10
-            };
-            const currentWeight = roleHierarchy[currentUser.role_code] || 10;
-            const requestedWeight = roleHierarchy[req.requested_role] || 10;
+          await db.exec(env, `ALTER TABLE app_users ADD COLUMN IF NOT EXISTS assigned_site TEXT`).catch(() => {});
 
-            let newRole = currentUser.role_code;
-            if (currentUser.role_code === 'NHAN_VIEN' || requestedWeight > currentWeight) {
-              newRole = req.requested_role;
-            } else if (req.requested_role === 'KHO_TRUONG') {
-              newRole = 'KHO_TRUONG';
-            }
-
-            await db.exec(env, `
-              UPDATE app_users
-              SET role_code = ?
-              WHERE email = ?
-            `, [newRole, req.user_email]);
+          // Xác định xem đây có phải yêu cầu Đổi Site hay không
+          let targetSite = (req.requested_site || '').trim();
+          if (!targetSite && req.requested_feature && /Đổi Site|Chuyển Đổi Điểm Bán/i.test(req.requested_feature)) {
+            const m = String(req.requested_feature).match(/→\s*([A-Za-z0-9_-]+)/);
+            if (m && m[1]) targetSite = m[1].trim();
           }
+          if (!targetSite && req.reason) {
+            const mReason = String(req.reason).match(/(?:site|cơ sở(?:\s+phụ\s+trách)?)\s*[:\[]?\s*([A-Z]\d{3}|ALL)\b/i);
+            if (mReason && mReason[1]) targetSite = mReason[1].toUpperCase();
+          }
+
+          if (targetSite) {
+            if (targetSite.toUpperCase() === 'ALL') {
+              await db.exec(env, `
+                INSERT INTO user_permissions (user_email, feature_code, can_view)
+                VALUES (?, 'all_sites', true)
+                ON CONFLICT(user_email, feature_code) DO UPDATE SET can_view = true
+              `, [req.user_email]).catch(() => {});
+              approvedSiteMsg = `Đã phê duyệt quyền truy cập Toàn Chuỗi (ALL) cho ${req.user_email}`;
+            } else {
+              await db.exec(env, `
+                UPDATE app_users SET assigned_site = ? WHERE LOWER(email) = LOWER(?)
+              `, [targetSite, req.user_email]).catch(() => {});
+              approvedSiteMsg = `Đã phê duyệt chuyển sang site [${targetSite}] cho ${req.user_email}`;
+            }
+          } else {
+            const currentUser = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [req.user_email]);
+            if (currentUser) {
+              const roleHierarchy = {
+                'ADMIN': 100,
+                'KHO_TRUONG': 50,
+                'BEP_TRUONG': 40,
+                'KE_TOAN': 40,
+                'NHAN_VIEN': 10
+              };
+              const currentWeight = roleHierarchy[currentUser.role_code] || 10;
+              const requestedWeight = roleHierarchy[req.requested_role] || 10;
+
+              let newRole = currentUser.role_code;
+              if (currentUser.role_code === 'NHAN_VIEN' || requestedWeight > currentWeight) {
+                newRole = req.requested_role;
+              } else if (req.requested_role === 'KHO_TRUONG') {
+                newRole = 'KHO_TRUONG';
+              }
+
+              await db.exec(env, `
+                UPDATE app_users
+                SET role_code = ?
+                WHERE email = ?
+              `, [newRole, req.user_email]);
+            }
+          }
+
+          invalidateMemoryCache('auth_me_');
         }
 
         return new Response(JSON.stringify({
           success: true,
-          message: action === 'APPROVE' ? `Đã phê duyệt vai trò ${req.requested_role} cho ${req.user_email}` : `Đã từ chối yêu cầu của ${req.user_email}`
+          message: action === 'APPROVE'
+            ? (approvedSiteMsg || `Đã phê duyệt vai trò ${req.requested_role} cho ${req.user_email}`)
+            : `Đã từ chối yêu cầu của ${req.user_email}`
         }), { headers: corsHeaders });
       }
 

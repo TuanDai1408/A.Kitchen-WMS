@@ -36,6 +36,7 @@ import {
   updateSelectedSiteLabel,
   checkAndPromptUserSite,
   openSiteSelectorModal,
+  closeSiteSelectorModal,
   saveSiteSelection,
   canUserSwitchSite
 } from './sites-modal';
@@ -167,6 +168,7 @@ if (typeof window !== 'undefined') {
   w.updateSelectedSiteLabel = updateSelectedSiteLabel;
   w.checkAndPromptUserSite = checkAndPromptUserSite;
   w.openSiteSelectorModal = openSiteSelectorModal;
+  w.closeSiteSelectorModal = closeSiteSelectorModal;
   w.saveSiteSelection = saveSiteSelection;
   w.canUserSwitchSite = canUserSwitchSite;
 

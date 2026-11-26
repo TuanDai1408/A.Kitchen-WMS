@@ -1,6 +1,7 @@
 import { AuthAccessRequest } from './types';
 import { FEATURE_TITLES, repairAtobMojibake } from './constants';
 import { gCurrentUser } from './accounts';
+import { openSiteSelectorModal } from './sites-modal';
 
 export let cachedAccessRequests: AuthAccessRequest[] = [];
 export let pendingRequestFeature: string = '';
@@ -55,33 +56,7 @@ export function openRequestAccessForSite(targetSite?: string): void {
     }
     return;
   }
-
-  const currentSite = localStorage.getItem('orbit_user_site') || curUser.assignedSite || 'K001';
-  pendingRequestFeature = 'switch_site';
-  pendingRequestFeatureName = 'Chuyển Đổi Điểm Bán / Quản Lý Đa Site';
-
-  const featEl = document.getElementById('reqFeatureName');
-  const descEl = document.getElementById('reqFeatureDesc');
-  const roleSel = document.getElementById('reqRoleSelect') as HTMLSelectElement | null;
-  const userEl = document.getElementById('reqUserName');
-  const emailEl = document.getElementById('reqUserEmail');
-  const reasonEl = document.getElementById('reqReasonInput') as HTMLTextAreaElement | null;
-
-  if (featEl) featEl.textContent = 'Quyền Chuyển Đổi Điểm Bán / Đa Cơ Sở';
-  if (descEl) {
-    descEl.textContent = `Tài khoản của bạn đang được cố định tại điểm bán [${currentSite}]. Để đổi sang cơ sở khác hoặc thao tác trên nhiều điểm bán, bạn cần gửi yêu cầu để Admin phê duyệt cấp quyền.`;
-  }
-  if (roleSel) roleSel.value = curUser.role || 'BEP_TRUONG';
-  if (userEl) userEl.textContent = curUser.fullName || 'Người dùng';
-  if (emailEl) emailEl.textContent = curUser.email;
-  if (reasonEl) {
-    reasonEl.value = targetSite 
-      ? `Xin cấp quyền chuyển sang cơ sở phụ trách: ${targetSite}`
-      : `Xin cấp quyền chuyển đổi điểm bán phụ trách để thực hiện xuất nhập kho và kiểm kê.`;
-  }
-
-  document.getElementById('requestAccessModal')?.classList.remove('hidden');
-  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+  openSiteSelectorModal(targetSite);
 }
 
 export async function submitRequestAccess(): Promise<void> {
@@ -208,7 +183,10 @@ export function renderAdminRequestsTable(): void {
           <div class="font-bold text-gray-900 dark:text-white">${repairAtobMojibake(req.user_name || req.user_email)}</div>
           <div class="text-xs text-gray-400 tabular-nums">${req.user_email}</div>
         </td>
-        <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">${req.requested_feature || '--'}</td>
+        <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">
+          <div>${req.requested_feature || '--'}</div>
+          ${(req as any).requested_site ? `<span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Site đích: ${(req as any).requested_site}</span>` : ''}
+        </td>
         <td class="py-2.5 px-3">
           <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
         </td>

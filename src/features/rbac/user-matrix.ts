@@ -175,38 +175,43 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
   });
 
   let headHtml = `
-    <tr class="bg-gray-50/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-800 select-none">
-      <th rowspan="2" class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-xs sticky left-0 z-30 bg-gray-50 dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">STT</th>
-      <th rowspan="2" class="py-3 px-4 text-left font-bold uppercase tracking-wider text-xs sticky left-12 z-30 bg-gray-50 dark:bg-gray-900 min-w-[220px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Nhân Sự &amp; Email</th>
-      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-xs sticky left-[268px] z-30 bg-gray-50 dark:bg-gray-900 min-w-[130px] shadow-[2px_0_5px_rgba(0,0,0,0.04)]">Vai Trò Hệ Thống</th>
+    <tr class="bg-gray-50/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 select-none">
+      <th rowspan="2" class="py-3 px-3 text-center w-12 font-bold uppercase tracking-wider text-[11px] text-gray-500 sticky left-0 z-30 bg-gray-50 dark:bg-gray-900">STT</th>
+      <th rowspan="2" class="py-3 px-4 text-left font-bold uppercase tracking-wider text-[11px] text-gray-500 sticky left-12 z-30 bg-gray-50 dark:bg-gray-900 min-w-[240px]">Nhân Sự &amp; Site Phụ Trách</th>
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] text-gray-500 sticky left-[288px] z-30 bg-gray-50 dark:bg-gray-900 min-w-[130px] border-r border-gray-200 dark:border-gray-800 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.08)]">Vai Trò</th>
   `;
 
   groups.forEach((g) => {
-    const colColor = g.color === 'rose' ? 'bg-rose-50/60 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300'
-      : g.color === 'emerald' ? 'bg-emerald-50/60 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
-      : g.color === 'amber' ? 'bg-amber-50/60 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
-      : g.color === 'blue' ? 'bg-blue-50/60 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300'
-      : 'bg-purple-50/60 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300';
+    const colColor = g.color === 'rose' ? 'bg-rose-50/80 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-b-2 border-b-rose-400/60'
+      : g.color === 'emerald' ? 'bg-emerald-50/80 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-b-2 border-b-emerald-400/60'
+      : g.color === 'amber' ? 'bg-amber-50/80 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-b-2 border-b-amber-400/60'
+      : g.color === 'blue' ? 'bg-blue-50/80 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-b-2 border-b-blue-400/60'
+      : 'bg-purple-50/80 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border-b-2 border-b-purple-400/60';
 
     headHtml += `
-      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-semibold uppercase tracking-wider text-xs border-l border-gray-200 dark:border-gray-800 ${colColor}">
-        ${escapeHtml(g.groupName)} (${g.features.length})
+      <th colspan="${g.features.length}" class="py-2.5 px-3 text-center font-bold uppercase tracking-wider text-[11px] border-l-2 border-gray-200 dark:border-gray-700/80 ${colColor}">
+        ${escapeHtml(g.groupName)} <span class="opacity-70 font-mono">(${g.features.length})</span>
       </th>
     `;
   });
 
   headHtml += `
-      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-xs min-w-[100px] border-l border-gray-200 dark:border-gray-800">Thao Tác</th>
+      <th rowspan="2" class="py-3 px-3 text-center font-bold uppercase tracking-wider text-[11px] text-gray-500 min-w-[100px] sticky right-0 z-30 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.08)]">Thao Tác</th>
     </tr>
-    <tr class="bg-gray-50 dark:bg-white/3 border-b border-gray-200 dark:border-gray-800 text-xs">
+    <tr class="bg-gray-50/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800 text-[11px]">
   `;
 
+  let prevGroup = '';
   visibleFeatures.forEach((f) => {
+    const isGroupStart = prevGroup !== '' && prevGroup !== f.group;
+    prevGroup = f.group;
     headHtml += `
-      <th class="py-2 px-2 text-center font-semibold text-gray-600 dark:text-gray-300 border-l border-gray-100 dark:border-gray-800 min-w-[110px]" title="${escapeHtml(f.name)} (${escapeHtml(f.code)})">
-        <div class="flex items-center justify-center gap-1">
-          <i data-lucide="${f.icon || 'shield'}" class="w-3.5 h-3.5 text-gray-400"></i>
-          <span class="truncate max-w-[95px]">${escapeHtml(f.name)}</span>
+      <th class="py-2.5 px-2 text-center font-semibold text-gray-600 dark:text-gray-300 ${isGroupStart ? 'border-l-2 border-gray-200 dark:border-gray-700/80' : 'border-l border-gray-100 dark:border-gray-800'} min-w-[102px]" title="${escapeHtml(f.name)} (${escapeHtml(f.code)})">
+        <div class="flex flex-col items-center justify-center gap-1">
+          <span class="size-6 rounded-lg bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 shadow-2xs">
+            <i data-lucide="${f.icon || 'shield'}" class="w-3.5 h-3.5"></i>
+          </span>
+          <span class="truncate max-w-[92px] leading-tight">${escapeHtml(f.name)}</span>
         </div>
       </th>
     `;
@@ -230,28 +235,39 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
       ? u.avatar_url
       : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
 
-    const roleBadge = u.role_code === 'ADMIN' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">ADMIN</span>'
-      : u.role_code === 'KHO_TRUONG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">KHO_TRƯỞNG</span>'
-      : u.role_code === 'BEP_TRUONG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">BẾP_TRƯỞNG</span>'
-      : u.role_code === 'KE_TOAN' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">KẾ_TOÁN</span>'
-      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">QL_VÙNG</span>'
-      : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">NHÂN_VIÊN</span>';
+    const roleBadge = u.role_code === 'ADMIN' ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">ADMIN</span>'
+      : u.role_code === 'KHO_TRUONG' ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">KHO_TRƯỞNG</span>'
+      : u.role_code === 'BEP_TRUONG' ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">BẾP_TRƯỞNG</span>'
+      : u.role_code === 'KE_TOAN' ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800">KẾ_TOÁN</span>'
+      : u.role_code === 'QUAN_LY_VUNG' ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800">QL_VÙNG</span>'
+      : '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">NHÂN_VIÊN</span>';
+
+    const resolvedList = visibleFeatures.map(f => ({ f, perm: resolveUserFeaturePermission(u, f, rolePerms, userPerms) }));
+    const grantedCount = resolvedList.filter(x => x.perm.isGranted).length;
+    const assignedSite = (u as any).assigned_site || '';
 
     let rowHtml = `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors ${isLocked ? 'opacity-60 bg-rose-50/20' : ''}">
-        <td class="py-3 px-3 text-center font-mono tabular-nums text-gray-400 text-xs sticky left-0 z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">${idx + 1}</td>
-        <td class="py-3 px-4 sticky left-12 z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
-          <div class="flex items-center gap-2.5">
-            <img src="${avatarUrl}" class="size-8 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
+      <tr class="group hover:bg-brand-50/30 dark:hover:bg-white/[0.03] transition-colors ${isLocked ? 'opacity-55 bg-rose-50/20' : (idx % 2 === 1 ? 'bg-gray-50/40 dark:bg-white/[0.015]' : 'bg-white dark:bg-gray-900')}">
+        <td class="py-3 px-3 text-center font-mono tabular-nums text-gray-400 text-xs sticky left-0 z-20 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/80">${idx + 1}</td>
+        <td class="py-3 px-4 sticky left-12 z-20 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/80">
+          <div class="flex items-center gap-3">
+            <img src="${avatarUrl}" class="size-9 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800 shrink-0" alt="Avatar">
             <div class="min-w-0">
-              <div class="font-bold text-gray-900 dark:text-white truncate max-w-[160px] text-xs">${escapeHtml(u.full_name || 'Chưa đặt tên')}</div>
-              <div class="text-xs text-gray-400 truncate max-w-[160px] font-mono" title="${escapeHtml(u.email)}">${escapeHtml(u.email)}</div>
+              <div class="font-bold text-gray-900 dark:text-white truncate max-w-[170px] text-xs flex items-center gap-1.5">
+                <span class="truncate">${escapeHtml(u.full_name || 'Chưa đặt tên')}</span>
+                ${isLocked ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-rose-600 text-white font-bold">KHÓA</span>' : ''}
+              </div>
+              <div class="text-[11px] text-gray-400 truncate max-w-[175px] font-mono" title="${escapeHtml(u.email)}">${escapeHtml(u.email)}</div>
+              <div class="flex items-center gap-1.5 mt-1">
+                ${assignedSite ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-mono font-bold text-[10px] border border-blue-200/70 dark:border-blue-800">📍 ${escapeHtml(assignedSite)}</span>` : ''}
+                <span class="inline-flex items-center px-1.5 py-0.2 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-mono font-semibold text-[10px]">${grantedCount}/${visibleFeatures.length} quyền</span>
+              </div>
             </div>
           </div>
         </td>
-        <td class="py-3 px-3 text-center sticky left-[268px] z-20 bg-white dark:bg-gray-900 shadow-[2px_0_5px_rgba(0,0,0,0.04)]">
+        <td class="py-3 px-3 text-center sticky left-[288px] z-20 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/80 border-r border-gray-200 dark:border-gray-800 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.08)]">
           ${canManage ? `
-            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="hover:scale-105 transition-transform" title="Bấm để đổi vai trò của user này">
+            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="hover:scale-105 transition-transform" title="Bấm để cấu hình vai trò &amp; quyền Xem/Sửa/Xóa chi tiết">
               ${roleBadge}
             </button>
           ` : `
@@ -260,58 +276,64 @@ export function renderUserMatrixTable(data: UserMatrixData): void {
         </td>
     `;
 
-    visibleFeatures.forEach((f) => {
-      const perm = resolveUserFeaturePermission(u, f, rolePerms, userPerms);
-      let btnBg = '';
+    let cellPrevGroup = '';
+    resolvedList.forEach(({ f, perm }) => {
+      const isGroupStart = cellPrevGroup !== '' && cellPrevGroup !== f.group;
+      cellPrevGroup = f.group;
+
+      let btnClass = '';
       let icon = '';
+      let cornerDot = '';
       let tooltipText = '';
 
       if (perm.isGranted) {
         if (perm.type === 'CUSTOM_GRANT') {
-          btnBg = 'bg-brand-500 hover:bg-brand-600 text-white shadow-xs';
-          icon = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
-          tooltipText = `Đang CẤP RIÊNG. Bấm để CẮT QUYỀN ${f.name}`;
+          btnClass = 'bg-brand-500 hover:bg-brand-600 text-white shadow-xs ring-2 ring-brand-500/25';
+          icon = '<i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>';
+          cornerDot = '<span class="absolute -top-1 -right-1 size-2.5 rounded-full bg-amber-400 ring-2 ring-white dark:ring-gray-900"></span>';
+          tooltipText = `Cấp riêng: ${f.name} (Bấm để thu hồi)`;
         } else {
-          btnBg = 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs';
-          icon = '<i data-lucide="check" class="w-3.5 h-3.5"></i>';
-          tooltipText = `Có quyền theo vai trò ${u.role_code}. Bấm để CẮT QUYỀN ${f.name}`;
+          btnClass = 'bg-emerald-500/12 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-emerald-500/35';
+          icon = '<i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>';
+          tooltipText = `Theo vai trò ${u.role_code}: ${f.name} (Bấm để cắt quyền)`;
         }
       } else {
         if (perm.type === 'CUSTOM_REVOKE') {
-          btnBg = 'bg-rose-500 hover:bg-rose-600 text-white shadow-xs';
-          icon = '<i data-lucide="x" class="w-3.5 h-3.5"></i>';
-          tooltipText = `Đã BỊ CẮT QUYỀN. Bấm để CẤP LẠI ${f.name}`;
+          btnClass = 'bg-rose-500/15 hover:bg-rose-500 text-rose-600 hover:text-white border border-rose-500/40';
+          icon = '<i data-lucide="x" class="w-4 h-4 stroke-[2.5]"></i>';
+          cornerDot = '<span class="absolute -top-1 -right-1 size-2.5 rounded-full bg-rose-600 ring-2 ring-white dark:ring-gray-900"></span>';
+          tooltipText = `Bị thu hồi: ${f.name} (Bấm để cấp lại)`;
         } else {
-          btnBg = 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-400';
+          btnClass = 'bg-gray-100/80 hover:bg-gray-200 dark:bg-gray-800/70 dark:hover:bg-gray-700 text-gray-400 border border-transparent';
           icon = '<i data-lucide="minus" class="w-3.5 h-3.5"></i>';
-          tooltipText = `Không có quyền. Bấm để CẤP QUYỀN ${f.name}`;
+          tooltipText = `Không có quyền: ${f.name} (Bấm để cấp quyền)`;
         }
       }
 
       rowHtml += `
-        <td class="py-2.5 px-2 text-center border-l border-gray-100 dark:border-gray-800/60">
-          <div class="inline-flex flex-col items-center gap-1">
+        <td class="py-2.5 px-2 text-center ${isGroupStart ? 'border-l-2 border-gray-200 dark:border-gray-700/80' : 'border-l border-gray-100 dark:border-gray-800/60'}">
+          <div class="inline-flex items-center justify-center">
             <button
               ${canManage ? `onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"` : `disabled`}
-              class="size-7 rounded-lg ${btnBg} flex items-center justify-center transition-all ${canManage ? 'active:scale-90' : 'cursor-not-allowed opacity-80'}"
+              class="relative size-8 rounded-xl ${btnClass} flex items-center justify-center transition-all ${canManage ? 'active:scale-90 cursor-pointer' : 'cursor-not-allowed opacity-75'}"
               title="${canManage ? tooltipText : 'Chỉ Quản trị viên mới có quyền thay đổi phân quyền'}"
             >
               ${icon}
+              ${cornerDot}
             </button>
-            <span class="text-[10px] px-1 py-0.2 rounded font-bold ${perm.badgeClass}">${perm.label}</span>
           </div>
         </td>
       `;
     });
 
     rowHtml += `
-        <td class="py-3 px-3 text-center border-l border-gray-100 dark:border-gray-800">
+        <td class="py-3 px-3 text-center sticky right-0 z-20 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/80 border-l border-gray-200 dark:border-gray-800 shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.08)]">
           ${canManage ? `
             <div class="flex items-center justify-center gap-1.5">
-              <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Chỉnh sửa vai trò & tài khoản">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-300 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Phân quyền Xem/Sửa/Xóa &amp; vai trò">
+                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="toggleUserStatusPrompt('${escapeHtml(u.email)}', '${isLocked ? 'ACTIVE' : 'LOCKED'}')" class="p-1.5 rounded-lg border ${isLocked ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-rose-200 text-rose-600 hover:bg-rose-50'} transition-colors" title="${isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}">
+              <button onclick="toggleUserStatusPrompt('${escapeHtml(u.email)}', '${isLocked ? 'ACTIVE' : 'LOCKED'}')" class="p-1.5 rounded-xl border ${isLocked ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50' : 'border-rose-200 text-rose-600 hover:bg-rose-50'} transition-colors" title="${isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}">
                 <i data-lucide="${isLocked ? 'unlock' : 'lock'}" class="w-3.5 h-3.5"></i>
               </button>
             </div>
@@ -341,6 +363,8 @@ export function renderUserMatrixMobile(data: UserMatrixData): void {
 
   const searchKeyword = ((document.getElementById('userMatrixSearchInput') as HTMLInputElement | null)?.value || '').trim().toLowerCase();
   const selectedRole = (document.getElementById('userMatrixRoleFilter') as HTMLSelectElement | null)?.value || 'ALL';
+  const selectedGroup = (document.getElementById('userMatrixGroupFilter') as HTMLSelectElement | null)?.value || 'ALL';
+  const visibleFeatures = allFeatures.filter((f) => selectedGroup === 'ALL' || f.group === selectedGroup);
 
   const filteredUsers = users.filter((u) => {
     if (selectedRole !== 'ALL' && u.role_code !== selectedRole) return false;
@@ -360,52 +384,68 @@ export function renderUserMatrixMobile(data: UserMatrixData): void {
   const canManage = canUserManageUsers();
 
   container.innerHTML = filteredUsers.map((u) => {
+    const isLocked = u.status === 'LOCKED';
     const initials = getCleanInitials(u.full_name || u.email);
     const avatarUrl = (u.avatar_url && !u.avatar_url.includes('ui-avatars.com'))
       ? u.avatar_url
       : `https://ui-avatars.com/api/?name=${initials}&background=465fff&color=fff&bold=true`;
 
-    const featuresGrid = allFeatures.map((f) => {
-      const perm = resolveUserFeaturePermission(u, f, rolePerms, userPerms);
+    const resolvedList = visibleFeatures.map((f) => ({ f, perm: resolveUserFeaturePermission(u, f, rolePerms, userPerms) }));
+    const grantedCount = resolvedList.filter(x => x.perm.isGranted).length;
+    const assignedSite = (u as any).assigned_site || '';
+
+    const featuresGrid = resolvedList.map(({ f, perm }) => {
       const isGranted = perm.isGranted;
       const isRevoked = perm.type === 'CUSTOM_REVOKE';
+      const isCustomGrant = perm.type === 'CUSTOM_GRANT';
 
       return `
-        <div class="flex items-center justify-between p-2 rounded-xl border border-gray-100 dark:border-gray-800 ${isGranted ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : (isRevoked ? 'bg-rose-50/40 dark:bg-rose-950/20' : 'bg-gray-50/50 dark:bg-gray-800/30')}">
+        <div class="flex items-center justify-between p-2.5 rounded-xl border ${
+          isCustomGrant ? 'border-brand-200 dark:border-brand-800 bg-brand-50/40 dark:bg-brand-950/20' :
+          isGranted ? 'border-emerald-200/70 dark:border-emerald-900/50 bg-emerald-50/30 dark:bg-emerald-950/15' :
+          isRevoked ? 'border-rose-200/70 dark:border-rose-900/50 bg-rose-50/30 dark:bg-rose-950/15' :
+          'border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30'
+        }">
           <div class="flex items-center gap-2 min-w-0">
             <i data-lucide="${f.icon || 'shield'}" class="w-3.5 h-3.5 text-gray-400 shrink-0"></i>
             <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">${escapeHtml(f.name)}</span>
           </div>
           <button
             ${canManage ? `onclick="toggleUserPermission('${escapeHtml(u.email)}', '${escapeHtml(f.code)}', ${perm.isGranted}, '${perm.type}')"` : `disabled`}
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${isGranted ? 'bg-emerald-500 text-white' : (isRevoked ? 'bg-rose-500 text-white' : 'bg-gray-200 text-gray-600')} ${canManage ? '' : 'cursor-not-allowed opacity-80'}"
+            class="px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all shrink-0 ${
+              isCustomGrant ? 'bg-brand-500 text-white' :
+              isGranted ? 'bg-emerald-500 text-white' :
+              isRevoked ? 'bg-rose-500 text-white' :
+              'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+            } ${canManage ? '' : 'cursor-not-allowed opacity-80'}"
             title="${canManage ? '' : 'Chỉ Quản trị viên mới có quyền thay đổi phân quyền'}"
           >
             <span>${isGranted ? 'BẬT' : 'TẮT'}</span>
-            <span class="text-[8px] opacity-80">(${perm.label})</span>
           </button>
         </div>
       `;
     }).join('');
 
     return `
-      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3.5">
+      <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3 ${isLocked ? 'opacity-60' : ''}">
         <div class="flex items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800/80 pb-3">
           <div class="flex items-center gap-2.5 min-w-0">
-            <img src="${avatarUrl}" class="size-9 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700 shrink-0" alt="Avatar">
+            <img src="${avatarUrl}" class="size-10 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800 shrink-0" alt="Avatar">
             <div class="min-w-0">
-              <div class="font-semibold text-xs text-gray-900 dark:text-white truncate">${escapeHtml(u.full_name || 'Chưa đặt tên')}</div>
-              <div class="text-xs text-gray-400 truncate font-mono">${escapeHtml(u.email)}</div>
+              <div class="font-bold text-xs text-gray-900 dark:text-white truncate">${escapeHtml(u.full_name || 'Chưa đặt tên')}</div>
+              <div class="text-[11px] text-gray-400 truncate font-mono">${escapeHtml(u.email)}</div>
+              <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                <span class="text-[10px] px-1.5 py-0.2 rounded font-bold bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200/70 dark:border-brand-800">${u.role_code}</span>
+                ${assignedSite ? `<span class="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">📍 ${escapeHtml(assignedSite)}</span>` : ''}
+                <span class="text-[10px] px-1.5 py-0.2 rounded font-mono bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${grantedCount}/${visibleFeatures.length}</span>
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-xs px-2 py-0.5 rounded font-semibold bg-brand-50 text-brand-600 border border-brand-200">${u.role_code}</span>
-            ${canManage ? `
-              <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
-                <i data-lucide="more-vertical" class="w-4 h-4"></i>
-              </button>
-            ` : ''}
-          </div>
+          ${canManage ? `
+            <button onclick="openEditUserModal('${escapeHtml(u.email)}')" class="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 shrink-0" title="Phân quyền chi tiết">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">

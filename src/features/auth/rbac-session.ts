@@ -221,6 +221,29 @@ export async function syncCurrentUserPermissions(): Promise<void> {
       curUser.roleName = json.data.roleName;
       if (json.data.user && json.data.user.fullName) curUser.fullName = json.data.user.fullName;
       if (json.data.user && json.data.user.avatarUrl) curUser.avatarUrl = json.data.user.avatarUrl;
+
+      const serverSite = (json.data.user && json.data.user.assignedSite) || json.data.assignedSite;
+      if (serverSite) {
+        const prevSite = curUser.assignedSite || localStorage.getItem('orbit_user_site');
+        const w = typeof window !== 'undefined' ? (window as any) : {};
+        const canSwitch = typeof w.canUserSwitchSite === 'function' ? w.canUserSwitchSite(curUser) : false;
+        if (!canSwitch && prevSite !== serverSite) {
+          curUser.assignedSite = serverSite;
+          try {
+            localStorage.setItem('orbit_user_site', serverSite);
+            localStorage.removeItem('orbit_pending_site_request');
+          } catch (e) {}
+          if (typeof w.onGlobalBranchChange === 'function') {
+            w.onGlobalBranchChange(serverSite);
+          }
+          if (typeof showToast === 'function') {
+            showToast(`Yêu cầu đổi sang site [${serverSite}] đã được Quản trị viên duyệt!`, 'success');
+          }
+        } else if (!curUser.assignedSite) {
+          curUser.assignedSite = serverSite;
+        }
+      }
+
       try { localStorage.setItem('orbit_user', JSON.stringify(curUser)); } catch (e) {}
       saveAccountToList(curUser);
       applyUserSessionToUI();

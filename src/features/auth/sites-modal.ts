@@ -1,11 +1,12 @@
 import { AuthSiteOption } from './types';
 import { DEFAULT_SITES_LIST, isMasterAccount } from './constants';
 import { gCurrentUser, saveAccountToList } from './accounts';
-import { openRequestAccessForSite } from './access-requests';
 
 export let selectedModalRegion: string = 'ALL';
 export let tempSelectedSite: string = 'K001';
 
+declare const showLoading: (msg?: string) => void;
+declare const hideLoading: () => void;
 declare const showToast: (msg: string, type?: string) => void;
 declare const onGlobalBranchChange: (site: string) => void;
 declare const lucide: any;
@@ -193,32 +194,122 @@ export function checkAndPromptUserSite(forceOpen: boolean = false): void {
 
 /**
  * Mở modal chọn điểm bán:
- * Nếu là user không có quyền -> Chuyển sang modal xin cấp quyền chuyển cơ sở.
+ * - Admin / người có quyền switch_site: chọn và đổi site ngay lập tức.
+ * - User thường: vẫn được mở danh sách site để chọn site muốn chuyển và gửi yêu cầu chờ Admin duyệt.
  */
-export function openSiteSelectorModal(): void {
+export function openSiteSelectorModal(preselectSite?: string): void {
   const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
-  if (!canUserSwitchSite(curUser)) {
-    const assigned = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
-    openRequestAccessForSite();
-    if (typeof showToast === 'function') {
-      showToast(`Điểm bán của bạn đã được cố định là [${assigned}]. Vui lòng gửi yêu cầu nếu bạn cần chuyển cơ sở!`, 'warning');
-    }
-    return;
+  const canSwitch = canUserSwitchSite(curUser);
+  const assigned = (curUser && curUser.assignedSite) || localStorage.getItem('orbit_user_site') || 'K001';
+
+  if (preselectSite) {
+    tempSelectedSite = preselectSite;
+  } else {
+    tempSelectedSite = assigned;
   }
 
   const modal = document.getElementById('siteSelectorModal');
   if (!modal) return;
+
+  const titleEl = document.getElementById('siteSelectorTitle');
+  const subEl = document.getElementById('siteSelectorSubtitle');
+  const noticeEl = document.getElementById('siteSwitchApprovalNotice');
+  const noticeTextEl = document.getElementById('siteSwitchApprovalNoticeText');
+  const reasonWrap = document.getElementById('siteSwitchReasonWrap');
+  const reasonInput = document.getElementById('siteSwitchReasonInput') as HTMLInputElement | null;
+  const submitLabel = document.getElementById('siteSelectorSubmitLabel');
+  const closeBtn = document.getElementById('siteSelectorCloseBtn');
+
+  if (canSwitch) {
+    if (titleEl) titleEl.textContent = 'Chọn Điểm Bán / Bếp Bạn Phụ Trách';
+    if (subEl) subEl.textContent = 'Lựa chọn sẽ lưu lại trên máy cá nhân để không phải chọn lại lần sau';
+    if (noticeEl) noticeEl.classList.add('hidden');
+    if (reasonWrap) reasonWrap.classList.add('hidden');
+    if (submitLabel) submitLabel.textContent = 'Xác Nhận & Tiếp Tục';
+    if (closeBtn) closeBtn.classList.remove('hidden');
+  } else {
+    if (titleEl) titleEl.textContent = 'Yêu Cầu Đổi Điểm Bán / Site';
+    if (subEl) subEl.textContent = `Site cố định hiện tại: ${assigned} • Chọn site mới để gửi Quản trị viên duyệt`;
+    if (noticeEl) noticeEl.classList.remove('hidden');
+    if (noticeTextEl) {
+      noticeTextEl.textContent = `Tài khoản của bạn đang cố định tại site [${assigned}]. Vui lòng chọn site bạn muốn chuyển bên dưới và nhấn "Gửi Yêu Cầu Đổi Site" để Quản trị viên xác nhận duyệt.`;
+    }
+    if (reasonWrap) reasonWrap.classList.remove('hidden');
+    if (reasonInput) reasonInput.value = '';
+    if (submitLabel) submitLabel.textContent = 'Gửi Yêu Cầu Đổi Site';
+    if (closeBtn) closeBtn.classList.remove('hidden');
+  }
+
   renderSitesOptions();
   modal.classList.remove('hidden');
   if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
 
+export function closeSiteSelectorModal(): void {
+  document.getElementById('siteSelectorModal')?.classList.add('hidden');
+}
+
 /**
- * Lưu điểm bán khi Admin / người có quyền chọn đổi:
- * Tự động cập nhật localStorage và đồng bộ tất cả bộ lọc các tab.
+ * Lưu điểm bán (nếu có quyền) hoặc gửi yêu cầu đổi site chờ Admin duyệt (nếu là user thường).
  */
-export function saveSiteSelection(): void {
+export async function saveSiteSelection(): Promise<void> {
+  const curUser = (typeof window !== 'undefined' ? (window as any).gCurrentUser : null) || gCurrentUser;
   const site = tempSelectedSite || localStorage.getItem('orbit_user_site') || 'K001';
+
+  if (!canUserSwitchSite(curUser)) {
+    if (!curUser || !curUser.email) {
+      if (typeof showToast === 'function') showToast('Vui lòng đăng nhập để gửi yêu cầu đổi site!', 'warning');
+      return;
+    }
+
+    const currentSite = curUser.assignedSite || localStorage.getItem('orbit_user_site') || 'K001';
+    if (site.toUpperCase() === currentSite.toUpperCase()) {
+      if (typeof showToast === 'function') {
+        showToast(`Bạn đang ở site [${currentSite}] rồi. Vui lòng chọn một site khác cần chuyển!`, 'warning');
+      }
+      return;
+    }
+
+    const reasonInput = (document.getElementById('siteSwitchReasonInput') as HTMLInputElement | null)?.value?.trim() || '';
+    const sites = getAppSitesList();
+    const siteObj = sites.find(s => s.code.toLowerCase() === site.toLowerCase());
+    const siteLabel = siteObj ? `${site} (${siteObj.name})` : site;
+    const finalReason = reasonInput || `Xin phê duyệt chuyển từ site ${currentSite} sang ${siteLabel}`;
+
+    try {
+      if (typeof showLoading === 'function') showLoading(`Đang gửi yêu cầu chuyển sang site ${site}...`);
+      const res = await fetch('/api/auth/request-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: curUser.email,
+          fullName: curUser.fullName || curUser.name || '',
+          requestedRole: curUser.role || 'NHAN_VIEN',
+          requestedSite: site,
+          requestedFeature: `Đổi Site: ${currentSite} → ${site}`,
+          reason: finalReason
+        })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Gửi yêu cầu thất bại');
+
+      try {
+        localStorage.setItem('orbit_pending_site_request', JSON.stringify({ site, from: currentSite, at: Date.now() }));
+      } catch (e) {}
+
+      closeSiteSelectorModal();
+      if (typeof showToast === 'function') {
+        showToast(`Đã gửi yêu cầu đổi sang site [${site}]! Vui lòng chờ Quản trị viên xác nhận duyệt.`, 'success');
+      }
+    } catch (err: any) {
+      console.error('saveSiteSelection request error:', err);
+      if (typeof showToast === 'function') showToast('Lỗi gửi yêu cầu: ' + err.message, 'error');
+    } finally {
+      if (typeof hideLoading === 'function') hideLoading();
+    }
+    return;
+  }
+
   localStorage.setItem('orbit_user_site', site);
   if (gCurrentUser) {
     gCurrentUser.assignedSite = site;
@@ -240,7 +331,7 @@ export function saveSiteSelection(): void {
     onGlobalBranchChange(site);
   }
 
-  document.getElementById('siteSelectorModal')?.classList.add('hidden');
+  closeSiteSelectorModal();
   const sites = getAppSitesList();
   const siteObj = sites.find(s => s.code === site);
   if (typeof showToast === 'function') {
