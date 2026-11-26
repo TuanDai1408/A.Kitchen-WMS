@@ -309,12 +309,16 @@ export function onWasteLineNoteChange(code: string, val: string): void {
 export function updateWasteKPIs(): void {
   const items: FnbWasteStockItem[] = window.gFnbWasteStockItems || [];
   let selectedCount = 0;
+  let totalQty = 0;
   let totalEstAmt = 0;
+  const selectedItems: FnbWasteStockItem[] = [];
 
   items.forEach(i => {
     if (i.wasteQty > 0) {
       selectedCount++;
+      totalQty += Number(i.wasteQty) || 0;
       totalEstAmt += (i.wasteQty * (Number(i.unit_price) || 0));
+      selectedItems.push(i);
     }
   });
 
@@ -333,12 +337,60 @@ export function updateWasteKPIs(): void {
 
   const btnSubmit = document.getElementById('btnSubmitDirectWaste') as HTMLButtonElement | null;
   const btnSubmitText = document.getElementById('btnSubmitDirectWasteText');
-  if (btnSubmit) {
-    btnSubmit.disabled = (selectedCount === 0);
+  if (btnSubmit) btnSubmit.disabled = (selectedCount === 0);
+  if (btnSubmitText) btnSubmitText.textContent = `Xác nhận tạo biên bản hủy (${selectedCount})`;
+
+  const slipWrap = document.getElementById('wasteSelectedSlip');
+  const slipCount = document.getElementById('wasteSlipCount');
+  const slipList = document.getElementById('wasteSelectedSlipList');
+  const slipTotalItems = document.getElementById('wasteSlipTotalItems');
+  const slipTotalQty = document.getElementById('wasteSlipTotalQty');
+  const slipTotalAmt = document.getElementById('wasteSlipTotalAmount');
+  const bottomBtn = document.getElementById('btnSubmitDirectWasteBottom') as HTMLButtonElement | null;
+  const bottomBtnText = document.getElementById('btnSubmitDirectWasteBottomText');
+
+  if (slipWrap) slipWrap.classList.toggle('hidden', selectedCount === 0);
+  if (slipCount) slipCount.textContent = String(selectedCount);
+  if (slipTotalItems) slipTotalItems.textContent = String(selectedCount);
+  if (slipTotalQty) slipTotalQty.textContent = Number(totalQty.toFixed(2)).toLocaleString('vi-VN');
+  if (slipTotalAmt) slipTotalAmt.textContent = `${Math.round(totalEstAmt).toLocaleString('vi-VN')} ₫`;
+  if (bottomBtn) bottomBtn.disabled = (selectedCount === 0);
+  if (bottomBtnText) bottomBtnText.textContent = `Xác nhận tạo biên bản hủy (${selectedCount})`;
+
+  if (slipList) {
+    slipList.innerHTML = selectedItems.map(i => {
+      const lineAmt = (Number(i.wasteQty) || 0) * (Number(i.unit_price) || 0);
+      return `
+        <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-gray-900 border border-rose-200/70 dark:border-rose-800/60 text-xs">
+          <div class="min-w-0">
+            <div class="font-bold text-gray-900 dark:text-white truncate">${escapeHtml(i.name || i.code)}</div>
+            <div class="text-[11px] font-mono text-gray-500">${escapeHtml(i.code)} • <b class="text-rose-600">${Number(i.wasteQty).toLocaleString('vi-VN')} ${escapeHtml(i.unit || '')}</b> • ${Math.round(lineAmt).toLocaleString('vi-VN')} ₫</div>
+          </div>
+          <button type="button" onclick="removeDirectWasteLine('${escapeHtml(i.code)}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 shrink-0" title="Bỏ mặt hàng này">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+    if (window.lucide) window.lucide.createIcons();
   }
-  if (btnSubmitText) {
-    btnSubmitText.textContent = `Xác Nhận Tạo Biên Bản Hủy (${selectedCount})`;
+}
+
+export function removeDirectWasteLine(code: string): void {
+  const item = (window.gFnbWasteStockItems || []).find((i: any) => i.code === code);
+  if (item) {
+    item.wasteQty = 0;
   }
+  renderFnbWasteStockTable();
+  updateWasteKPIs();
+}
+
+export function resetDirectWasteSelection(): void {
+  (window.gFnbWasteStockItems || []).forEach((i: any) => {
+    i.wasteQty = 0;
+  });
+  renderFnbWasteStockTable();
+  updateWasteKPIs();
 }
 
 export async function submitDirectWaste(): Promise<void> {

@@ -6,6 +6,7 @@ import {
   toggleKitchenItemSelection,
   onKitchenLineQtyInput,
   updateKitchenIssueKPIs,
+  removeKitchenSelectedLine,
   resetKitchenIssueForm,
   submitCreateKitchenIssue
 } from './stock-table';
@@ -169,6 +170,7 @@ win.populateKitchenGroupFilter = populateKitchenGroupFilter;
 win.toggleKitchenItemSelection = toggleKitchenItemSelection;
 win.onKitchenLineQtyInput = onKitchenLineQtyInput;
 win.updateKitchenIssueKPIs = updateKitchenIssueKPIs;
+win.removeKitchenSelectedLine = removeKitchenSelectedLine;
 win.resetKitchenIssueForm = resetKitchenIssueForm;
 win.submitCreateKitchenIssue = submitCreateKitchenIssue;
 

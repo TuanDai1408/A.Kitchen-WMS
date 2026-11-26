@@ -11,6 +11,8 @@ import {
   onWasteLineReasonChange,
   onWasteLineNoteChange,
   updateWasteKPIs,
+  removeDirectWasteLine,
+  resetDirectWasteSelection,
   submitDirectWaste
 } from './stock-table';
 import {
@@ -122,6 +124,8 @@ win.onWasteLineQtyChange = onWasteLineQtyChange;
 win.onWasteLineReasonChange = onWasteLineReasonChange;
 win.onWasteLineNoteChange = onWasteLineNoteChange;
 win.updateWasteKPIs = updateWasteKPIs;
+win.removeDirectWasteLine = removeDirectWasteLine;
+win.resetDirectWasteSelection = resetDirectWasteSelection;
 win.submitDirectWaste = submitDirectWaste;
 
 // History & Detail

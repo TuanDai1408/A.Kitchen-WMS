@@ -256,11 +256,13 @@ export function updateKitchenIssueKPIs(): void {
   let totalQty = 0;
   let totalAmount = 0;
 
+  const selectedList: KitchenIssueLine[] = [];
   gKitchenSelectedLines.forEach(line => {
     if (line.qty > 0) {
       countItems++;
       totalQty += line.qty;
       totalAmount += line.amount;
+      selectedList.push(line);
     }
   });
 
@@ -273,6 +275,26 @@ export function updateKitchenIssueKPIs(): void {
   const amountEl = document.getElementById('kitchenIssueTotalAmount');
   if (amountEl) amountEl.textContent = formatVND(totalAmount);
 
+  const slipWrap = document.getElementById('kitchenIssueSelectedSlip');
+  const slipCount = document.getElementById('kitchenIssueSlipCount');
+  const slipList = document.getElementById('kitchenIssueSelectedSlipList');
+  if (slipWrap) slipWrap.classList.toggle('hidden', countItems === 0);
+  if (slipCount) slipCount.textContent = String(countItems);
+  if (slipList) {
+    slipList.innerHTML = selectedList.map(l => `
+      <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-gray-900 border border-emerald-200/70 dark:border-emerald-800/60 text-xs">
+        <div class="min-w-0">
+          <div class="font-bold text-gray-900 dark:text-white truncate">${l.item_name}</div>
+          <div class="text-[11px] font-mono text-gray-500">${l.item_code} • <b class="text-emerald-600">${formatNumber(l.qty)} ${l.unit}</b> • ${formatVND(l.amount)}</div>
+        </div>
+        <button type="button" onclick="removeKitchenSelectedLine('${l.item_code}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 shrink-0" title="Bỏ mặt hàng này">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    `).join('');
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+  }
+
   const submitBtn = document.getElementById('btnSubmitKitchenIssue') as HTMLButtonElement | null;
   if (submitBtn) {
     submitBtn.disabled = countItems === 0;
@@ -282,6 +304,16 @@ export function updateKitchenIssueKPIs(): void {
       submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
   }
+}
+
+export function removeKitchenSelectedLine(itemCode: string): void {
+  gKitchenSelectedLines.delete(itemCode);
+  const item = gKitchenStockItems.find(i => i.code === itemCode);
+  if (item) {
+    item.issueQty = 0;
+    item.selected = false;
+  }
+  renderKitchenStockTable();
 }
 
 /**
