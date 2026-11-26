@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1540">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1612">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1540"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1612"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1931,6 +1931,49 @@
                 </thead>
                 <tbody id="cfgCategoryRulesBody" class="divide-y divide-gray-100 dark:divide-gray-800/70"></tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Card 6: Nguồn dữ liệu Thẻ kho & Chi tiết mã hàng -->
+          <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <i data-lucide="database" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Nguồn dữ liệu Thẻ kho &amp; Chi tiết mã hàng</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Chọn các bảng dữ liệu được phép hiển thị trong lịch sử xuất nhập tồn (Tab Hạn dùng &amp; Xuất FEFO và Tab Tồn kho)</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Phiếu nhập kho Webapp (<span class="font-mono text-emerald-600 dark:text-emerald-400">PN...</span>)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Bảng <span class="font-mono">fnb_stock_receipts</span></div>
+                </div>
+                <input type="checkbox" id="cfg_history_src_receipts" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+              <label class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Biên bản hủy hàng Webapp (<span class="font-mono text-rose-600 dark:text-rose-400">BBH...</span>)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Bảng <span class="font-mono">fnb_stock_wastes</span></div>
+                </div>
+                <input type="checkbox" id="cfg_history_src_wastes" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+              <label class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Phiếu xuất bếp Webapp (<span class="font-mono text-amber-600 dark:text-amber-400">XKSD...</span>)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Bảng <span class="font-mono">fnb_kitchen_issues</span></div>
+                </div>
+                <input type="checkbox" id="cfg_history_src_kitchen_issues" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
+              <label class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/70 dark:border-gray-800 cursor-pointer">
+                <div>
+                  <div class="text-xs font-bold text-gray-800 dark:text-gray-200">Chứng từ SAP ERP MB51 (<span class="font-mono text-blue-600 dark:text-blue-400">60... / 80...</span>)</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Bảng <span class="font-mono">mb51_material_docs</span></div>
+                </div>
+                <input type="checkbox" id="cfg_history_src_sap_mb51" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+              </label>
             </div>
           </div>
         </div>

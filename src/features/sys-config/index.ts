@@ -34,6 +34,10 @@ export interface SystemConfigData {
   waste_approval_amount_threshold: number;
   waste_approval_pct_threshold: number;
   default_page_size: number;
+  history_src_receipts: boolean;
+  history_src_wastes: boolean;
+  history_src_kitchen_issues: boolean;
+  history_src_sap_mb51: boolean;
   category_rules_json: string;
 }
 
@@ -67,6 +71,10 @@ export const DEFAULT_SYSTEM_CONFIG_UI: SystemConfigData = {
   waste_approval_amount_threshold: 500000,
   waste_approval_pct_threshold: 3,
   default_page_size: 25,
+  history_src_receipts: true,
+  history_src_wastes: true,
+  history_src_kitchen_issues: true,
+  history_src_sap_mb51: true,
   category_rules_json: JSON.stringify(DEFAULT_CATEGORY_RULES_UI)
 };
 
@@ -248,6 +256,10 @@ export async function loadSystemConfig(): Promise<void> {
       setInputVal('cfg_waste_approval_amount_threshold', cfg.waste_approval_amount_threshold ?? 500000);
       setInputVal('cfg_waste_approval_pct_threshold', cfg.waste_approval_pct_threshold ?? 3);
       setInputVal('cfg_default_page_size', cfg.default_page_size);
+      setInputVal('cfg_history_src_receipts', cfg.history_src_receipts !== false);
+      setInputVal('cfg_history_src_wastes', cfg.history_src_wastes !== false);
+      setInputVal('cfg_history_src_kitchen_issues', cfg.history_src_kitchen_issues !== false);
+      setInputVal('cfg_history_src_sap_mb51', cfg.history_src_sap_mb51 !== false);
 
       try {
         const parsedRules = JSON.parse(cfg.category_rules_json || '[]');
@@ -334,6 +346,10 @@ export async function saveSystemConfig(): Promise<void> {
     waste_approval_amount_threshold: getNumberInputVal('cfg_waste_approval_amount_threshold', 500000),
     waste_approval_pct_threshold: getNumberInputVal('cfg_waste_approval_pct_threshold', 3),
     default_page_size: getNumberInputVal('cfg_default_page_size', 25),
+    history_src_receipts: getCheckboxVal('cfg_history_src_receipts', true),
+    history_src_wastes: getCheckboxVal('cfg_history_src_wastes', true),
+    history_src_kitchen_issues: getCheckboxVal('cfg_history_src_kitchen_issues', true),
+    history_src_sap_mb51: getCheckboxVal('cfg_history_src_sap_mb51', true),
     category_rules_json: JSON.stringify(cleanRules)
   };
 

@@ -417,7 +417,12 @@ const DEFAULT_SYSTEM_CONFIG = {
   waste_approval_amount_threshold: 500000,
   waste_approval_pct_threshold: 3,
   default_page_size: 25,
-  // 5. Quy tắc riêng theo Nhóm hàng
+  // 5. Nguồn dữ liệu Thẻ kho & Chi tiết mã hàng
+  history_src_receipts: true,
+  history_src_wastes: true,
+  history_src_kitchen_issues: true,
+  history_src_sap_mb51: true,
+  // 6. Quy tắc riêng theo Nhóm hàng
   category_rules_json: JSON.stringify(DEFAULT_CATEGORY_RULES)
 };
 
@@ -2061,11 +2066,13 @@ export default {
         }
 
         const isPg = db.isPg(env);
+        const sysCfg = await getSystemConfig(env);
         let rows = [];
 
         if (isPg) {
-          const q = `
-            WITH raw_history AS (
+          const unionParts = [];
+          if (sysCfg.history_src_receipts !== false) {
+            unionParts.push(`
               SELECT 
                 r.receipt_date::date as doc_date,
                 r.receipt_code as doc_no,
@@ -2087,9 +2094,10 @@ export default {
               FROM fnb_stock_receipt_lines l
               JOIN fnb_stock_receipts r ON l.receipt_id = r.id
               WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(r.site_code) = UPPER($2))
-
-              UNION ALL
-
+            `);
+          }
+          if (sysCfg.history_src_wastes !== false) {
+            unionParts.push(`
               SELECT 
                 w.waste_date::date as doc_date,
                 w.waste_code as doc_no,
@@ -2108,9 +2116,10 @@ export default {
               FROM fnb_stock_waste_lines l
               JOIN fnb_stock_wastes w ON l.waste_id = w.id
               WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(w.site_code) = UPPER($2))
-
-              UNION ALL
-
+            `);
+          }
+          if (sysCfg.history_src_kitchen_issues !== false) {
+            unionParts.push(`
               SELECT 
                 ki.issue_date::date as doc_date,
                 ki.issue_code as doc_no,
@@ -2129,9 +2138,10 @@ export default {
               FROM fnb_kitchen_issue_lines l
               JOIN fnb_kitchen_issues ki ON l.issue_id = ki.id
               WHERE l.item_code = $1 AND ($2 = 'ALL' OR UPPER(ki.site_code) = UPPER($2))
-
-              UNION ALL
-
+            `);
+          }
+          if (sysCfg.history_src_sap_mb51 !== false) {
+            unionParts.push(`
               SELECT 
                 m.posting_date::date as doc_date,
                 m.mat_doc as doc_no,
@@ -2154,13 +2164,21 @@ export default {
                 m.posting_date::timestamp as sort_time
               FROM mb51_material_docs m
               WHERE m.material = $1 AND ($2 = 'ALL' OR UPPER(m.site) = UPPER($2))
-            )
-            SELECT * FROM raw_history
-            ORDER BY doc_date DESC, sort_time DESC
-            LIMIT 100;
-          `;
-          const res = await db.query(env, q, [sku, siteParam]);
-          rows = res.rows || [];
+            `);
+          }
+
+          if (unionParts.length > 0) {
+            const q = `
+              WITH raw_history AS (
+                ${unionParts.join('\nUNION ALL\n')}
+              )
+              SELECT * FROM raw_history
+              ORDER BY doc_date DESC, sort_time DESC
+              LIMIT 100;
+            `;
+            const res = await db.query(env, q, [sku, siteParam]);
+            rows = res.rows || [];
+          }
         }
 
         let totalIn = 0;
@@ -4690,6 +4708,7 @@ export default {
         invalidateMemoryCache('/api/reorder');
         invalidateMemoryCache('/api/leadtime');
         invalidateMemoryCache('/api/wh-dashboard');
+        invalidateMemoryCache('/api/wh');
 
         await writeAuditLog(env, request, {
           userEmail: requestorEmail,
@@ -4729,6 +4748,7 @@ export default {
         invalidateMemoryCache('/api/reorder');
         invalidateMemoryCache('/api/leadtime');
         invalidateMemoryCache('/api/wh-dashboard');
+        invalidateMemoryCache('/api/wh');
         await writeAuditLog(env, request, {
           userEmail: requestorEmail,
           action: 'SYSTEM_CONFIG_RESET',
