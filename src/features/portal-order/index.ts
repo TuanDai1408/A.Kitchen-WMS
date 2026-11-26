@@ -6,7 +6,6 @@ import {
   onQtyChange,
   calcBudget,
   renderOrderCartSummary,
-  toggleOrderCartDrawer,
   removeOrderCartItem,
   clearOrderCart
 } from './order-table';
@@ -29,7 +28,6 @@ win.filterItems = filterItems;
 win.onQtyChange = onQtyChange;
 win.calcBudget = calcBudget;
 win.renderOrderCartSummary = renderOrderCartSummary;
-win.toggleOrderCartDrawer = toggleOrderCartDrawer;
 win.removeOrderCartItem = removeOrderCartItem;
 win.clearOrderCart = clearOrderCart;
 win.reviewOrder = reviewOrder;

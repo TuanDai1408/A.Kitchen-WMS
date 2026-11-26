@@ -242,68 +242,58 @@ export function calcBudget(forcedBudget?: number, forcedDaDat?: number): void {
   renderOrderCartSummary();
 }
 
-let gOrderCartDrawerOpen = false;
-
-export function toggleOrderCartDrawer(forceState?: boolean): void {
-  const panel = document.getElementById('orderCartDrawerPanel');
-  const btn = document.getElementById('btnToggleOrderCartDrawer');
-  if (!panel) return;
-  gOrderCartDrawerOpen = typeof forceState === 'boolean' ? forceState : !gOrderCartDrawerOpen;
-  panel.classList.toggle('hidden', !gOrderCartDrawerOpen);
-  if (btn) {
-    btn.innerHTML = gOrderCartDrawerOpen
-      ? `<i data-lucide="chevron-down" class="w-3.5 h-3.5"></i><span>Thu gọn</span>`
-      : `<i data-lucide="chevron-up" class="w-3.5 h-3.5"></i><span>Xem chi tiết</span>`;
-  }
-  const w = typeof window !== 'undefined' ? (window as any) : {};
-  if (w.lucide && typeof w.lucide.createIcons === 'function') {
-    const card = document.getElementById('orderCartSummaryCard');
-    if (card) w.lucide.createIcons({ root: card });
-  }
-}
-
 export function renderOrderCartSummary(): void {
   const card = document.getElementById('orderCartSummaryCard');
+  const slip = document.getElementById('orderCartSelectedSlip');
   const tbody = document.getElementById('orderCartSummaryBody');
   const countEl = document.getElementById('orderCartItemCount');
+  const footerCountEl = document.getElementById('orderCartFooterCount');
   const qtyEl = document.getElementById('orderCartTotalQty');
   const amtEl = document.getElementById('orderCartTotalAmount');
+  const submitBtn = document.getElementById('btnSubmitPortalOrder') as HTMLButtonElement | null;
   if (!card || !tbody) return;
 
   const selected = getAppItems().filter(i => (Number(i.soLuongDat) || 0) > 0);
-  if (!selected.length) {
-    gOrderCartDrawerOpen = false;
-    document.getElementById('orderCartDrawerPanel')?.classList.add('hidden');
-    card.classList.add('hidden');
-    tbody.innerHTML = '';
-    return;
-  }
-
-  card.classList.remove('hidden');
   const totalQty = selected.reduce((s, it) => s + (Number(it.soLuongDat) || 0), 0);
   const totalAmt = selected.reduce((s, it) => s + ((Number(it.soLuongDat) || 0) * (Number(it.donGia) || 0)), 0);
 
   if (countEl) countEl.textContent = String(selected.length);
+  if (footerCountEl) footerCountEl.textContent = String(selected.length);
   if (qtyEl) qtyEl.textContent = String(Math.round(totalQty * 10) / 10);
   if (amtEl) amtEl.textContent = fmtVND(totalAmt);
+
+  if (!selected.length) {
+    slip?.classList.add('hidden');
+    tbody.innerHTML = '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    return;
+  }
+
+  slip?.classList.remove('hidden');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
 
   tbody.innerHTML = selected.map((it, idx) => {
     const qty = Number(it.soLuongDat) || 0;
     const price = Number(it.donGia) || 0;
     const lineAmt = qty * price;
     return `
-      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="py-2.5 px-3 text-center font-mono text-xs text-gray-400">${idx + 1}</td>
-        <td class="py-2.5 px-3">
-          <div class="text-xs font-semibold text-gray-900 dark:text-white leading-snug">${safeEscapeHtml(it.tenSP)}</div>
-          <div class="text-[11px] font-mono text-gray-400 mt-0.5">${safeEscapeHtml(it.maHang)} • ${fmtVND(price)}</div>
-        </td>
-        <td class="py-2.5 px-3 text-center text-xs text-gray-600 dark:text-gray-300">${safeEscapeHtml(it.dvt || '')}</td>
-        <td class="py-2.5 px-3 text-right font-mono text-xs font-bold text-brand-600 dark:text-brand-400">${qty}</td>
-        <td class="py-2.5 px-3 text-right font-mono text-xs font-bold text-gray-900 dark:text-white">${fmtVND(lineAmt)}</td>
-        <td class="py-2.5 px-3 text-center">
-          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
-            <i data-lucide="x" class="w-4 h-4"></i>
+      <tr class="hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors">
+        <td class="py-1.5 px-2.5 text-center font-mono text-gray-400">${idx + 1}</td>
+        <td class="py-1.5 px-2.5 font-mono font-bold text-gray-800 dark:text-gray-200 whitespace-nowrap">${safeEscapeHtml(it.maHang)}</td>
+        <td class="py-1.5 px-2.5 font-medium text-gray-900 dark:text-white">${safeEscapeHtml(it.tenSP)}</td>
+        <td class="py-1.5 px-2 text-center text-gray-600 dark:text-gray-300">${safeEscapeHtml(it.dvt || '')}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">${qty}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono text-gray-600 dark:text-gray-300 tabular-nums">${fmtVND(price)}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono font-bold text-brand-600 dark:text-brand-400 tabular-nums">${fmtVND(lineAmt)}</td>
+        <td class="py-1.5 px-2 text-center">
+          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
         </td>
       </tr>
