@@ -60,6 +60,65 @@ export function createPgClient(env) {
   });
 }
 
+// In-isolate concurrency limiter + retry for Supabase Session Pooler (pool_size: 15)
+const MAX_CONCURRENT_PG = 5;
+let _activePgClients = 0;
+const _pgWaitQueue = [];
+
+function acquirePgSlot() {
+  if (_activePgClients < MAX_CONCURRENT_PG) {
+    _activePgClients++;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => _pgWaitQueue.push(resolve));
+}
+
+function releasePgSlot() {
+  const next = _pgWaitQueue.shift();
+  if (next) {
+    next();
+  } else {
+    _activePgClients = Math.max(0, _activePgClients - 1);
+  }
+}
+
+function isPoolLimitError(err) {
+  const msg = String(err?.message || err || '').toLowerCase();
+  const code = String(err?.code || '').toUpperCase();
+  return (
+    code === 'EMAXCONNSESSION' ||
+    code === '53300' ||
+    msg.includes('max clients reached') ||
+    msg.includes('emaxconnsession') ||
+    msg.includes('too many clients')
+  );
+}
+
+async function runWithPgClient(env, fn) {
+  const maxAttempts = 5;
+  let lastErr = null;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await acquirePgSlot();
+    const client = createPgClient(env);
+    try {
+      await client.connect();
+      return await fn(client);
+    } catch (err) {
+      lastErr = err;
+      if (isPoolLimitError(err) && attempt < maxAttempts - 1) {
+        const delayMs = 80 * Math.pow(2, attempt) + Math.floor(Math.random() * 80);
+        await new Promise((r) => setTimeout(r, delayMs));
+        continue;
+      }
+      throw err;
+    } finally {
+      await client.end().catch(() => {});
+      releasePgSlot();
+    }
+  }
+  throw lastErr;
+}
+
 /**
  * Run a query returning an array of rows
  * @param {object} env
@@ -69,15 +128,11 @@ export function createPgClient(env) {
  */
 export async function query(env, sql, params = []) {
   if (isPg(env)) {
-    const client = createPgClient(env);
-    await client.connect();
-    try {
+    return await runWithPgClient(env, async (client) => {
       const targetSql = resolveSql(sql, true);
       const res = await client.query(targetSql, params);
       return { rows: res.rows || [] };
-    } finally {
-      await client.end().catch(() => {});
-    }
+    });
   } else {
     // D1
     const targetSql = resolveSql(sql, false);
@@ -109,9 +164,7 @@ export async function queryOne(env, sql, params = []) {
  */
 export async function exec(env, sql, params = []) {
   if (isPg(env)) {
-    const client = createPgClient(env);
-    await client.connect();
-    try {
+    return await runWithPgClient(env, async (client) => {
       const targetSql = resolveSql(sql, true);
       const res = await client.query(targetSql, params);
       return {
@@ -119,9 +172,7 @@ export async function exec(env, sql, params = []) {
         rows: res.rows || [],
         lastRowId: res.rows?.[0]?.id,
       };
-    } finally {
-      await client.end().catch(() => {});
-    }
+    });
   } else {
     // D1
     const targetSql = resolveSql(sql, false);
@@ -142,41 +193,39 @@ export async function exec(env, sql, params = []) {
  */
 export async function withTransaction(env, callback) {
   if (isPg(env)) {
-    const client = createPgClient(env);
-    await client.connect();
-    const tx = {
-      query: async (sql, params = []) => {
-        const targetSql = resolveSql(sql, true);
-        const res = await client.query(targetSql, params);
-        return { rows: res.rows || [] };
-      },
-      queryOne: async (sql, params = []) => {
-        const targetSql = resolveSql(sql, true);
-        const res = await client.query(targetSql, params);
-        return res.rows[0] || null;
-      },
-      exec: async (sql, params = []) => {
-        const targetSql = resolveSql(sql, true);
-        const res = await client.query(targetSql, params);
-        return {
-          rowCount: res.rowCount || 0,
-          rows: res.rows || [],
-          lastRowId: res.rows?.[0]?.id,
-        };
-      },
-    };
+    return await runWithPgClient(env, async (client) => {
+      const tx = {
+        query: async (sql, params = []) => {
+          const targetSql = resolveSql(sql, true);
+          const res = await client.query(targetSql, params);
+          return { rows: res.rows || [] };
+        },
+        queryOne: async (sql, params = []) => {
+          const targetSql = resolveSql(sql, true);
+          const res = await client.query(targetSql, params);
+          return res.rows[0] || null;
+        },
+        exec: async (sql, params = []) => {
+          const targetSql = resolveSql(sql, true);
+          const res = await client.query(targetSql, params);
+          return {
+            rowCount: res.rowCount || 0,
+            rows: res.rows || [],
+            lastRowId: res.rows?.[0]?.id,
+          };
+        },
+      };
 
-    try {
-      await client.query('BEGIN');
-      const result = await callback(tx);
-      await client.query('COMMIT');
-      return result;
-    } catch (err) {
-      await client.query('ROLLBACK').catch(() => {});
-      throw err;
-    } finally {
-      await client.end().catch(() => {});
-    }
+      try {
+        await client.query('BEGIN');
+        const result = await callback(tx);
+        await client.query('COMMIT');
+        return result;
+      } catch (err) {
+        await client.query('ROLLBACK').catch(() => {});
+        throw err;
+      }
+    });
   } else {
     // D1
     const tx = {

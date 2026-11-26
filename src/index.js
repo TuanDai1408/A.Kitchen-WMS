@@ -358,7 +358,9 @@ async function ensureUserPermissionsTable(env) {
   }
 }
 
+let _tabVisEnsured = false;
 async function ensureSystemTabVisibilityTable(env) {
+  if (_tabVisEnsured) return;
   const isPostgres = db.isPg(env);
   const timeType = isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
   try {
@@ -378,6 +380,7 @@ async function ensureSystemTabVisibilityTable(env) {
         updated_at ${timeType}
       )
     `);
+    _tabVisEnsured = true;
   } catch (err) {
     console.error('ensureSystemTabVisibilityTable error:', err);
   }
