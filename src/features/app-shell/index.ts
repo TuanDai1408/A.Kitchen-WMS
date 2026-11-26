@@ -76,6 +76,9 @@ import {
   gFnbBlindCount,
   switchTab,
   onGlobalMonthChange,
+  onGlobalDateRangeChange,
+  getGlobalDateRange,
+  initGlobalDateRangePicker,
   onGlobalBranchChange,
   populateSitesFor,
   onSelectVung,
@@ -160,6 +163,9 @@ if (typeof window !== 'undefined') {
   w.gFnbBlindCount = gFnbBlindCount;
   w.switchTab = switchTab;
   w.onGlobalMonthChange = onGlobalMonthChange;
+  w.onGlobalDateRangeChange = onGlobalDateRangeChange;
+  w.getGlobalDateRange = getGlobalDateRange;
+  w.initGlobalDateRangePicker = initGlobalDateRangePicker;
   w.onGlobalBranchChange = onGlobalBranchChange;
   w.populateSitesFor = populateSitesFor;
   w.onSelectVung = onSelectVung;

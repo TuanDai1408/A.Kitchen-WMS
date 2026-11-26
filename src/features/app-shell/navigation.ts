@@ -193,6 +193,112 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
   }
 }
 
+declare const flatpickr: any;
+
+function formatIsoDate(dt: Date): string {
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const d = String(dt.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function getDefaultTwoMonthRange(): { startDate: string; endDate: string } {
+  const end = new Date();
+  const start = new Date(end.getFullYear(), end.getMonth() - 2, end.getDate());
+  return { startDate: formatIsoDate(start), endDate: formatIsoDate(end) };
+}
+
+let gGlobalDateRange = getDefaultTwoMonthRange();
+let gDateFetchInterceptorInstalled = false;
+
+export function getGlobalDateRange(): { startDate: string; endDate: string; month: string } {
+  return {
+    startDate: gGlobalDateRange.startDate,
+    endDate: gGlobalDateRange.endDate,
+    month: gGlobalDateRange.endDate.slice(0, 7)
+  };
+}
+
+export function installGlobalDateRangeFetchInterceptor(): void {
+  if (typeof window === 'undefined' || gDateFetchInterceptorInstalled) return;
+  gDateFetchInterceptorInstalled = true;
+  const origFetch = window.fetch.bind(window);
+  const TARGET_PATHS = [
+    '/api/fnb/counts',
+    '/api/fnb/receipts',
+    '/api/fnb/wastes',
+    '/api/fnb/kitchen-issues',
+    '/api/fnb/po-list',
+    '/api/leadtime',
+    '/api/orders',
+    '/api/vouchers',
+    '/api/audit-logs',
+    '/api/system/deleted-records'
+  ];
+
+  window.fetch = function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    try {
+      const method = (init?.method || (typeof input !== 'string' && !(input instanceof URL) ? input.method : 'GET') || 'GET').toUpperCase();
+      if (method === 'GET' && typeof input === 'string' && input.startsWith('/api/')) {
+        const urlObj = new URL(input, window.location.origin);
+        if (TARGET_PATHS.includes(urlObj.pathname)) {
+          if (!urlObj.searchParams.has('start_date') && !urlObj.searchParams.has('end_date')) {
+            urlObj.searchParams.set('start_date', gGlobalDateRange.startDate);
+            urlObj.searchParams.set('end_date', gGlobalDateRange.endDate);
+          }
+          return origFetch(urlObj.pathname + urlObj.search, init);
+        }
+      }
+    } catch (_) {}
+    return origFetch(input, init);
+  };
+}
+installGlobalDateRangeFetchInterceptor();
+
+export function initGlobalDateRangePicker(): void {
+  installGlobalDateRangeFetchInterceptor();
+  const el = document.getElementById('globalDateRangePicker') as HTMLInputElement | null;
+  if (!el || typeof flatpickr === 'undefined') return;
+
+  const [sy, sm, sd] = gGlobalDateRange.startDate.split('-').map(Number);
+  const [ey, em, ed] = gGlobalDateRange.endDate.split('-').map(Number);
+  const startDt = new Date(sy, (sm || 1) - 1, sd || 1);
+  const endDt = new Date(ey, (em || 1) - 1, ed || 1);
+
+  const hiddenMonth = document.getElementById('globalMonthPicker') as HTMLInputElement | null;
+  if (hiddenMonth) hiddenMonth.value = gGlobalDateRange.endDate.slice(0, 7);
+
+  flatpickr(el, {
+    mode: 'range',
+    dateFormat: 'd/m/Y',
+    defaultDate: [startDt, endDt],
+    locale: (flatpickr.l10ns && flatpickr.l10ns.vn) ? flatpickr.l10ns.vn : ((flatpickr.l1ons && flatpickr.l1ons.vn) ? flatpickr.l1ons.vn : 'default'),
+    onChange: (selectedDates: Date[]) => {
+      if (selectedDates && selectedDates.length === 2) {
+        const sIso = formatIsoDate(selectedDates[0]);
+        const eIso = formatIsoDate(selectedDates[1]);
+        onGlobalDateRangeChange(sIso, eIso);
+      }
+    }
+  });
+}
+
+export function onGlobalDateRangeChange(startIso: string, endIso: string): void {
+  if (!startIso || !endIso) return;
+  gGlobalDateRange = { startDate: startIso, endDate: endIso };
+  const monthVal = endIso.slice(0, 7);
+  const hiddenMonth = document.getElementById('globalMonthPicker') as HTMLInputElement | null;
+  if (hiddenMonth) hiddenMonth.value = monthVal;
+  onGlobalMonthChange(monthVal);
+
+  invalidateTabCache();
+  const activeTab = localStorage.getItem('orbit_active_tab') || 'wh-dashboard';
+  const w = typeof window !== 'undefined' ? (window as any) : {};
+  if (typeof w.switchTab === 'function') {
+    w.switchTab(activeTab, undefined, true);
+  }
+}
+
 export function onGlobalMonthChange(val: string): void {
   const orderMonthEl = document.getElementById('orderMonth') as HTMLInputElement | null;
   if (orderMonthEl) orderMonthEl.value = val;
@@ -482,6 +588,7 @@ export async function initSystem(): Promise<void> {
       }
     }
 
+    initGlobalDateRangePicker();
     const w = typeof window !== 'undefined' ? (window as any) : {};
     if (typeof w.loadDashboardSummary === 'function') {
       await w.loadDashboardSummary();

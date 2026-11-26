@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1430">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1440">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1430"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1440"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -496,14 +496,17 @@
           <select id="globalBranchSelect" onchange="onGlobalBranchChange(this.value);" class="hidden"></select>
         </div>
 
-        <!-- Global Month Picker (Hiển thị nhãn Tiếng Việt "Tháng MM/YYYY") -->
-        <div class="hidden md:flex items-center relative shrink-0">
-          <button type="button" onclick="const p = document.getElementById('globalMonthPicker'); if (p.showPicker) p.showPicker(); else p.click();" class="header-control px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium flex items-center gap-2 shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
-            <i data-lucide="calendar" class="w-4 h-4 text-gray-400 shrink-0"></i>
-            <span id="currentDateDisplay" class="hidden 2xl:inline text-xs text-gray-500 dark:text-gray-400"></span>
-            <span id="globalMonthDisplay" class="text-sm font-medium text-gray-800 dark:text-gray-200">Tháng 11/2026</span>
-          </button>
-          <input type="month" id="globalMonthPicker" value="2026-11" onchange="if (typeof updateGlobalMonthLabel === 'function') updateGlobalMonthLabel(this.value); onGlobalMonthChange(this.value);" class="sr-only">
+        <!-- Global Date Range Picker (Mặc định 2 tháng gần nhất để tối ưu hiệu suất) -->
+        <div class="hidden md:flex items-center relative shrink-0" title="Chọn khoảng thời gian lọc dữ liệu toàn hệ thống (mặc định 2 tháng gần nhất)">
+          <i data-lucide="calendar" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10"></i>
+          <input
+            type="text"
+            id="globalDateRangePicker"
+            placeholder="2 tháng gần nhất..."
+            class="header-control pl-9 pr-3 w-56 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-mono font-medium shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors cursor-pointer outline-none focus:border-brand-500"
+            readonly
+          />
+          <input type="hidden" id="globalMonthPicker" value="2026-11">
         </div>
 
         <!-- Admin Pending Requests Button (Visible for Admin) -->

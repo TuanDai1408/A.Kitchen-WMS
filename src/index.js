@@ -448,6 +448,18 @@ function invalidateSystemConfigCache() {
   _systemConfigCacheAt = 0;
 }
 
+function resolveDateRange(searchParams, defaultMonths = 2) {
+  const s = (searchParams.get('start_date') || '').trim().slice(0, 10);
+  const e = (searchParams.get('end_date') || '').trim().slice(0, 10);
+  if (s && e && /^\d{4}-\d{2}-\d{2}$/.test(s) && /^\d{4}-\d{2}-\d{2}$/.test(e)) {
+    return { startDate: s, endDate: e };
+  }
+  const end = new Date();
+  const start = new Date(end.getFullYear(), end.getMonth() - defaultMonths, end.getDate());
+  const fmt = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+  return { startDate: fmt(start), endDate: fmt(end) };
+}
+
 async function ensureSystemSettingsTable(env) {
   if (_systemSettingsEnsured) return;
   const isPostgres = db.isPg(env);
@@ -1763,6 +1775,7 @@ export default {
             }
           }
         }
+        const { startDate, endDate } = resolveDateRange(searchParams, 2);
 
         const query = {
           d1: `
@@ -1803,7 +1816,10 @@ export default {
               ROUND(SUM(CAST(po.order_qty AS NUMERIC) * CAST(po.net_price AS NUMERIC)), 0) as total_amount
             FROM sap_po_items po
             WHERE (? = '' OR UPPER(po.site) = ?)
-              AND (? = '' OR SUBSTR(po.doc_date, 1, 7) = ?)
+              AND (
+                (? <> '' AND SUBSTR(po.doc_date, 1, 7) = ?)
+                OR (? = '' AND SUBSTR(CAST(po.doc_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(po.doc_date AS TEXT), 1, 10) <= ?)
+              )
             GROUP BY po.po_number, po.site, po.supplier_name
             ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
             LIMIT 100
@@ -1847,15 +1863,18 @@ export default {
               ROUND(SUM(po.order_qty::numeric * po.net_price::numeric)::numeric, 0) as total_amount
             FROM sap_po_items po
             WHERE ($1 = '' OR UPPER(po.site) = $1)
-              AND ($2 = '' OR TO_CHAR(po.doc_date, 'YYYY-MM') = $2)
+              AND (
+                ($2 <> '' AND TO_CHAR(po.doc_date, 'YYYY-MM') = $2)
+                OR ($2 = '' AND TO_CHAR(po.doc_date, 'YYYY-MM-DD') >= $3 AND TO_CHAR(po.doc_date, 'YYYY-MM-DD') <= $4)
+              )
             GROUP BY po.po_number, po.site, po.supplier_name
             ORDER BY MIN(po.doc_date) DESC, po.po_number DESC
             LIMIT 100
           `
         };
         const queryParams = db.isPg(env) 
-          ? [siteParam, monthParam] 
-          : [siteParam, siteParam, monthParam, monthParam];
+          ? [siteParam, monthParam, startDate, endDate] 
+          : [siteParam, siteParam, monthParam, monthParam, monthParam, startDate, endDate];
         const { rows: results } = await db.query(env, query, queryParams);
         return new Response(JSON.stringify({ success: true, data: results }), { headers: corsHeaders });
       }
@@ -6213,13 +6232,14 @@ export default {
       if ((pathname === '/api/fnb/counts' || pathname === '/fnb/counts')) {
         if (request.method === 'GET') {
           const siteCode = searchParams.get('site_code');
-          let q = `SELECT * FROM fnb_stock_counts`;
-          let b = [];
+          const { startDate, endDate } = resolveDateRange(searchParams, 2);
+          let q = `SELECT * FROM fnb_stock_counts WHERE SUBSTR(CAST(count_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(count_date AS TEXT), 1, 10) <= ?`;
+          let b = [startDate, endDate];
           if (siteCode && siteCode !== 'all') {
-            q += ` WHERE site_code = ?`;
+            q += ` AND site_code = ?`;
             b.push(siteCode);
           }
-          q += ` ORDER BY count_date DESC, id DESC LIMIT 50`;
+          q += ` ORDER BY count_date DESC, id DESC LIMIT 100`;
           const { rows: counts } = await db.query(env, q, b);
 
           // Lấy chi tiết các dòng nếu cần
@@ -6501,6 +6521,7 @@ export default {
         const siteCode = searchParams.get('site_code');
         const search = searchParams.get('search') || '';
         const status = searchParams.get('status') || '';
+        const { startDate, endDate } = resolveDateRange(searchParams, 2);
         
         let q = `
           SELECT 
@@ -6514,9 +6535,9 @@ export default {
             SUM(order_qty * net_price) as total_amount,
             status
           FROM wms.sap_po_items
-          WHERE 1=1
+          WHERE SUBSTR(CAST(doc_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(doc_date AS TEXT), 1, 10) <= ?
         `;
-        const params = [];
+        const params = [startDate, endDate];
         if (siteCode && siteCode !== 'all') {
           q += ` AND site = ?`;
           params.push(siteCode.toUpperCase());
@@ -6738,13 +6759,14 @@ export default {
 
         if (request.method === 'GET') {
           const siteCode = searchParams.get('site_code');
-          let q = `SELECT * FROM fnb_stock_receipts`;
-          let b = [];
+          const { startDate, endDate } = resolveDateRange(searchParams, 2);
+          let q = `SELECT * FROM fnb_stock_receipts WHERE SUBSTR(CAST(receipt_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(receipt_date AS TEXT), 1, 10) <= ?`;
+          let b = [startDate, endDate];
           if (siteCode && siteCode !== 'all') {
-            q += ` WHERE site_code = ?`;
+            q += ` AND site_code = ?`;
             b.push(siteCode);
           }
-          q += ` ORDER BY receipt_date DESC, id DESC LIMIT 50`;
+          q += ` ORDER BY receipt_date DESC, id DESC LIMIT 100`;
           const { rows: receipts } = await db.query(env, q, b);
 
           const receiptId = searchParams.get('id');
@@ -7269,13 +7291,14 @@ export default {
       if ((pathname === '/api/fnb/wastes' || pathname === '/fnb/wastes')) {
         if (request.method === 'GET') {
           const siteCode = searchParams.get('site_code');
-          let q = `SELECT * FROM fnb_stock_wastes`;
-          let b = [];
+          const { startDate, endDate } = resolveDateRange(searchParams, 2);
+          let q = `SELECT * FROM fnb_stock_wastes WHERE SUBSTR(CAST(waste_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(waste_date AS TEXT), 1, 10) <= ?`;
+          let b = [startDate, endDate];
           if (siteCode && siteCode !== 'all') {
-            q += ` WHERE site_code = ?`;
+            q += ` AND site_code = ?`;
             b.push(siteCode);
           }
-          q += ` ORDER BY waste_date DESC, id DESC LIMIT 50`;
+          q += ` ORDER BY waste_date DESC, id DESC LIMIT 100`;
           const { rows: wastes } = await db.query(env, q, b);
 
           const wasteId = searchParams.get('id');
@@ -7733,10 +7756,11 @@ export default {
             }), { headers: corsHeaders });
           }
 
-          let q = `SELECT * FROM fnb_kitchen_issues`;
-          let b = [];
+          const { startDate, endDate } = resolveDateRange(searchParams, 2);
+          let q = `SELECT * FROM fnb_kitchen_issues WHERE SUBSTR(CAST(issue_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(issue_date AS TEXT), 1, 10) <= ?`;
+          let b = [startDate, endDate];
           if (siteCode && siteCode !== 'all') {
-            q += ` WHERE UPPER(site_code) = UPPER(?)`;
+            q += ` AND UPPER(site_code) = UPPER(?)`;
             b.push(siteCode);
           }
           q += ` ORDER BY issue_date DESC, id DESC LIMIT 100`;
