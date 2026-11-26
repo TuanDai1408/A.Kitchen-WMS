@@ -152,10 +152,12 @@ export function recalculateWasteModalTotal(): void {
 }
 
 export async function submitCreateWaste(): Promise<void> {
+  if (!assertPermission('fnb-waste', 'create', 'tạo biên bản hủy hàng')) return;
   const container = document.getElementById('wasteLinesContainer');
   if (!container) return;
 
-  const lines: any[] = [];
+  const lineMap = new Map<string, any>();
+  const defaultReason = (document.getElementById('wasteModalReason') as HTMLSelectElement | null)?.value || 'Hàng hỏng / rách';
   container.querySelectorAll('.p-3').forEach(row => {
     const sel = row.querySelector('select');
     const itemCode = sel?.value;
@@ -165,15 +167,21 @@ export async function submitCreateWaste(): Promise<void> {
     const qty = parseFloat(qtyInput?.value || '0') || 0;
 
     if (itemCode && qty > 0) {
-      lines.push({
-        item_code: itemCode,
-        qty: qty,
-        unit_price: price,
-        reason_detail: (document.getElementById('wasteModalReason') as HTMLSelectElement | null)?.value || 'Hàng hỏng / rách',
-        note: ''
-      });
+      const existing = lineMap.get(itemCode);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        lineMap.set(itemCode, {
+          item_code: itemCode,
+          qty: qty,
+          unit_price: price,
+          reason_detail: defaultReason,
+          note: ''
+        });
+      }
     }
   });
+  const lines: any[] = Array.from(lineMap.values());
 
   if (!lines.length) {
     if (typeof window.showToast === 'function') window.showToast('Vui lòng chọn mặt hàng và nhập số lượng hủy > 0!');

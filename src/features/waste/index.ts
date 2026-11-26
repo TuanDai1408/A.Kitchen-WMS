@@ -62,12 +62,20 @@ export async function loadFnbWaste(): Promise<void> {
     const res = await fetch(`/api/fnb/stock/items-for-site?site_code=${encodeURIComponent(siteCode)}&in_stock_only=1&no-cache=1`);
     const json = await res.json();
     if (json.success && json.data) {
-      window.gFnbWasteStockItems = (json.data.items || []).map((i: any) => ({
-        ...i,
-        wasteQty: 0,
-        wasteReason: 'Hàng hỏng / ôi thiu không đạt chuẩn',
-        wasteNote: ''
-      }));
+      const seenCodes = new Set<string>();
+      window.gFnbWasteStockItems = (json.data.items || [])
+        .filter((i: any) => {
+          const code = String(i.code || '').trim();
+          if (!code || seenCodes.has(code)) return false;
+          seenCodes.add(code);
+          return true;
+        })
+        .map((i: any) => ({
+          ...i,
+          wasteQty: 0,
+          wasteReason: 'Hàng hỏng / ôi thiu không đạt chuẩn',
+          wasteNote: ''
+        }));
     } else {
       window.gFnbWasteStockItems = [];
     }

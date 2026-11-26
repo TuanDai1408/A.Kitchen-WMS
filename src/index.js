@@ -5183,7 +5183,11 @@ export default {
                      COALESCE(d.entry_unit, i.unit, '') as unit, 
                      COALESCE(d.nhom_hang, d.nganh_hang, i.item_group, '') as item_group
               FROM fnb_stock_count_lines l
-              LEFT JOIN dim_article_stock d ON l.item_code = d.material
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit
+                FROM dim_article_stock
+                GROUP BY material
+              ) d ON l.item_code = d.material
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.count_id = ?
             `, [countId]);
@@ -5544,7 +5548,11 @@ export default {
                      COALESCE(d.material_desc, p.article_desc, i.name, l.item_code) as item_name,
                      COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit
               FROM fnb_stock_receipt_lines l
-              LEFT JOIN dim_article_stock d ON l.item_code = d.material
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit
+                FROM dim_article_stock
+                GROUP BY material
+              ) d ON l.item_code = d.material
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, order_unit FROM sap_po_items) p ON l.item_code = p.article
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.receipt_id = ?
@@ -6128,7 +6136,11 @@ export default {
                      COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit, 
                      COALESCE(d.nhom_hang, p.merch_category, i.item_group, 'Chưa phân loại') as item_group
               FROM fnb_stock_waste_lines l
-              LEFT JOIN dim_article_stock d ON l.item_code = d.material
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit
+                FROM dim_article_stock
+                GROUP BY material
+              ) d ON l.item_code = d.material
               LEFT JOIN (SELECT DISTINCT ON (article) article, article_desc, merch_category, order_unit, net_price FROM sap_po_items) p ON l.item_code = p.article
               LEFT JOIN fnb_stock_items i ON l.item_code = i.code
               WHERE l.waste_id = ?
