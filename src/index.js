@@ -6200,10 +6200,10 @@ export default {
               UPDATE fnb_stock_balances
               SET waste_qty = GREATEST(0, COALESCE(waste_qty, 0) - ?),
                   book_qty = COALESCE(book_qty, 0) + ?,
-                  total_value = (COALESCE(book_qty, 0) + ?) * ?,
+                  total_value = CASE WHEN ? > 0 THEN (COALESCE(book_qty, 0) + ?) * ? ELSE COALESCE(total_value, 0) END,
                   updated_at = NOW()
               WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
-            `, [oldQty, oldQty, oldQty, oldPrice, oldLine.item_code, siteCode]);
+            `, [oldQty, oldQty, oldPrice, oldQty, oldPrice, oldLine.item_code, siteCode]);
 
             if (brId) {
               try {
@@ -6365,7 +6365,7 @@ export default {
             const pWaste = caller.permissions['fnb-waste'];
             const canDel = pWaste && pWaste.canDelete;
             if (!canDel) {
-              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Xóa biên bản hủy hàng' }), { status: 403, headers: corsHeaders });
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Hủy biên bản hủy hàng' }), { status: 403, headers: corsHeaders });
             }
           }
 
@@ -6399,11 +6399,11 @@ export default {
 
             return new Response(JSON.stringify({
               success: true,
-              message: `Đã xóa biên bản hủy ${existingWaste.waste_code} và hoàn trả tồn kho!`
+              message: `Đã hủy phiếu ${existingWaste.waste_code} và hoàn trả tồn kho!`
             }), { headers: corsHeaders });
           } catch (e) {
             console.error('Delete waste error:', e);
-            return new Response(JSON.stringify({ success: false, error: 'Lỗi xóa biên bản hủy: ' + e.message }), { headers: corsHeaders, status: 500 });
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi hủy phiếu: ' + e.message }), { headers: corsHeaders, status: 500 });
           }
         }
       }

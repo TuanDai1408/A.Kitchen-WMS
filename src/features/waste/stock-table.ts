@@ -2,6 +2,7 @@ import { escapeHtml, formatCompactVND } from '@/ts/utils/formatters';
 import { getActiveFnbWasteSite } from './helpers';
 import { switchFnbWasteSubView } from './history';
 import type { FnbWasteStockItem } from './types';
+import { assertPermission } from '@/features/auth';
 
 declare const window: any;
 
@@ -341,6 +342,7 @@ export function updateWasteKPIs(): void {
 }
 
 export async function submitDirectWaste(): Promise<void> {
+  if (!assertPermission('fnb-waste', 'create', 'tạo biên bản hủy hàng')) return;
   const allItems: FnbWasteStockItem[] = window.gFnbWasteStockItems || [];
   const validLines = allItems.filter(i => (i.wasteQty || 0) > 0);
 

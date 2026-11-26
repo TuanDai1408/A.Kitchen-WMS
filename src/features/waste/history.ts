@@ -90,8 +90,8 @@ export async function loadFnbWasteHistory(siteCodeArg?: string): Promise<void> {
                     </button>
                   ` : ''}
                   ${canDelete ? `
-                    <button type="button" onclick="confirmDeleteWaste(${w.id}, '${escapeHtml(w.waste_code)}')" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 transition-colors" title="Xóa biên bản hủy">
-                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <button type="button" onclick="confirmDeleteWaste(${w.id}, '${escapeHtml(w.waste_code)}')" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 transition-colors" title="Hủy phiếu">
+                      <i data-lucide="x-circle" class="w-4 h-4"></i>
                     </button>
                   ` : ''}
                 </div>
@@ -124,7 +124,7 @@ export async function loadFnbWasteHistory(siteCodeArg?: string): Promise<void> {
                   <button type="button" onclick="openEditWasteModal(${w.id})" class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-xs">Sửa</button>
                 ` : ''}
                 ${canDelete ? `
-                  <button type="button" onclick="confirmDeleteWaste(${w.id}, '${escapeHtml(w.waste_code)}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs">Xóa</button>
+                  <button type="button" onclick="confirmDeleteWaste(${w.id}, '${escapeHtml(w.waste_code)}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs">Hủy phiếu</button>
                 ` : ''}
               </div>
             </div>
@@ -368,7 +368,7 @@ export async function saveEditWaste(): Promise<void> {
 }
 
 export function confirmDeleteWaste(wasteId: number | string, wasteCode: string): void {
-  if (!assertPermission('fnb-waste', 'delete', 'xóa biên bản hủy hàng')) return;
+  if (!assertPermission('fnb-waste', 'delete', 'hủy biên bản hủy hàng')) return;
   _pendingDeleteWaste = { id: wasteId, code: wasteCode || `#${wasteId}` };
   const codeEl = document.getElementById('confirmDeleteWasteCode');
   if (codeEl) codeEl.textContent = _pendingDeleteWaste.code;
@@ -382,7 +382,7 @@ export function closeDeleteWasteModal(): void {
 }
 
 export async function executeDeleteWaste(): Promise<void> {
-  if (!assertPermission('fnb-waste', 'delete', 'xóa biên bản hủy hàng')) return;
+  if (!assertPermission('fnb-waste', 'delete', 'hủy biên bản hủy hàng')) return;
   if (!_pendingDeleteWaste) return;
 
   const { id } = _pendingDeleteWaste;
@@ -390,23 +390,23 @@ export async function executeDeleteWaste(): Promise<void> {
   if (btn) btn.disabled = true;
 
   try {
-    if (typeof window.showLoading === 'function') window.showLoading('Đang xóa biên bản hủy & hoàn trả tồn kho...');
+    if (typeof window.showLoading === 'function') window.showLoading('Đang hủy phiếu & hoàn trả tồn kho...');
     const res = await fetch(`/api/fnb/wastes?id=${encodeURIComponent(String(id))}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
     });
     const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'Xóa thất bại');
+    if (!json.success) throw new Error(json.error || 'Hủy phiếu thất bại');
 
-    if (typeof window.showToast === 'function') window.showToast(json.message || 'Đã xóa biên bản hủy!', 'success');
+    if (typeof window.showToast === 'function') window.showToast(json.message || 'Đã hủy phiếu thành công!', 'success');
     closeDeleteWasteModal();
     await loadFnbWasteHistory();
     if (typeof window.loadFnbWaste === 'function') window.loadFnbWaste();
     if (typeof window.loadStockFEFO === 'function') window.loadStockFEFO();
     if (typeof window.loadWhInventory === 'function') window.loadWhInventory();
   } catch (e: any) {
-    if (typeof window.showToast === 'function') window.showToast('Lỗi xóa biên bản: ' + e.message, 'error');
+    if (typeof window.showToast === 'function') window.showToast('Lỗi hủy phiếu: ' + e.message, 'error');
   } finally {
     if (btn) btn.disabled = false;
     if (typeof window.hideLoading === 'function') window.hideLoading();

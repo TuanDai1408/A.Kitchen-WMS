@@ -1,10 +1,12 @@
 import { escapeHtml } from '@/ts/utils/formatters';
 import { getActiveFnbWasteSite } from './helpers';
 import { switchFnbWasteSubView } from './history';
+import { assertPermission } from '@/features/auth';
 
 declare const window: any;
 
 export async function openCreateWasteModal(): Promise<void> {
+  if (!assertPermission('fnb-waste', 'create', 'tạo biên bản hủy hàng')) return;
   const modal = document.getElementById('createWasteModal');
   const siteCode = getActiveFnbWasteSite();
   const siteSel = document.getElementById('wasteModalSite') as HTMLSelectElement | null;
