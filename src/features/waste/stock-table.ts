@@ -358,18 +358,25 @@ export function updateWasteKPIs(): void {
   if (bottomBtnText) bottomBtnText.textContent = `Xác nhận tạo biên bản hủy (${selectedCount})`;
 
   if (slipList) {
-    slipList.innerHTML = selectedItems.map(i => {
-      const lineAmt = (Number(i.wasteQty) || 0) * (Number(i.unit_price) || 0);
+    slipList.innerHTML = selectedItems.map((i, idx) => {
+      const uPrice = Number(i.unit_price) || 0;
+      const lineAmt = (Number(i.wasteQty) || 0) * uPrice;
       return `
-        <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-gray-900 border border-rose-200/70 dark:border-rose-800/60 text-xs">
-          <div class="min-w-0">
-            <div class="font-bold text-gray-900 dark:text-white truncate">${escapeHtml(i.name || i.code)}</div>
-            <div class="text-[11px] font-mono text-gray-500">${escapeHtml(i.code)} • <b class="text-rose-600">${Number(i.wasteQty).toLocaleString('vi-VN')} ${escapeHtml(i.unit || '')}</b> • ${Math.round(lineAmt).toLocaleString('vi-VN')} ₫</div>
-          </div>
-          <button type="button" onclick="removeDirectWasteLine('${escapeHtml(i.code)}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 shrink-0" title="Bỏ mặt hàng này">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
+        <tr class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors">
+          <td class="py-1.5 px-2.5 text-center font-mono text-gray-400">${idx + 1}</td>
+          <td class="py-1.5 px-2.5 font-mono font-semibold text-rose-600 dark:text-rose-400 whitespace-nowrap">${escapeHtml(i.code)}</td>
+          <td class="py-1.5 px-2.5 font-semibold text-gray-900 dark:text-white max-w-[200px] truncate">${escapeHtml(i.name || i.code)}</td>
+          <td class="py-1.5 px-2 text-center text-gray-500">${escapeHtml(i.unit || '')}</td>
+          <td class="py-1.5 px-2.5 text-right font-mono font-bold text-rose-600 dark:text-rose-400">${Number(i.wasteQty).toLocaleString('vi-VN')}</td>
+          <td class="py-1.5 px-2.5 text-right font-mono text-gray-500">${Math.round(uPrice).toLocaleString('vi-VN')} ₫</td>
+          <td class="py-1.5 px-2.5 text-right font-mono font-bold text-gray-900 dark:text-white">${Math.round(lineAmt).toLocaleString('vi-VN')} ₫</td>
+          <td class="py-1.5 px-2.5 hidden sm:table-cell text-gray-500 truncate max-w-[160px]">${escapeHtml(i.wasteReason || 'Hàng hỏng')}</td>
+          <td class="py-1.5 px-2 text-center">
+            <button type="button" onclick="removeDirectWasteLine('${escapeHtml(i.code)}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="Bỏ mặt hàng này">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
       `;
     }).join('');
     if (window.lucide) window.lucide.createIcons();

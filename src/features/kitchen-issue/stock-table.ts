@@ -281,16 +281,21 @@ export function updateKitchenIssueKPIs(): void {
   if (slipWrap) slipWrap.classList.toggle('hidden', countItems === 0);
   if (slipCount) slipCount.textContent = String(countItems);
   if (slipList) {
-    slipList.innerHTML = selectedList.map(l => `
-      <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-gray-900 border border-emerald-200/70 dark:border-emerald-800/60 text-xs">
-        <div class="min-w-0">
-          <div class="font-bold text-gray-900 dark:text-white truncate">${l.item_name}</div>
-          <div class="text-[11px] font-mono text-gray-500">${l.item_code} • <b class="text-emerald-600">${formatNumber(l.qty)} ${l.unit}</b> • ${formatVND(l.amount)}</div>
-        </div>
-        <button type="button" onclick="removeKitchenSelectedLine('${l.item_code}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 shrink-0" title="Bỏ mặt hàng này">
-          <i data-lucide="x" class="w-3.5 h-3.5"></i>
-        </button>
-      </div>
+    slipList.innerHTML = selectedList.map((l, idx) => `
+      <tr class="hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors">
+        <td class="py-1.5 px-2.5 text-center font-mono text-gray-400">${idx + 1}</td>
+        <td class="py-1.5 px-2.5 font-mono font-semibold text-brand-600 dark:text-brand-400 whitespace-nowrap">${l.item_code}</td>
+        <td class="py-1.5 px-2.5 font-semibold text-gray-900 dark:text-white max-w-[200px] truncate">${l.item_name}</td>
+        <td class="py-1.5 px-2 text-center text-gray-500">${l.unit}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">${formatNumber(l.qty)}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono text-gray-500">${formatVND(l.unit_price)}</td>
+        <td class="py-1.5 px-2.5 text-right font-mono font-bold text-gray-900 dark:text-white">${formatVND(l.amount)}</td>
+        <td class="py-1.5 px-2 text-center">
+          <button type="button" onclick="removeKitchenSelectedLine('${l.item_code}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="Bỏ mặt hàng này">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </td>
+      </tr>
     `).join('');
     if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
   }
