@@ -1986,6 +1986,357 @@ export default {
         }), { headers: corsHeaders });
       }
 
+      // 1.10.1 QUẢN LÝ LÔ HÀNG (CRUD ĐỒNG BỘ XUẤT NHẬP KHO & AUDIT LOGS): /api/wh/batches
+      if (pathname === '/api/wh/batches') {
+        const isPg = db.isPg(env);
+        const safeTxStep = async (tx, fn) => {
+          if (!isPg) {
+            try { return await fn(); } catch (_) { return null; }
+          }
+          const sp = 'sp_' + Math.random().toString(36).slice(2, 10);
+          await tx.exec(`SAVEPOINT ${sp}`);
+          try {
+            const res = await fn();
+            await tx.exec(`RELEASE SAVEPOINT ${sp}`);
+            return res;
+          } catch (err) {
+            await tx.exec(`ROLLBACK TO SAVEPOINT ${sp}`).catch(() => {});
+            await tx.exec(`RELEASE SAVEPOINT ${sp}`).catch(() => {});
+            return null;
+          }
+        };
+
+        if (request.method === 'GET') {
+          try {
+            const siteParam = (searchParams.get('branch') || searchParams.get('site') || 'ALL').trim().toUpperCase();
+            const search = (searchParams.get('search') || '').trim().toLowerCase();
+
+            let q = `
+              SELECT
+                b.id::text as id,
+                b.sku,
+                b.branch_id,
+                UPPER(COALESCE(br.code, b.branch_id)) as branch_code,
+                COALESCE(br.name, b.branch_id) as branch_name,
+                b.batch_code,
+                b.mfg_date::text as mfg_date,
+                b.exp_date::text as exp_date,
+                b.qty,
+                COALESCE(b.storage_loc, 'Kệ Bếp') as storage_loc,
+                b.created_at,
+                COALESCE(d.material_desc, p.article_desc, i.name, b.sku) as item_name,
+                COALESCE(d.entry_unit, p.order_unit, i.unit, 'Phần') as unit,
+                COALESCE(d.nhom_hang, p.merch_category, i.category, 'Hàng hóa') as category,
+                COALESCE(NULLIF(d.price, 0), NULLIF(p.net_price, 0), 0) as unit_price
+              FROM inventory_batches b
+              LEFT JOIN branches br ON b.branch_id = br.id OR UPPER(br.code) = UPPER(b.branch_id)
+              LEFT JOIN (
+                SELECT material, MAX(material_desc) as material_desc, MAX(nhom_hang) as nhom_hang, MAX(entry_unit) as entry_unit, MAX(price) as price
+                FROM dim_article_stock GROUP BY material
+              ) d ON b.sku = d.material
+              LEFT JOIN (
+                SELECT article, MAX(article_desc) as article_desc, MAX(merch_category) as merch_category, MAX(order_unit) as order_unit, MAX(net_price) as net_price
+                FROM sap_po_items GROUP BY article
+              ) p ON b.sku = p.article
+              LEFT JOIN items i ON b.sku = i.sku
+              WHERE 1=1
+            `;
+            const params = [];
+            if (siteParam && siteParam !== 'ALL') {
+              q += ` AND (UPPER(COALESCE(br.code, b.branch_id)) = UPPER(?) OR LOWER(b.branch_id) = LOWER(?))`;
+              params.push(siteParam, siteParam);
+            }
+            if (search) {
+              q += ` AND (LOWER(b.sku) LIKE ? OR LOWER(b.batch_code) LIKE ? OR LOWER(COALESCE(d.material_desc, p.article_desc, i.name, '')) LIKE ?)`;
+              const like = `%${search}%`;
+              params.push(like, like, like);
+            }
+            q += ` ORDER BY b.exp_date ASC NULLS LAST, b.created_at DESC LIMIT 300`;
+
+            const { rows } = await db.query(env, q, params);
+            return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
+          } catch (e) {
+            console.error('GET /api/wh/batches error:', e);
+            return new Response(JSON.stringify({ success: false, error: e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
+
+        if (request.method === 'POST') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const p = caller.permissions['wh-stock'];
+            if (!p || p.isRevoked || p.canView === false || p.canCreate === false) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Thêm lô hàng mới' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            const body = await request.json();
+            const branchCode = String(body.branch_code || body.site_code || 'K001').trim().toUpperCase();
+            const sku = String(body.sku || '').trim();
+            const batchCode = String(body.batch_code || '').trim();
+            const mfgDate = body.mfg_date ? String(body.mfg_date).slice(0, 10) : null;
+            const expDate = body.exp_date ? String(body.exp_date).slice(0, 10) : null;
+            const qty = Number(body.qty) || 0;
+            const storageLoc = String(body.storage_loc || 'Kệ Bếp').trim();
+            const note = String(body.note || 'Thêm lô trực tiếp từ Quản lý lô hàng').trim();
+
+            if (!sku || !batchCode || qty <= 0) {
+              return new Response(JSON.stringify({ success: false, error: 'Vui lòng nhập đầy đủ Mã hàng, Mã lô và Số lượng > 0' }), { status: 400, headers: corsHeaders });
+            }
+
+            const batchId = `bat_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+            const fallbackExp = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
+            const finalExp = expDate || fallbackExp;
+
+            await db.withTransaction(env, async (tx) => {
+              const brRow = await safeTxStep(tx, () => tx.queryOne(`SELECT id FROM branches WHERE UPPER(code) = UPPER(?) LIMIT 1`, [branchCode]));
+              const publicBranchId = brRow?.id || branchCode.toLowerCase();
+
+              const priceRow = await safeTxStep(tx, () => tx.queryOne(`
+                SELECT COALESCE(NULLIF(MAX(price), 0), 0) as price FROM dim_article_stock WHERE material = ?
+              `, [sku]));
+              const unitPrice = Number(priceRow?.price) || 0;
+              const lineAmount = qty * unitPrice;
+
+              await tx.exec(`
+                INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+              `, [batchId, sku, publicBranchId, batchCode, mfgDate, finalExp, qty, storageLoc]);
+
+              await safeTxStep(tx, () => tx.exec(`
+                INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+              `, [batchId, sku, branchCode.toLowerCase(), batchCode, mfgDate, finalExp, qty, storageLoc]));
+
+              await safeTxStep(tx, () => tx.exec(`
+                INSERT INTO fnb_stock_balances (item_code, site_code, region, opening_qty, receipt_qty, sales_bom_qty, waste_qty, book_qty, total_value, updated_at)
+                VALUES (?, ?, 'Miền Nam', 0, ?, 0, 0, ?, ?, NOW())
+                ON CONFLICT (item_code, site_code) DO UPDATE SET
+                  receipt_qty = COALESCE(fnb_stock_balances.receipt_qty, 0) + EXCLUDED.receipt_qty,
+                  book_qty = COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty,
+                  total_value = (COALESCE(fnb_stock_balances.book_qty, 0) + EXCLUDED.receipt_qty) * CASE WHEN ? > 0 THEN ? ELSE 0 END,
+                  updated_at = NOW()
+              `, [sku, branchCode, qty, qty, lineAmount, unitPrice, unitPrice]));
+
+              await safeTxStep(tx, () => tx.exec(`
+                INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
+                VALUES (?, ?, ?, ?, 'NHAP_LO', ?, ?)
+              `, ['tx_' + Math.random().toString(36).slice(2, 11), publicBranchId, sku, batchId, qty, `${batchCode} - ${note}`]));
+
+              await safeTxStep(tx, () => tx.exec(`
+                INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                VALUES (?, 'NHAP_LO', ?, ?, ?, ?, ?, ?, ?)
+              `, [batchCode, sku, branchCode, qty, unitPrice, lineAmount, note, caller?.user?.email || 'Quản lý kho']));
+            });
+
+            invalidateMemoryCache('/api/stock');
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/wh');
+
+            await writeAuditLog(env, request, {
+              userEmail: caller?.user?.email,
+              action: 'CREATE',
+              entityType: 'BATCH',
+              entityId: batchId,
+              docCode: batchCode,
+              siteCode: branchCode,
+              summary: `Thêm lô ${batchCode} cho mã ${sku} (SL: ${qty}, HSD: ${finalExp})`,
+              newData: { batchId, branch_code: branchCode, sku, batch_code: batchCode, mfg_date: mfgDate, exp_date: finalExp, qty, storage_loc: storageLoc, note }
+            });
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã thêm lô ${batchCode} và đồng bộ tồn kho thành công!`,
+              data: { id: batchId, batch_code: batchCode }
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi thêm lô: ' + e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
+
+        if (request.method === 'PUT') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const p = caller.permissions['wh-stock'];
+            if (!p || p.isRevoked || p.canView === false || !p.canEdit) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Sửa lô hàng' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            const body = await request.json();
+            const id = body.id || searchParams.get('id');
+            if (!id) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID lô hàng' }), { status: 400, headers: corsHeaders });
+            }
+
+            const existing = await db.queryOne(env, `SELECT * FROM inventory_batches WHERE id = ?`, [id]);
+            if (!existing) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy lô hàng' }), { status: 404, headers: corsHeaders });
+            }
+
+            const brRow = await db.queryOne(env, `SELECT code FROM branches WHERE id = ? OR UPPER(code) = UPPER(?) LIMIT 1`, [existing.branch_id, existing.branch_id]).catch(() => null);
+            const branchCode = (brRow?.code || existing.branch_id || 'K001').toUpperCase();
+
+            const newBatchCode = String(body.batch_code || existing.batch_code).trim();
+            const newMfg = body.mfg_date !== undefined ? (body.mfg_date ? String(body.mfg_date).slice(0, 10) : null) : existing.mfg_date;
+            const newExp = body.exp_date !== undefined ? (body.exp_date ? String(body.exp_date).slice(0, 10) : null) : existing.exp_date;
+            const newQty = body.qty !== undefined ? Math.max(0, Number(body.qty) || 0) : (Number(existing.qty) || 0);
+            const newLoc = String(body.storage_loc ?? existing.storage_loc ?? 'Kệ Bếp').trim();
+            const note = String(body.note || 'Điều chỉnh lô từ Quản lý lô hàng').trim();
+            const oldQty = Number(existing.qty) || 0;
+            const deltaQty = newQty - oldQty;
+
+            await db.withTransaction(env, async (tx) => {
+              await tx.exec(`
+                UPDATE inventory_batches
+                SET batch_code = ?, mfg_date = ?, exp_date = ?, qty = ?, storage_loc = ?
+                WHERE id = ?
+              `, [newBatchCode, newMfg, newExp, newQty, newLoc, id]);
+
+              await safeTxStep(tx, () => tx.exec(`
+                UPDATE wms.inventory_batches
+                SET batch_code = ?, mfg_date = ?, exp_date = ?, qty = ?, storage_loc = ?
+                WHERE id = ?
+              `, [newBatchCode, newMfg, newExp, newQty, newLoc, id]));
+
+              if (Math.abs(deltaQty) > 0.0001) {
+                const priceRow = await safeTxStep(tx, () => tx.queryOne(`
+                  SELECT COALESCE(NULLIF(MAX(price), 0), 0) as price FROM dim_article_stock WHERE material = ?
+                `, [existing.sku]));
+                const unitPrice = Number(priceRow?.price) || 0;
+
+                await safeTxStep(tx, () => tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET book_qty = GREATEST(0, COALESCE(book_qty, 0) + ?),
+                      total_value = CASE WHEN ? > 0 THEN GREATEST(0, COALESCE(book_qty, 0) + ?) * ? ELSE COALESCE(total_value, 0) END,
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [deltaQty, unitPrice, deltaQty, unitPrice, existing.sku, branchCode]));
+
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
+                  VALUES (?, ?, ?, ?, 'DIEU_CHINH_LO', ?, ?)
+                `, ['tx_' + Math.random().toString(36).slice(2, 11), existing.branch_id, existing.sku, id, deltaQty, `${newBatchCode} (${oldQty} → ${newQty}) - ${note}`]));
+
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'DIEU_CHINH_LO', ?, ?, ?, ?, ?, ?, ?)
+                `, [newBatchCode, existing.sku, branchCode, deltaQty, unitPrice, deltaQty * unitPrice, `Sửa lô ${newBatchCode}: ${oldQty} → ${newQty}. ${note}`, caller?.user?.email || 'Quản lý kho']));
+              }
+            });
+
+            invalidateMemoryCache('/api/stock');
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/wh');
+
+            await writeAuditLog(env, request, {
+              userEmail: caller?.user?.email,
+              action: 'UPDATE',
+              entityType: 'BATCH',
+              entityId: id,
+              docCode: newBatchCode,
+              siteCode: branchCode,
+              summary: `Sửa lô ${newBatchCode} (${existing.sku}): SL ${oldQty} → ${newQty}, HSD ${newExp || '—'}`,
+              oldData: existing,
+              newData: { batch_code: newBatchCode, mfg_date: newMfg, exp_date: newExp, qty: newQty, storage_loc: newLoc, note }
+            });
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã cập nhật lô ${newBatchCode} và đồng bộ tồn kho thành công!`
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi sửa lô: ' + e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
+
+        if (request.method === 'DELETE') {
+          const caller = await getCallerPermissions(env, request);
+          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
+            const p = caller.permissions['wh-stock'];
+            if (!p || p.isRevoked || p.canView === false || !p.canDelete) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Xóa lô hàng' }), { status: 403, headers: corsHeaders });
+            }
+          }
+
+          try {
+            let id = searchParams.get('id');
+            if (!id) {
+              try {
+                const body = await request.json();
+                id = body?.id;
+              } catch (_) {}
+            }
+            if (!id) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu ID lô hàng cần xóa' }), { status: 400, headers: corsHeaders });
+            }
+
+            const existing = await db.queryOne(env, `SELECT * FROM inventory_batches WHERE id = ?`, [id]);
+            if (!existing) {
+              return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy lô hàng' }), { status: 404, headers: corsHeaders });
+            }
+
+            const brRow = await db.queryOne(env, `SELECT code FROM branches WHERE id = ? OR UPPER(code) = UPPER(?) LIMIT 1`, [existing.branch_id, existing.branch_id]).catch(() => null);
+            const branchCode = (brRow?.code || existing.branch_id || 'K001').toUpperCase();
+            const oldQty = Number(existing.qty) || 0;
+
+            await db.withTransaction(env, async (tx) => {
+              await tx.exec(`DELETE FROM inventory_batches WHERE id = ?`, [id]);
+              await safeTxStep(tx, () => tx.exec(`DELETE FROM wms.inventory_batches WHERE id = ?`, [id]));
+
+              if (oldQty > 0) {
+                const priceRow = await safeTxStep(tx, () => tx.queryOne(`
+                  SELECT COALESCE(NULLIF(MAX(price), 0), 0) as price FROM dim_article_stock WHERE material = ?
+                `, [existing.sku]));
+                const unitPrice = Number(priceRow?.price) || 0;
+
+                await safeTxStep(tx, () => tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                      total_value = CASE WHEN ? > 0 THEN GREATEST(0, COALESCE(book_qty, 0) - ?) * ? ELSE COALESCE(total_value, 0) END,
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [oldQty, unitPrice, oldQty, unitPrice, existing.sku, branchCode]));
+
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
+                  VALUES (?, ?, ?, ?, 'XOA_LO', ?, ?)
+                `, ['tx_' + Math.random().toString(36).slice(2, 11), existing.branch_id, existing.sku, id, oldQty, `Xóa lô ${existing.batch_code}`]));
+
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'XOA_LO', ?, ?, ?, ?, ?, ?, ?)
+                `, [existing.batch_code, existing.sku, branchCode, -oldQty, unitPrice, -oldQty * unitPrice, `Xóa lô ${existing.batch_code}`, caller?.user?.email || 'Quản lý kho']));
+              }
+            });
+
+            invalidateMemoryCache('/api/stock');
+            invalidateMemoryCache('/api/fnb');
+            invalidateMemoryCache('/api/wh');
+
+            await writeAuditLog(env, request, {
+              userEmail: caller?.user?.email,
+              action: 'DELETE',
+              entityType: 'BATCH',
+              entityId: id,
+              docCode: existing.batch_code,
+              siteCode: branchCode,
+              summary: `Xóa lô ${existing.batch_code} (${existing.sku}, SL: ${oldQty}) và đồng bộ trừ tồn kho`,
+              oldData: existing
+            });
+
+            return new Response(JSON.stringify({
+              success: true,
+              message: `Đã xóa lô ${existing.batch_code} và đồng bộ tồn kho!`
+            }), { headers: corsHeaders });
+          } catch (e) {
+            return new Response(JSON.stringify({ success: false, error: 'Lỗi xóa lô: ' + e.message }), { status: 500, headers: corsHeaders });
+          }
+        }
+      }
+
       // 1.11 GET /api/wh/item-batches - Chi tiết các lô hàng đã nhập của mã hàng
       if (pathname === '/api/wh/item-batches' && request.method === 'GET') {
         const sku = (searchParams.get('sku') || '').trim();

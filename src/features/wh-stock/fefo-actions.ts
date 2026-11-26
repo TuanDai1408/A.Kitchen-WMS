@@ -35,6 +35,15 @@ export async function loadStockFEFO(): Promise<void> {
           catSel.value = curVal;
         }
       }
+      const batchSel = document.getElementById('fefoBatchFilter') as HTMLSelectElement | null;
+      if (batchSel) {
+        const curBatch = batchSel.value;
+        const batches = Array.from(new Set(fefoItems.map(i => (i.batch_code || i.batch_no || '').trim()).filter(Boolean))).sort() as string[];
+        batchSel.innerHTML = '<option value="">Tất cả lô hàng</option>' + batches.map(b => `<option value="${b}">${b}</option>`).join('');
+        if (curBatch && batches.includes(curBatch)) {
+          batchSel.value = curBatch;
+        }
+      }
       filterFefoLive();
     }
   } catch (e) {

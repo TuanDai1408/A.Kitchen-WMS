@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1145">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1150">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1145"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1150"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -2780,7 +2780,17 @@
             <h1 class="page-title">Hạn dùng &amp; xuất FEFO</h1>
             <p class="page-subtitle">Tự động ưu tiên xuất theo hạn dùng tăng dần (FEFO). Cảnh báo cận date ≤ 7 ngày theo chuẩn an toàn thực phẩm.</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+              <button id="btnSubTabWhFefo" type="button" onclick="switchWhStockSubView('fefo')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs bg-brand-500 text-white flex items-center gap-1.5">
+                <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
+                <span>Hạn dùng &amp; FEFO</span>
+              </button>
+              <button id="btnSubTabWhBatches" type="button" onclick="switchWhStockSubView('batches')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/5 flex items-center gap-1.5">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                <span>Quản lý lô hàng</span>
+              </button>
+            </div>
             <button onclick="exportFefoToExcel()" class="btn btn-secondary">
               <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
             </button>
@@ -2790,9 +2800,10 @@
           </div>
         </div>
 
+        <div id="whStockSubViewFefo" class="space-y-4">
         <!-- Filter Bar -->
         <div class="filter-bar">
-          <div class="relative flex-1 min-w-[240px]">
+          <div class="relative flex-1 min-w-[220px]">
             <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             <input 
               type="text" 
@@ -2803,7 +2814,7 @@
             />
           </div>
 
-          <div class="w-full sm:w-48">
+          <div class="w-full sm:w-44">
             <select id="fefoCategoryFilter" onchange="filterFefoLive()" class="select">
               <option value="">Tất cả nhóm hàng</option>
               <option value="Gia vị">Gia vị</option>
@@ -2812,7 +2823,13 @@
             </select>
           </div>
 
-          <div class="w-full sm:w-52">
+          <div class="w-full sm:w-44">
+            <select id="fefoBatchFilter" onchange="filterFefoLive()" class="select font-mono">
+              <option value="">Tất cả lô hàng</option>
+            </select>
+          </div>
+
+          <div class="w-full sm:w-48">
             <select id="fefoStatusFilter" onchange="filterFefoLive()" class="select">
               <option value="">Tất cả trạng thái</option>
               <option value="safe">An toàn</option>
@@ -2885,6 +2902,60 @@
 
           <!-- Native Mobile Card View -->
           <div id="fefoMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+        </div>
+        </div><!-- End whStockSubViewFefo -->
+
+        <!-- SUB-VIEW 2: QUẢN LÝ LÔ HÀNG (THÊM / SỬA / XÓA ĐỒNG BỘ TỒN KHO & RBAC) -->
+        <div id="whStockSubViewBatches" class="hidden space-y-4">
+          <div class="filter-bar">
+            <div class="relative flex-1 min-w-[220px]">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="batchManageSearchInput" oninput="renderBatchManagerTable()" placeholder="Tìm theo mã lô, SKU, tên hàng..." class="input pl-9 w-full">
+            </div>
+            <div class="w-full sm:w-52">
+              <select id="batchManageSiteFilter" onchange="loadBatchManager()" class="select">
+                <option value="ALL">Tất cả điểm bán</option>
+              </select>
+            </div>
+            <div class="w-full sm:w-44">
+              <select id="batchManageStatusFilter" onchange="renderBatchManagerTable()" class="select">
+                <option value="">Tất cả HSD</option>
+                <option value="red">Cận / Hết hạn (≤ 7 ngày)</option>
+                <option value="yellow">Sắp hết hạn (8 - 15 ngày)</option>
+                <option value="safe">An toàn (&gt; 15 ngày)</option>
+              </select>
+            </div>
+            <button type="button" onclick="loadBatchManager()" class="btn btn-secondary btn-icon" title="Làm mới danh sách lô">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+            <button type="button" id="btnOpenAddBatchModal" onclick="openCreateBatchModal()" class="btn btn-primary">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm lô mới
+            </button>
+          </div>
+
+          <div class="table-card p-5">
+            <div class="hidden lg:block table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="text-center w-12">#</th>
+                    <th class="col-code">Mã lô</th>
+                    <th>Điểm bán</th>
+                    <th>Mặt hàng (SKU)</th>
+                    <th class="col-date text-center">Ngày SX</th>
+                    <th class="col-date text-center">Hạn dùng (EXP)</th>
+                    <th class="col-num text-right">SL Tồn Lô</th>
+                    <th class="text-center">Trạng thái &amp; Vị trí</th>
+                    <th class="col-actions text-center w-28">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="batchManageTableBody">
+                  <tr><td colspan="9" class="p-8 text-center text-gray-400 text-xs">Đang tải danh sách lô hàng...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="batchManageMobileCards" class="block lg:hidden space-y-3"></div>
+          </div>
         </div>
       </section>
 <section id="wh-reorder" class="tab-panel space-y-4">
@@ -7164,6 +7235,94 @@
         <button type="button" id="btnExecuteDeleteWaste" onclick="executeDeleteWaste()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
           <i data-lucide="x-circle" class="w-4 h-4"></i>
           <span>Hủy phiếu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL THÊM / SỬA LÔ HÀNG -->
+  <div id="modalBatchManage" style="z-index: 100022;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none overflow-y-auto" onclick="if(event.target===this)closeBatchManageModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden max-h-[92vh] animate-scale-up">
+      <div class="p-4 sm:p-5 pb-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="batchModalTitle" class="font-bold text-base text-gray-900 dark:text-white leading-tight">Thêm Lô Hàng Mới</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tự động đồng bộ tồn kho FEFO, tồn kho site &amp; nhật ký audit</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeBatchManageModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Điểm bán / Kho <span class="text-rose-500">*</span></label>
+            <select id="batchModalSiteSelect" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs"></select>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Mã lô (Batch Code) <span class="text-rose-500">*</span></label>
+            <input type="text" id="batchModalCode" placeholder="VD: LO-261126-01" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-mono font-bold text-xs">
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="block font-semibold text-gray-700 dark:text-gray-300">Mặt hàng (SKU) <span class="text-rose-500">*</span></label>
+          <select id="batchModalSkuSelect" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs"></select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Số lượng tồn lô <span class="text-rose-500">*</span></label>
+            <input type="number" step="0.01" min="0" id="batchModalQty" placeholder="0" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-mono font-bold text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ngày sản xuất (MFG)</label>
+            <input type="date" id="batchModalMfgDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-mono text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Hạn sử dụng (EXP)</label>
+            <input type="date" id="batchModalExpDate" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 font-mono text-xs">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Vị trí lưu trữ</label>
+            <input type="text" id="batchModalStorageLoc" value="Kệ Bếp" placeholder="VD: Kệ Bếp / Kho Mát" class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-semibold text-gray-700 dark:text-gray-300">Ghi chú điều chỉnh</label>
+            <input type="text" id="batchModalNote" placeholder="Lý do thêm / điều chỉnh lô..." class="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs">
+          </div>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-end gap-2.5 shrink-0">
+        <button type="button" onclick="closeBatchManageModal()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Hủy</button>
+        <button type="button" id="btnSaveBatchManage" onclick="saveBatchManage()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition-all">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Lưu lô hàng</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XÁC NHẬN XÓA LÔ HÀNG -->
+  <div id="modalConfirmDeleteBatch" style="z-index: 100025;" class="fixed inset-0 hidden bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none" onclick="if(event.target===this)closeDeleteBatchModal()">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-scale-up p-6 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+        <i data-lucide="trash-2" class="w-7 h-7"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-gray-900 dark:text-white">Xác nhận xóa lô hàng?</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Mã lô: <b id="confirmDeleteBatchCode" class="font-mono text-rose-600"></b></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">Thao tác này sẽ xóa lô hàng khỏi FEFO và tự động trừ số lượng tồn kho tương ứng trên hệ thống.</p>
+      </div>
+      <div class="flex items-center justify-center gap-2.5 pt-2">
+        <button type="button" onclick="closeDeleteBatchModal()" class="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Đóng</button>
+        <button type="button" id="btnExecuteDeleteBatch" onclick="executeDeleteBatch()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Xóa lô</span>
         </button>
       </div>
     </div>

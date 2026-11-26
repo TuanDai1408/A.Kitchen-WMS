@@ -28,12 +28,25 @@ import {
   exportFefoToExcel,
   exportSelectedStockExcel
 } from './export';
+import {
+  switchWhStockSubView,
+  loadBatchManager,
+  renderBatchManagerTable,
+  openCreateBatchModal,
+  openEditBatchModal,
+  closeBatchManageModal,
+  saveBatchManage,
+  confirmDeleteBatch,
+  closeDeleteBatchModal,
+  executeDeleteBatch
+} from './batch-manager';
 
 export * from './types';
 export * from './helpers';
 export * from './fefo-table';
 export * from './fefo-actions';
 export * from './export';
+export * from './batch-manager';
 
 // Bind to window for HTML inline handlers & backwards compatibility
 if (typeof window !== 'undefined') {
@@ -64,4 +77,15 @@ if (typeof window !== 'undefined') {
 
   w.exportFefoToExcel = exportFefoToExcel;
   w.exportSelectedStockExcel = exportSelectedStockExcel;
+
+  w.switchWhStockSubView = switchWhStockSubView;
+  w.loadBatchManager = loadBatchManager;
+  w.renderBatchManagerTable = renderBatchManagerTable;
+  w.openCreateBatchModal = openCreateBatchModal;
+  w.openEditBatchModal = openEditBatchModal;
+  w.closeBatchManageModal = closeBatchManageModal;
+  w.saveBatchManage = saveBatchManage;
+  w.confirmDeleteBatch = confirmDeleteBatch;
+  w.closeDeleteBatchModal = closeDeleteBatchModal;
+  w.executeDeleteBatch = executeDeleteBatch;
 }

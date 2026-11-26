@@ -183,6 +183,7 @@ export function renderFefoRows(items: StockFefoItem[]): void {
 export function filterFefoLive(): void {
   const q = ((document.getElementById('fefoSearchInput') as HTMLInputElement)?.value || '').toLowerCase().trim();
   const category = (document.getElementById('fefoCategoryFilter') as HTMLSelectElement)?.value || '';
+  const batchCode = (document.getElementById('fefoBatchFilter') as HTMLSelectElement)?.value || '';
   const status = (document.getElementById('fefoStatusFilter') as HTMLSelectElement)?.value || '';
 
   const rawItems: StockFefoItem[] = (typeof App !== 'undefined' && App.fefoItems) ? App.fefoItems : [];
@@ -195,12 +196,14 @@ export function filterFefoLive(): void {
       (r.batch_no && r.batch_no.toLowerCase().includes(q))
     );
     const matchCategory = !category || r.category === category || (Boolean(r.category) && r.category!.includes(category));
+    const itemBatch = (r.batch_code || r.batch_no || '').trim();
+    const matchBatch = !batchCode || itemBatch === batchCode;
     let matchStatus = true;
     if (status === 'safe') matchStatus = r.danger_level === 'green';
     else if (status === 'yellow') matchStatus = r.danger_level === 'yellow';
     else if (status === 'red') matchStatus = r.danger_level === 'red';
     else if (status) matchStatus = r.danger_level === status;
-    return matchSearch && matchCategory && matchStatus;
+    return matchSearch && matchCategory && matchBatch && matchStatus;
   });
 
   // Sorting
@@ -264,6 +267,9 @@ export function resetFefoFilters(): void {
 
   const catEl = document.getElementById('fefoCategoryFilter') as HTMLSelectElement | null;
   if (catEl) catEl.value = '';
+
+  const batchEl = document.getElementById('fefoBatchFilter') as HTMLSelectElement | null;
+  if (batchEl) batchEl.value = '';
 
   const statusEl = document.getElementById('fefoStatusFilter') as HTMLSelectElement | null;
   if (statusEl) statusEl.value = '';
