@@ -3045,14 +3045,26 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu mã đơn hàng cần xóa' }), { status: 400, headers: corsHeaders });
         }
 
-        const existing = await db.queryOne(env, `SELECT order_code FROM don_hang WHERE order_code = ? LIMIT 1`, [code]);
+        const existing = await db.queryOne(env, `SELECT * FROM don_hang WHERE order_code = ? LIMIT 1`, [code]);
         if (!existing) {
           return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy đơn hàng trong hệ thống' }), { status: 404, headers: corsHeaders });
         }
+        const { rows: oldSteps } = await db.query(env, `SELECT * FROM quy_trinh_don WHERE order_code = ?`, [code]).catch(() => ({ rows: [] }));
 
         await db.withTransaction(env, async (tx) => {
           await tx.exec(`DELETE FROM quy_trinh_don WHERE order_code = ?`, [code]);
           await tx.exec(`DELETE FROM don_hang WHERE order_code = ?`, [code]);
+        });
+
+        await writeAuditLog(env, request, {
+          userEmail: caller?.user?.email,
+          action: 'DELETE',
+          entityType: 'ORDER',
+          entityId: code,
+          docCode: code,
+          siteCode: existing.site_code || existing.branch_code || null,
+          summary: `Xóa đơn đặt hàng ${code}`,
+          oldData: { header: existing, steps: oldSteps || [] }
         });
 
         invalidateMemoryCache('/api/orders');
@@ -3455,14 +3467,26 @@ export default {
           return new Response(JSON.stringify({ success: false, error: 'Thiếu mã chứng từ cần xóa' }), { status: 400, headers: corsHeaders });
         }
 
-        const existing = await db.queryOne(env, `SELECT voucher_code FROM chung_tu WHERE voucher_code = ?`, [maCT]);
+        const existing = await db.queryOne(env, `SELECT * FROM chung_tu WHERE voucher_code = ?`, [maCT]);
         if (!existing) {
           return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy chứng từ trong hệ thống' }), { status: 404, headers: corsHeaders });
         }
+        const { rows: oldFiles } = await db.query(env, `SELECT * FROM chung_tu_file WHERE voucher_code = ?`, [maCT]).catch(() => ({ rows: [] }));
 
         await db.withTransaction(env, async (tx) => {
           await tx.exec(`DELETE FROM chung_tu_file WHERE voucher_code = ?`, [maCT]);
           await tx.exec(`DELETE FROM chung_tu WHERE voucher_code = ?`, [maCT]);
+        });
+
+        await writeAuditLog(env, request, {
+          userEmail: caller?.user?.email,
+          action: 'DELETE',
+          entityType: 'VOUCHER',
+          entityId: maCT,
+          docCode: maCT,
+          siteCode: existing.site_code || existing.branch_code || null,
+          summary: `Xóa chứng từ ${maCT}`,
+          oldData: { header: existing, files: oldFiles || [] }
         });
 
         invalidateMemoryCache('/api/vouchers');
@@ -4700,6 +4724,289 @@ export default {
           data: { ...DEFAULT_SYSTEM_CONFIG },
           message: 'Đã khôi phục toàn bộ cấu hình về mặc định!'
         }), { headers: corsHeaders });
+      }
+
+      // ======================================================================
+      // 2.11.RST DANH SÁCH DỮ LIỆU ĐÃ XÓA & KHÔI PHỤC (CHỈ DÀNH RIÊNG trantuandai2508)
+      // ======================================================================
+      if (pathname === '/api/system/deleted-records' && request.method === 'GET') {
+        await ensureAuditLogsTable(env);
+        const caller = await getCallerPermissions(env, request);
+        const requestorEmail = caller?.user?.email || caller?.email || request.headers.get('X-User-Email') || '';
+        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        if (!isMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Từ chối truy cập: Chức năng khôi phục dữ liệu chỉ dành riêng cho tài khoản trantuandai2508.'
+          }), { status: 403, headers: corsHeaders });
+        }
+
+        const entityType = (searchParams.get('entity_type') || '').trim().toUpperCase();
+        const qText = (searchParams.get('q') || '').trim().toLowerCase();
+        const limit = Math.min(200, Math.max(1, Number(searchParams.get('limit')) || 100));
+
+        let sql = `SELECT id, user_email, action, entity_type, entity_id, doc_code, site_code, summary, old_data, created_at
+                   FROM audit_logs
+                   WHERE action IN ('DELETE', 'CANCEL') AND old_data IS NOT NULL`;
+        const params = [];
+        if (entityType && entityType !== 'ALL') {
+          sql += ` AND UPPER(entity_type) = ?`;
+          params.push(entityType);
+        }
+        sql += ` ORDER BY id DESC LIMIT ?`;
+        params.push(limit);
+
+        const { rows } = await db.query(env, sql, params).catch(() => ({ rows: [] }));
+        const { rows: restoredRows } = await db.query(env, `
+          SELECT entity_type, entity_id, doc_code, created_at
+          FROM audit_logs
+          WHERE action = 'RESTORE'
+          ORDER BY id DESC LIMIT 300
+        `).catch(() => ({ rows: [] }));
+
+        const restoredMap = new Map();
+        for (const rr of (restoredRows || [])) {
+          const k = `${String(rr.entity_type || '').toUpperCase()}|${String(rr.entity_id || '')}|${String(rr.doc_code || '')}`;
+          if (!restoredMap.has(k)) restoredMap.set(k, rr.created_at);
+        }
+
+        let items = (rows || []).map(r => {
+          const k = `${String(r.entity_type || '').toUpperCase()}|${String(r.entity_id || '')}|${String(r.doc_code || '')}`;
+          const restoredAt = restoredMap.get(k) || null;
+          return {
+            ...r,
+            is_restored: Boolean(restoredAt && String(restoredAt) >= String(r.created_at || '')),
+            restored_at: restoredAt
+          };
+        });
+
+        if (qText) {
+          items = items.filter(it =>
+            String(it.doc_code || '').toLowerCase().includes(qText) ||
+            String(it.summary || '').toLowerCase().includes(qText) ||
+            String(it.site_code || '').toLowerCase().includes(qText) ||
+            String(it.user_email || '').toLowerCase().includes(qText) ||
+            String(it.old_data || '').toLowerCase().includes(qText)
+          );
+        }
+
+        return new Response(JSON.stringify({ success: true, data: items }), { headers: corsHeaders });
+      }
+
+      if (pathname === '/api/system/restore' && request.method === 'POST') {
+        await ensureAuditLogsTable(env);
+        const caller = await getCallerPermissions(env, request);
+        const body = await request.json().catch(() => ({}));
+        const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
+        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        if (!isMaster) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Từ chối truy cập: Chỉ tài khoản trantuandai2508 được phép khôi phục dữ liệu đã xóa.'
+          }), { status: 403, headers: corsHeaders });
+        }
+
+        const auditLogId = Number(body.auditLogId || body.id);
+        if (!auditLogId) {
+          return new Response(JSON.stringify({ success: false, error: 'Thiếu auditLogId cần khôi phục' }), { status: 400, headers: corsHeaders });
+        }
+
+        const logRow = await db.queryOne(env, `SELECT * FROM audit_logs WHERE id = ? LIMIT 1`, [auditLogId]);
+        if (!logRow || !logRow.old_data) {
+          return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy bản ghi audit hoặc không có dữ liệu gốc để khôi phục' }), { status: 404, headers: corsHeaders });
+        }
+
+        let oldObj = null;
+        try {
+          oldObj = typeof logRow.old_data === 'string' ? JSON.parse(logRow.old_data) : logRow.old_data;
+        } catch (e) {
+          return new Response(JSON.stringify({ success: false, error: 'Dữ liệu old_data không hợp lệ' }), { status: 400, headers: corsHeaders });
+        }
+
+        const eType = String(logRow.entity_type || '').toUpperCase();
+        const insertDynamic = async (tx, tableName, obj, excludeCols = ['id'], returningId = false) => {
+          const keys = Object.keys(obj || {}).filter(k => !excludeCols.includes(k) && obj[k] !== undefined);
+          if (!keys.length) return null;
+          const cols = keys.join(', ');
+          const placeholders = keys.map(() => '?').join(', ');
+          const vals = keys.map(k => obj[k]);
+          const sql = `INSERT INTO ${tableName} (${cols}) VALUES (${placeholders})${returningId ? ' RETURNING id' : ''}`;
+          if (returningId) {
+            return await tx.queryOne(sql, vals);
+          }
+          await tx.exec(sql, vals);
+          return null;
+        };
+
+        try {
+          let restoredMessage = '';
+          await db.withTransaction(env, async (tx) => {
+            if (eType === 'BATCH') {
+              const b = oldObj;
+              const bId = b.id || logRow.entity_id || ('bat_' + Math.random().toString(36).slice(2, 11));
+              const qty = Number(b.qty) || 0;
+              await tx.exec(`
+                INSERT INTO inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+              `, [bId, b.sku, b.branch_id, b.batch_code, b.mfg_date || null, b.exp_date || null, qty, b.storage_loc || 'Kho Tổng']);
+              await safeTxStep(tx, () => tx.exec(`
+                INSERT INTO wms.inventory_batches (id, sku, branch_id, batch_code, mfg_date, exp_date, qty, storage_loc, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+              `, [bId, b.sku, b.branch_id, b.batch_code, b.mfg_date || null, b.exp_date || null, qty, b.storage_loc || 'Kho Tổng']));
+
+              const brRow = await safeTxStep(tx, () => tx.queryOne(`SELECT code FROM branches WHERE id = ? OR UPPER(code) = UPPER(?) LIMIT 1`, [b.branch_id, b.branch_id]));
+              const siteCode = (brRow?.code || logRow.site_code || 'K001').toUpperCase();
+              if (qty > 0) {
+                const priceRow = await safeTxStep(tx, () => tx.queryOne(`SELECT COALESCE(NULLIF(MAX(price), 0), 0) as price FROM dim_article_stock WHERE material = ?`, [b.sku]));
+                const unitPrice = Number(priceRow?.price) || 0;
+                await safeTxStep(tx, () => tx.exec(`
+                  UPDATE fnb_stock_balances
+                  SET book_qty = COALESCE(book_qty, 0) + ?,
+                      total_value = CASE WHEN ? > 0 THEN (COALESCE(book_qty, 0) + ?) * ? ELSE COALESCE(total_value, 0) END,
+                      updated_at = NOW()
+                  WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                `, [qty, unitPrice, qty, unitPrice, b.sku, siteCode]));
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO stock_transactions (id, branch_id, sku, batch_id, trans_type, qty, note)
+                  VALUES (?, ?, ?, ?, 'KHOI_PHUC_LO', ?, ?)
+                `, ['tx_' + Math.random().toString(36).slice(2, 11), b.branch_id, b.sku, bId, qty, `Khôi phục lô ${b.batch_code}`]));
+                await safeTxStep(tx, () => tx.exec(`
+                  INSERT INTO fnb_stock_transactions (trans_code, trans_type, item_code, site_code, qty, unit_price, total_amount, note, created_by)
+                  VALUES (?, 'KHOI_PHUC_LO', ?, ?, ?, ?, ?, ?, ?)
+                `, [b.batch_code, b.sku, siteCode, qty, unitPrice, qty * unitPrice, `Khôi phục lô ${b.batch_code}`, requestorEmail]));
+              }
+              restoredMessage = `Đã khôi phục mặt hàng ${b.sku} trong lô ${b.batch_code} (SL: ${qty})!`;
+            } else if (eType === 'KITCHEN_ISSUE') {
+              const header = oldObj.header || oldObj;
+              const lines = Array.isArray(oldObj.lines) ? oldObj.lines : [];
+              const ins = await insertDynamic(tx, 'fnb_kitchen_issues', header, ['id', 'created_at'], true);
+              const newId = ins?.id;
+              const siteCode = header.site_code;
+              for (const ln of lines) {
+                await insertDynamic(tx, 'fnb_kitchen_issue_lines', { ...ln, issue_id: newId }, ['id', 'created_at'], false);
+                const qty = Number(ln.qty) || 0;
+                const price = Number(ln.unit_price) || 0;
+                if (qty > 0) {
+                  await safeTxStep(tx, () => tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                        total_value = GREATEST(0, (COALESCE(book_qty, 0) - ?) * ?),
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [qty, qty, price, ln.item_code, siteCode]));
+                }
+              }
+              restoredMessage = `Đã khôi phục phiếu xuất kho ${header.issue_code} (${lines.length} dòng)!`;
+            } else if (eType === 'WASTE') {
+              const header = oldObj.header || oldObj;
+              const lines = Array.isArray(oldObj.lines) ? oldObj.lines : [];
+              const ins = await insertDynamic(tx, 'fnb_stock_wastes', header, ['id', 'created_at'], true);
+              const newId = ins?.id;
+              const siteCode = header.site_code;
+              for (const ln of lines) {
+                await insertDynamic(tx, 'fnb_stock_waste_lines', { ...ln, waste_id: newId }, ['id', 'created_at'], false);
+                const qty = Number(ln.qty) || 0;
+                const price = Number(ln.unit_price) || 0;
+                if (qty > 0) {
+                  await safeTxStep(tx, () => tx.exec(`
+                    UPDATE fnb_stock_balances
+                    SET waste_qty = COALESCE(waste_qty, 0) + ?,
+                        book_qty = GREATEST(0, COALESCE(book_qty, 0) - ?),
+                        total_value = CASE WHEN ? > 0 THEN GREATEST(0, COALESCE(book_qty, 0) - ?) * ? ELSE COALESCE(total_value, 0) END,
+                        updated_at = NOW()
+                    WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                  `, [qty, qty, price, qty, price, ln.item_code, siteCode]));
+                }
+              }
+              restoredMessage = `Đã khôi phục biên bản hủy ${header.waste_code} (${lines.length} dòng)!`;
+            } else if (eType === 'COUNT') {
+              const header = oldObj.header || oldObj;
+              const lines = Array.isArray(oldObj.lines) ? oldObj.lines : [];
+              const ins = await insertDynamic(tx, 'fnb_stock_counts', header, ['id', 'created_at'], true);
+              const newId = ins?.id;
+              for (const ln of lines) {
+                await insertDynamic(tx, 'fnb_stock_count_lines', { ...ln, count_id: newId }, ['id', 'created_at'], false);
+              }
+              restoredMessage = `Đã khôi phục phiếu kiểm kê ${header.count_code}${lines.length ? ` (${lines.length} dòng)` : ''}!`;
+            } else if (eType === 'RECEIPT') {
+              const header = oldObj.header || (oldObj.receipt_code ? oldObj : null);
+              const lines = Array.isArray(oldObj.lines) ? oldObj.lines : [];
+              if (header) {
+                const ins = await insertDynamic(tx, 'fnb_stock_receipts', header, ['id', 'created_at'], true);
+                const newId = ins?.id;
+                const siteCode = header.site_code;
+                for (const ln of lines) {
+                  await insertDynamic(tx, 'fnb_stock_receipt_lines', { ...ln, receipt_id: newId }, ['id', 'created_at'], false);
+                  const qty = Number(ln.qty) || 0;
+                  const price = Number(ln.unit_price) || 0;
+                  if (qty > 0) {
+                    await safeTxStep(tx, () => tx.exec(`
+                      UPDATE fnb_stock_balances
+                      SET book_qty = COALESCE(book_qty, 0) + ?,
+                          receipt_qty = COALESCE(receipt_qty, 0) + ?,
+                          total_value = CASE WHEN ? > 0 THEN (COALESCE(book_qty, 0) + ?) * ? ELSE COALESCE(total_value, 0) END,
+                          updated_at = NOW()
+                      WHERE item_code = ? AND UPPER(site_code) = UPPER(?)
+                    `, [qty, qty, price, qty, price, ln.item_code, siteCode]));
+                  }
+                }
+                if (header.invoice_no) {
+                  await safeTxStep(tx, () => tx.exec(`UPDATE wms.sap_po_items SET status = 'COMPLETED', updated_at = NOW() WHERE po_number = ?`, [header.invoice_no]));
+                }
+                restoredMessage = `Đã khôi phục phiếu nhập kho ${header.receipt_code} (${lines.length} dòng)!`;
+              } else if (oldObj.po_number) {
+                await safeTxStep(tx, () => tx.exec(`UPDATE wms.sap_po_items SET status = 'COMPLETED', updated_at = NOW() WHERE po_number = ?`, [oldObj.po_number]));
+                restoredMessage = `Đã khôi phục trạng thái đơn PO ${oldObj.po_number}!`;
+              }
+            } else if (eType === 'ORDER') {
+              const header = oldObj.header || oldObj;
+              const steps = Array.isArray(oldObj.steps) ? oldObj.steps : [];
+              await insertDynamic(tx, 'don_hang', header, ['id'], false);
+              for (const st of steps) {
+                await insertDynamic(tx, 'quy_trinh_don', st, ['id'], false);
+              }
+              restoredMessage = `Đã khôi phục đơn đặt hàng ${header.order_code}!`;
+            } else if (eType === 'VOUCHER') {
+              const header = oldObj.header || oldObj;
+              const files = Array.isArray(oldObj.files) ? oldObj.files : [];
+              await insertDynamic(tx, 'chung_tu', header, ['id'], false);
+              for (const fl of files) {
+                await insertDynamic(tx, 'chung_tu_file', fl, ['id'], false);
+              }
+              restoredMessage = `Đã khôi phục chứng từ ${header.voucher_code}!`;
+            } else {
+              throw new Error(`Chưa hỗ trợ khôi phục loại dữ liệu: ${eType}`);
+            }
+          });
+
+          invalidateMemoryCache('/api/stock');
+          invalidateMemoryCache('/api/fnb');
+          invalidateMemoryCache('/api/wh');
+          invalidateMemoryCache('/api/po-sap');
+          invalidateMemoryCache('/api/vouchers');
+
+          await writeAuditLog(env, request, {
+            userEmail: requestorEmail,
+            action: 'RESTORE',
+            entityType: eType,
+            entityId: logRow.entity_id,
+            docCode: logRow.doc_code,
+            siteCode: logRow.site_code,
+            summary: restoredMessage || `Khôi phục dữ liệu ${eType} (${logRow.doc_code || logRow.entity_id})`,
+            newData: oldObj
+          });
+
+          return new Response(JSON.stringify({
+            success: true,
+            message: restoredMessage || 'Khôi phục dữ liệu thành công!'
+          }), { headers: corsHeaders });
+        } catch (err) {
+          console.error('POST /api/system/restore error:', err);
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Lỗi khôi phục dữ liệu: ' + (err?.message || err)
+          }), { status: 500, headers: corsHeaders });
+        }
       }
 
       // 2.11.3 CHUYỂN ĐỔI VAI TRÒ TEST NHANH (/api/auth/switch-role)
@@ -6142,6 +6449,7 @@ export default {
             if (!existing) {
               return new Response(JSON.stringify({ success: false, error: 'Không tìm thấy phiếu kiểm kê' }), { status: 404, headers: corsHeaders });
             }
+            const { rows: oldCountLines } = await db.query(env, `SELECT * FROM fnb_stock_count_lines WHERE count_id = ?`, [countId]).catch(() => ({ rows: [] }));
 
             await db.withTransaction(env, async (tx) => {
               await tx.exec(`DELETE FROM fnb_stock_count_lines WHERE count_id = ?`, [countId]);
@@ -6158,7 +6466,7 @@ export default {
               docCode: existing.count_code,
               siteCode: existing.site_code,
               summary: `Xóa/hủy phiếu kiểm kê ${existing.count_code}`,
-              oldData: existing
+              oldData: { header: existing, lines: oldCountLines || [] }
             });
 
             return new Response(JSON.stringify({
@@ -6834,6 +7142,7 @@ export default {
               receipt = await db.queryOne(env, `SELECT * FROM fnb_stock_receipts WHERE invoice_no = ? ORDER BY id DESC LIMIT 1`, [poNumber]);
             }
 
+            let deletedReceiptLines = [];
             await db.withTransaction(env, async (tx) => {
               if (receipt) {
                 const rId = receipt.id;
@@ -6843,6 +7152,7 @@ export default {
 
                 // Lấy các dòng mặt hàng
                 const { rows: lines } = await tx.query(`SELECT * FROM fnb_stock_receipt_lines WHERE receipt_id = ?`, [rId]);
+                deletedReceiptLines = lines || [];
 
                 for (const line of (lines || [])) {
                   const qty = Number(line.qty) || 0;
@@ -6924,7 +7234,7 @@ export default {
               docCode: receipt?.receipt_code || poNumber,
               siteCode: receipt?.site_code || null,
               summary: `Hủy phiếu nhập kho ${receipt?.receipt_code || poNumber}`,
-              oldData: receipt || { po_number: poNumber }
+              oldData: receipt ? { header: receipt, lines: deletedReceiptLines } : { po_number: poNumber }
             });
 
             return new Response(JSON.stringify({

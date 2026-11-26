@@ -405,6 +405,195 @@ export async function resetSystemConfigToDefault(): Promise<void> {
   }
 }
 
+export interface DeletedAuditRecord {
+  id: number;
+  user_email: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  doc_code: string;
+  site_code: string;
+  summary: string;
+  old_data: string;
+  created_at: string;
+  is_restored?: boolean;
+  restored_at?: string | null;
+}
+
+let gDeletedRecordsList: DeletedAuditRecord[] = [];
+
+const ENTITY_LABELS: Record<string, { label: string; badge: string }> = {
+  BATCH: { label: 'Lô hàng (FEFO)', badge: 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border-purple-200 dark:border-purple-800' },
+  KITCHEN_ISSUE: { label: 'Xuất kho sử dụng', badge: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200 dark:border-amber-800' },
+  WASTE: { label: 'Hủy hàng & hao hụt', badge: 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border-rose-200 dark:border-rose-800' },
+  COUNT: { label: 'Kiểm kê hằng ngày', badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
+  RECEIPT: { label: 'Nhập kho tại site', badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
+  ORDER: { label: 'Đặt hàng vật tư', badge: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' },
+  VOUCHER: { label: 'Chứng từ kế toán', badge: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700' }
+};
+
+export function switchSysConfigSubView(mode: 'params' | 'restore'): void {
+  const paramsBox = document.getElementById('sysConfigFormContainer');
+  const restoreBox = document.getElementById('sysConfigRestoreContainer');
+  const headerActions = document.getElementById('sysConfigHeaderActions');
+  const btnParams = document.getElementById('btnSubTabSysCfgParams');
+  const btnRestore = document.getElementById('btnSubTabSysCfgRestore');
+
+  const activeCls = 'pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+  const inactiveCls = 'pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px';
+
+  if (mode === 'restore') {
+    paramsBox?.classList.add('hidden');
+    restoreBox?.classList.remove('hidden');
+    headerActions?.classList.add('hidden');
+    if (btnParams) btnParams.className = inactiveCls;
+    if (btnRestore) btnRestore.className = activeCls;
+    loadDeletedRecords();
+  } else {
+    paramsBox?.classList.remove('hidden');
+    restoreBox?.classList.add('hidden');
+    headerActions?.classList.remove('hidden');
+    if (btnParams) btnParams.className = activeCls;
+    if (btnRestore) btnRestore.className = inactiveCls;
+  }
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    const root = document.getElementById('sys-config');
+    if (root) lucide.createIcons({ root });
+  }
+}
+
+export async function loadDeletedRecords(): Promise<void> {
+  const user = getCurrentAppUser();
+  if (!user || !isMasterAccount(user)) return;
+
+  const entityType = (document.getElementById('sysRestoreEntityFilter') as HTMLSelectElement | null)?.value || 'ALL';
+  const tbody = document.getElementById('sysRestoreTableBody');
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 text-xs">Đang tải lịch sử dữ liệu đã xóa...</td></tr>`;
+  }
+
+  try {
+    const resp = await fetch(`/api/system/deleted-records?entity_type=${encodeURIComponent(entityType)}`, {
+      headers: { 'X-User-Email': user.email || '' }
+    });
+    const json = await resp.json();
+    if (!resp.ok || !json.success) {
+      throw new Error(json.error || 'Không thể tải danh sách');
+    }
+    gDeletedRecordsList = json.data || [];
+    filterDeletedRecords();
+  } catch (err: any) {
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 text-xs">${escapeAttr(err?.message || 'Lỗi tải dữ liệu')}</td></tr>`;
+    }
+  }
+}
+
+export function filterDeletedRecords(): void {
+  const q = ((document.getElementById('sysRestoreSearchInput') as HTMLInputElement | null)?.value || '').trim().toLowerCase();
+  const filtered = gDeletedRecordsList.filter(r => {
+    if (!q) return true;
+    return (
+      String(r.doc_code || '').toLowerCase().includes(q) ||
+      String(r.summary || '').toLowerCase().includes(q) ||
+      String(r.site_code || '').toLowerCase().includes(q) ||
+      String(r.user_email || '').toLowerCase().includes(q) ||
+      String(r.old_data || '').toLowerCase().includes(q)
+    );
+  });
+
+  const tbody = document.getElementById('sysRestoreTableBody');
+  const mob = document.getElementById('sysRestoreMobileCards');
+
+  if (!filtered.length) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 text-xs">Chưa có bản ghi đã xóa nào phù hợp bộ lọc.</td></tr>`;
+    if (mob) mob.innerHTML = `<div class="p-6 text-center text-gray-400 text-xs bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Chưa có bản ghi đã xóa nào.</div>`;
+    return;
+  }
+
+  if (tbody) {
+    tbody.innerHTML = filtered.map(r => {
+      const meta = ENTITY_LABELS[String(r.entity_type || '').toUpperCase()] || { label: r.entity_type, badge: 'bg-gray-100 text-gray-700 border-gray-200' };
+      const timeStr = r.created_at ? String(r.created_at).replace('T', ' ').slice(0, 19) : '—';
+      const actionHtml = r.is_restored
+        ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Đã khôi phục</span>`
+        : `<button type="button" onclick="restoreDeletedRecord(${r.id})" class="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors shadow-2xs"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Khôi phục</button>`;
+
+      return `
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="p-3 font-mono text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">${escapeAttr(timeStr)}</td>
+          <td class="p-3 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ${meta.badge}">${escapeAttr(meta.label)}</span>
+          </td>
+          <td class="p-3 font-mono text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap">${escapeAttr(r.doc_code || r.entity_id || '—')}</td>
+          <td class="p-3 text-center font-mono text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">${escapeAttr(r.site_code || 'ALL')}</td>
+          <td class="p-3 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">${escapeAttr(r.user_email || '—')}</td>
+          <td class="p-3 text-xs text-gray-800 dark:text-gray-200 min-w-[220px]">${escapeAttr(r.summary || '—')}</td>
+          <td class="p-3 text-right whitespace-nowrap">${actionHtml}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  if (mob) {
+    mob.innerHTML = filtered.map(r => {
+      const meta = ENTITY_LABELS[String(r.entity_type || '').toUpperCase()] || { label: r.entity_type, badge: 'bg-gray-100 text-gray-700 border-gray-200' };
+      const timeStr = r.created_at ? String(r.created_at).replace('T', ' ').slice(0, 19) : '—';
+      const actionHtml = r.is_restored
+        ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">Đã khôi phục</span>`
+        : `<button type="button" onclick="restoreDeletedRecord(${r.id})" class="px-3 py-1.5 rounded-lg bg-brand-500 text-white text-xs font-bold inline-flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Khôi phục</button>`;
+
+      return `
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-4 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ${meta.badge}">${escapeAttr(meta.label)}</span>
+            <span class="font-mono text-[11px] text-gray-400">${escapeAttr(timeStr)}</span>
+          </div>
+          <div class="font-mono text-xs font-bold text-gray-900 dark:text-white">${escapeAttr(r.doc_code || r.entity_id || '—')} • ${escapeAttr(r.site_code || 'ALL')}</div>
+          <div class="text-xs text-gray-600 dark:text-gray-300">${escapeAttr(r.summary || '—')}</div>
+          <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+            <span class="text-[11px] text-gray-400">${escapeAttr(r.user_email || '—')}</span>
+            ${actionHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    const root = document.getElementById('sysConfigRestoreContainer');
+    if (root) lucide.createIcons({ root });
+  }
+}
+
+export async function restoreDeletedRecord(auditLogId: number): Promise<void> {
+  const user = getCurrentAppUser();
+  if (!user || !isMasterAccount(user)) {
+    if (typeof showToast === 'function') showToast('Chỉ tài khoản trantuandai2508 được phép khôi phục dữ liệu!', 'error');
+    return;
+  }
+
+  try {
+    const resp = await fetch('/api/system/restore', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Email': user.email || ''
+      },
+      body: JSON.stringify({ requestorEmail: user.email || '', auditLogId })
+    });
+    const json = await resp.json();
+    if (!resp.ok || !json.success) {
+      if (typeof showToast === 'function') showToast(json.error || 'Khôi phục thất bại!', 'error');
+      return;
+    }
+    if (typeof showToast === 'function') showToast(json.message || 'Khôi phục dữ liệu thành công!', 'success');
+    await loadDeletedRecords();
+  } catch (err: any) {
+    if (typeof showToast === 'function') showToast('Lỗi kết nối khi khôi phục: ' + (err?.message || err), 'error');
+  }
+}
+
 if (typeof window !== 'undefined') {
   const w = window as any;
   w.loadSystemConfig = loadSystemConfig;
@@ -416,4 +605,8 @@ if (typeof window !== 'undefined') {
   w.addCategoryRuleRow = addCategoryRuleRow;
   w.removeCategoryRuleRow = removeCategoryRuleRow;
   w.updateCategoryRuleField = updateCategoryRuleField;
+  w.switchSysConfigSubView = switchSysConfigSubView;
+  w.loadDeletedRecords = loadDeletedRecords;
+  w.filterDeletedRecords = filterDeletedRecords;
+  w.restoreDeletedRecord = restoreDeletedRecord;
 }

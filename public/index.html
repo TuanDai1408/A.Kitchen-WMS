@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261126_1345">
+  <link rel="stylesheet" href="/assets/app.css?v=20261126_1415">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261126_1345"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261126_1415"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1674,7 +1674,7 @@
               </p>
               <div id="sysConfigLastUpdated" class="text-xs text-gray-400 dark:text-gray-500 mt-1.5 font-mono">Đang tải thông tin cấu hình...</div>
             </div>
-            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div id="sysConfigHeaderActions" class="flex flex-wrap items-center gap-2.5 shrink-0">
               <button type="button" onclick="resetSystemConfigToDefault()" class="px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
                 <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                 <span>Khôi phục mặc định</span>
@@ -1685,6 +1685,18 @@
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- Underline Sub-tabs -->
+        <div class="flex items-center gap-6 border-b border-gray-200 dark:border-gray-800 overflow-x-auto select-none">
+          <button id="btnSubTabSysCfgParams" type="button" onclick="switchSysConfigSubView('params')" class="pb-2.5 px-1 border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+            <span>Tham số &amp; quy tắc vận hành</span>
+          </button>
+          <button id="btnSubTabSysCfgRestore" type="button" onclick="switchSysConfigSubView('restore')" class="pb-2.5 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap -mb-px">
+            <i data-lucide="history" class="w-3.5 h-3.5"></i>
+            <span>Khôi phục dữ liệu đã xóa</span>
+          </button>
         </div>
 
         <div id="sysConfigLockBanner" class="hidden rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 p-6 text-center space-y-2">
@@ -1915,6 +1927,51 @@
                 <tbody id="cfgCategoryRulesBody" class="divide-y divide-gray-100 dark:divide-gray-800/70"></tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <!-- Sub-view 2: Khôi phục dữ liệu đã xóa (Audit Logs Trash) -->
+        <div id="sysConfigRestoreContainer" class="hidden space-y-4">
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-3 shadow-theme-xs flex flex-wrap lg:flex-nowrap items-center gap-3">
+            <div class="relative flex-1 min-w-[220px]">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="sysRestoreSearchInput" oninput="filterDeletedRecords()" placeholder="Tìm mã lô, mã phiếu, SKU, người xóa..." class="input pl-9 w-full font-sans text-xs">
+            </div>
+            <select id="sysRestoreEntityFilter" onchange="loadDeletedRecords()" class="select font-sans w-full sm:w-auto min-w-fit whitespace-nowrap text-xs">
+              <option value="ALL">Tất cả phân hệ có xóa</option>
+              <option value="BATCH">Quản lý lô hàng (FEFO)</option>
+              <option value="KITCHEN_ISSUE">Xuất kho sử dụng</option>
+              <option value="WASTE">Hủy hàng &amp; hao hụt</option>
+              <option value="COUNT">Kiểm kê hằng ngày</option>
+              <option value="RECEIPT">Nhập kho tại site</option>
+              <option value="ORDER">Đặt hàng vật tư bếp</option>
+              <option value="VOUCHER">Chứng từ kế toán</option>
+            </select>
+            <button type="button" onclick="loadDeletedRecords()" class="btn btn-secondary text-xs shrink-0">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
+            </button>
+          </div>
+
+          <div class="table-card p-5">
+            <div class="hidden lg:block table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="col-date">Thời gian xóa</th>
+                    <th>Phân hệ</th>
+                    <th class="col-code">Mã phiếu / Lô</th>
+                    <th class="col-code text-center">Site</th>
+                    <th>Người thực hiện</th>
+                    <th>Nội dung đã xóa</th>
+                    <th class="text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="sysRestoreTableBody">
+                  <tr><td colspan="7" class="p-8 text-center text-gray-400 text-xs">Đang tải lịch sử dữ liệu đã xóa...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="sysRestoreMobileCards" class="block lg:hidden space-y-3"></div>
           </div>
         </div>
       </section>
