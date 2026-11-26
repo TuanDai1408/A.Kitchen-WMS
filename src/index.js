@@ -4606,9 +4606,9 @@ export default {
 
       if (pathname === '/api/system/config' && request.method === 'POST') {
         await ensureSystemSettingsTable(env);
-        const caller = await getCaller(env, request);
+        const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
-        const requestorEmail = caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
+        const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
         const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
         if (!isMaster) {
           return new Response(JSON.stringify({
@@ -4669,9 +4669,9 @@ export default {
 
       if (pathname === '/api/system/config/reset' && request.method === 'POST') {
         await ensureSystemSettingsTable(env);
-        const caller = await getCaller(env, request);
+        const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
-        const requestorEmail = caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
+        const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
         const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
         if (!isMaster) {
           return new Response(JSON.stringify({
