@@ -167,7 +167,7 @@ export function renderCategoryRulesTable(): void {
         <input type="number" min="1" step="1" value="${r.leadtime_days}" oninput="updateCategoryRuleField(${idx}, 'leadtime_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
       </td>
       <td class="p-2.5 text-center">
-        <button type="button" onclick="removeCategoryRuleRow(${idx})" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
+        <button type="button" onclick="removeCategoryRuleRow(${idx})" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
         </button>
       </td>

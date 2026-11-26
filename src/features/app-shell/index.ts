@@ -17,7 +17,8 @@ import {
   renderKpi,
   showToast,
   showLoading,
-  hideLoading
+  hideLoading,
+  showAppConfirmModal
 } from './ui-feedback';
 
 import {
@@ -118,6 +119,7 @@ if (typeof window !== 'undefined') {
   w.showToast = showToast;
   w.showLoading = showLoading;
   w.hideLoading = hideLoading;
+  w.showAppConfirmModal = showAppConfirmModal;
 
   // Sidebar
   w.openSidebar = openSidebar;
@@ -178,14 +180,20 @@ if (typeof window !== 'undefined') {
   w.initFnbSiteSelectors = initFnbSiteSelectors;
   w.initSystem = initSystem;
 
-  // Global Ctrl+K / Cmd+K search shortcut listener
+  // Global Ctrl+K / Cmd+K / F2 search shortcut listener
   window.addEventListener('keydown', (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+    if (((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) || e.key === 'F2') {
       e.preventDefault();
-      const searchInput = (document.getElementById('globalHeaderSearch') || document.getElementById('sidebarMenuSearch')) as HTMLInputElement | null;
+      const sidebarEl = document.getElementById('sidebar');
+      if (sidebarEl && (sidebarEl.classList.contains('-translate-x-full') || sidebarEl.classList.contains('lg:hidden'))) {
+        toggleSidebar();
+      }
+      const searchInput = document.getElementById('sidebarMenuSearch') as HTMLInputElement | null;
       if (searchInput) {
-        searchInput.focus();
-        if (typeof searchInput.select === 'function') searchInput.select();
+        setTimeout(() => {
+          searchInput.focus();
+          if (typeof searchInput.select === 'function') searchInput.select();
+        }, 50);
       }
     }
   });

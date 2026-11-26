@@ -523,7 +523,11 @@ export async function submitManualReceipt(): Promise<void> {
   }
 
   if (hasExpired) {
-    const ok = confirm('Cảnh báo: Có mặt hàng có Hạn Dùng (EXP) đã hết hạn hoặc hết hạn hôm nay. Bạn có chắc chắn muốn nhập kho không?');
+    const confirmFn = (window as any).showAppConfirmModal;
+    const msg = 'Cảnh báo: Có mặt hàng có Hạn Dùng (EXP) đã hết hạn hoặc hết hạn hôm nay. Bạn có chắc chắn muốn nhập kho không?';
+    const ok = typeof confirmFn === 'function'
+      ? await confirmFn(msg, { title: 'Cảnh báo Hạn Sử Dụng', confirmText: 'Vẫn nhập kho', danger: true })
+      : confirm(msg);
     if (!ok) return;
   }
 

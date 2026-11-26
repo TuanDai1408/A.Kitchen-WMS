@@ -154,3 +154,50 @@ export function hideLoading(): void {
   const loadingEl = document.getElementById('loading');
   if (loadingEl) loadingEl.classList.add('hidden');
 }
+
+export function showAppConfirmModal(
+  message: string,
+  options?: { title?: string; confirmText?: string; cancelText?: string; danger?: boolean }
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('globalConfirmModal');
+    const titleEl = document.getElementById('globalConfirmTitle');
+    const msgEl = document.getElementById('globalConfirmMessage');
+    const okBtn = document.getElementById('globalConfirmOkBtn') as HTMLButtonElement | null;
+    const cancelBtn = document.getElementById('globalConfirmCancelBtn') as HTMLButtonElement | null;
+    const iconWrap = document.getElementById('globalConfirmIconWrap');
+
+    if (!modal || !okBtn || !cancelBtn) {
+      resolve(window.confirm(message));
+      return;
+    }
+
+    if (titleEl) titleEl.textContent = options?.title || 'Xác nhận thao tác';
+    if (msgEl) msgEl.textContent = message;
+    okBtn.textContent = options?.confirmText || 'Xác nhận';
+    cancelBtn.textContent = options?.cancelText || 'Hủy';
+
+    if (options?.danger) {
+      okBtn.className = 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors';
+      if (iconWrap) iconWrap.className = 'w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0';
+    } else {
+      okBtn.className = 'px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-xs transition-colors';
+      if (iconWrap) iconWrap.className = 'w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0';
+    }
+
+    const cleanup = (result: boolean) => {
+      modal.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    modal.classList.remove('hidden');
+    const w = typeof window !== 'undefined' ? (window as any) : {};
+    if (w.lucide && typeof w.lucide.createIcons === 'function') w.lucide.createIcons({ root: modal });
+  });
+}

@@ -292,8 +292,8 @@ export function renderOrderCartSummary(): void {
         <td class="py-1.5 px-2.5 text-right font-mono text-gray-600 dark:text-gray-300 tabular-nums">${fmtVND(price)}</td>
         <td class="py-1.5 px-2.5 text-right font-mono font-bold text-brand-600 dark:text-brand-400 tabular-nums">${fmtVND(lineAmt)}</td>
         <td class="py-1.5 px-2 text-center">
-          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          <button type="button" onclick="removeOrderCartItem('${safeEscapeHtml(it.maHang)}')" class="p-2 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Bỏ mặt hàng này">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </td>
       </tr>

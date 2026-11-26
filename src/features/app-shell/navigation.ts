@@ -211,6 +211,7 @@ function getDefaultTwoMonthRange(): { startDate: string; endDate: string } {
 let gGlobalDateRange = getDefaultTwoMonthRange();
 let gDateFetchInterceptorInstalled = false;
 let gGlobalFlatpickrInstance: any = null;
+let gMobileFlatpickrInstance: any = null;
 
 export function getGlobalDateRange(): { startDate: string; endDate: string; month: string } {
   return {
@@ -269,11 +270,12 @@ export function initGlobalDateRangePicker(): void {
   const hiddenMonth = document.getElementById('globalMonthPicker') as HTMLInputElement | null;
   if (hiddenMonth) hiddenMonth.value = gGlobalDateRange.endDate.slice(0, 7);
 
+  const localeObj = (flatpickr.l10ns && flatpickr.l10ns.vn) ? flatpickr.l10ns.vn : ((flatpickr.l1ons && flatpickr.l1ons.vn) ? flatpickr.l1ons.vn : 'default');
   gGlobalFlatpickrInstance = flatpickr(el, {
     mode: 'range',
     dateFormat: 'd/m/Y',
     defaultDate: [startDt, endDt],
-    locale: (flatpickr.l10ns && flatpickr.l10ns.vn) ? flatpickr.l10ns.vn : ((flatpickr.l1ons && flatpickr.l1ons.vn) ? flatpickr.l1ons.vn : 'default'),
+    locale: localeObj,
     onChange: (selectedDates: Date[]) => {
       if (selectedDates && selectedDates.length === 2) {
         document.querySelectorAll('.global-date-preset').forEach(b => {
@@ -282,13 +284,40 @@ export function initGlobalDateRangePicker(): void {
         });
         const sIso = formatIsoDate(selectedDates[0]);
         const eIso = formatIsoDate(selectedDates[1]);
+        if (gMobileFlatpickrInstance && typeof gMobileFlatpickrInstance.setDate === 'function') {
+          gMobileFlatpickrInstance.setDate(selectedDates, false);
+        }
         onGlobalDateRangeChange(sIso, eIso);
       }
     }
   });
+
+  const mobEl = document.getElementById('mobileDateRangePicker') as HTMLInputElement | null;
+  if (mobEl) {
+    gMobileFlatpickrInstance = flatpickr(mobEl, {
+      mode: 'range',
+      dateFormat: 'd/m/Y',
+      defaultDate: [startDt, endDt],
+      locale: localeObj,
+      onChange: (selectedDates: Date[]) => {
+        if (selectedDates && selectedDates.length === 2) {
+          document.querySelectorAll('.global-date-preset').forEach(b => {
+            b.classList.remove('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
+            b.classList.add('text-gray-600', 'dark:text-gray-300', 'font-medium');
+          });
+          const sIso = formatIsoDate(selectedDates[0]);
+          const eIso = formatIsoDate(selectedDates[1]);
+          if (gGlobalFlatpickrInstance && typeof gGlobalFlatpickrInstance.setDate === 'function') {
+            gGlobalFlatpickrInstance.setDate(selectedDates, false);
+          }
+          onGlobalDateRangeChange(sIso, eIso);
+        }
+      }
+    });
+  }
 }
 
-export function applyGlobalDatePreset(preset: '7d' | '30d' | '2m' | 'this_month', btn?: HTMLElement): void {
+export function applyGlobalDatePreset(preset: '7d' | '30d' | '2m' | 'this_month', _btn?: HTMLElement): void {
   const end = new Date();
   let start = new Date();
   if (preset === '7d') {
@@ -305,14 +334,16 @@ export function applyGlobalDatePreset(preset: '7d' | '30d' | '2m' | 'this_month'
     b.classList.remove('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
     b.classList.add('text-gray-600', 'dark:text-gray-300', 'font-medium');
   });
-  const targetBtn = btn || document.querySelector(`.global-date-preset[data-preset="${preset}"]`);
-  if (targetBtn) {
+  document.querySelectorAll(`.global-date-preset[data-preset="${preset}"]`).forEach(targetBtn => {
     targetBtn.classList.add('active', 'bg-brand-500', 'text-white', 'font-bold', 'shadow-2xs');
     targetBtn.classList.remove('text-gray-600', 'dark:text-gray-300', 'font-medium');
-  }
+  });
 
   if (gGlobalFlatpickrInstance && typeof gGlobalFlatpickrInstance.setDate === 'function') {
     gGlobalFlatpickrInstance.setDate([start, end], false);
+  }
+  if (gMobileFlatpickrInstance && typeof gMobileFlatpickrInstance.setDate === 'function') {
+    gMobileFlatpickrInstance.setDate([start, end], false);
   }
   onGlobalDateRangeChange(formatIsoDate(start), formatIsoDate(end));
 }

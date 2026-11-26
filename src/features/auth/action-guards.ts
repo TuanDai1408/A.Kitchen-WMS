@@ -177,7 +177,7 @@ export function assertPermission(featureCode: string, action: 'edit' | 'delete' 
     if (typeof (window as any).showToast === 'function') {
       (window as any).showToast(msg, 'warning');
     } else {
-      alert(msg);
+      console.warn('[Permission Denied]', msg);
     }
     return false;
   }

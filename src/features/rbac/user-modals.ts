@@ -320,9 +320,15 @@ export async function resetUserAllPermsPrompt(): Promise<void> {
   const userEmail = (document.getElementById('editUserTargetEmail') as HTMLInputElement | null)?.value;
   if (!userEmail) return;
 
-  if (!confirm(`Bạn có chắc chắn muốn xóa tất cả phân quyền riêng và khôi phục quyền mặc định theo vai trò cho ${userEmail}?`)) {
-    return;
-  }
+  const confirmFn = (window as any).showAppConfirmModal;
+  const ok = typeof confirmFn === 'function'
+    ? await confirmFn(`Bạn có chắc chắn muốn xóa tất cả phân quyền riêng và khôi phục quyền mặc định theo vai trò cho ${userEmail}?`, {
+        title: 'Khôi phục quyền mặc định',
+        confirmText: 'Khôi phục',
+        danger: true
+      })
+    : confirm(`Bạn có chắc chắn muốn xóa tất cả phân quyền riêng và khôi phục quyền mặc định theo vai trò cho ${userEmail}?`);
+  if (!ok) return;
 
   try {
     if (typeof showLoading === 'function') showLoading();
@@ -358,7 +364,15 @@ export async function bulkSetUserPermissionsPrompt(action: 'REVOKE_ALL' | 'GRANT
     ? `Bạn có chắc chắn muốn KHÓA / CẮT TOÀN BỘ 20 tab phân quyền của tài khoản ${userEmail}?\n\nSau khi khóa, tài khoản này sẽ bị chặn và không thể xem hay sử dụng bất kỳ tab tính năng nào trên hệ thống.`
     : `Bạn có chắc chắn muốn CẤP TOÀN BỘ 20 tab phân quyền cho tài khoản ${userEmail}?`;
 
-  if (!confirm(confirmMsg)) return;
+  const confirmFn = (window as any).showAppConfirmModal;
+  const ok = typeof confirmFn === 'function'
+    ? await confirmFn(confirmMsg, {
+        title: isRevoke ? 'Khóa toàn bộ quyền' : 'Cấp toàn bộ quyền',
+        confirmText: isRevoke ? 'Khóa toàn bộ' : 'Cấp toàn bộ',
+        danger: isRevoke
+      })
+    : confirm(confirmMsg);
+  if (!ok) return;
 
   await bulkSetUserPermissions(userEmail, action);
   closeEditUserModal();
