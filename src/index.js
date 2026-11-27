@@ -4871,6 +4871,10 @@ export default {
           }
 
           if (request.method === 'POST') {
+            const caller = await getCallerPermissions(env, request);
+            if (!caller?.isMaster && !caller?.permissions?.['hr-employees']?.canCreate) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền thêm/import nhân sự' }), { headers: corsHeaders, status: 403 });
+            }
             const body = await request.json().catch(() => ({}));
             const list = Array.isArray(body.employees) ? body.employees : [body];
             let saved = 0;
@@ -4909,6 +4913,10 @@ export default {
           }
 
           if (request.method === 'PUT') {
+            const caller = await getCallerPermissions(env, request);
+            if (!caller?.isMaster && !caller?.permissions?.['hr-employees']?.canEdit) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền chỉnh sửa nhân sự' }), { headers: corsHeaders, status: 403 });
+            }
             const body = await request.json().catch(() => ({}));
             const idVal = Number(body.id);
             const empCode = String(body.emp_code || '').trim();
@@ -4934,6 +4942,10 @@ export default {
           }
 
           if (request.method === 'DELETE') {
+            const caller = await getCallerPermissions(env, request);
+            if (!caller?.isMaster && !caller?.permissions?.['hr-employees']?.canDelete) {
+              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền xóa nhân sự' }), { headers: corsHeaders, status: 403 });
+            }
             const idVal = Number(searchParams.get('id'));
             if (!idVal) {
               return new Response(JSON.stringify({ success: false, error: 'Thiếu id nhân sự' }), { headers: corsHeaders, status: 400 });

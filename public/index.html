@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1415">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1425">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1415"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1425"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1704,13 +1704,16 @@
           </div>
           <div class="flex items-center gap-2 flex-wrap shrink-0">
             <input type="file" id="hrImportExcelInput" accept=".xlsx,.xls" class="hidden" onchange="importHrEmployeesExcel(this)">
-            <button type="button" onclick="document.getElementById('hrImportExcelInput').click()" class="btn btn-secondary">
+            <button type="button" onclick="downloadHrTemplateExcel()" class="btn btn-secondary" title="Tải file Excel mẫu để nhập danh sách nhân sự">
+              <i data-lucide="download" class="w-4 h-4"></i> Tải file mẫu
+            </button>
+            <button type="button" id="btnHrImportExcel" onclick="document.getElementById('hrImportExcelInput').click()" class="btn btn-secondary">
               <i data-lucide="upload" class="w-4 h-4"></i> Import Excel
             </button>
             <button type="button" onclick="exportHrEmployeesExcel()" class="btn btn-secondary">
               <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
             </button>
-            <button type="button" onclick="openHrEmployeeModal()" class="btn btn-primary">
+            <button type="button" id="btnHrAddEmployee" onclick="openHrEmployeeModal()" class="btn btn-primary">
               <i data-lucide="user-plus" class="w-4 h-4"></i> Thêm nhân sự
             </button>
           </div>
@@ -1861,11 +1864,13 @@
             </div>
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Chức danh công việc</label>
-              <input type="text" id="hrFormJobTitle" class="input w-full" placeholder="VD: Nhân viên Phụ bếp">
+              <select id="hrFormJobTitle" onchange="onHrSelectCustomToggle('hrFormJobTitle', 'hrFormJobTitleCustom')" class="select w-full"></select>
+              <input type="text" id="hrFormJobTitleCustom" class="input w-full mt-1.5 hidden" placeholder="Nhập chức danh mới...">
             </div>
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nơi làm việc</label>
-              <input type="text" id="hrFormWorkLocation" class="input w-full" placeholder="VD: HUB Đa Phúc">
+              <select id="hrFormWorkLocation" onchange="onHrSelectCustomToggle('hrFormWorkLocation', 'hrFormWorkLocationCustom')" class="select w-full"></select>
+              <input type="text" id="hrFormWorkLocationCustom" class="input w-full mt-1.5 hidden" placeholder="Nhập nơi làm việc mới...">
             </div>
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Giới tính</label>
