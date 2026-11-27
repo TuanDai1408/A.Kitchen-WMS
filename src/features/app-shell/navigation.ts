@@ -501,6 +501,8 @@ export function onGlobalBranchChange(code?: string): void {
   if (ropBadge) ropBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : targetSite;
   const hsBadge = document.getElementById('hsCurrentSiteBadge');
   if (hsBadge) hsBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
+  const hrBadge = document.getElementById('hrCurrentSiteBadge');
+  if (hrBadge) hrBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : (code === 'ALL' ? 'Tất cả điểm bán' : targetSite);
 
   // Sync tab Xuất kho sử dụng badge
   const kitchenBadge = document.getElementById('kitchenIssueCurrentSiteBadge');
@@ -550,6 +552,7 @@ export function onGlobalBranchChange(code?: string): void {
     if (typeof w.loadWhInventory === 'function') w.loadWhInventory();
     if (typeof w.loadWhReceivedOrders === 'function') w.loadWhReceivedOrders();
     if (typeof w.loadHistory === 'function') w.loadHistory();
+    if (typeof w.filterHrEmployees === 'function') w.filterHrEmployees();
     if (typeof w.searchVouchers === 'function') w.searchVouchers();
     else if (typeof w.loadPoSap === 'function') w.loadPoSap();
   } catch (e) {

@@ -116,14 +116,54 @@ function updateHrKpis(list: HrEmployee[]): void {
   setTxt('hrKpiLocations', locCount);
 }
 
+function getActiveGlobalHrSite(): string {
+  const globalSel = (document.getElementById('globalBranchSelect') as HTMLSelectElement | null)?.value;
+  const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('orbit_user_site') : null;
+  const raw = (globalSel || saved || 'ALL').trim().toUpperCase();
+  return raw || 'ALL';
+}
+
+function matchEmployeeToGlobalSite(emp: HrEmployee, siteCode: string): boolean {
+  if (!siteCode || siteCode === 'ALL') return true;
+  const loc = (emp.work_location || '').toLowerCase().trim();
+  if (!loc) return false;
+  if (loc.includes(siteCode.toLowerCase())) return true;
+
+  const sitesList = typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : [];
+  const siteObj = sitesList.find((s: any) => s?.code && s.code.toUpperCase() === siteCode);
+  if (!siteObj) return false;
+
+  const fullName = String(siteObj.ten || siteObj.name || '').toLowerCase();
+  const stripped = fullName
+    .replace(/^[a-z]\d{3}\s*-\s*/i, '')
+    .replace(/^(mn|mb)\s+a\.?kitchen\s*-\s*/i, '')
+    .trim();
+  return Boolean(stripped && (loc.includes(stripped) || stripped.includes(loc)));
+}
+
 export function filterHrEmployees(): void {
+  const activeSite = getActiveGlobalHrSite();
+  const siteScoped = gHrEmployees.filter(e => matchEmployeeToGlobalSite(e, activeSite));
+  updateHrKpis(siteScoped);
+
+  const hrBadge = document.getElementById('hrCurrentSiteBadge');
+  if (hrBadge) {
+    if (activeSite === 'ALL') {
+      hrBadge.textContent = 'Tất cả điểm bán';
+    } else {
+      const sitesList = typeof window.getAppSitesList === 'function' ? window.getAppSitesList() : [];
+      const siteObj = sitesList.find((s: any) => s?.code && s.code.toUpperCase() === activeSite);
+      hrBadge.textContent = siteObj ? (siteObj.ten || siteObj.name) : activeSite;
+    }
+  }
+
   const q = ((document.getElementById('hrSearchInput') as HTMLInputElement | null)?.value || '').toLowerCase().trim();
   const status = (document.getElementById('hrFilterStatus') as HTMLSelectElement | null)?.value || '';
   const loc = (document.getElementById('hrFilterLocation') as HTMLSelectElement | null)?.value || '';
   const job = (document.getElementById('hrFilterJobTitle') as HTMLSelectElement | null)?.value || '';
   const empType = (document.getElementById('hrFilterEmpType') as HTMLSelectElement | null)?.value || '';
 
-  gHrFiltered = gHrEmployees.filter(e => {
+  gHrFiltered = siteScoped.filter(e => {
     if (q) {
       const match =
         (e.emp_code || '').toLowerCase().includes(q) ||
