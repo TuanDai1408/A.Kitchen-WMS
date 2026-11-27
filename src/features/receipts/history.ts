@@ -1,6 +1,7 @@
 import { escapeHtml } from '@/ts/utils/formatters';
 import { formatReceiptDateYMD, getActiveFnbReceiptSite } from './helpers';
 import { canUserEdit, canUserDelete, assertPermission } from '@/features/auth';
+import { exportReceiptExcel, ReceiptExportSlip } from './export-excel';
 
 declare const window: any;
 
@@ -88,6 +89,9 @@ export function renderFnbReceiptsHistoryTable(): void {
               <button type="button" onclick="viewReceiptDetail(${r.id})" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Xem chi tiết phiếu">
                 <i data-lucide="eye" class="w-4 h-4"></i>
               </button>
+              <button type="button" onclick="exportReceiptById(${r.id})" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 transition-colors" title="Xuất phiếu Excel nhập hàng (Aptos)">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              </button>
               ${canEdit ? `
                 <button type="button" onclick="openEditReceiptModal(${r.id})" class="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 transition-colors" title="Sửa phiếu nhập kho">
                   <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -124,6 +128,7 @@ export function renderFnbReceiptsHistoryTable(): void {
           </div>
           <div class="flex items-center justify-end gap-1.5 pt-2 border-t border-gray-100 dark:border-gray-800 flex-wrap">
             <button type="button" onclick="viewReceiptDetail(${r.id})" class="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-xs">Xem</button>
+            <button type="button" onclick="exportReceiptById(${r.id})" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-xs">Excel</button>
             ${canEdit ? `
               <button type="button" onclick="openEditReceiptModal(${r.id})" class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold text-xs">Sửa</button>
             ` : ''}
@@ -164,18 +169,34 @@ export async function loadFnbReceiptsHistory(siteCodeArg?: string): Promise<void
 export async function viewReceiptDetail(receiptId: number | string): Promise<void> {
   try {
     if (typeof window.showLoading === 'function') window.showLoading();
-    const res = await fetch(`/api/fnb/receipts?id=${receiptId}`);
+    const res = await fetch(`/api/fnb/receipts?id=${receiptId}&no-cache=1`);
     const json = await res.json();
     if (!json.success) throw new Error('Không tải được phiếu nhập');
 
+    const header = (json.data.receipts || []).find((r: any) => String(r.id) === String(receiptId))
+      || (window.gFnbReceiptsHistory || []).find((r: any) => String(r.id) === String(receiptId))
+      || { id: receiptId, receipt_code: `PNK-${receiptId}`, site_code: getActiveFnbReceiptSite(), receipt_date: new Date().toISOString().slice(0, 10) };
     const lines: any[] = json.data.lines || [];
+    window.gCurrentViewingReceiptSlip = { ...header, lines };
+
     const modal = document.getElementById('invDetailModal');
     const titleEl = document.getElementById('invDetailModalTitle');
     const subEl = document.getElementById('invDetailModalSub');
-    if (titleEl) titleEl.textContent = `Chi Tiết Phiếu Nhập #${receiptId}`;
-    if (subEl) subEl.textContent = `${lines.length} mặt hàng nhập kho`;
+    if (titleEl) titleEl.textContent = `Chi Tiết Phiếu Nhập ${header.receipt_code || '#' + receiptId}`;
+    if (subEl) subEl.textContent = `${lines.length} mặt hàng nhập kho • Điểm bán ${header.site_code || ''}`;
 
     const html = `
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          Ngày nhập: <b class="font-mono text-gray-800 dark:text-gray-200">${escapeHtml(formatReceiptDateYMD(header.receipt_date))}</b>
+          • NCC: <b class="text-gray-800 dark:text-gray-200">${escapeHtml(header.supplier || 'Bếp Trung Tâm Siba')}</b>
+          ${header.invoice_no ? ` • PO/HĐ: <b class="font-mono text-gray-800 dark:text-gray-200">${escapeHtml(header.invoice_no)}</b>` : ''}
+        </div>
+        <button type="button" onclick="exportCurrentReceiptDetail()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+          <span>Xuất Phiếu Excel (Aptos)</span>
+        </button>
+      </div>
       <div class="overflow-x-auto">
         <table class="data-table">
           <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 border-b border-gray-200 dark:border-gray-800">
@@ -217,6 +238,39 @@ export async function viewReceiptDetail(receiptId: number | string): Promise<voi
   } finally {
     if (typeof window.hideLoading === 'function') window.hideLoading();
   }
+}
+
+export async function exportReceiptById(receiptId: number | string): Promise<void> {
+  if (typeof window.showLoading === 'function') window.showLoading('Đang lấy chi tiết phiếu nhập kho để xuất Excel...');
+  try {
+    const res = await fetch(`/api/fnb/receipts?id=${encodeURIComponent(String(receiptId))}&no-cache=1`);
+    const json = await res.json();
+    if (!json.success || !json.data) throw new Error(json.error || 'Không tải được phiếu nhập kho');
+
+    const header = (json.data.receipts || []).find((r: any) => String(r.id) === String(receiptId))
+      || (window.gFnbReceiptsHistory || []).find((r: any) => String(r.id) === String(receiptId));
+    if (!header) throw new Error('Không tìm thấy thông tin phiếu nhập kho');
+
+    const fullReceipt: ReceiptExportSlip = {
+      ...header,
+      lines: json.data.lines || []
+    };
+    await exportReceiptExcel(fullReceipt);
+  } catch (err: any) {
+    console.error('exportReceiptById error:', err);
+    if (typeof window.showToast === 'function') window.showToast('Lỗi xuất Excel: ' + err.message, 'error');
+  } finally {
+    if (typeof window.hideLoading === 'function') window.hideLoading();
+  }
+}
+
+export async function exportCurrentReceiptDetail(): Promise<void> {
+  const slip = window.gCurrentViewingReceiptSlip;
+  if (!slip) {
+    if (typeof window.showToast === 'function') window.showToast('Không có dữ liệu phiếu nhập đang mở', 'warning');
+    return;
+  }
+  await exportReceiptExcel(slip);
 }
 
 export async function openEditReceiptModal(receiptId: number | string): Promise<void> {

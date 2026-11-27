@@ -26,7 +26,9 @@ import {
   saveEditReceipt,
   confirmDeleteReceipt,
   closeDeleteReceiptModal,
-  executeDeleteReceipt
+  executeDeleteReceipt,
+  exportReceiptById,
+  exportCurrentReceiptDetail
 } from './history';
 import {
   openManualReceiptModal,
@@ -57,6 +59,7 @@ export * from './po-list';
 export * from './po-modal';
 export * from './history';
 export * from './manual-modal';
+export * from './export-excel';
 
 // Attach all functions & globals to window for complete backwards compatibility
 const win = window as any;
@@ -107,6 +110,8 @@ win.saveEditReceipt = saveEditReceipt;
 win.confirmDeleteReceipt = confirmDeleteReceipt;
 win.closeDeleteReceiptModal = closeDeleteReceiptModal;
 win.executeDeleteReceipt = executeDeleteReceipt;
+win.exportReceiptById = exportReceiptById;
+win.exportCurrentReceiptDetail = exportCurrentReceiptDetail;
 
 // Manual Receipt Modal
 win.openManualReceiptModal = openManualReceiptModal;

@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Tailwind CSS v4
-        run: npm run build:css
+      - name: Type-check and Build CSS + TS
+        run: npm run type-check && npm run build
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

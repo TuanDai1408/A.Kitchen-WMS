@@ -2,6 +2,11 @@ name = "akitchen-kho-app"
 main = "src/index.js"
 compatibility_date = "2026-11-16"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+routes = [
+  { pattern = "warehouse.akitchen.site", custom_domain = true }
+]
 
 [vars]
 DB_BACKEND = "supabase"
