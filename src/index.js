@@ -527,7 +527,7 @@ const ALL_SYSTEM_FEATURES = [
   'fnb-chain', 'fnb-pl', 'fnb-pos', 'fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste',
   'wh-dashboard', 'wh-stock', 'wh-reorder', 'wh-leadtime', 'wh-posap',
   'portal-voucher', 'portal-search', 'portal-order', 'portal-history', 'portal-baocao', 'portal-kiemke',
-  'fnb-sites', 'user-matrix'
+  'fnb-sites', 'hr-employees', 'user-matrix'
 ];
 
 async function buildUserPermissions(env, user) {
@@ -4343,6 +4343,7 @@ export default {
           
           // Nhóm 5: Hệ Thống
           { code: 'fnb-sites', name: 'Danh Mục 14 Điểm Bán', group: 'sys-admin', groupName: 'Hệ Thống & Danh Mục', icon: 'building-2', color: 'purple' },
+          { code: 'hr-employees', name: 'Quản Lý Nhân Sự', group: 'sys-admin', groupName: 'Hệ Thống & Danh Mục', icon: 'users', color: 'purple' },
           { code: 'user-matrix', name: 'Quản Lý User & Phân Quyền', group: 'sys-admin', groupName: 'Hệ Thống & Danh Mục', icon: 'users-cog', color: 'purple' }
         ];
 
@@ -4833,6 +4834,118 @@ export default {
       // ======================================================================
       // 2.11.CFG CẤU HÌNH THAM SỐ HỆ THỐNG (ĐỌC PUBLIC ĐỂ ÁP DỤNG, GHI CHỈ trantuandai2508)
       // ======================================================================
+      // 2.11.4a QUẢN LÝ NHÂN SỰ (HR EMPLOYEES): GET / POST / PUT / DELETE /api/hr/employees
+      if (pathname === '/api/hr/employees') {
+        try {
+          await db.exec(env, `
+            CREATE TABLE IF NOT EXISTS hr_employees (
+              id SERIAL PRIMARY KEY,
+              emp_code TEXT UNIQUE NOT NULL,
+              full_name TEXT NOT NULL,
+              job_title TEXT,
+              gender TEXT,
+              hire_date DATE,
+              birth_date DATE,
+              age INTEGER,
+              status TEXT DEFAULT 'Đang làm việc',
+              work_location TEXT,
+              emp_type TEXT DEFAULT 'Fulltime',
+              phone TEXT,
+              company_email TEXT,
+              resign_date DATE,
+              notes TEXT,
+              created_at TIMESTAMPTZ DEFAULT NOW(),
+              updated_at TIMESTAMPTZ DEFAULT NOW()
+            )
+          `).catch(() => {});
+
+          if (request.method === 'GET') {
+            const { rows } = await db.query(env, `
+              SELECT id, emp_code, full_name, job_title, gender, hire_date, birth_date, age,
+                     COALESCE(NULLIF(status, ''), 'Đang làm việc') as status,
+                     work_location, emp_type, phone, company_email, resign_date, notes
+              FROM hr_employees
+              ORDER BY CASE WHEN status = 'Đã nghỉ' THEN 1 ELSE 0 END ASC, full_name ASC
+            `);
+            return new Response(JSON.stringify({ success: true, data: rows || [] }), { headers: corsHeaders });
+          }
+
+          if (request.method === 'POST') {
+            const body = await request.json().catch(() => ({}));
+            const list = Array.isArray(body.employees) ? body.employees : [body];
+            let saved = 0;
+            for (const emp of list) {
+              const empCode = String(emp.emp_code || '').trim();
+              const fullName = String(emp.full_name || '').trim();
+              if (!empCode || !fullName) continue;
+              const statusVal = String(emp.status || '').trim() || (emp.resign_date ? 'Đã nghỉ' : 'Đang làm việc');
+              await db.exec(env, `
+                INSERT INTO hr_employees (emp_code, full_name, job_title, gender, hire_date, birth_date, age, status, work_location, emp_type, phone, company_email, resign_date, notes, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ON CONFLICT (emp_code) DO UPDATE SET
+                  full_name = EXCLUDED.full_name,
+                  job_title = EXCLUDED.job_title,
+                  gender = EXCLUDED.gender,
+                  hire_date = EXCLUDED.hire_date,
+                  birth_date = EXCLUDED.birth_date,
+                  age = EXCLUDED.age,
+                  status = EXCLUDED.status,
+                  work_location = EXCLUDED.work_location,
+                  emp_type = EXCLUDED.emp_type,
+                  phone = EXCLUDED.phone,
+                  company_email = EXCLUDED.company_email,
+                  resign_date = EXCLUDED.resign_date,
+                  notes = COALESCE(EXCLUDED.notes, hr_employees.notes),
+                  updated_at = NOW()
+              `, [
+                empCode, fullName, emp.job_title || '', emp.gender || '',
+                emp.hire_date || null, emp.birth_date || null, emp.age ? Number(emp.age) : null,
+                statusVal, emp.work_location || '', emp.emp_type || 'Fulltime',
+                emp.phone || '', emp.company_email || '', emp.resign_date || null, emp.notes || ''
+              ]);
+              saved++;
+            }
+            return new Response(JSON.stringify({ success: true, saved }), { headers: corsHeaders });
+          }
+
+          if (request.method === 'PUT') {
+            const body = await request.json().catch(() => ({}));
+            const idVal = Number(body.id);
+            const empCode = String(body.emp_code || '').trim();
+            const fullName = String(body.full_name || '').trim();
+            if (!idVal || !empCode || !fullName) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu id, mã nhân viên hoặc họ tên' }), { headers: corsHeaders, status: 400 });
+            }
+            const statusVal = String(body.status || '').trim() || (body.resign_date ? 'Đã nghỉ' : 'Đang làm việc');
+            await db.exec(env, `
+              UPDATE hr_employees
+              SET emp_code = ?, full_name = ?, job_title = ?, gender = ?,
+                  hire_date = ?, birth_date = ?, age = ?, status = ?,
+                  work_location = ?, emp_type = ?, phone = ?, company_email = ?,
+                  resign_date = ?, notes = ?, updated_at = NOW()
+              WHERE id = ?
+            `, [
+              empCode, fullName, body.job_title || '', body.gender || '',
+              body.hire_date || null, body.birth_date || null, body.age ? Number(body.age) : null,
+              statusVal, body.work_location || '', body.emp_type || 'Fulltime',
+              body.phone || '', body.company_email || '', body.resign_date || null, body.notes || '', idVal
+            ]);
+            return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+          }
+
+          if (request.method === 'DELETE') {
+            const idVal = Number(searchParams.get('id'));
+            if (!idVal) {
+              return new Response(JSON.stringify({ success: false, error: 'Thiếu id nhân sự' }), { headers: corsHeaders, status: 400 });
+            }
+            await db.exec(env, `DELETE FROM hr_employees WHERE id = ?`, [idVal]);
+            return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+          }
+        } catch (err) {
+          return new Response(JSON.stringify({ success: false, error: err?.message || String(err) }), { headers: corsHeaders, status: 500 });
+        }
+      }
+
       if (pathname === '/api/system/config' && request.method === 'GET') {
         const cfg = await getSystemConfig(env);
         const { rows } = await db.query(env, `SELECT setting_key, updated_by, updated_at FROM system_settings`).catch(() => ({ rows: [] }));

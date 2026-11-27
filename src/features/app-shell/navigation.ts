@@ -162,6 +162,7 @@ export function switchTab(tabId: string, btn?: HTMLElement, forceReload: boolean
         if (tabId === 'fnb-kitchen-issue' && typeof w.loadFnbKitchenIssue === 'function') w.loadFnbKitchenIssue();
         if (tabId === 'fnb-waste' && typeof w.loadFnbWaste === 'function') w.loadFnbWaste();
         if (tabId === 'fnb-sites' && typeof w.loadFnbSites === 'function') w.loadFnbSites();
+        if (tabId === 'hr-employees' && typeof w.loadHrEmployees === 'function') w.loadHrEmployees();
         if (tabId === 'user-matrix' && typeof w.loadUserMatrix === 'function') w.loadUserMatrix();
         if (tabId === 'sys-config' && typeof w.loadSystemConfig === 'function') w.loadSystemConfig();
 

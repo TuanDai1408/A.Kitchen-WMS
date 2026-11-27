@@ -80,6 +80,7 @@ export const ALL_TAB_GROUPS: TabCategoryGroup[] = [
     color: 'purple',
     tabs: [
       { id: 'fnb-sites', name: 'Danh Mục 14 Điểm Bán', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống', icon: 'map-pin' },
+      { id: 'hr-employees', name: 'Quản Lý Nhân Sự', desc: 'Quản lý hồ sơ nhân sự, chức danh, nơi làm việc và trạng thái', icon: 'users' },
       { id: 'user-matrix', name: 'Phân Quyền User Matrix', desc: 'Ma trận phân quyền người dùng và kiểm soát truy cập', icon: 'shield' }
     ]
   }
@@ -122,6 +123,7 @@ export const FEATURE_TITLES: Record<string, FeatureTitleInfo> = {
 
   // Nhóm 5: Hệ Thống & Danh Mục
   'fnb-sites': { name: 'Danh Mục 14 Điểm Bán', role: 'KHO_TRUONG', desc: 'Quản lý thông tin điểm bán, mã trạm và cấu hình hệ thống' },
+  'hr-employees': { name: 'Quản Lý Nhân Sự', role: 'ADMIN', desc: 'Quản lý hồ sơ nhân sự, chức danh, điểm làm việc và tình trạng công tác' },
   'user-matrix': { name: 'Phân Quyền User Matrix', role: 'ADMIN', desc: 'Ma trận phân quyền người dùng và kiểm soát truy cập' }
 };
 

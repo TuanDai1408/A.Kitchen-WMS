@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1215">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1235">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1215"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1235"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -372,6 +372,15 @@
                 <div class="flex items-center gap-3.5 min-w-0">
                   <i data-lucide="building-2" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
                   <span class="truncate">Danh Mục 14 Điểm Bán</span>
+                </div>
+                <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
+              </button>
+            </li>
+            <li>
+              <button onclick="switchTab('hr-employees', this)" data-tab="hr-employees" class="nav-btn group menu-item w-full relative flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all text-left menu-item-inactive text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <i data-lucide="users" class="menu-icon w-5 h-5 shrink-0 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200"></i>
+                  <span class="truncate">Quản Lý Nhân Sự</span>
                 </div>
                 <span class="lock-icon hidden text-gray-400 shrink-0"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>
               </button>
@@ -1670,6 +1679,226 @@
       </div>
 
       <!-- TAB: CẤU HÌNH HỆ THỐNG (ĐỘC QUYỀN MASTER OWNER: trantuandai2508) -->
+      <section id="hr-employees" class="tab-panel space-y-5">
+        <div class="page-header">
+          <div class="min-w-0 flex-1">
+            <h1 class="page-title">Quản Lý Nhân Sự</h1>
+            <p class="page-subtitle whitespace-normal break-words">Hồ sơ nhân sự toàn hệ thống, phân bổ nơi làm việc, chức danh và trạng thái công tác</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <input type="file" id="hrImportExcelInput" accept=".xlsx,.xls" class="hidden" onchange="importHrEmployeesExcel(this)">
+            <button type="button" onclick="document.getElementById('hrImportExcelInput').click()" class="btn btn-secondary">
+              <i data-lucide="upload" class="w-4 h-4"></i> Import Excel
+            </button>
+            <button type="button" onclick="exportHrEmployeesExcel()" class="btn btn-secondary">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel
+            </button>
+            <button type="button" onclick="openHrEmployeeModal()" class="btn btn-primary">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Thêm nhân sự
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Strip -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div><span class="kpi-label">Tổng nhân sự</span><p class="kpi-sub mt-0.5">Toàn danh sách</p></div>
+              <div class="kpi-icon"><i data-lucide="users" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body"><span id="hrKpiTotal" class="kpi-value">0</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div><span class="kpi-label">Đang làm việc</span><p class="kpi-sub mt-0.5">Nhân sự hoạt động</p></div>
+              <div class="kpi-icon text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30"><i data-lucide="user-check" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body"><span id="hrKpiActive" class="kpi-value text-emerald-600 dark:text-emerald-400">0</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div><span class="kpi-label">Đã nghỉ việc</span><p class="kpi-sub mt-0.5">Hồ sơ nghỉ việc</p></div>
+              <div class="kpi-icon text-rose-600 bg-rose-50 dark:bg-rose-950/30"><i data-lucide="user-x" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body"><span id="hrKpiResigned" class="kpi-value text-rose-600 dark:text-rose-400">0</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div><span class="kpi-label">Điểm làm việc</span><p class="kpi-sub mt-0.5">HUB &amp; Canteen</p></div>
+              <div class="kpi-icon text-brand-600 bg-brand-50 dark:bg-brand-950/30"><i data-lucide="map-pin" class="size-5"></i></div>
+            </div>
+            <div class="kpi-body"><span id="hrKpiLocations" class="kpi-value text-brand-600 dark:text-brand-400">0</span></div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="field flex-1 min-w-[210px]">
+            <label class="field-label">Tìm kiếm nhân sự</label>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="hrSearchInput" oninput="filterHrEmployees()" placeholder="Mã NV, họ tên, SĐT, email..." class="input pl-9 w-full">
+            </div>
+          </div>
+          <div class="field w-full sm:w-44">
+            <label class="field-label">Tình trạng</label>
+            <select id="hrFilterStatus" onchange="filterHrEmployees()" class="select">
+              <option value="">Tất cả tình trạng</option>
+              <option value="Đang làm việc">Đang làm việc</option>
+              <option value="Đã nghỉ">Đã nghỉ</option>
+            </select>
+          </div>
+          <div class="field w-full sm:w-48">
+            <label class="field-label">Nơi làm việc</label>
+            <select id="hrFilterLocation" onchange="filterHrEmployees()" class="select">
+              <option value="">Tất cả nơi làm việc</option>
+            </select>
+          </div>
+          <div class="field w-full sm:w-48">
+            <label class="field-label">Chức danh</label>
+            <select id="hrFilterJobTitle" onchange="filterHrEmployees()" class="select">
+              <option value="">Tất cả chức danh</option>
+            </select>
+          </div>
+          <div class="field w-full sm:w-40">
+            <label class="field-label">Loại nhân viên</label>
+            <select id="hrFilterEmpType" onchange="filterHrEmployees()" class="select">
+              <option value="">Tất cả loại NV</option>
+            </select>
+          </div>
+          <button type="button" onclick="loadHrEmployees()" class="btn btn-secondary self-end shrink-0">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Làm mới
+          </button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card p-5">
+          <div class="hidden lg:block table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="text-center w-12">STT</th>
+                  <th class="col-code">Mã NV</th>
+                  <th class="min-w-[170px]">Họ và tên</th>
+                  <th class="min-w-[160px]">Chức danh</th>
+                  <th class="min-w-[150px]">Nơi làm việc</th>
+                  <th class="text-center w-24">Loại NV</th>
+                  <th class="col-date text-center">Ngày vào làm</th>
+                  <th class="col-code">Điện thoại</th>
+                  <th>Email công ty</th>
+                  <th class="col-badge text-center min-w-[130px] whitespace-nowrap">Tình trạng</th>
+                  <th class="col-actions text-center w-24">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="hrTableBody">
+                <tr><td colspan="11" class="p-8 text-center text-gray-400">Đang tải danh sách nhân sự...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div>
+                Hiển thị <span id="hrPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="hrPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="hrTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> nhân sự
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                <select id="hrPageSizeSelect" onchange="changeHrPageSize(this.value)" style="width: auto;" class="select font-sans py-1 px-2.5 text-xs w-auto min-w-fit whitespace-nowrap">
+                  <option value="10">10 dòng</option>
+                  <option value="25" selected>25 dòng</option>
+                  <option value="50">50 dòng</option>
+                  <option value="100">100 dòng</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+              <button id="hrPrevBtn" onclick="changeHrPage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+              <span id="hrCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+              <button id="hrNextBtn" onclick="changeHrPage(1)" class="btn btn-secondary btn-sm">Sau</button>
+            </div>
+          </div>
+
+          <div id="hrMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
+        </div>
+      </section>
+
+      <!-- Modal Thêm / Sửa Nhân Sự -->
+      <div id="hrEmployeeModal" style="z-index: 100020;" class="fixed inset-0 hidden bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5" onclick="if(event.target===this)closeHrEmployeeModal()">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <h3 id="hrModalTitle" class="font-bold text-base text-gray-900 dark:text-white">Thêm Nhân Sự Mới</h3>
+            <button type="button" onclick="closeHrEmployeeModal()" class="p-2 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs max-h-[75vh] overflow-y-auto custom-scrollbar">
+            <input type="hidden" id="hrFormId">
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Mã nhân viên *</label>
+              <input type="text" id="hrFormEmpCode" class="input w-full font-mono" placeholder="VD: 11303894">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Họ và tên *</label>
+              <input type="text" id="hrFormFullName" class="input w-full" placeholder="Nhập họ tên...">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Chức danh công việc</label>
+              <input type="text" id="hrFormJobTitle" class="input w-full" placeholder="VD: Nhân viên Phụ bếp">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nơi làm việc</label>
+              <input type="text" id="hrFormWorkLocation" class="input w-full" placeholder="VD: HUB Đa Phúc">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Giới tính</label>
+              <select id="hrFormGender" class="select w-full">
+                <option value="Nữ">Nữ</option>
+                <option value="Nam">Nam</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Loại nhân viên</label>
+              <select id="hrFormEmpType" class="select w-full">
+                <option value="Fulltime">Fulltime</option>
+                <option value="Partime">Partime</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày vào làm</label>
+              <input type="date" id="hrFormHireDate" class="input w-full font-mono">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày sinh</label>
+              <input type="date" id="hrFormBirthDate" class="input w-full font-mono">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Điện thoại</label>
+              <input type="text" id="hrFormPhone" class="input w-full font-mono">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Email công ty</label>
+              <input type="email" id="hrFormEmail" class="input w-full">
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Tình trạng</label>
+              <select id="hrFormStatus" class="select w-full">
+                <option value="Đang làm việc">Đang làm việc</option>
+                <option value="Đã nghỉ">Đã nghỉ</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày nghỉ việc (nếu có)</label>
+              <input type="date" id="hrFormResignDate" class="input w-full font-mono">
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex justify-end gap-2">
+            <button type="button" onclick="closeHrEmployeeModal()" class="btn btn-secondary">Hủy</button>
+            <button type="button" onclick="saveHrEmployee()" class="btn btn-primary">Lưu nhân sự</button>
+          </div>
+        </div>
+      </div>
+
       <section id="sys-config" class="tab-panel space-y-5">
         <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
