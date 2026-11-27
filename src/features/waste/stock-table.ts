@@ -355,7 +355,11 @@ export function updateWasteKPIs(): void {
   if (slipTotalItems) slipTotalItems.textContent = String(selectedCount);
   if (slipTotalQty) slipTotalQty.textContent = Number(totalQty.toFixed(2)).toLocaleString('vi-VN');
   if (slipTotalAmt) slipTotalAmt.textContent = `${Math.round(totalEstAmt).toLocaleString('vi-VN')} ₫`;
-  if (bottomBtn) bottomBtn.disabled = (selectedCount === 0);
+  if (bottomBtn) {
+    bottomBtn.disabled = (selectedCount === 0);
+    bottomBtn.classList.toggle('opacity-50', selectedCount === 0);
+    bottomBtn.classList.toggle('cursor-not-allowed', selectedCount === 0);
+  }
   if (bottomBtnText) bottomBtnText.textContent = `Xác nhận tạo biên bản hủy (${selectedCount})`;
 
   if (slipList) {
