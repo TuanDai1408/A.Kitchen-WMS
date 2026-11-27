@@ -280,7 +280,7 @@ export function updateKitchenIssueKPIs(): void {
   const slipCount = document.getElementById('kitchenIssueSlipCount');
   const slipList = document.getElementById('kitchenIssueSelectedSlipList');
   if (slipWrap) slipWrap.classList.toggle('hidden', countItems === 0);
-  adjustListHeightForSubTable(countItems > 0, 'kitchenIssueItemsScroll', 'kitchenIssueItemsMobile', '550px', '500px');
+  adjustListHeightForSubTable(countItems > 0, 'kitchenIssueItemsScroll', 'kitchenIssueItemsMobile', '550px', '500px', '420px', '300px');
   if (slipCount) slipCount.textContent = String(countItems);
   if (slipList) {
     slipList.innerHTML = selectedList.map((l, idx) => `

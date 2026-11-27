@@ -117,7 +117,9 @@ export function adjustListHeightForSubTable(
   desktopId: string,
   mobileId: string,
   fullDesktopMaxH = '480px',
-  fullMobileMaxH = '460px'
+  fullMobileMaxH = '460px',
+  selectedDesktopMaxH = '280px',
+  selectedMobileMaxH = '240px'
 ): void {
   const apply = (id: string, targetMaxH: string) => {
     const el = document.getElementById(id);
@@ -125,8 +127,8 @@ export function adjustListHeightForSubTable(
     el.style.transition = 'max-height 180ms ease';
     el.style.maxHeight = targetMaxH;
   };
-  apply(desktopId, hasSelected ? '280px' : fullDesktopMaxH);
-  apply(mobileId, hasSelected ? '240px' : fullMobileMaxH);
+  apply(desktopId, hasSelected ? selectedDesktopMaxH : fullDesktopMaxH);
+  apply(mobileId, hasSelected ? selectedMobileMaxH : fullMobileMaxH);
 }
 
 export interface PaginationDomIds {

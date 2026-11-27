@@ -350,7 +350,7 @@ export function updateWasteKPIs(): void {
   const bottomBtnText = document.getElementById('btnSubmitDirectWasteBottomText');
 
   if (slipWrap) slipWrap.classList.toggle('hidden', selectedCount === 0);
-  adjustListHeightForSubTable(selectedCount > 0, 'fnbWasteStockScroll', 'fnbWasteStockMobileCards', '550px', '500px');
+  adjustListHeightForSubTable(selectedCount > 0, 'fnbWasteStockScroll', 'fnbWasteStockMobileCards', '550px', '500px', '420px', '300px');
   if (slipCount) slipCount.textContent = String(selectedCount);
   if (slipTotalItems) slipTotalItems.textContent = String(selectedCount);
   if (slipTotalQty) slipTotalQty.textContent = Number(totalQty.toFixed(2)).toLocaleString('vi-VN');
