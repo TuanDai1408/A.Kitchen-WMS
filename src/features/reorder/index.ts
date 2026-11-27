@@ -1,4 +1,4 @@
-import { loadReorderROP, renderRopTable, changeRopPage, changeRopPageSize } from './rop-table';
+import { loadReorderROP, renderRopTable, changeRopPage, changeRopPageSize, filterRopTable, setRopQuickStatusFilter } from './rop-table';
 import { loadLeadTime, renderLeadTimeTable, filterLeadTimeSla, changeLeadTimePage, changeLeadTimePageSize } from './leadtime-table';
 import { downloadRopExcel } from './export';
 
@@ -14,6 +14,8 @@ if (typeof window !== 'undefined') {
   w.renderRopTable = renderRopTable;
   w.changeRopPage = changeRopPage;
   w.changeRopPageSize = changeRopPageSize;
+  w.filterRopTable = filterRopTable;
+  w.setRopQuickStatusFilter = setRopQuickStatusFilter;
   w.loadLeadTime = loadLeadTime;
   w.renderLeadTimeTable = renderLeadTimeTable;
   w.filterLeadTimeSla = filterLeadTimeSla;

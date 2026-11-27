@@ -27,6 +27,101 @@ export function changeRopPageSize(size: string | number): void {
   renderRopTable(ropActiveItems);
 }
 
+function resolveRopStatus(r: RopItem): string {
+  const currentStock = parseFloat(String(r.current_stock !== undefined ? r.current_stock : 0));
+  const rop = parseFloat(String(r.rop !== undefined ? r.rop : (r.rop_threshold !== undefined ? r.rop_threshold : 25)));
+  return r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
+}
+
+function updateRopQuickCounts(items: RopItem[], activeStatus: string): void {
+  let outCnt = 0;
+  let needCnt = 0;
+  let safeCnt = 0;
+  items.forEach(r => {
+    const st = resolveRopStatus(r);
+    if (st === 'HẾT HÀNG') outCnt++;
+    else if (st === 'CẦN ĐẶT') needCnt++;
+    else safeCnt++;
+  });
+  const setTxt = (id: string, val: number) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(val);
+  };
+  setTxt('ropCountAll', items.length);
+  setTxt('ropCountOut', outCnt);
+  setTxt('ropCountNeed', needCnt);
+  setTxt('ropCountSafe', safeCnt);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-rop-pill]').forEach(btn => {
+    const pillKey = btn.dataset.ropPill || 'ALL';
+    const isActive = pillKey === activeStatus;
+    btn.classList.toggle('ring-2', isActive);
+    btn.classList.toggle('ring-brand-500/40', isActive);
+    if (pillKey === 'ALL') {
+      btn.classList.toggle('bg-brand-500', isActive);
+      btn.classList.toggle('text-white', isActive);
+      btn.classList.toggle('bg-white', !isActive);
+      btn.classList.toggle('dark:bg-gray-900', !isActive);
+      btn.classList.toggle('text-gray-700', !isActive);
+      btn.classList.toggle('dark:text-gray-200', !isActive);
+    }
+  });
+}
+
+function populateRopCategoryFilter(items: RopItem[]): void {
+  const sel = document.getElementById('ropCategoryFilter') as HTMLSelectElement | null;
+  if (!sel) return;
+  const cur = sel.value || '';
+  const cats = Array.from(new Set(items.map(i => (i.category || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'vi'));
+  sel.innerHTML = '<option value="">Tất cả nhóm ngành</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (cur && cats.includes(cur)) sel.value = cur;
+}
+
+export function setRopQuickStatusFilter(status: string): void {
+  const sel = document.getElementById('ropStatusFilter') as HTMLSelectElement | null;
+  if (sel) sel.value = status;
+  filterRopTable();
+}
+
+export function filterRopTable(): void {
+  const raw: RopItem[] = (typeof App !== 'undefined' && App.ropItems) ? App.ropItems : [];
+  const q = ((document.getElementById('ropSearchInput') as HTMLInputElement | null)?.value || '').toLowerCase().trim();
+  const statusFilter = (document.getElementById('ropStatusFilter') as HTMLSelectElement | null)?.value || 'ALL';
+  const catFilter = (document.getElementById('ropCategoryFilter') as HTMLSelectElement | null)?.value || '';
+  const sortBy = (document.getElementById('ropSortSelect') as HTMLSelectElement | null)?.value || 'PRIORITY';
+
+  updateRopQuickCounts(raw, statusFilter);
+
+  const filtered = raw.filter(r => {
+    const matchSearch = !q || (r.sku && r.sku.toLowerCase().includes(q)) || (r.item_name && r.item_name.toLowerCase().includes(q));
+    if (!matchSearch) return false;
+    if (catFilter && (r.category || '').trim() !== catFilter) return false;
+    const st = resolveRopStatus(r);
+    if (statusFilter === 'NEED_ACTION') return st === 'HẾT HÀNG' || st === 'CẦN ĐẶT';
+    if (statusFilter && statusFilter !== 'ALL') return st === statusFilter;
+    return true;
+  });
+
+  const prioRank = (r: RopItem) => {
+    const st = resolveRopStatus(r);
+    return st === 'HẾT HÀNG' ? 0 : (st === 'CẦN ĐẶT' ? 1 : 2);
+  };
+  const num = (v: any) => parseFloat(String(v ?? 0)) || 0;
+
+  filtered.sort((a, b) => {
+    if (sortBy === 'SUGGEST_DESC') return num(b.suggested_order ?? b.suggested_order_qty) - num(a.suggested_order ?? a.suggested_order_qty);
+    if (sortBy === 'STOCK_ASC') return num(a.current_stock) - num(b.current_stock);
+    if (sortBy === 'USAGE_DESC') return num(b.daily_usage) - num(a.daily_usage);
+    if (sortBy === 'NAME_ASC') return (a.item_name || a.sku || '').localeCompare(b.item_name || b.sku || '', 'vi');
+    const diff = prioRank(a) - prioRank(b);
+    if (diff !== 0) return diff;
+    return num(b.suggested_order ?? b.suggested_order_qty) - num(a.suggested_order ?? a.suggested_order_qty);
+  });
+
+  ropCurrentPage = 1;
+  renderRopTable(filtered);
+}
+
 function getRopStatusBadgeHtml(status: string): string {
   let badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60';
   let dotClass = 'bg-emerald-500';
@@ -161,7 +256,8 @@ export async function loadReorderROP(): Promise<void> {
       if (typeof App !== 'undefined') {
         App.ropItems = items;
       }
-      renderRopTable(items);
+      populateRopCategoryFilter(items);
+      filterRopTable();
     } else {
       if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-rose-500">Lỗi tải dữ liệu: ${json.error || 'Không xác định'}</td></tr>`;
       if (mob) mob.innerHTML = `<div class="p-6 text-center text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-2xl">Lỗi: ${json.error || 'Không xác định'}</div>`;

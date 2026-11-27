@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1202">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1208">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1202"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1208"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -3508,6 +3508,62 @@
           </div>
           <button onclick="downloadRopExcel()" class="btn btn-secondary shrink-0">
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel đề xuất
+          </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="field flex-1 min-w-[200px]">
+            <label class="field-label">Tìm kiếm mặt hàng</label>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <input type="text" id="ropSearchInput" oninput="filterRopTable()" placeholder="Nhập mã SKU hoặc tên mặt hàng..." class="input pl-9 w-full">
+            </div>
+          </div>
+          <div class="field w-full sm:w-48">
+            <label class="field-label">Trạng thái ROP</label>
+            <select id="ropStatusFilter" onchange="filterRopTable()" class="select">
+              <option value="ALL">Tất cả trạng thái</option>
+              <option value="NEED_ACTION">Cần xử lý (Hết &amp; Đặt)</option>
+              <option value="HẾT HÀNG">Hết hàng</option>
+              <option value="CẦN ĐẶT">Cần đặt</option>
+              <option value="AN TOÀN">An toàn</option>
+            </select>
+          </div>
+          <div class="field w-full sm:w-48">
+            <label class="field-label">Nhóm ngành hàng</label>
+            <select id="ropCategoryFilter" onchange="filterRopTable()" class="select">
+              <option value="">Tất cả nhóm ngành</option>
+            </select>
+          </div>
+          <div class="field w-full sm:w-48">
+            <label class="field-label">Sắp xếp theo</label>
+            <select id="ropSortSelect" onchange="filterRopTable()" class="select">
+              <option value="PRIORITY">Ưu tiên cảnh báo</option>
+              <option value="SUGGEST_DESC">Đề xuất đặt cao → thấp</option>
+              <option value="STOCK_ASC">Tồn hiện tại thấp → cao</option>
+              <option value="USAGE_DESC">Tiêu thụ/ngày cao → thấp</option>
+              <option value="NAME_ASC">Tên mặt hàng A → Z</option>
+            </select>
+          </div>
+          <button onclick="loadReorderROP()" class="btn btn-primary self-end shrink-0">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Làm mới
+          </button>
+        </div>
+
+        <!-- Quick Status Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <button type="button" onclick="setRopQuickStatusFilter('ALL')" data-rop-pill="ALL" class="rop-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-brand-500 text-white border-brand-500 shadow-2xs">
+            Tất cả (<span id="ropCountAll" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="setRopQuickStatusFilter('HẾT HÀNG')" data-rop-pill="HẾT HÀNG" class="rop-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/70 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+            Hết hàng (<span id="ropCountOut" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="setRopQuickStatusFilter('CẦN ĐẶT')" data-rop-pill="CẦN ĐẶT" class="rop-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/70 hover:bg-amber-50 dark:hover:bg-amber-950/30">
+            Cần đặt (<span id="ropCountNeed" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="setRopQuickStatusFilter('AN TOÀN')" data-rop-pill="AN TOÀN" class="rop-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/70 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
+            An toàn (<span id="ropCountSafe" class="font-mono">0</span>)
           </button>
         </div>
 
