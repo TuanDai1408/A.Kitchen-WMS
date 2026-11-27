@@ -1,12 +1,41 @@
 import type { LeadTimeItem, SlaFilter } from './types';
+import { paginateList } from '@/ts/utils/formatters';
 
 declare const App: { leadTimeRawData?: LeadTimeItem[]; currentBranch?: string; [key: string]: any };
 
+let leadTimeCurrentPage = 1;
+let leadTimePageSize = 25;
+let leadTimeActiveItems: LeadTimeItem[] = [];
+
+const LEADTIME_PAGINATION_IDS = {
+  startId: 'leadTimePageStart',
+  endId: 'leadTimePageEnd',
+  totalId: 'leadTimeTotalCount',
+  badgeId: 'leadTimeCurrentPageBadge',
+  prevId: 'leadTimePrevBtn',
+  nextId: 'leadTimeNextBtn'
+};
+
+export function changeLeadTimePage(delta: number): void {
+  leadTimeCurrentPage += delta;
+  renderLeadTimeTable(leadTimeActiveItems);
+}
+
+export function changeLeadTimePageSize(size: string | number): void {
+  leadTimePageSize = Math.max(1, parseInt(String(size), 10) || 25);
+  leadTimeCurrentPage = 1;
+  renderLeadTimeTable(leadTimeActiveItems);
+}
+
 export function renderLeadTimeTable(items: LeadTimeItem[]): void {
+  leadTimeActiveItems = items || [];
   const tbody = document.getElementById('leadTimeTableBody');
   const mob = document.getElementById('leadTimeMobileCards');
 
-  if (!items || !items.length) {
+  const { pagedItems, page } = paginateList(leadTimeActiveItems, leadTimeCurrentPage, leadTimePageSize, LEADTIME_PAGINATION_IDS);
+  leadTimeCurrentPage = page;
+
+  if (!pagedItems.length) {
     if (tbody) {
       tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">Không tìm thấy đơn PO nào phù hợp với Site và Kỳ tháng đã chọn.</td></tr>';
     }
@@ -17,7 +46,7 @@ export function renderLeadTimeTable(items: LeadTimeItem[]): void {
   }
 
   if (tbody) {
-    tbody.innerHTML = items.map(r => {
+    tbody.innerHTML = pagedItems.map(r => {
       const sup = r.supplier_name || r.vendor_name || 'Bếp Trung Tâm Siba Food';
       const oDate = r.order_date || (r.order_time ? r.order_time.split(' ')[0] : '—');
       const dDate = r.actual_delivery_date || (r.received_time ? r.received_time.split(' ')[0] : '—');
@@ -53,7 +82,7 @@ export function renderLeadTimeTable(items: LeadTimeItem[]): void {
   }
 
   if (mob) {
-    mob.innerHTML = items.map(r => {
+    mob.innerHTML = pagedItems.map(r => {
       const sup = r.supplier_name || r.vendor_name || 'Bếp Trung Tâm Siba Food';
       const oDate = r.order_date || (r.order_time ? r.order_time.split(' ')[0] : '—');
       const dDate = r.actual_delivery_date || (r.received_time ? r.received_time.split(' ')[0] : '—');
@@ -95,6 +124,7 @@ export function renderLeadTimeTable(items: LeadTimeItem[]): void {
 }
 
 export function filterLeadTimeSla(slaFilter: SlaFilter | string): void {
+  leadTimeCurrentPage = 1;
   const raw: LeadTimeItem[] = (typeof App !== 'undefined' && App.leadTimeRawData) ? App.leadTimeRawData : [];
   if (!slaFilter || slaFilter === 'ALL') {
     renderLeadTimeTable(raw);

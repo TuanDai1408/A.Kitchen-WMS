@@ -128,3 +128,45 @@ export function adjustListHeightForSubTable(
   apply(desktopId, hasSelected ? '280px' : fullDesktopMaxH);
   apply(mobileId, hasSelected ? '240px' : fullMobileMaxH);
 }
+
+export interface PaginationDomIds {
+  startId: string;
+  endId: string;
+  totalId: string;
+  badgeId: string;
+  prevId: string;
+  nextId: string;
+}
+
+/**
+ * Cắt trang dữ liệu và cập nhật đồng bộ thanh phân trang chuẩn FEFO.
+ */
+export function paginateList<T>(
+  items: T[],
+  requestedPage: number,
+  pageSize: number,
+  ids: PaginationDomIds
+): { pagedItems: T[]; page: number; startIdx: number; totalPages: number } {
+  const total = items.length;
+  const safeSize = Math.max(1, Number(pageSize) || 25);
+  const totalPages = Math.ceil(total / safeSize) || 1;
+  const page = Math.min(Math.max(1, requestedPage), totalPages);
+  const startIdx = (page - 1) * safeSize;
+  const pagedItems = items.slice(startIdx, startIdx + safeSize);
+
+  const startEl = document.getElementById(ids.startId);
+  const endEl = document.getElementById(ids.endId);
+  const totalEl = document.getElementById(ids.totalId);
+  const badgeEl = document.getElementById(ids.badgeId);
+  const prevBtn = document.getElementById(ids.prevId) as HTMLButtonElement | null;
+  const nextBtn = document.getElementById(ids.nextId) as HTMLButtonElement | null;
+
+  if (startEl) startEl.textContent = total === 0 ? '0' : String(startIdx + 1);
+  if (endEl) endEl.textContent = String(Math.min(startIdx + safeSize, total));
+  if (totalEl) totalEl.textContent = String(total);
+  if (badgeEl) badgeEl.textContent = `${page} / ${totalPages}`;
+  if (prevBtn) prevBtn.disabled = page <= 1;
+  if (nextBtn) nextBtn.disabled = page >= totalPages;
+
+  return { pagedItems, page, startIdx, totalPages };
+}

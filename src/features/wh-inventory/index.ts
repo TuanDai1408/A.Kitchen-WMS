@@ -2,7 +2,9 @@ import {
   gWhInventoryData,
   gWhFilteredInventory,
   loadWhInventory,
-  filterWhInventoryTable
+  filterWhInventoryTable,
+  changeWhInvPage,
+  changeWhInvPageSize
 } from './inventory-table';
 
 import {
@@ -54,6 +56,8 @@ if (typeof window !== 'undefined') {
   w.loadWhInventory = loadWhInventory;
   w.loadPoSap = loadWhInventory; // Alias for compatibility
   w.filterWhInventoryTable = filterWhInventoryTable;
+  w.changeWhInvPage = changeWhInvPage;
+  w.changeWhInvPageSize = changeWhInvPageSize;
 
   w.openWhItemHistoryModal = openWhItemHistoryModal;
   w.openWhItemBatchesModal = openWhItemBatchesModal;

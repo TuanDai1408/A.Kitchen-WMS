@@ -3478,7 +3478,7 @@
                   <th class="col-num text-right">Tồn hiện tại</th>
                   <th class="col-num text-right font-semibold text-amber-700 dark:text-amber-400">Ngưỡng ROP</th>
                   <th class="col-num text-right font-semibold text-brand-700 dark:text-brand-400">Đề xuất đặt</th>
-                  <th class="col-badge text-center">Trạng thái</th>
+                  <th class="col-badge text-center min-w-[125px] whitespace-nowrap">Trạng thái</th>
                 </tr>
               </thead>
               <tbody id="ropTableBody">
@@ -3486,6 +3486,30 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div>
+                Hiển thị <span id="ropPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="ropPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="ropTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span>Hiển thị:</span>
+                <select id="ropPageSizeSelect" onchange="changeRopPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                  <option value="10">10 dòng</option>
+                  <option value="25" selected>25 dòng</option>
+                  <option value="50">50 dòng</option>
+                  <option value="100">100 dòng</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+              <button id="ropPrevBtn" onclick="changeRopPage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+              <span id="ropCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+              <button id="ropNextBtn" onclick="changeRopPage(1)" class="btn btn-secondary btn-sm">Sau</button>
+            </div>
+          </div>
+
           <!-- Native Mobile Card View -->
           <div id="ropMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
@@ -3554,6 +3578,30 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div>
+                Hiển thị <span id="leadTimePageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="leadTimePageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="leadTimeTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> đơn PO
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span>Hiển thị:</span>
+                <select id="leadTimePageSizeSelect" onchange="changeLeadTimePageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                  <option value="10">10 dòng</option>
+                  <option value="25" selected>25 dòng</option>
+                  <option value="50">50 dòng</option>
+                  <option value="100">100 dòng</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+              <button id="leadTimePrevBtn" onclick="changeLeadTimePage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+              <span id="leadTimeCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+              <button id="leadTimeNextBtn" onclick="changeLeadTimePage(1)" class="btn btn-secondary btn-sm">Sau</button>
+            </div>
+          </div>
+
           <!-- Native Mobile Card View -->
           <div id="leadTimeMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
         </div>
@@ -3747,6 +3795,29 @@
                 <tr><td colspan="11" class="p-8 text-center text-gray-400 dark:text-gray-500">Đang tải dữ liệu tồn kho...</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div>
+                Hiển thị <span id="whInvPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="whInvPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="whInvTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span>Hiển thị:</span>
+                <select id="whInvPageSizeSelect" onchange="changeWhInvPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                  <option value="10">10 dòng</option>
+                  <option value="25" selected>25 dòng</option>
+                  <option value="50">50 dòng</option>
+                  <option value="100">100 dòng</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+              <button id="whInvPrevBtn" onclick="changeWhInvPage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+              <span id="whInvCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+              <button id="whInvNextBtn" onclick="changeWhInvPage(1)" class="btn btn-secondary btn-sm">Sau</button>
+            </div>
           </div>
 
           <!-- Native Mobile Card View -->

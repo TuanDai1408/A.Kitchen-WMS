@@ -1,13 +1,54 @@
 import type { RopItem } from './types';
-import { formatNumber } from '@/ts/utils/formatters';
+import { formatNumber, paginateList } from '@/ts/utils/formatters';
 
 declare const App: { ropItems?: RopItem[]; currentBranch?: string; [key: string]: any };
 
+let ropCurrentPage = 1;
+let ropPageSize = 25;
+let ropActiveItems: RopItem[] = [];
+
+const ROP_PAGINATION_IDS = {
+  startId: 'ropPageStart',
+  endId: 'ropPageEnd',
+  totalId: 'ropTotalCount',
+  badgeId: 'ropCurrentPageBadge',
+  prevId: 'ropPrevBtn',
+  nextId: 'ropNextBtn'
+};
+
+export function changeRopPage(delta: number): void {
+  ropCurrentPage += delta;
+  renderRopTable(ropActiveItems);
+}
+
+export function changeRopPageSize(size: string | number): void {
+  ropPageSize = Math.max(1, parseInt(String(size), 10) || 25);
+  ropCurrentPage = 1;
+  renderRopTable(ropActiveItems);
+}
+
+function getRopStatusBadgeHtml(status: string): string {
+  let badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60';
+  let dotClass = 'bg-emerald-500';
+  if (status === 'HẾT HÀNG') {
+    badgeClass = 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60';
+    dotClass = 'bg-rose-500';
+  } else if (status === 'CẦN ĐẶT') {
+    badgeClass = 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60';
+    dotClass = 'bg-amber-500';
+  }
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap shrink-0 ${badgeClass}"><span class="w-1.5 h-1.5 rounded-full shrink-0 ${dotClass}"></span><span>${status}</span></span>`;
+}
+
 export function renderRopTable(items: RopItem[]): void {
+  ropActiveItems = items || [];
   const tbody = document.getElementById('ropTableBody');
   const mob = document.getElementById('ropMobileCards');
 
-  if (!items || !items.length) {
+  const { pagedItems, page } = paginateList(ropActiveItems, ropCurrentPage, ropPageSize, ROP_PAGINATION_IDS);
+  ropCurrentPage = page;
+
+  if (!pagedItems.length) {
     if (tbody) {
       tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-emerald-600 dark:text-emerald-400 font-medium">Tất cả mặt hàng tại điểm kho này đều đạt ngưỡng tồn an toàn (Không cần đặt thêm).</td></tr>';
     }
@@ -18,7 +59,7 @@ export function renderRopTable(items: RopItem[]): void {
   }
 
   if (tbody) {
-    tbody.innerHTML = items.map(r => {
+    tbody.innerHTML = pagedItems.map(r => {
       const sku = r.sku || '';
       const itemName = r.item_name || sku;
       const unit = r.unit || r.uom || 'Phần';
@@ -34,25 +75,18 @@ export function renderRopTable(items: RopItem[]): void {
         : (r.suggested_order_qty !== undefined ? r.suggested_order_qty : (currentStock < rop ? Math.max(0, 35 - currentStock) : 0))));
       const status = r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
 
-      let statusBadgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold';
-      if (status === 'HẾT HÀNG') {
-        statusBadgeClass = 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold';
-      } else if (status === 'CẦN ĐẶT') {
-        statusBadgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-bold animate-pulse';
-      }
-
       return `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="p-3 text-center font-mono tabular-nums font-bold text-gray-800 dark:text-gray-200 text-xs">${sku}</td>
+          <td class="p-3 text-center font-mono tabular-nums font-bold text-gray-800 dark:text-gray-200 text-xs whitespace-nowrap">${sku}</td>
           <td class="p-3 font-semibold text-gray-900 dark:text-white text-xs">${itemName}</td>
-          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">${formatNumber(dailyUsage, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
-          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">${leadTimeDays} ngày</td>
-          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs">${formatNumber(safetyStock, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
-          <td class="p-3 text-right font-mono tabular-nums font-bold ${currentStock <= 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white'} text-xs">${formatNumber(currentStock, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
-          <td class="p-3 text-right font-mono tabular-nums font-bold text-amber-600 dark:text-amber-400 text-xs">${formatNumber(rop, 1)} <span class="text-[11px] text-amber-600/70 font-sans">${unit}</span></td>
-          <td class="p-3 text-right font-mono tabular-nums font-bold ${suggestedOrder > 0 ? 'text-brand-600 dark:text-brand-400' : 'text-gray-400'} text-xs">${suggestedOrder > 0 ? '+' + formatNumber(suggestedOrder, 1) : '0'} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
-          <td class="p-3 text-center">
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] ${statusBadgeClass}">${status}</span>
+          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs whitespace-nowrap">${formatNumber(dailyUsage, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
+          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs whitespace-nowrap">${leadTimeDays} ngày</td>
+          <td class="p-3 text-right font-mono tabular-nums text-gray-700 dark:text-gray-300 text-xs whitespace-nowrap">${formatNumber(safetyStock, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
+          <td class="p-3 text-right font-mono tabular-nums font-bold ${currentStock <= 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white'} text-xs whitespace-nowrap">${formatNumber(currentStock, 1)} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
+          <td class="p-3 text-right font-mono tabular-nums font-bold text-amber-600 dark:text-amber-400 text-xs whitespace-nowrap">${formatNumber(rop, 1)} <span class="text-[11px] text-amber-600/70 font-sans">${unit}</span></td>
+          <td class="p-3 text-right font-mono tabular-nums font-bold ${suggestedOrder > 0 ? 'text-brand-600 dark:text-brand-400' : 'text-gray-400'} text-xs whitespace-nowrap">${suggestedOrder > 0 ? '+' + formatNumber(suggestedOrder, 1) : '0'} <span class="text-[11px] text-gray-400 font-sans">${unit}</span></td>
+          <td class="p-3 text-center whitespace-nowrap">
+            ${getRopStatusBadgeHtml(status)}
           </td>
         </tr>
       `;
@@ -60,7 +94,7 @@ export function renderRopTable(items: RopItem[]): void {
   }
 
   if (mob) {
-    mob.innerHTML = items.map(r => {
+    mob.innerHTML = pagedItems.map(r => {
       const sku = r.sku || '';
       const itemName = r.item_name || sku;
       const unit = r.unit || r.uom || 'Phần';
@@ -74,21 +108,14 @@ export function renderRopTable(items: RopItem[]): void {
         : (r.suggested_order_qty !== undefined ? r.suggested_order_qty : (currentStock < rop ? Math.max(0, 35 - currentStock) : 0))));
       const status = r.status || (currentStock <= 0 ? 'HẾT HÀNG' : (currentStock < rop ? 'CẦN ĐẶT' : 'AN TOÀN'));
 
-      let statusBadgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200';
-      if (status === 'HẾT HÀNG') {
-        statusBadgeClass = 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200';
-      } else if (status === 'CẦN ĐẶT') {
-        statusBadgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200';
-      }
-
       return `
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
-          <div class="flex items-center justify-between">
-            <div>
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
               <div class="font-semibold text-xs text-gray-900 dark:text-white">${itemName}</div>
               <div class="text-[11px] font-mono text-gray-400 mt-0.5">SKU: ${sku}</div>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusBadgeClass}">${status}</span>
+            ${getRopStatusBadgeHtml(status)}
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
             <div>Tồn hiện tại: <b class="font-mono tabular-nums text-gray-900 dark:text-white">${formatNumber(currentStock, 1)} ${unit}</b></div>

@@ -1,5 +1,5 @@
-import { loadReorderROP, renderRopTable } from './rop-table';
-import { loadLeadTime, renderLeadTimeTable, filterLeadTimeSla } from './leadtime-table';
+import { loadReorderROP, renderRopTable, changeRopPage, changeRopPageSize } from './rop-table';
+import { loadLeadTime, renderLeadTimeTable, filterLeadTimeSla, changeLeadTimePage, changeLeadTimePageSize } from './leadtime-table';
 import { downloadRopExcel } from './export';
 
 export * from './types';
@@ -12,8 +12,12 @@ if (typeof window !== 'undefined') {
   const w = window as any;
   w.loadReorderROP = loadReorderROP;
   w.renderRopTable = renderRopTable;
+  w.changeRopPage = changeRopPage;
+  w.changeRopPageSize = changeRopPageSize;
   w.loadLeadTime = loadLeadTime;
   w.renderLeadTimeTable = renderLeadTimeTable;
   w.filterLeadTimeSla = filterLeadTimeSla;
+  w.changeLeadTimePage = changeLeadTimePage;
+  w.changeLeadTimePageSize = changeLeadTimePageSize;
   w.downloadRopExcel = downloadRopExcel;
 }

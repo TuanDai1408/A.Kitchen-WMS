@@ -1,11 +1,34 @@
 import type { WhInventoryItem, WhInventoryFilterStatus } from './types';
-import { formatNumber, formatVND } from '@/ts/utils/formatters';
+import { formatNumber, formatVND, paginateList } from '@/ts/utils/formatters';
 
 declare const App: { currentBranch?: string; [key: string]: any };
 declare const lucide: any;
 
 export let gWhInventoryData: WhInventoryItem[] = [];
 export let gWhFilteredInventory: WhInventoryItem[] = [];
+
+let whInvCurrentPage = 1;
+let whInvPageSize = 25;
+
+const WH_INV_PAGINATION_IDS = {
+  startId: 'whInvPageStart',
+  endId: 'whInvPageEnd',
+  totalId: 'whInvTotalCount',
+  badgeId: 'whInvCurrentPageBadge',
+  prevId: 'whInvPrevBtn',
+  nextId: 'whInvNextBtn'
+};
+
+export function changeWhInvPage(delta: number): void {
+  whInvCurrentPage += delta;
+  renderWhInventoryPage();
+}
+
+export function changeWhInvPageSize(size: string | number): void {
+  whInvPageSize = Math.max(1, parseInt(String(size), 10) || 25);
+  whInvCurrentPage = 1;
+  renderWhInventoryPage();
+}
 
 export function getWhInventoryData(): WhInventoryItem[] {
   return gWhInventoryData;
@@ -74,18 +97,26 @@ export function filterWhInventoryTable(): void {
   const rowCountEl = document.getElementById('whInvRowCount');
   if (rowCountEl) rowCountEl.textContent = formatNumber(list.length, 0);
 
-  // Render Desktop Table
+  whInvCurrentPage = 1;
+  renderWhInventoryPage();
+}
+
+export function renderWhInventoryPage(): void {
+  const list = gWhFilteredInventory;
   const tbody = document.getElementById('whInventoryTableBody');
   const mob = document.getElementById('whInventoryMobileCards');
 
-  if (!list.length) {
+  const { pagedItems, page, startIdx } = paginateList(list, whInvCurrentPage, whInvPageSize, WH_INV_PAGINATION_IDS);
+  whInvCurrentPage = page;
+
+  if (!pagedItems.length) {
     if (tbody) tbody.innerHTML = '<tr><td colspan="11" class="p-8 text-center text-gray-400">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</td></tr>';
     if (mob) mob.innerHTML = '<div class="p-8 text-center text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có mặt hàng nào phù hợp với bộ lọc hiện tại.</div>';
     return;
   }
 
   if (tbody) {
-    tbody.innerHTML = list.map((r, idx) => {
+    tbody.innerHTML = pagedItems.map((r, idx) => {
       const receiptQty = parseFloat(String(r.receipt_qty || 0));
       const bookQty = parseFloat(String(r.book_qty || 0));
       const batchCount = parseInt(String(r.batch_count || 0), 10);
@@ -99,7 +130,7 @@ export function filterWhInventoryTable(): void {
 
       return `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
-          <td class="px-2 py-2 text-center text-gray-400 tabular-nums font-mono">${idx + 1}</td>
+          <td class="px-2 py-2 text-center text-gray-400 tabular-nums font-mono">${startIdx + idx + 1}</td>
           <td class="px-2 py-2 whitespace-nowrap">
             <button onclick="openWhItemHistoryModal('${r.sku}')" class="font-mono font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1" title="Xem thẻ kho chi tiết">
               <span>${r.sku}</span>
@@ -155,7 +186,7 @@ export function filterWhInventoryTable(): void {
 
   // Render Mobile Cards
   if (mob) {
-    mob.innerHTML = list.map((r, idx) => {
+    mob.innerHTML = pagedItems.map((r, idx) => {
       const receiptQty = parseFloat(String(r.receipt_qty || 0));
       const bookQty = parseFloat(String(r.book_qty || 0));
       const batchCount = parseInt(String(r.batch_count || 0), 10);
@@ -165,7 +196,7 @@ export function filterWhInventoryTable(): void {
           <div class="flex items-start justify-between gap-2">
             <div>
               <div class="flex items-center gap-2">
-                <span class="text-gray-400 text-xs font-mono">#${idx + 1}</span>
+                <span class="text-gray-400 text-xs font-mono">#${startIdx + idx + 1}</span>
                 <span class="font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${r.sku}</span>
                 <span class="px-1.5 py-0.2 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">${r.unit || 'Phần'}</span>
               </div>
