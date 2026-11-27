@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1158">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1202">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1158"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1202"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -2623,6 +2623,29 @@
               </table>
             </div>
 
+            <!-- Pagination Bar (PO / PR) -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+              <div class="flex flex-wrap items-center gap-3">
+                <div>
+                  Hiển thị <span id="fnbPoPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="fnbPoPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="fnbPoTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> đơn PO
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                  <select id="fnbPoPageSizeSelect" onchange="changeFnbPoPageSize(this.value)" style="width: auto;" class="select font-sans py-1 px-2.5 text-xs w-auto min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                    <option value="10">10 dòng</option>
+                    <option value="25" selected>25 dòng</option>
+                    <option value="50">50 dòng</option>
+                    <option value="100">100 dòng</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+                <button id="fnbPoPrevBtn" onclick="changeFnbPoPage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+                <span id="fnbPoCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+                <button id="fnbPoNextBtn" onclick="changeFnbPoPage(1)" class="btn btn-secondary btn-sm">Sau</button>
+              </div>
+            </div>
+
             <!-- PO Mobile Card View -->
             <div id="fnbPoMobileCards" class="block lg:hidden space-y-3 mt-4"></div>
           </div>
@@ -2672,6 +2695,29 @@
                 <tbody id="fnbReceiptsTableBody">
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Bar (Lịch sử phiếu nhập) -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 mt-4">
+              <div class="flex flex-wrap items-center gap-3">
+                <div>
+                  Hiển thị <span id="fnbReceiptHistPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="fnbReceiptHistPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="fnbReceiptHistTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> phiếu nhập
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                  <select id="fnbReceiptHistPageSizeSelect" onchange="changeFnbReceiptHistoryPageSize(this.value)" style="width: auto;" class="select font-sans py-1 px-2.5 text-xs w-auto min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+                    <option value="10">10 dòng</option>
+                    <option value="25" selected>25 dòng</option>
+                    <option value="50">50 dòng</option>
+                    <option value="100">100 dòng</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inline-flex items-center gap-1.5 self-end sm:self-auto">
+                <button id="fnbReceiptHistPrevBtn" onclick="changeFnbReceiptHistoryPage(-1)" class="btn btn-secondary btn-sm">Trước</button>
+                <span id="fnbReceiptHistCurrentPageBadge" class="badge badge-brand num px-3 py-1">1 / 1</span>
+                <button id="fnbReceiptHistNextBtn" onclick="changeFnbReceiptHistoryPage(1)" class="btn btn-secondary btn-sm">Sau</button>
+              </div>
             </div>
 
             <!-- Receipts Mobile Card View -->

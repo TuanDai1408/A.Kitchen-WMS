@@ -1,9 +1,32 @@
-import { escapeHtml } from '@/ts/utils/formatters';
+import { escapeHtml, paginateList } from '@/ts/utils/formatters';
 import { formatReceiptDateYMD, getActiveFnbReceiptSite } from './helpers';
 import { canUserEdit, canUserDelete, assertPermission } from '@/features/auth';
 import { exportReceiptExcel, ReceiptExportSlip } from './export-excel';
 
 declare const window: any;
+
+let fnbReceiptHistCurrentPage = 1;
+let fnbReceiptHistPageSize = 25;
+
+const RECEIPT_HIST_PAGINATION_IDS = {
+  startId: 'fnbReceiptHistPageStart',
+  endId: 'fnbReceiptHistPageEnd',
+  totalId: 'fnbReceiptHistTotalCount',
+  badgeId: 'fnbReceiptHistCurrentPageBadge',
+  prevId: 'fnbReceiptHistPrevBtn',
+  nextId: 'fnbReceiptHistNextBtn'
+};
+
+export function changeFnbReceiptHistoryPage(delta: number): void {
+  fnbReceiptHistCurrentPage += delta;
+  renderFnbReceiptsHistoryTable();
+}
+
+export function changeFnbReceiptHistoryPageSize(size: string | number): void {
+  fnbReceiptHistPageSize = Math.max(1, parseInt(String(size), 10) || 25);
+  fnbReceiptHistCurrentPage = 1;
+  renderFnbReceiptsHistoryTable();
+}
 
 let _editReceiptData: {
   id: number | string;
@@ -71,11 +94,14 @@ export function renderFnbReceiptsHistoryTable(): void {
     );
   }
 
+  const { pagedItems, page } = paginateList(receipts, fnbReceiptHistCurrentPage, fnbReceiptHistPageSize, RECEIPT_HIST_PAGINATION_IDS);
+  fnbReceiptHistCurrentPage = page;
+
   if (tbody) {
-    if (!receipts.length) {
+    if (!pagedItems.length) {
       tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không tìm thấy phiếu nhập kho nào phù hợp cho điểm bán ${escapeHtml(siteCode)}.</td></tr>`;
     } else {
-      tbody.innerHTML = receipts.map(r => `
+      tbody.innerHTML = pagedItems.map(r => `
         <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
           <td class="py-3 px-4 font-mono font-bold text-brand-600 dark:text-brand-400 text-xs">${escapeHtml(r.receipt_code)}</td>
           <td class="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(r.site_code)}</td>
@@ -110,10 +136,10 @@ export function renderFnbReceiptsHistoryTable(): void {
   }
 
   if (mob) {
-    if (!receipts.length) {
+    if (!pagedItems.length) {
       mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không tìm thấy phiếu nhập kho nào phù hợp.</div>`;
     } else {
-      mob.innerHTML = receipts.map(r => `
+      mob.innerHTML = pagedItems.map(r => `
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-2.5">
           <div class="flex items-start justify-between gap-2">
             <div>

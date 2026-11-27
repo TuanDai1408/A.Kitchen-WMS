@@ -1,5 +1,5 @@
 import { getActiveFnbReceiptSite, formatReceiptDateYMD, getReceiptExpWarningHtml } from './helpers';
-import { switchFnbReceiptSubView, loadFnbReceipts, onFnbPoSearchInput, loadFnbPoList, renderFnbPoTable } from './po-list';
+import { switchFnbReceiptSubView, loadFnbReceipts, onFnbPoSearchInput, loadFnbPoList, renderFnbPoTable, changeFnbPoPage, changeFnbPoPageSize } from './po-list';
 import {
   openPoReceiptModal,
   renderReceiptLinesTable,
@@ -28,7 +28,9 @@ import {
   closeDeleteReceiptModal,
   executeDeleteReceipt,
   exportReceiptById,
-  exportCurrentReceiptDetail
+  exportCurrentReceiptDetail,
+  changeFnbReceiptHistoryPage,
+  changeFnbReceiptHistoryPageSize
 } from './history';
 import {
   openManualReceiptModal,
@@ -82,6 +84,8 @@ win.loadFnbReceipts = loadFnbReceipts;
 win.onFnbPoSearchInput = onFnbPoSearchInput;
 win.loadFnbPoList = loadFnbPoList;
 win.renderFnbPoTable = renderFnbPoTable;
+win.changeFnbPoPage = changeFnbPoPage;
+win.changeFnbPoPageSize = changeFnbPoPageSize;
 
 // PO Receipt Modal
 win.openPoReceiptModal = openPoReceiptModal;
@@ -112,6 +116,8 @@ win.closeDeleteReceiptModal = closeDeleteReceiptModal;
 win.executeDeleteReceipt = executeDeleteReceipt;
 win.exportReceiptById = exportReceiptById;
 win.exportCurrentReceiptDetail = exportCurrentReceiptDetail;
+win.changeFnbReceiptHistoryPage = changeFnbReceiptHistoryPage;
+win.changeFnbReceiptHistoryPageSize = changeFnbReceiptHistoryPageSize;
 
 // Manual Receipt Modal
 win.openManualReceiptModal = openManualReceiptModal;

@@ -1,8 +1,33 @@
-import { escapeHtml } from '@/ts/utils/formatters';
+import { escapeHtml, paginateList } from '@/ts/utils/formatters';
 import { formatReceiptDateYMD, getActiveFnbReceiptSite } from './helpers';
 import type { ReceiptSubView } from './types';
 
 declare const window: any;
+
+let fnbPoCurrentPage = 1;
+let fnbPoPageSize = 25;
+
+const FNB_PO_PAGINATION_IDS = {
+  startId: 'fnbPoPageStart',
+  endId: 'fnbPoPageEnd',
+  totalId: 'fnbPoTotalCount',
+  badgeId: 'fnbPoCurrentPageBadge',
+  prevId: 'fnbPoPrevBtn',
+  nextId: 'fnbPoNextBtn'
+};
+
+export function changeFnbPoPage(delta: number): void {
+  fnbPoCurrentPage += delta;
+  const searchVal = (document.getElementById('fnbPoSearchInput') as HTMLInputElement | null)?.value || '';
+  renderFnbPoTable(searchVal);
+}
+
+export function changeFnbPoPageSize(size: string | number): void {
+  fnbPoPageSize = Math.max(1, parseInt(String(size), 10) || 25);
+  fnbPoCurrentPage = 1;
+  const searchVal = (document.getElementById('fnbPoSearchInput') as HTMLInputElement | null)?.value || '';
+  renderFnbPoTable(searchVal);
+}
 
 export function switchFnbReceiptSubView(view: ReceiptSubView): void {
   window.gFnbReceiptCurrentView = view;
@@ -133,12 +158,15 @@ export function renderFnbPoTable(query: string = ''): void {
     sumEl.textContent = `Hiển thị ${list.length} đơn đặt hàng`;
   }
 
+  const { pagedItems, page } = paginateList(list, fnbPoCurrentPage, fnbPoPageSize, FNB_PO_PAGINATION_IDS);
+  fnbPoCurrentPage = page;
+
   // Desktop Table
   if (tbody) {
-    if (list.length === 0) {
+    if (pagedItems.length === 0) {
       tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-400">Không có đơn đặt hàng PO nào cho điểm bán này.</td></tr>`;
     } else {
-      tbody.innerHTML = list.map(po => {
+      tbody.innerHTML = pagedItems.map(po => {
         const isOpen = (po.status === 'OPEN');
         const isPartial = (po.status === 'PARTIAL');
         const isCompleted = (po.status === 'COMPLETED');
@@ -199,10 +227,10 @@ export function renderFnbPoTable(query: string = ''): void {
 
   // Mobile Cards
   if (mob) {
-    if (list.length === 0) {
+    if (pagedItems.length === 0) {
       mob.innerHTML = `<div class="text-center py-8 text-gray-400 bg-white dark:bg-white/3 rounded-2xl border border-gray-200 dark:border-gray-800">Không có đơn đặt hàng PO nào.</div>`;
     } else {
-      mob.innerHTML = list.map(po => {
+      mob.innerHTML = pagedItems.map(po => {
         const isCompleted = (po.status === 'COMPLETED');
         const isPartial = (po.status === 'PARTIAL');
         const isBTT = (po.po_number || '').startsWith('50000') || !po.supplier_code || po.supplier_name === 'Bếp Trung Tâm Siba';
