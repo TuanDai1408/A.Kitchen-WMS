@@ -387,10 +387,10 @@ async function ensureSystemTabVisibilityTable(env) {
 }
 
 const DEFAULT_CATEGORY_RULES = [
-  { category: 'Rau củ', fefo_red_days: 2, fefo_yellow_days: 5, leadtime_days: 1 },
-  { category: 'Thịt cá & Hải sản', fefo_red_days: 2, fefo_yellow_days: 7, leadtime_days: 1 },
-  { category: 'Gia vị & Đồ khô', fefo_red_days: 14, fefo_yellow_days: 45, leadtime_days: 2 },
-  { category: 'Bao bì & Vật tư', fefo_red_days: 30, fefo_yellow_days: 90, leadtime_days: 3 }
+  { category: 'Rau củ', rop_safety_stock: 5, rop_daily_usage: 15, rop_threshold: 20, rop_target_stock: 35, leadtime_days: 1, sla_target_hours: 24, fefo_red_days: 2, fefo_yellow_days: 5 },
+  { category: 'Thịt cá & Hải sản', rop_safety_stock: 5, rop_daily_usage: 12, rop_threshold: 17, rop_target_stock: 30, leadtime_days: 1, sla_target_hours: 24, fefo_red_days: 2, fefo_yellow_days: 7 },
+  { category: 'Gia vị & Đồ khô', rop_safety_stock: 8, rop_daily_usage: 5, rop_threshold: 18, rop_target_stock: 30, leadtime_days: 2, sla_target_hours: 48, fefo_red_days: 14, fefo_yellow_days: 45 },
+  { category: 'Bao bì & Vật tư', rop_safety_stock: 10, rop_daily_usage: 8, rop_threshold: 34, rop_target_stock: 50, leadtime_days: 3, sla_target_hours: 72, fefo_red_days: 30, fefo_yellow_days: 90 }
 ];
 
 const DEFAULT_SYSTEM_CONFIG = {
@@ -1761,18 +1761,29 @@ export default {
         results = (results || []).map(r => {
           const catRule = matchCategoryRule(r.category, catRules);
           const effLeadDays = catRule && Number(catRule.leadtime_days) > 0 ? Number(catRule.leadtime_days) : cfgLeadDays;
+          const effSafety = catRule && catRule.rop_safety_stock !== undefined && Number(catRule.rop_safety_stock) >= 0
+            ? Number(catRule.rop_safety_stock)
+            : cfgSafety;
+          const baseDaily = catRule && Number(catRule.rop_daily_usage) > 0 ? Number(catRule.rop_daily_usage) : cfgDaily;
           const effDaily = calcMode === 'auto_history'
-            ? Math.round((Number(r.hist_daily_usage || cfgDaily) * peakMult) * 10) / 10
-            : cfgDaily;
+            ? Math.round((Number(r.hist_daily_usage || baseDaily) * peakMult) * 10) / 10
+            : baseDaily;
           const effRop = calcMode === 'auto_history'
-            ? Math.round((effDaily * effLeadDays + cfgSafety) * 10) / 10
-            : cfgRop;
+            ? Math.round((effDaily * effLeadDays + effSafety) * 10) / 10
+            : (catRule && Number(catRule.rop_threshold) > 0
+                ? Number(catRule.rop_threshold)
+                : (catRule ? Math.round((effDaily * effLeadDays + effSafety) * 10) / 10 : cfgRop));
           const curStock = Number(r.current_stock) || 0;
-          const effTarget = calcMode === 'auto_history' ? Math.round((effRop + effDaily * effLeadDays) * 10) / 10 : cfgTarget;
+          const effTarget = calcMode === 'auto_history'
+            ? Math.round((effRop + effDaily * effLeadDays) * 10) / 10
+            : (catRule && Number(catRule.rop_target_stock) > 0
+                ? Number(catRule.rop_target_stock)
+                : (catRule ? Math.round((effRop + effDaily * effLeadDays) * 10) / 10 : cfgTarget));
           const effSuggested = curStock < effRop ? Math.max(0, Math.round(effTarget - curStock)) : 0;
           const effStatus = curStock <= 0 ? 'HẾT HÀNG' : (curStock < effRop ? 'CẦN ĐẶT' : 'AN TOÀN');
           return {
             ...r,
+            safety_stock: effSafety,
             daily_usage: effDaily,
             lead_time_days: effLeadDays,
             lead_time_hours: effLeadDays * 24,
@@ -4825,6 +4836,13 @@ export default {
       if (pathname === '/api/system/config' && request.method === 'GET') {
         const cfg = await getSystemConfig(env);
         const { rows } = await db.query(env, `SELECT setting_key, updated_by, updated_at FROM system_settings`).catch(() => ({ rows: [] }));
+        const { rows: catRows } = await db.query(env, `
+          SELECT DISTINCT cat FROM (
+            SELECT NULLIF(TRIM(nhom_hang), '') AS cat FROM dim_article_stock
+            UNION
+            SELECT NULLIF(TRIM(merch_category), '') AS cat FROM sap_po_items
+          ) c WHERE cat IS NOT NULL ORDER BY cat ASC LIMIT 100
+        `).catch(() => ({ rows: [] }));
         const meta = {};
         (rows || []).forEach(r => {
           meta[r.setting_key] = { updated_by: r.updated_by, updated_at: r.updated_at };
@@ -4833,6 +4851,7 @@ export default {
           success: true,
           data: cfg,
           defaults: DEFAULT_SYSTEM_CONFIG,
+          available_categories: (catRows || []).map(c => c.cat).filter(Boolean),
           meta
         }), { headers: corsHeaders });
       }

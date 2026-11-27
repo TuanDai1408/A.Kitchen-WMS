@@ -6,9 +6,14 @@ declare const lucide: any;
 
 export interface CategoryRule {
   category: string;
+  rop_safety_stock: number;
+  rop_daily_usage: number;
+  rop_threshold: number;
+  rop_target_stock: number;
+  leadtime_days: number;
+  sla_target_hours: number;
   fefo_red_days: number;
   fefo_yellow_days: number;
-  leadtime_days: number;
 }
 
 export interface SystemConfigData {
@@ -42,10 +47,10 @@ export interface SystemConfigData {
 }
 
 export const DEFAULT_CATEGORY_RULES_UI: CategoryRule[] = [
-  { category: 'Rau củ', fefo_red_days: 2, fefo_yellow_days: 5, leadtime_days: 1 },
-  { category: 'Thịt cá & Hải sản', fefo_red_days: 2, fefo_yellow_days: 7, leadtime_days: 1 },
-  { category: 'Gia vị & Đồ khô', fefo_red_days: 14, fefo_yellow_days: 45, leadtime_days: 2 },
-  { category: 'Bao bì & Vật tư', fefo_red_days: 30, fefo_yellow_days: 90, leadtime_days: 3 }
+  { category: 'Rau củ', rop_safety_stock: 5, rop_daily_usage: 15, rop_threshold: 20, rop_target_stock: 35, leadtime_days: 1, sla_target_hours: 24, fefo_red_days: 2, fefo_yellow_days: 5 },
+  { category: 'Thịt cá & Hải sản', rop_safety_stock: 5, rop_daily_usage: 12, rop_threshold: 17, rop_target_stock: 30, leadtime_days: 1, sla_target_hours: 24, fefo_red_days: 2, fefo_yellow_days: 7 },
+  { category: 'Gia vị & Đồ khô', rop_safety_stock: 8, rop_daily_usage: 5, rop_threshold: 18, rop_target_stock: 30, leadtime_days: 2, sla_target_hours: 48, fefo_red_days: 14, fefo_yellow_days: 45 },
+  { category: 'Bao bì & Vật tư', rop_safety_stock: 10, rop_daily_usage: 8, rop_threshold: 34, rop_target_stock: 50, leadtime_days: 3, sla_target_hours: 72, fefo_red_days: 30, fefo_yellow_days: 90 }
 ];
 
 export const DEFAULT_SYSTEM_CONFIG_UI: SystemConfigData = {
@@ -81,6 +86,31 @@ export const DEFAULT_SYSTEM_CONFIG_UI: SystemConfigData = {
 let gSystemConfigCache: SystemConfigData = { ...DEFAULT_SYSTEM_CONFIG_UI };
 let gSystemConfigLoaded = false;
 let gEditableCategoryRules: CategoryRule[] = [...DEFAULT_CATEGORY_RULES_UI];
+let gAvailableDbCategories: string[] = [];
+
+function normalizeCategoryRule(raw: Partial<CategoryRule>): CategoryRule {
+  const leadtime = Math.max(1, Number(raw.leadtime_days) || 2);
+  const safety = Number(raw.rop_safety_stock);
+  const daily = Number(raw.rop_daily_usage);
+  const rop = Number(raw.rop_threshold);
+  const target = Number(raw.rop_target_stock);
+  const sla = Number(raw.sla_target_hours);
+  const effSafety = Number.isFinite(safety) && safety >= 0 ? safety : 5;
+  const effDaily = Number.isFinite(daily) && daily > 0 ? daily : 10;
+  const effRop = Number.isFinite(rop) && rop > 0 ? rop : Math.round((effDaily * leadtime + effSafety) * 10) / 10;
+  const effTarget = Number.isFinite(target) && target > 0 ? target : Math.round((effRop + effDaily * leadtime) * 10) / 10;
+  return {
+    category: String(raw.category || ''),
+    rop_safety_stock: effSafety,
+    rop_daily_usage: effDaily,
+    rop_threshold: effRop,
+    rop_target_stock: effTarget,
+    leadtime_days: leadtime,
+    sla_target_hours: Number.isFinite(sla) && sla > 0 ? sla : leadtime * 24,
+    fefo_red_days: Math.max(1, Number(raw.fefo_red_days) || 7),
+    fefo_yellow_days: Math.max(1, Number(raw.fefo_yellow_days) || 30)
+  };
+}
 
 export function getCachedSystemConfig(): SystemConfigData {
   return gSystemConfigCache;
@@ -149,30 +179,48 @@ export function renderCategoryRulesTable(): void {
   const tbody = document.getElementById('cfgCategoryRulesBody');
   if (!tbody) return;
   if (!gEditableCategoryRules.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-400">Chưa có quy tắc nhóm hàng nào. Nhấn "+ Thêm nhóm hàng" để tạo.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-xs text-gray-400">Chưa có quy tắc nhóm hàng nào. Nhấn "+ Thêm nhóm hàng" hoặc "Nạp ngành hàng từ DB" để tạo.</td></tr>`;
     return;
   }
-  tbody.innerHTML = gEditableCategoryRules.map((r, idx) => `
-    <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40">
-      <td class="p-2.5">
-        <input type="text" value="${escapeAttr(r.category)}" oninput="updateCategoryRuleField(${idx}, 'category', this.value)" placeholder="Tên nhóm hàng (VD: Rau củ)" class="input w-full text-xs py-1.5 px-2.5 font-sans">
-      </td>
-      <td class="p-2.5">
-        <input type="number" min="1" step="1" value="${r.fefo_red_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_red_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
-      </td>
-      <td class="p-2.5">
-        <input type="number" min="1" step="1" value="${r.fefo_yellow_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_yellow_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
-      </td>
-      <td class="p-2.5">
-        <input type="number" min="1" step="1" value="${r.leadtime_days}" oninput="updateCategoryRuleField(${idx}, 'leadtime_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
-      </td>
-      <td class="p-2.5 text-center">
-        <button type="button" onclick="removeCategoryRuleRow(${idx})" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = gEditableCategoryRules.map((raw, idx) => {
+    const r = normalizeCategoryRule(raw);
+    return `
+      <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40">
+        <td class="p-2">
+          <input type="text" list="cfgCategoryDatalist" value="${escapeAttr(r.category)}" oninput="updateCategoryRuleField(${idx}, 'category', this.value)" placeholder="Chọn hoặc nhập nhóm hàng..." class="input w-full text-xs py-1.5 px-2.5 font-sans">
+        </td>
+        <td class="p-2">
+          <input type="number" min="0" step="0.5" value="${r.rop_safety_stock}" oninput="updateCategoryRuleField(${idx}, 'rop_safety_stock', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="0" step="0.5" value="${r.rop_daily_usage}" oninput="updateCategoryRuleField(${idx}, 'rop_daily_usage', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="0" step="0.5" value="${r.rop_threshold}" oninput="updateCategoryRuleField(${idx}, 'rop_threshold', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="0" step="0.5" value="${r.rop_target_stock}" oninput="updateCategoryRuleField(${idx}, 'rop_target_stock', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="1" step="1" value="${r.leadtime_days}" oninput="updateCategoryRuleField(${idx}, 'leadtime_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="1" step="1" value="${r.sla_target_hours}" oninput="updateCategoryRuleField(${idx}, 'sla_target_hours', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="1" step="1" value="${r.fefo_red_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_red_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2">
+          <input type="number" min="1" step="1" value="${r.fefo_yellow_days}" oninput="updateCategoryRuleField(${idx}, 'fefo_yellow_days', this.value)" class="input w-full text-xs py-1.5 px-2 font-mono text-right">
+        </td>
+        <td class="p-2 text-center">
+          <button type="button" onclick="removeCategoryRuleRow(${idx})" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Xóa dòng">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
   if (typeof lucide !== 'undefined' && lucide.createIcons) {
     lucide.createIcons({ root: tbody });
@@ -180,13 +228,29 @@ export function renderCategoryRulesTable(): void {
 }
 
 export function addCategoryRuleRow(): void {
-  gEditableCategoryRules.push({
-    category: '',
-    fefo_red_days: 7,
-    fefo_yellow_days: 30,
-    leadtime_days: 2
+  gEditableCategoryRules.push(normalizeCategoryRule({ category: '' }));
+  renderCategoryRulesTable();
+}
+
+export function importDbCategoriesToRules(): void {
+  if (!gAvailableDbCategories.length) {
+    if (typeof showToast === 'function') showToast('Không có danh sách ngành hàng bổ sung từ DB', 'info');
+    return;
+  }
+  const existing = new Set(gEditableCategoryRules.map(r => (r.category || '').toLowerCase().trim()));
+  let added = 0;
+  gAvailableDbCategories.forEach(cat => {
+    const key = cat.toLowerCase().trim();
+    if (key && !existing.has(key)) {
+      gEditableCategoryRules.push(normalizeCategoryRule({ category: cat }));
+      existing.add(key);
+      added++;
+    }
   });
   renderCategoryRulesTable();
+  if (typeof showToast === 'function') {
+    showToast(added > 0 ? `Đã nạp thêm ${added} ngành hàng từ CSDL` : 'Tất cả ngành hàng từ CSDL đã có trong bảng', added > 0 ? 'success' : 'info');
+  }
 }
 
 export function removeCategoryRuleRow(idx: number): void {
@@ -201,7 +265,8 @@ export function updateCategoryRuleField(idx: number, field: keyof CategoryRule, 
     row.category = val;
   } else {
     const n = Number(val);
-    row[field] = Number.isFinite(n) && n > 0 ? n : 1;
+    const minZero = field === 'rop_safety_stock' || field === 'rop_daily_usage' || field === 'rop_threshold' || field === 'rop_target_stock';
+    row[field] = Number.isFinite(n) && (minZero ? n >= 0 : n > 0) ? n : (minZero ? 0 : 1);
   }
 }
 
@@ -261,9 +326,19 @@ export async function loadSystemConfig(): Promise<void> {
       setInputVal('cfg_history_src_kitchen_issues', cfg.history_src_kitchen_issues !== false);
       setInputVal('cfg_history_src_sap_mb51', cfg.history_src_sap_mb51 !== false);
 
+      if (Array.isArray(json.available_categories)) {
+        gAvailableDbCategories = json.available_categories;
+        const dl = document.getElementById('cfgCategoryDatalist');
+        if (dl) {
+          dl.innerHTML = gAvailableDbCategories.map(c => `<option value="${escapeAttr(c)}"></option>`).join('');
+        }
+      }
+
       try {
         const parsedRules = JSON.parse(cfg.category_rules_json || '[]');
-        gEditableCategoryRules = Array.isArray(parsedRules) ? parsedRules : [...DEFAULT_CATEGORY_RULES_UI];
+        gEditableCategoryRules = Array.isArray(parsedRules)
+          ? parsedRules.map((r: any) => normalizeCategoryRule(r))
+          : [...DEFAULT_CATEGORY_RULES_UI];
       } catch {
         gEditableCategoryRules = [...DEFAULT_CATEGORY_RULES_UI];
       }
@@ -619,6 +694,7 @@ if (typeof window !== 'undefined') {
   w.getCachedSystemConfig = getCachedSystemConfig;
   w.onRopCalcModeChange = onRopCalcModeChange;
   w.addCategoryRuleRow = addCategoryRuleRow;
+  w.importDbCategoriesToRules = importDbCategoriesToRules;
   w.removeCategoryRuleRow = removeCategoryRuleRow;
   w.updateCategoryRuleField = updateCategoryRuleField;
   w.switchSysConfigSubView = switchSysConfigSubView;

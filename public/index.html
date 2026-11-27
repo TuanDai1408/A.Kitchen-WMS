@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1208">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1215">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1208"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1215"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1724,8 +1724,8 @@
                 <i data-lucide="alert-triangle" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Cảnh báo Tồn kho &amp; Điểm đặt hàng (ROP)</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Áp dụng cho Dashboard tổng quan, Cảnh báo ROP &amp; gợi ý đặt hàng</p>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Cảnh báo Tồn kho &amp; Điểm đặt hàng (ROP) — Mặc định chung</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Tham số dự phòng khi nhóm hàng chưa có cấu hình riêng ở bảng bên dưới</p>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1778,8 +1778,8 @@
                 <i data-lucide="clock" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Leadtime &amp; SLA Nhà cung cấp</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Áp dụng cho tab Lead Time &amp; NCC và tính trễ hạn đơn PO</p>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Leadtime &amp; SLA Nhà cung cấp — Mặc định chung</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Tham số dự phòng cho tab Lead Time &amp; NCC khi nhóm hàng chưa có cấu hình riêng</p>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1905,7 +1905,7 @@
             </div>
           </div>
 
-          <!-- Card 5: Quy tắc riêng theo Nhóm hàng (Full-width) -->
+          <!-- Card 5: Quy tắc riêng theo Nhóm hàng / Ngành hàng (Full-width) -->
           <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/3 p-5 shadow-theme-xs space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
               <div class="flex items-center gap-2.5">
@@ -1913,24 +1913,36 @@
                   <i data-lucide="layers" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Quy tắc riêng theo Nhóm hàng (FEFO &amp; Leadtime Override)</h3>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Ưu tiên áp dụng thay cho ngưỡng mặc định khi mặt hàng thuộc nhóm tương ứng (khớp theo từ khóa tên nhóm hàng).</p>
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Cấu hình riêng theo Nhóm hàng / Ngành hàng (ROP, Leadtime, SLA &amp; FEFO)</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Ưu tiên áp dụng thay cho ngưỡng mặc định chung theo từng ngành hàng / nhóm hàng thực tế.</p>
                 </div>
               </div>
-              <button type="button" onclick="addCategoryRuleRow()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>Thêm nhóm hàng</span>
-              </button>
+              <div class="flex items-center gap-2 flex-wrap shrink-0">
+                <button type="button" onclick="importDbCategoriesToRules()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors" title="Tự động nạp các ngành hàng có trong CSDL chưa được cấu hình">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Nạp ngành hàng từ DB</span>
+                </button>
+                <button type="button" onclick="addCategoryRuleRow()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Thêm nhóm hàng</span>
+                </button>
+              </div>
             </div>
+            <datalist id="cfgCategoryDatalist"></datalist>
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr class="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    <th class="p-2.5 min-w-[200px]">Từ khóa Nhóm hàng</th>
-                    <th class="p-2.5 text-right w-36">FEFO Đỏ (≤ ngày)</th>
-                    <th class="p-2.5 text-right w-36">FEFO Vàng (≤ ngày)</th>
-                    <th class="p-2.5 text-right w-36">Leadtime (Ngày)</th>
-                    <th class="p-2.5 text-center w-16">Xóa</th>
+                  <tr class="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    <th class="p-2.5 min-w-[190px]">Nhóm / Ngành hàng</th>
+                    <th class="p-2.5 text-right w-24">Tồn an toàn</th>
+                    <th class="p-2.5 text-right w-28">Tiêu thụ/ngày</th>
+                    <th class="p-2.5 text-right w-24">Ngưỡng ROP</th>
+                    <th class="p-2.5 text-right w-28">Tồn mục tiêu</th>
+                    <th class="p-2.5 text-right w-28">Leadtime (Ngày)</th>
+                    <th class="p-2.5 text-right w-24">SLA (Giờ)</th>
+                    <th class="p-2.5 text-right w-28">FEFO Đỏ (≤ ngày)</th>
+                    <th class="p-2.5 text-right w-28">FEFO Vàng (≤ ngày)</th>
+                    <th class="p-2.5 text-center w-14">Xóa</th>
                   </tr>
                 </thead>
                 <tbody id="cfgCategoryRulesBody" class="divide-y divide-gray-100 dark:divide-gray-800/70"></tbody>
