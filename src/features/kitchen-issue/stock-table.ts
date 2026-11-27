@@ -2,6 +2,7 @@ import { KitchenStockItem, KitchenIssueLine } from './types';
 import { formatVND, formatNumber, getActiveKitchenIssueSite } from './helpers';
 import { loadKitchenIssueHistory } from './history';
 import { assertPermission } from '@/features/auth';
+import { adjustListHeightForSubTable } from '@/ts/utils/formatters';
 
 declare const showToast: (msg: string, type?: string) => void;
 declare const showLoading: (msg?: string) => void;
@@ -279,6 +280,7 @@ export function updateKitchenIssueKPIs(): void {
   const slipCount = document.getElementById('kitchenIssueSlipCount');
   const slipList = document.getElementById('kitchenIssueSelectedSlipList');
   if (slipWrap) slipWrap.classList.toggle('hidden', countItems === 0);
+  adjustListHeightForSubTable(countItems > 0, 'kitchenIssueItemsScroll', 'kitchenIssueItemsMobile', '550px', '500px');
   if (slipCount) slipCount.textContent = String(countItems);
   if (slipList) {
     slipList.innerHTML = selectedList.map((l, idx) => `

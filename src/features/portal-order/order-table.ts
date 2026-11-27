@@ -1,5 +1,6 @@
 import type { PortalOrderItem } from './types';
 import { safeCellCode, safeCellBadge, safeEscapeHtml, fmtVND, fmtNum } from './helpers';
+import { adjustListHeightForSubTable } from '@/ts/utils/formatters';
 
 declare const lucide: any;
 
@@ -264,6 +265,7 @@ export function renderOrderCartSummary(): void {
 
   if (!selected.length) {
     slip?.classList.add('hidden');
+    adjustListHeightForSubTable(false, 'orderItemsScroll', 'orderMobileCards', '420px', '420px');
     tbody.innerHTML = '';
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -273,6 +275,7 @@ export function renderOrderCartSummary(): void {
   }
 
   slip?.classList.remove('hidden');
+  adjustListHeightForSubTable(true, 'orderItemsScroll', 'orderMobileCards', '420px', '420px');
   if (submitBtn) {
     submitBtn.disabled = false;
     submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');

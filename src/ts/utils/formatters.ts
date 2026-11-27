@@ -107,3 +107,24 @@ export function getCleanInitials(name: string | null | undefined): string {
     return 'U';
   }
 }
+
+/**
+ * Thu gọn chiều cao bảng danh sách mặt hàng chính khi bảng con tóm tắt mở ra,
+ * giúp giữ khoảng trống hiển thị cả 2 bảng và tránh bảng con đè lên danh sách.
+ */
+export function adjustListHeightForSubTable(
+  hasSelected: boolean,
+  desktopId: string,
+  mobileId: string,
+  fullDesktopMaxH = '480px',
+  fullMobileMaxH = '460px'
+): void {
+  const apply = (id: string, targetMaxH: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.transition = 'max-height 180ms ease';
+    el.style.maxHeight = targetMaxH;
+  };
+  apply(desktopId, hasSelected ? '280px' : fullDesktopMaxH);
+  apply(mobileId, hasSelected ? '240px' : fullMobileMaxH);
+}
