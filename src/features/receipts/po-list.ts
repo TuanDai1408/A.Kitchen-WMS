@@ -94,7 +94,7 @@ export async function loadFnbPoList(siteCodeArg?: string): Promise<void> {
       renderFnbPoTable(searchVal);
 
       // Update badge pending
-      const pendingCount = (window.gFnbPoList || []).filter((p: any) => p.status === 'OPEN').length;
+      const pendingCount = (window.gFnbPoList || []).filter((p: any) => p.status === 'OPEN' || p.status === 'PARTIAL').length;
       const bPending = document.getElementById('fnbReceiptBadgePendingCount');
       if (bPending) bPending.textContent = String(pendingCount);
     } else {
@@ -140,12 +140,13 @@ export function renderFnbPoTable(query: string = ''): void {
     } else {
       tbody.innerHTML = list.map(po => {
         const isOpen = (po.status === 'OPEN');
+        const isPartial = (po.status === 'PARTIAL');
         const isCompleted = (po.status === 'COMPLETED');
         const statusBadge = isCompleted 
-          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Đã Nhập Kho</span>`
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 whitespace-nowrap"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Đã Nhập Kho</span>`
           : (isOpen 
-              ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400"><i data-lucide="clock" class="w-3 h-3"></i> Chờ Nhập Kho</span>`
-              : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">Nhập 1 phần</span>`);
+              ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400 whitespace-nowrap"><i data-lucide="clock" class="w-3 h-3"></i> Chờ Nhập Kho</span>`
+              : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400 whitespace-nowrap"><i data-lucide="loader" class="w-3 h-3"></i> Nhập 1 Phần</span>`);
 
         const isBTT = (po.po_number || '').startsWith('50000') || !po.supplier_code || po.supplier_name === 'Bếp Trung Tâm Siba';
         const sourceBadge = isBTT
@@ -154,6 +155,7 @@ export function renderFnbPoTable(query: string = ''): void {
 
         const totalAmt = Number(po.total_amount) || 0;
         const totalQty = Number(po.total_qty) || 0;
+        const totalReceived = Number(po.total_received_qty) || 0;
 
         return `
           <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
@@ -174,7 +176,8 @@ export function renderFnbPoTable(query: string = ''): void {
               ${po.item_count} mã
             </td>
             <td class="py-3 px-3 text-right tabular-nums text-xs font-semibold text-gray-800 dark:text-gray-200">
-              ${totalQty.toFixed(1)}
+              <div>${totalQty.toFixed(1)}</div>
+              ${isPartial && totalReceived > 0 ? `<div class="text-[11px] font-medium text-blue-600 dark:text-blue-400">Đã nhập: ${totalReceived.toFixed(1)}</div>` : ''}
             </td>
             <td class="py-3 px-4 text-right tabular-nums text-xs font-bold text-gray-900 dark:text-white">
               ${totalAmt > 0 ? Math.round(totalAmt).toLocaleString('vi-VN') + ' đ' : 'Theo điều chuyển'}
@@ -183,9 +186,9 @@ export function renderFnbPoTable(query: string = ''): void {
               ${statusBadge}
             </td>
             <td class="py-3 px-3 text-center">
-              <button type="button" onclick="openPoReceiptModal('${escapeHtml(po.po_number)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl ${isCompleted ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200' : 'bg-brand-500 hover:bg-brand-600 text-white shadow-theme-xs'} font-semibold text-xs transition-all">
+              <button type="button" onclick="openPoReceiptModal('${escapeHtml(po.po_number)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl ${isCompleted ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200' : 'bg-brand-500 hover:bg-brand-600 text-white shadow-theme-xs'} font-semibold text-xs transition-all whitespace-nowrap">
                 <i data-lucide="${isCompleted ? 'eye' : 'package-plus'}" class="w-3.5 h-3.5"></i>
-                <span>${isCompleted ? 'Xem Nhập' : 'Nhập Kho'}</span>
+                <span>${isCompleted ? 'Xem Nhập' : (isPartial ? 'Nhập Tiếp' : 'Nhập Kho')}</span>
               </button>
             </td>
           </tr>
@@ -201,6 +204,7 @@ export function renderFnbPoTable(query: string = ''): void {
     } else {
       mob.innerHTML = list.map(po => {
         const isCompleted = (po.status === 'COMPLETED');
+        const isPartial = (po.status === 'PARTIAL');
         const isBTT = (po.po_number || '').startsWith('50000') || !po.supplier_code || po.supplier_name === 'Bếp Trung Tâm Siba';
         const totalAmt = Number(po.total_amount) || 0;
         const totalQty = Number(po.total_qty) || 0;
@@ -214,7 +218,7 @@ export function renderFnbPoTable(query: string = ''): void {
                 <div class="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold mt-0.5">PO: ${escapeHtml(po.po_number)} • ${escapeHtml(formatReceiptDateYMD(po.doc_date))}</div>
               </div>
               <div class="text-right">
-                <span class="text-xs font-bold ${isCompleted ? 'text-emerald-600' : 'text-amber-600'} block">${isCompleted ? 'Đã Nhập' : 'Chờ Nhập'}</span>
+                <span class="text-xs font-bold ${isCompleted ? 'text-emerald-600' : (isPartial ? 'text-blue-600' : 'text-amber-600')} block">${isCompleted ? 'Đã Nhập' : (isPartial ? 'Nhập 1 Phần' : 'Chờ Nhập')}</span>
                 <span class="text-xs text-gray-400 tabular-nums">${po.item_count} mặt hàng</span>
               </div>
             </div>
@@ -232,7 +236,7 @@ export function renderFnbPoTable(query: string = ''): void {
 
             <button type="button" onclick="openPoReceiptModal('${escapeHtml(po.po_number)}')" class="w-full py-2 rounded-xl ${isCompleted ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300' : 'bg-brand-500 text-white shadow-theme-xs'} font-semibold text-xs flex items-center justify-center gap-2">
               <i data-lucide="${isCompleted ? 'eye' : 'package-plus'}" class="w-4 h-4"></i>
-              <span>${isCompleted ? 'Xem Chi Tiết Đơn' : 'Kiểm Đếm & Nhập Kho Thực Tế'}</span>
+              <span>${isCompleted ? 'Xem Chi Tiết Đơn' : (isPartial ? 'Nhập Tiếp Phần Còn Lại' : 'Kiểm Đếm & Nhập Kho Thực Tế')}</span>
             </button>
           </div>
         `;

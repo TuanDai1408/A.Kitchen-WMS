@@ -2579,8 +2579,9 @@
             <div class="field w-48">
               <select id="fnbPoStatusFilter" onchange="loadFnbPoList()" class="select">
                 <option value="">Tất cả trạng thái</option>
-                <option value="OPEN" selected>Chờ nhập kho (OPEN)</option>
-                <option value="COMPLETED">Đã nhập kho (COMPLETED)</option>
+                <option value="OPEN" selected>Chờ / Đang nhập dở</option>
+                <option value="PARTIAL">Nhập 1 phần (PARTIAL)</option>
+                <option value="COMPLETED">Đã nhập đủ (COMPLETED)</option>
               </select>
             </div>
 
@@ -5532,6 +5533,8 @@
                   <th class="py-2.5 px-2 text-center w-14">ĐVT</th>
                   <th class="py-2.5 px-3 text-right">Đơn Giá</th>
                   <th class="py-2.5 px-3 text-right">SL Đặt</th>
+                  <th class="py-2.5 px-3 text-right">Đã Nhập</th>
+                  <th class="py-2.5 px-3 text-right text-amber-600 dark:text-amber-400">Còn Lại</th>
                   <th class="py-2.5 px-3 text-center w-28">SL Thực Nhập *</th>
                   <th class="py-2.5 px-3 text-center min-w-[125px]">Số Lô (Batch)</th>
                   <th class="py-2.5 px-3 text-center min-w-[185px]">Hạn Dùng (EXP)</th>

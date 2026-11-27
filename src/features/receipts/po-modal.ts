@@ -44,6 +44,9 @@ export async function openPoReceiptModal(poNumber: string): Promise<void> {
     window.gReceiptLines = lines.map((item: any) => {
       const cat = (item.merch_category || '').toLowerCase();
       const isFood = !cat.includes('bao bì') && !cat.includes('công cụ') && !cat.includes('hóa chất') && !cat.includes('tạp phẩm');
+      const orderQty = Number(item.order_qty) || 0;
+      const receivedQty = Number(item.received_qty) || 0;
+      const remainingQty = Math.max(0, Math.round((orderQty - receivedQty) * 100) / 100);
       return {
         po_item: item.po_item,
         item_code: item.item_code,
@@ -51,8 +54,10 @@ export async function openPoReceiptModal(poNumber: string): Promise<void> {
         merch_category: item.merch_category,
         unit: item.unit || 'KG',
         unit_price: Number(item.unit_price) || 0,
-        order_qty: Number(item.order_qty) || 0,
-        actual_qty: Number(item.order_qty) || 0,
+        order_qty: orderQty,
+        received_qty: receivedQty,
+        remaining_qty: remainingQty,
+        actual_qty: remainingQty,
         batch_code: defaultBatch,
         exp_date: isFood ? defaultExp1y : '',
         is_food: isFood,
@@ -88,12 +93,18 @@ export function renderReceiptLinesTable(): void {
     tbody.innerHTML = lines.map((item, idx) => {
       const lineTotal = (item.actual_qty || 0) * (item.unit_price || 0);
       grandTotal += lineTotal;
+      const receivedQty = Number(item.received_qty) || 0;
+      const remainingQty = item.remaining_qty !== undefined ? Number(item.remaining_qty) : Math.max(0, (Number(item.order_qty) || 0) - receivedQty);
+      const isLineDone = remainingQty <= 0;
 
       return `
-        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors">
+        <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-800/40 transition-colors ${isLineDone ? 'opacity-60 bg-emerald-50/20 dark:bg-emerald-950/10' : ''}">
           <td class="py-2.5 px-3 text-center tabular-nums text-gray-400 text-xs">${idx + 1}</td>
           <td class="py-2.5 px-3">
-            <div class="font-bold text-gray-900 dark:text-white text-xs">${escapeHtml(item.item_name || 'Vật tư')}</div>
+            <div class="font-bold text-gray-900 dark:text-white text-xs flex items-center gap-1.5 flex-wrap">
+              <span>${escapeHtml(item.item_name || 'Vật tư')}</span>
+              ${isLineDone ? '<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">Đã nhập đủ</span>' : ''}
+            </div>
             <div class="text-xs text-gray-400 tabular-nums flex items-center gap-1.5 mt-0.5">
               <span class="font-mono text-brand-600 dark:text-brand-400">${escapeHtml(item.item_code)}</span>
               ${item.merch_category ? `<span>•</span><span>${escapeHtml(item.merch_category)}</span>` : ''}
@@ -108,6 +119,12 @@ export function renderReceiptLinesTable(): void {
           </td>
           <td class="py-2.5 px-3 text-right tabular-nums text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-800/20">
             ${Number(item.order_qty).toFixed(1)}
+          </td>
+          <td class="py-2.5 px-3 text-right tabular-nums text-xs font-semibold ${receivedQty > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}">
+            ${receivedQty.toFixed(1)}
+          </td>
+          <td class="py-2.5 px-3 text-right tabular-nums text-xs font-bold ${remainingQty > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}">
+            ${remainingQty.toFixed(1)}
           </td>
           <td class="py-2.5 px-3 text-center">
             <input type="number" step="0.01" min="0" value="${item.actual_qty}" 
@@ -151,6 +168,8 @@ export function renderReceiptLinesTable(): void {
   if (mob) {
     mob.innerHTML = lines.map((item, idx) => {
       const lineTotal = (item.actual_qty || 0) * (item.unit_price || 0);
+      const receivedQty = Number(item.received_qty) || 0;
+      const remainingQty = item.remaining_qty !== undefined ? Number(item.remaining_qty) : Math.max(0, (Number(item.order_qty) || 0) - receivedQty);
 
       return `
         <div class="bg-white dark:bg-white/3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-3">
@@ -163,18 +182,22 @@ export function renderReceiptLinesTable(): void {
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">#${idx + 1}</span>
           </div>
 
-          <div class="grid grid-cols-3 gap-2 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-xl text-center tabular-nums text-xs">
+          <div class="grid grid-cols-4 gap-2 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-xl text-center tabular-nums text-xs">
             <div>
-              <span class="text-gray-400 block text-[11px]">SL Đặt SAP:</span>
+              <span class="text-gray-400 block text-[11px]">SL Đặt:</span>
               <span class="font-bold text-gray-700 dark:text-gray-300">${Number(item.order_qty).toFixed(1)}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block text-[11px]">Đã Nhập:</span>
+              <span class="font-bold text-blue-600 dark:text-blue-400">${receivedQty.toFixed(1)}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block text-[11px]">Còn Lại:</span>
+              <span class="font-bold ${remainingQty > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}">${remainingQty.toFixed(1)}</span>
             </div>
             <div>
               <span class="text-gray-400 block text-[11px]">Thành tiền:</span>
               <span id="receiptLineTotalMob_${idx}" class="num font-bold text-brand-600 dark:text-brand-400">${lineTotal > 0 ? Math.round(lineTotal).toLocaleString('vi-VN') + ' ₫' : '0 ₫'}</span>
-            </div>
-            <div>
-              <span class="text-gray-400 block text-[11px]">Phân loại:</span>
-              <span class="text-xs font-medium">${item.is_food ? 'Thực phẩm' : 'Vật tư'}</span>
             </div>
           </div>
 

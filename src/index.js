@@ -6716,35 +6716,44 @@ export default {
         const { startDate, endDate } = resolveDateRange(searchParams, 2);
         
         let q = `
-          SELECT 
-            po_number,
-            site,
-            MAX(doc_date) as doc_date,
-            supplier_code,
-            COALESCE(NULLIF(supplier_name, ''), 'Bếp Trung Tâm Siba') as supplier_name,
-            COUNT(*) as item_count,
-            SUM(order_qty) as total_qty,
-            SUM(order_qty * net_price) as total_amount,
-            status
-          FROM wms.sap_po_items
-          WHERE SUBSTR(CAST(doc_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(doc_date AS TEXT), 1, 10) <= ?
+          SELECT * FROM (
+            SELECT 
+              po_number,
+              site,
+              MAX(doc_date) as doc_date,
+              supplier_code,
+              COALESCE(NULLIF(supplier_name, ''), 'Bếp Trung Tâm Siba') as supplier_name,
+              COUNT(*) as item_count,
+              SUM(order_qty) as total_qty,
+              SUM(COALESCE(received_qty, 0)) as total_received_qty,
+              SUM(order_qty * net_price) as total_amount,
+              CASE
+                WHEN SUM(CASE WHEN COALESCE(received_qty, 0) < order_qty THEN 1 ELSE 0 END) = 0 THEN 'COMPLETED'
+                WHEN SUM(CASE WHEN COALESCE(received_qty, 0) > 0 THEN 1 ELSE 0 END) > 0 THEN 'PARTIAL'
+                ELSE 'OPEN'
+              END as status
+            FROM wms.sap_po_items
+            WHERE SUBSTR(CAST(doc_date AS TEXT), 1, 10) >= ? AND SUBSTR(CAST(doc_date AS TEXT), 1, 10) <= ?
         `;
         const params = [startDate, endDate];
         if (siteCode && siteCode !== 'all') {
           q += ` AND site = ?`;
           params.push(siteCode.toUpperCase());
         }
-        if (status) {
-          q += ` AND status = ?`;
-          params.push(status);
-        }
         if (search) {
           q += ` AND (po_number LIKE ? OR supplier_name LIKE ? OR supplier_code LIKE ?)`;
           const s = `%${search}%`;
           params.push(s, s, s);
         }
-        q += ` GROUP BY po_number, site, supplier_code, supplier_name, status
-               ORDER BY MAX(doc_date) DESC, po_number DESC
+        q += ` GROUP BY po_number, site, supplier_code, supplier_name
+          ) po_agg`;
+        if (status === 'OPEN') {
+          q += ` WHERE status IN ('OPEN', 'PARTIAL')`;
+        } else if (status) {
+          q += ` WHERE status = ?`;
+          params.push(status);
+        }
+        q += ` ORDER BY doc_date DESC, po_number DESC
                LIMIT 100`;
         const { rows } = await db.query(env, q, params);
         const formattedRows = (rows || []).map(r => {
@@ -7092,8 +7101,8 @@ export default {
                 if (invoice_no) {
                   await safeTxStep(tx, () => tx.exec(`
                     UPDATE wms.sap_po_items
-                    SET received_qty = received_qty + ?,
-                        status = CASE WHEN (received_qty + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
+                    SET received_qty = COALESCE(received_qty, 0) + ?,
+                        status = CASE WHEN (COALESCE(received_qty, 0) + ?) >= order_qty THEN 'COMPLETED' ELSE 'PARTIAL' END,
                         updated_at = NOW()
                     WHERE po_number = ? AND article = ?
                   `, [qty, qty, invoice_no, item.item_code]));
