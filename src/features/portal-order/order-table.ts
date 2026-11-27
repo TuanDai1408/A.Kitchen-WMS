@@ -265,7 +265,7 @@ export function renderOrderCartSummary(): void {
 
   if (!selected.length) {
     slip?.classList.add('hidden');
-    adjustListHeightForSubTable(false, 'orderItemsScroll', 'orderMobileCards', '420px', '420px');
+    adjustListHeightForSubTable(false, 'orderItemsScroll', 'orderMobileCards');
     tbody.innerHTML = '';
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -275,7 +275,7 @@ export function renderOrderCartSummary(): void {
   }
 
   slip?.classList.remove('hidden');
-  adjustListHeightForSubTable(true, 'orderItemsScroll', 'orderMobileCards', '420px', '420px');
+  adjustListHeightForSubTable(true, 'orderItemsScroll', 'orderMobileCards');
   if (submitBtn) {
     submitBtn.disabled = false;
     submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');

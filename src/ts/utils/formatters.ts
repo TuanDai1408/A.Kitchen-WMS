@@ -116,10 +116,10 @@ export function adjustListHeightForSubTable(
   hasSelected: boolean,
   desktopId: string,
   mobileId: string,
-  fullDesktopMaxH = '480px',
-  fullMobileMaxH = '460px',
-  selectedDesktopMaxH = '280px',
-  selectedMobileMaxH = '240px'
+  fullDesktopMaxH = '560px',
+  fullMobileMaxH = '400px',
+  selectedDesktopMaxH = '420px',
+  selectedMobileMaxH = '300px'
 ): void {
   const apply = (id: string, targetMaxH: string) => {
     const el = document.getElementById(id);
