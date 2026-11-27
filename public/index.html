@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1235">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1415">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1235"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1415"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -1236,6 +1236,22 @@
           </button>
         </div>
 
+        <!-- Filter Pills by Group (SITE / HUB / CANTEEN) -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <button type="button" onclick="filterFnbSitesByGroup('ALL')" data-site-group="ALL" class="site-group-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-brand-500 text-white border-brand-500 shadow-2xs">
+            Tất cả (<span id="siteCountAll" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="filterFnbSitesByGroup('SITE')" data-site-group="SITE" class="site-group-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800/70 hover:bg-sky-50 dark:hover:bg-sky-950/30">
+            SITE (<span id="siteCountSite" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="filterFnbSitesByGroup('HUB')" data-site-group="HUB" class="site-group-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-50 dark:hover:bg-purple-950/30">
+            HUB (<span id="siteCountHub" class="font-mono">0</span>)
+          </button>
+          <button type="button" onclick="filterFnbSitesByGroup('CANTEEN')" data-site-group="CANTEEN" class="site-group-pill px-3 py-1.5 rounded-xl font-semibold border transition-all bg-white dark:bg-gray-900 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/70 hover:bg-amber-50 dark:hover:bg-amber-950/30">
+            CANTEEN (<span id="siteCountCanteen" class="font-mono">0</span>)
+          </button>
+        </div>
+
         <!-- Sites Master Table -->
         <div class="table-card p-5">
           <div class="hidden lg:block table-scroll">
@@ -1244,6 +1260,7 @@
                 <tr>
                   <th class="col-code">Mã SAP</th>
                   <th>Tên điểm bán / Bếp vận hành</th>
+                  <th class="text-center">Phân nhóm</th>
                   <th class="text-center">Vùng miền</th>
                   <th>Địa chỉ cơ sở</th>
                   <th>Quản lý &amp; Hotline</th>

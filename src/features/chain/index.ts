@@ -24,7 +24,8 @@ import {
 
 import {
   loadFnbSites,
-  renderFnbSites
+  renderFnbSites,
+  filterFnbSitesByGroup
 } from './sites-master';
 
 import {
@@ -64,6 +65,7 @@ if (typeof window !== 'undefined') {
 
   w.loadFnbSites = loadFnbSites;
   w.renderFnbSites = renderFnbSites;
+  w.filterFnbSitesByGroup = filterFnbSitesByGroup;
 
   w.exportFnbChainExcel = exportFnbChainExcel;
   w.exportFnbPLExcel = exportFnbPLExcel;

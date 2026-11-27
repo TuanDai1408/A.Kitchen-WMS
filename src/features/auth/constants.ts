@@ -137,7 +137,7 @@ export const DEFAULT_SITES_LIST: AuthSiteOption[] = [
   { code: 'K006', name: 'K006 - MN A.Kitchen - PTNT Quảng Trực', ten: 'K006 - MN A.Kitchen - PTNT Quảng Trực', region: 'Miền Nam', desc: 'Trường học • MN A.Kitchen - PTNT Quảng Trực' },
   { code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', ten: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam', desc: 'Căn tin • MB Bếp ăn canteen G – Group' },
   { code: 'K500', name: 'K500 - MB A Kitchen Hòa Bình', ten: 'K500 - MB A Kitchen Hòa Bình', region: 'Miền Bắc', desc: 'Căn tin • MB A Kitchen Hòa Bình' },
-  { code: 'K501', name: 'K501 - Công ty TNHH Julie sandlau', ten: 'K501 - Công ty TNHH Julie sandlau', region: 'Miền Bắc', desc: 'Doanh nghiệp • Công ty TNHH Julie sandlau' },
+  { code: 'K501', name: 'K501 - Site Julie Sandlau', ten: 'K501 - Site Julie Sandlau', region: 'Miền Bắc', desc: 'SITE • Site Julie Sandlau' },
   { code: 'K502', name: 'K502 - A.Kitchen - Miền Bắc', ten: 'K502 - A.Kitchen - Miền Bắc', region: 'Miền Bắc', desc: 'Site ảo • A.Kitchen - Miền Bắc' },
   { code: 'K503', name: 'K503 - MB A.Kitchen - TTH An Thượng', ten: 'K503 - MB A.Kitchen - TTH An Thượng', region: 'Miền Bắc', desc: 'Trung tâm • MB A.Kitchen - TTH An Thượng' },
   { code: 'K504', name: 'K504 - MB A.Kitchen - Hub An Khánh', ten: 'K504 - MB A.Kitchen - Hub An Khánh', region: 'Miền Bắc', desc: 'Hub • MB A.Kitchen - Hub An Khánh' },

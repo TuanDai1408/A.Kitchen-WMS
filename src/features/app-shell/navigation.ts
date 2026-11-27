@@ -30,7 +30,7 @@ export const gFnbSitesList: any[] = [
   { id: 'R515', code: 'R515', name: 'R515 - MB Bếp ăn canteen G – Group', region: 'Miền Nam' },
   { id: 'K800', code: 'K800', name: 'K800 - A.Kitchen - Miền Trung', region: 'Miền Trung' },
   { id: 'K500', code: 'K500', name: 'K500 - MB A Kitchen Hòa Bình', region: 'Miền Bắc' },
-  { id: 'K501', code: 'K501', name: 'K501 - Công ty TNHH Julie sandlau', region: 'Miền Bắc' },
+  { id: 'K501', code: 'K501', name: 'K501 - Site Julie Sandlau', region: 'Miền Bắc' },
   { id: 'K502', code: 'K502', name: 'K502 - A.Kitchen - Miền Bắc', region: 'Miền Bắc' },
   { id: 'K503', code: 'K503', name: 'K503 - MB A.Kitchen - TTH An Thượng', region: 'Miền Bắc' },
   { id: 'K504', code: 'K504', name: 'K504 - MB A.Kitchen - Hub An Khánh', region: 'Miền Bắc' },
