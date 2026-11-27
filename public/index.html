@@ -21,10 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
 <!-- Compiled Tailwind CSS v4 Build (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/app.css?v=20261127_1150">
+  <link rel="stylesheet" href="/assets/app.css?v=20261127_1158">
   
   <!-- A.Kitchen Modern TypeScript Core Engine (ESBuild / TS Bundled) -->
-  <script type="module" src="/assets/wms-core.js?v=20261127_1150"></script>
+  <script type="module" src="/assets/wms-core.js?v=20261127_1158"></script>
   
   <!-- Pinned CDN Libraries -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
@@ -3360,9 +3360,9 @@
               <div id="stockPaginationInfo">
                 Hiển thị <span class="font-bold text-gray-800 dark:text-white num">1</span> - <span id="stockPageEnd" class="font-bold text-gray-800 dark:text-white num">25</span> trên tổng số <span id="stockTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
               </div>
-              <div class="flex items-center gap-1.5">
-                <span>Hiển thị:</span>
-                <select id="fefoPageSizeSelect" onchange="changeStockPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                <select style="width: auto;" id="fefoPageSizeSelect" onchange="changeStockPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
                   <option value="10">10 dòng</option>
                   <option value="25" selected>25 dòng</option>
                   <option value="50">50 dòng</option>
@@ -3494,9 +3494,9 @@
               <div>
                 Hiển thị <span id="ropPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="ropPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="ropTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
               </div>
-              <div class="flex items-center gap-1.5">
-                <span>Hiển thị:</span>
-                <select id="ropPageSizeSelect" onchange="changeRopPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                <select style="width: auto;" id="ropPageSizeSelect" onchange="changeRopPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
                   <option value="10">10 dòng</option>
                   <option value="25" selected>25 dòng</option>
                   <option value="50">50 dòng</option>
@@ -3586,9 +3586,9 @@
               <div>
                 Hiển thị <span id="leadTimePageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="leadTimePageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="leadTimeTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> đơn PO
               </div>
-              <div class="flex items-center gap-1.5">
-                <span>Hiển thị:</span>
-                <select id="leadTimePageSizeSelect" onchange="changeLeadTimePageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                <select style="width: auto;" id="leadTimePageSizeSelect" onchange="changeLeadTimePageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
                   <option value="10">10 dòng</option>
                   <option value="25" selected>25 dòng</option>
                   <option value="50">50 dòng</option>
@@ -3804,9 +3804,9 @@
               <div>
                 Hiển thị <span id="whInvPageStart" class="font-bold text-gray-800 dark:text-white num">0</span> - <span id="whInvPageEnd" class="font-bold text-gray-800 dark:text-white num">0</span> trên tổng số <span id="whInvTotalCount" class="font-bold text-gray-800 dark:text-white num">0</span> mặt hàng
               </div>
-              <div class="flex items-center gap-1.5">
-                <span>Hiển thị:</span>
-                <select id="whInvPageSizeSelect" onchange="changeWhInvPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                <span class="whitespace-nowrap shrink-0">Hiển thị:</span>
+                <select style="width: auto;" id="whInvPageSizeSelect" onchange="changeWhInvPageSize(this.value)" class="select font-sans py-1 px-2.5 text-xs min-w-fit whitespace-nowrap" title="Số dòng hiển thị mỗi trang">
                   <option value="10">10 dòng</option>
                   <option value="25" selected>25 dòng</option>
                   <option value="50">50 dòng</option>

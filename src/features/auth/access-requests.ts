@@ -157,18 +157,18 @@ export function renderAdminRequestsTable(): void {
     const isApproved = req.status === 'APPROVED';
 
     const statusBadge = isPending 
-      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">ĐANG CHỜ DUYỆT</span>'
+      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 whitespace-nowrap shrink-0">ĐANG CHỜ DUYỆT</span>'
       : isApproved
-      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">ĐÃ DUYỆT</span>'
-      : '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">TỪ CHỐI</span>';
+      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 whitespace-nowrap shrink-0">ĐÃ DUYỆT</span>'
+      : '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 whitespace-nowrap shrink-0">TỪ CHỐI</span>';
 
     const actions = isPending ? `
-      <div class="flex items-center justify-center gap-1.5">
-        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs active:translate-y-px transition-all">
-          <i data-lucide="check" class="w-3 h-3"></i> Duyệt
+      <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 shadow-xs active:translate-y-px transition-all">
+          <i data-lucide="check" class="w-3 h-3 shrink-0"></i><span>Duyệt</span>
         </button>
-        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs flex items-center gap-1 active:translate-y-px transition-all">
-          <i data-lucide="x" class="w-3 h-3"></i> Từ chối
+        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 active:translate-y-px transition-all">
+          <i data-lucide="x" class="w-3 h-3 shrink-0"></i><span>Từ chối</span>
         </button>
       </div>
     ` : `
