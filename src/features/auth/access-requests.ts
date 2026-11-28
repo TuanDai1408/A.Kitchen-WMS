@@ -127,10 +127,16 @@ export async function openAdminApprovalModal(): Promise<void> {
 
   try {
     const res = await fetch('/api/auth/access-requests');
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (json.success && Array.isArray(json.data)) {
       cachedAccessRequests = json.data;
       renderAdminRequestsTable();
+    } else if (json.error) {
+      if (typeof showToast === 'function') showToast(json.error, 'error');
+      const mobileEl = document.getElementById('adminRequestsMobileCards');
+      if (mobileEl) {
+        mobileEl.innerHTML = `<div class="p-6 text-center text-rose-500 text-xs font-medium">${json.error}</div>`;
+      }
     }
   } catch (e) {
     console.error(e);
@@ -144,64 +150,126 @@ export function closeAdminApprovalModal(): void {
 
 export function renderAdminRequestsTable(): void {
   const tbody = document.getElementById('adminRequestsTableBody');
-  if (!tbody) return;
+  const mobileContainer = document.getElementById('adminRequestsMobileCards');
+  if (!tbody && !mobileContainer) return;
 
   const list = cachedAccessRequests || [];
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Chưa có yêu cầu cấp quyền nào từ nhân viên.</td></tr>`;
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Chưa có yêu cầu cấp quyền nào từ nhân viên.</td></tr>`;
+    }
+    if (mobileContainer) {
+      mobileContainer.innerHTML = `<div class="p-8 text-center text-gray-400 text-xs">Chưa có yêu cầu cấp quyền nào từ nhân viên.</div>`;
+    }
     return;
   }
 
-  tbody.innerHTML = list.map(req => {
-    const isPending = req.status === 'PENDING';
-    const isApproved = req.status === 'APPROVED';
+  if (tbody) {
+    tbody.innerHTML = list.map(req => {
+      const isPending = req.status === 'PENDING';
+      const isApproved = req.status === 'APPROVED';
 
-    const statusBadge = isPending 
-      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 whitespace-nowrap shrink-0">ĐANG CHỜ DUYỆT</span>'
-      : isApproved
-      ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 whitespace-nowrap shrink-0">ĐÃ DUYỆT</span>'
-      : '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 whitespace-nowrap shrink-0">TỪ CHỐI</span>';
+      const statusBadge = isPending
+        ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 whitespace-nowrap shrink-0">ĐANG CHỜ DUYỆT</span>'
+        : isApproved
+        ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 whitespace-nowrap shrink-0">ĐÃ DUYỆT</span>'
+        : '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 whitespace-nowrap shrink-0">TỪ CHỐI</span>';
 
-    const actions = isPending ? `
-      <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
-        <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 shadow-xs active:translate-y-px transition-all">
-          <i data-lucide="check" class="w-3 h-3 shrink-0"></i><span>Duyệt</span>
-        </button>
-        <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 active:translate-y-px transition-all">
-          <i data-lucide="x" class="w-3 h-3 shrink-0"></i><span>Từ chối</span>
-        </button>
-      </div>
-    ` : `
-      <div class="text-center text-xs text-gray-400 tabular-nums">
-        ${req.reviewed_by || 'Admin'}<br>${(req.reviewed_at || '').substring(0, 16)}
-      </div>
-    `;
+      const actions = isPending ? `
+        <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 shadow-xs active:translate-y-px transition-all">
+            <i data-lucide="check" class="w-3 h-3 shrink-0"></i><span>Duyệt</span>
+          </button>
+          <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs inline-flex items-center gap-1 whitespace-nowrap shrink-0 active:translate-y-px transition-all">
+            <i data-lucide="x" class="w-3 h-3 shrink-0"></i><span>Từ chối</span>
+          </button>
+        </div>
+      ` : `
+        <div class="text-center text-xs text-gray-400 tabular-nums">
+          ${req.reviewed_by || 'Admin'}<br>${(req.reviewed_at || '').substring(0, 16)}
+        </div>
+      `;
 
-    return `
-      <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-        <td class="py-2.5 px-3">
-          <div class="font-bold text-gray-900 dark:text-white">${repairAtobMojibake(req.user_name || req.user_email)}</div>
-          <div class="text-xs text-gray-400 tabular-nums">${req.user_email}</div>
-        </td>
-        <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">
-          <div>${req.requested_feature || '--'}</div>
-          ${(req as any).requested_site ? `<span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Site đích: ${(req as any).requested_site}</span>` : ''}
-        </td>
-        <td class="py-2.5 px-3">
-          <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
-        </td>
-        <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-xs max-w-[200px] truncate" title="${req.reason || ''}">
-          ${req.reason || '--'}
-        </td>
-        <td class="py-2.5 px-3 text-xs text-gray-400 tabular-nums">
-          ${(req.created_at || '').substring(0, 16)}
-        </td>
-        <td class="py-2.5 px-3 text-center">
-          ${isPending ? actions : statusBadge}
-        </td>
-      </tr>
-    `;
-  }).join('');
+      return `
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+          <td class="py-2.5 px-3">
+            <div class="font-bold text-gray-900 dark:text-white">${repairAtobMojibake(req.user_name || req.user_email)}</div>
+            <div class="text-xs text-gray-400 tabular-nums">${req.user_email}</div>
+          </td>
+          <td class="py-2.5 px-3 font-medium text-gray-800 dark:text-gray-200">
+            <div>${req.requested_feature || '--'}</div>
+            ${(req as any).requested_site ? `<span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Site đích: ${(req as any).requested_site}</span>` : ''}
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
+          </td>
+          <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-xs max-w-[200px] truncate" title="${req.reason || ''}">
+            ${req.reason || '--'}
+          </td>
+          <td class="py-2.5 px-3 text-xs text-gray-400 tabular-nums">
+            ${(req.created_at || '').substring(0, 16)}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            ${isPending ? actions : statusBadge}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  if (mobileContainer) {
+    mobileContainer.innerHTML = list.map(req => {
+      const isPending = req.status === 'PENDING';
+      const isApproved = req.status === 'APPROVED';
+
+      const statusBadge = isPending
+        ? '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 whitespace-nowrap shrink-0">ĐANG CHỜ DUYỆT</span>'
+        : isApproved
+        ? '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 whitespace-nowrap shrink-0">ĐÃ DUYỆT</span>'
+        : '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 whitespace-nowrap shrink-0">TỪ CHỐI</span>';
+
+      const actionButtons = isPending ? `
+        <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-gray-100 dark:border-gray-800">
+          <button onclick="handleApproveRequest(${req.id}, 'APPROVE')" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 whitespace-nowrap shadow-xs active:translate-y-px transition-all">
+            <i data-lucide="check" class="w-3.5 h-3.5 shrink-0"></i><span>Duyệt</span>
+          </button>
+          <button onclick="handleApproveRequest(${req.id}, 'REJECT')" class="py-2 px-3 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold text-xs inline-flex items-center justify-center gap-1.5 whitespace-nowrap active:translate-y-px transition-all">
+            <i data-lucide="x" class="w-3.5 h-3.5 shrink-0"></i><span>Từ chối</span>
+          </button>
+        </div>
+      ` : `
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-[11px] text-gray-400">
+          <span>Xử lý: ${req.reviewed_by || 'Admin'}</span>
+          <span class="font-mono tabular-nums">${(req.reviewed_at || '').substring(0, 16)}</span>
+        </div>
+      `;
+
+      return `
+        <div class="p-3.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/80 shadow-xs space-y-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="font-bold text-sm text-gray-900 dark:text-white truncate">${repairAtobMojibake(req.user_name || req.user_email)}</div>
+              <div class="text-xs text-gray-400 truncate font-mono">${req.user_email}</div>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase">${req.requested_role}</span>
+            ${(req as any).requested_site ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Site đích: ${(req as any).requested_site}</span>` : ''}
+          </div>
+
+          <div class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+            <div><span class="text-gray-400">Yêu cầu:</span> <span class="font-semibold">${req.requested_feature || '--'}</span></div>
+            ${req.reason ? `<div><span class="text-gray-400">Lý do:</span> ${req.reason}</div>` : ''}
+            <div class="text-[11px] text-gray-400 font-mono tabular-nums">${(req.created_at || '').substring(0, 16)}</div>
+          </div>
+
+          ${actionButtons}
+        </div>
+      `;
+    }).join('');
+  }
 
   if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
