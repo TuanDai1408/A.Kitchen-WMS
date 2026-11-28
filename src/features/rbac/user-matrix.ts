@@ -127,6 +127,14 @@ export function resolveUserFeaturePermission(
       return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
     }
   } else if (user.role_code === 'NHAN_VIEN') {
+    const customDefault = (gUserMatrixData as any)?.newUserDefaultPermissions;
+    if (customDefault && typeof customDefault === 'object') {
+      const defPerm = customDefault[feature.code];
+      if (defPerm && isTruthyBool(defPerm.canView)) {
+        return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+      }
+      return { isGranted: false, type: 'NONE', label: 'Không', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-400' };
+    }
     const nvFeatures = ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
     if (nvFeatures.includes(feature.code)) {
       return { isGranted: true, type: 'ROLE_DEFAULT', label: 'Role', badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };

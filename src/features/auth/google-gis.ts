@@ -1,6 +1,6 @@
 import { GOOGLE_CLIENT_ID } from './constants';
 import { gCurrentUser, saveAccountToList, renderSavedAccountsInLoginModal } from './accounts';
-import { applyUserSessionToUI, updateUIForUnauthenticated } from './rbac-session';
+import { applyUserSessionToUI, updateUIForUnauthenticated, syncCurrentUserPermissions } from './rbac-session';
 import { checkAndPromptUserSite } from './sites-modal';
 import { checkPendingAccessRequests } from './access-requests';
 
@@ -76,6 +76,7 @@ export async function handleGoogleLoginResponse(response: any): Promise<void> {
     }
 
     checkAndPromptUserSite();
+    syncCurrentUserPermissions();
 
     if (curUser.role === 'ADMIN') {
       checkPendingAccessRequests();
@@ -136,6 +137,8 @@ export function loginWithGoogle(): void {
 export function dangXuatAdmin(): void {
   const w = typeof window !== 'undefined' ? (window as any) : {};
   localStorage.removeItem('orbit_user');
+  localStorage.removeItem('orbit_user_site');
+  localStorage.removeItem('orbit_pending_site_request');
   try { sessionStorage.setItem('orbit_explicit_logout', 'true'); } catch (e) {}
   w.gCurrentUser = null;
   updateUIForUnauthenticated();

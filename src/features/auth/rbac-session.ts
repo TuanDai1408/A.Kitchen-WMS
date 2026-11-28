@@ -737,7 +737,7 @@ export function canAccessTab(tabId: string): boolean {
     return ['wh-dashboard', 'fnb-sites', 'portal-baocao', 'portal-voucher', 'portal-search'].includes(tabId);
   }
   if (curUser.role === 'NHAN_VIEN') {
-    return ['wh-dashboard', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].includes(tabId);
+    return ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].includes(tabId);
   }
 
   return false;

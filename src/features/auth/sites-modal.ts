@@ -182,6 +182,10 @@ export function checkAndPromptUserSite(forceOpen: boolean = false): void {
 
   // User mới đăng nhập lần đầu chưa có assigned_site trong DB -> bắt buộc mở modal chọn site 1 lần duy nhất
   if (curUser && curUser.email && !hasAssignedSite && !canSwitch) {
+    try {
+      localStorage.removeItem('orbit_user_site');
+      localStorage.removeItem('orbit_pending_site_request');
+    } catch (e) {}
     if (typeof onGlobalBranchChange === 'function') {
       onGlobalBranchChange('K001');
     }

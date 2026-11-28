@@ -615,7 +615,7 @@ async function buildUserPermissions(env, user) {
       if (!hasCustomDefault) {
         ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'].forEach(f => {
           if (!permissions[f] || !permissions[f].canView) {
-            permissions[f] = { canView: true, canCreate: true, canEdit: true, canDelete: false };
+            permissions[f] = { canView: true, canCreate: true, canEdit: false, canDelete: false };
           }
         });
       }
@@ -3965,9 +3965,10 @@ export default {
           if (!email) {
             return new Response(JSON.stringify({ success: false, error: 'Không nhận được thông tin email từ Google' }), { status: 400, headers: corsHeaders });
           }
+          email = String(email).trim().toLowerCase();
 
           // 1. Tìm kiếm user trong app_users
-          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [email]);
+          let user = await db.queryOne(env, `SELECT * FROM app_users WHERE LOWER(email) = LOWER(?) LIMIT 1`, [email]);
 
           if (user && user.full_name) {
             const repaired = repairAtobMojibake(user.full_name);
@@ -3988,9 +3989,9 @@ export default {
 
           if (!user) {
             // Xác định vai trò mặc định:
-            // Chỉ tài khoản Owner mới mặc định ADMIN, các user mới khác mặc định là NHAN_VIEN chờ duyệt
+            // Chỉ tài khoản Master Owner mới mặc định ADMIN, các user mới khác mặc định là NHAN_VIEN
             let defaultRole = 'NHAN_VIEN';
-            if (email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com') {
+            if (isMasterEmail(email)) {
               defaultRole = 'ADMIN';
             }
 
@@ -4313,6 +4314,14 @@ export default {
           return await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, last_login, created_at FROM app_users ORDER BY id ASC`);
         });
         const { rows: userPerms } = await db.query(env, `SELECT * FROM user_permissions`);
+        let newUserDefaultPermissions = null;
+        try {
+          await ensureSystemSettingsTable(env);
+          const defRow = await db.queryOne(env, `SELECT setting_value FROM system_settings WHERE setting_key = 'new_user_default_permissions' LIMIT 1`).catch(() => null);
+          if (defRow && defRow.setting_value) {
+            newUserDefaultPermissions = JSON.parse(defRow.setting_value);
+          }
+        } catch (_) {}
 
         const users = (rawUsers || []).map(u => {
           const repaired = repairAtobMojibake(u.full_name);
@@ -4360,6 +4369,7 @@ export default {
             roles: roles || [],
             rolePermissions: perms || [],
             userPermissions: userPerms || [],
+            newUserDefaultPermissions,
             features
           }
         }), { headers: corsHeaders });
@@ -4672,7 +4682,7 @@ export default {
         const defaultList = ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
         ALL_SYSTEM_FEATURES.forEach(f => {
           const isDef = defaultList.includes(f);
-          fallbackPerms[f] = { canView: isDef, canCreate: isDef, canEdit: isDef, canDelete: false };
+          fallbackPerms[f] = { canView: isDef, canCreate: isDef, canEdit: false, canDelete: false };
         });
 
         let permsMap = fallbackPerms;

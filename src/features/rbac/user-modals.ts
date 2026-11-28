@@ -477,14 +477,14 @@ export function toggleNewUserDefaultFlag(tabId: string, flag: keyof DefaultPermF
 
 export function toggleAllNewUserDefaults(mode: 'clear' | 'basic'): void {
   const tabGroups = Array.isArray(ALL_TAB_GROUPS) ? ALL_TAB_GROUPS : [];
-  const basicTabs = ['fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
+  const basicTabs = ['fnb-stock', 'fnb-counts', 'fnb-kitchen-issue', 'portal-baocao', 'portal-order'];
   for (const grp of tabGroups) {
     for (const tab of (grp.tabs || [])) {
       const isBasic = mode === 'basic' && basicTabs.includes(tab.id);
       gNewUserDefaultPermsMap[tab.id] = {
         canView: isBasic,
         canCreate: isBasic,
-        canEdit: isBasic,
+        canEdit: false,
         canDelete: false
       };
     }
