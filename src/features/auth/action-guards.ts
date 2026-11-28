@@ -111,12 +111,21 @@ export function canUserPerformAction(featureCode: string, action: 'edit' | 'dele
     return false;
   }
 
-  // QUY TẮC BẢO VỆ 4: Thao tác TẠO MỚI ('create')
+  // QUY TẮC BẢO VỆ 4: Thao tác TẠO MỚI ('create') theo vai trò nghiệp vụ
   if (action === 'create') {
+    if (role === 'KHO_TRUONG') {
+      return ['fnb-stock', 'fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'wh-stock', 'wh-reorder', 'portal-order', 'portal-kiemke'].includes(featureCode);
+    }
+    if (role === 'BEP_TRUONG') {
+      return ['fnb-counts', 'fnb-receipts', 'fnb-kitchen-issue', 'fnb-waste', 'portal-order', 'portal-kiemke', 'portal-baocao'].includes(featureCode);
+    }
+    if (role === 'KE_TOAN') {
+      return ['portal-voucher', 'portal-search'].includes(featureCode);
+    }
     if (role === 'NHAN_VIEN') {
       return ['portal-order', 'fnb-counts'].includes(featureCode);
     }
-    return true;
+    return false;
   }
 
   return false;

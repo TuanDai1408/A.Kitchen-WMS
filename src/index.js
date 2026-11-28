@@ -136,6 +136,8 @@ const FEATURE_NAME_TO_CODE = {
   'Kiểm Kê Kho Tổng': 'portal-kiemke',
   'fnb-sites': 'fnb-sites',
   'Danh Mục 14 Điểm Bán & Mã SAP': 'fnb-sites',
+  'hr-employees': 'hr-employees',
+  'Quản Lý Nhân Sự': 'hr-employees',
   'user-matrix': 'user-matrix',
   'Quản Lý User & Phân Quyền': 'user-matrix'
 };
@@ -735,11 +737,15 @@ async function buildUserPermissions(env, user) {
   return permissions;
 }
 
+function isMasterEmail(email) {
+  return String(email || '').toLowerCase().trim() === 'trantuandai2508@gmail.com';
+}
+
 async function getCallerPermissions(env, request) {
   try {
     const callerEmail = (request.headers.get('x-user-email') || '').toLowerCase().trim();
     if (!callerEmail) return null;
-    const isMaster = callerEmail === 'trantuandai2508@gmail.com' || callerEmail.includes('trantuandai2508');
+    const isMaster = isMasterEmail(callerEmail);
     let user = await db.queryOne(env, `SELECT * FROM app_users WHERE email = ? LIMIT 1`, [callerEmail]);
     if (!user && isMaster) {
       user = { id: 1, email: callerEmail, full_name: 'Trần Tuấn Đại', role_code: 'ADMIN', status: 'ACTIVE' };
@@ -753,6 +759,36 @@ async function getCallerPermissions(env, request) {
     console.error('getCallerPermissions error:', e);
     return null;
   }
+}
+
+async function requireCallerPermission(env, request, featureCodes, action = 'view', errorMsg = 'Bạn không có quyền thực hiện thao tác này') {
+  const caller = await getCallerPermissions(env, request);
+  if (!caller || !caller.user || !caller.user.email) {
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Chưa xác thực người dùng' }), { status: 401, headers: corsHeaders }) };
+  }
+  if (caller.user.status === 'LOCKED' || caller.user.role_code === 'UNKNOWN') {
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Tài khoản không hợp lệ hoặc đã bị khóa' }), { status: 403, headers: corsHeaders }) };
+  }
+  if (caller.isMaster) {
+    return { ok: true, caller };
+  }
+  const codes = Array.isArray(featureCodes) ? featureCodes : [featureCodes];
+  const actions = Array.isArray(action) ? action : [action];
+  const hasPerm = codes.some(code => {
+    const p = caller.permissions?.[code];
+    if (!p || p.isRevoked || p.canView === false) return false;
+    return actions.some(act => {
+      if (act === 'view') return p.canView === true;
+      if (act === 'create') return p.canCreate === true;
+      if (act === 'edit') return p.canEdit === true;
+      if (act === 'delete') return p.canDelete === true;
+      return false;
+    });
+  });
+  if (!hasPerm) {
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: errorMsg }), { status: 403, headers: corsHeaders }) };
+  }
+  return { ok: true, caller };
 }
 
 
@@ -2315,13 +2351,8 @@ export default {
         }
 
         if (request.method === 'POST') {
-          const caller = await getCallerPermissions(env, request);
-          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-            const p = caller.permissions['wh-stock'];
-            if (!p || p.isRevoked || p.canView === false || p.canCreate === false) {
-              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Thêm lô hàng mới' }), { status: 403, headers: corsHeaders });
-            }
-          }
+          const auth = await requireCallerPermission(env, request, 'wh-stock', 'create', 'Bạn không có quyền Thêm lô hàng mới');
+          if (!auth.ok) return auth.response;
 
           try {
             const body = await request.json();
@@ -2409,13 +2440,8 @@ export default {
         }
 
         if (request.method === 'PUT') {
-          const caller = await getCallerPermissions(env, request);
-          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-            const p = caller.permissions['wh-stock'];
-            if (!p || p.isRevoked || p.canView === false || !p.canEdit) {
-              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Sửa lô hàng' }), { status: 403, headers: corsHeaders });
-            }
-          }
+          const auth = await requireCallerPermission(env, request, 'wh-stock', 'edit', 'Bạn không có quyền Sửa lô hàng');
+          if (!auth.ok) return auth.response;
 
           try {
             const body = await request.json();
@@ -2506,13 +2532,8 @@ export default {
         }
 
         if (request.method === 'DELETE') {
-          const caller = await getCallerPermissions(env, request);
-          if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-            const p = caller.permissions['wh-stock'];
-            if (!p || p.isRevoked || p.canView === false || !p.canDelete) {
-              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền Xóa lô hàng' }), { status: 403, headers: corsHeaders });
-            }
-          }
+          const auth = await requireCallerPermission(env, request, 'wh-stock', 'delete', 'Bạn không có quyền Xóa lô hàng');
+          if (!auth.ok) return auth.response;
 
           try {
             let id = searchParams.get('id');
@@ -3014,13 +3035,8 @@ export default {
 
       // 2.3.1 PUT /api/order - Chỉnh sửa đơn hàng (RBAC)
       if ((pathname === '/api/order' || pathname === '/api/orders') && request.method === 'PUT') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['portal-history'] || caller.permissions['portal-order'];
-          if (!p || !p.canEdit || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền CHỈNH SỬA đơn hàng này' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, ['portal-history', 'portal-order'], 'edit', 'Bạn không có quyền CHỈNH SỬA đơn hàng này');
+        if (!auth.ok) return auth.response;
 
         const body = await request.json();
         const { orderCode, maDon, site, orderDate, ngayDat, orderedBy, nguoiDat, status, trangThai, month, thang, items, ghiChu, actor } = body;
@@ -3099,18 +3115,8 @@ export default {
 
       // 2.3.2 DELETE /api/order - Xóa đơn hàng (RBAC)
       if ((pathname === '/api/order' || pathname === '/api/orders') && request.method === 'DELETE') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller) {
-          if (caller.user.status === 'LOCKED' || caller.user.role_code === 'UNKNOWN') {
-            return new Response(JSON.stringify({ success: false, error: 'Tài khoản không hợp lệ hoặc đã bị khóa' }), { status: 403, headers: corsHeaders });
-          }
-          if (!caller.isMaster && caller.user.role_code !== 'ADMIN') {
-            const p = caller.permissions['portal-history'] || caller.permissions['portal-order'];
-            if (!p || !p.canDelete || p.isRevoked || p.canView === false) {
-              return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền XÓA đơn hàng này' }), { status: 403, headers: corsHeaders });
-            }
-          }
-        }
+        const auth = await requireCallerPermission(env, request, ['portal-history', 'portal-order'], 'delete', 'Bạn không có quyền XÓA đơn hàng này');
+        if (!auth.ok) return auth.response;
 
         let code = searchParams.get('orderCode') || searchParams.get('maDon');
         if (!code) {
@@ -3449,13 +3455,8 @@ export default {
 
       // 2.7.2 PUT /api/voucher - Cập nhật chứng từ
       if (pathname === '/api/voucher' && request.method === 'PUT') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['portal-voucher'] || caller.permissions['portal-search'];
-          if (!p || !p.canEdit || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền CHỈNH SỬA chứng từ này' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, ['portal-voucher', 'portal-search'], 'edit', 'Bạn không có quyền CHỈNH SỬA chứng từ này');
+        if (!auth.ok) return auth.response;
 
         const body = await request.json();
         const { maCT, site, loaiHoaDon, ngayXuat, ngayNhan, nguoiGiao, nguoiNhan, nhaCungCap, ghiChu, files, updateFiles } = body;
@@ -3526,13 +3527,8 @@ export default {
 
       // 2.7.3 DELETE /api/voucher - Xóa chứng từ
       if (pathname === '/api/voucher' && request.method === 'DELETE') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['portal-voucher'] || caller.permissions['portal-search'];
-          if (!p || !p.canDelete || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền XÓA chứng từ này' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, ['portal-voucher', 'portal-search'], 'delete', 'Bạn không có quyền XÓA chứng từ này');
+        if (!auth.ok) return auth.response;
 
         let maCT = searchParams.get('maCT');
         if (!maCT) {
@@ -3858,7 +3854,7 @@ export default {
             });
           }
 
-          const isMaster = user && user.email && (user.email.toLowerCase().trim() === 'trantuandai2508@gmail.com' || user.email.toLowerCase().includes('trantuandai2508'));
+          const isMaster = isMasterEmail(user?.email);
           await ensureSystemTabVisibilityTable(env);
           const { rows: tabVisRows } = await db.query(env, `SELECT tab_id, is_hidden FROM system_tab_visibility`).catch(() => ({ rows: [] }));
           const tabVisibility = {};
@@ -3903,7 +3899,7 @@ export default {
           return new Response(JSON.stringify(authResponseData), { headers: corsHeaders });
         } catch (dbErr) {
           console.warn('D1 limit or connection fallback for /api/auth/me:', dbErr.message);
-          const isOwner = email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com';
+          const isOwner = isMasterEmail(email);
           const role = isOwner ? 'ADMIN' : 'NHAN_VIEN';
           const defaultPermissions = {};
           ALL_SYSTEM_FEATURES.forEach(f => {
@@ -4075,7 +4071,7 @@ export default {
           console.error('Google Auth API Error:', err);
           if (email) {
             console.warn('D1 limit or connection fallback for /api/auth/google:', err.message);
-            const isOwner = email === 'trantuandai2508@gmail.com' || email === 'daitt5tiktok@gmail.com';
+            const isOwner = isMasterEmail(email);
             const role = isOwner ? 'ADMIN' : 'NHAN_VIEN';
             const defaultPermissions = {};
             ALL_SYSTEM_FEATURES.forEach(f => {
@@ -4291,6 +4287,8 @@ export default {
       }
 
       if (pathname === '/api/admin/clean-demo-data') {
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Chỉ Quản trị viên mới được dọn dữ liệu demo');
+        if (!auth.ok) return auth.response;
         await autoCleanDemoData(env);
         const { rows: remainingUsers } = await db.query(env, `SELECT id, email, full_name, role_code, status FROM app_users`);
         return new Response(JSON.stringify({
@@ -4301,6 +4299,8 @@ export default {
       }
 
       if (pathname === '/api/auth/users-matrix' && request.method === 'GET') {
+        const auth = await requireCallerPermission(env, request, 'user-matrix', 'view', 'Bạn không có quyền xem Ma trận phân quyền');
+        if (!auth.ok) return auth.response;
         const { rows: roles } = await db.query(env, `SELECT * FROM app_roles`);
         const { rows: perms } = await db.query(env, `SELECT * FROM role_permissions`);
         const { rows: rawUsers } = await db.query(env, `SELECT id, email, full_name, avatar_url, role_code, status, assigned_site, last_login, created_at FROM app_users ORDER BY id ASC`).catch(async () => {
@@ -4361,13 +4361,8 @@ export default {
 
       // 2. Toggle Phân Quyền hoặc Cắt Quyền cho từng user đối với từng chức năng
       if (pathname === '/api/auth/user-permissions/toggle' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền thay đổi phân quyền người dùng' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền thay đổi phân quyền người dùng');
+        if (!auth.ok) return auth.response;
 
         await ensureUserPermissionsTable(env);
         const { userEmail, featureCode, action } = await request.json(); // action: 'GRANT', 'REVOKE', 'RESET'
@@ -4414,13 +4409,8 @@ export default {
 
       // 3. Reset toàn bộ quyền của 1 user về mặc định theo Role
       if (pathname === '/api/auth/user-permissions/reset-user' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền khôi phục phân quyền người dùng' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền khôi phục phân quyền người dùng');
+        if (!auth.ok) return auth.response;
 
         const { userEmail } = await request.json();
         if (!userEmail) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail' }), { status: 400, headers: corsHeaders });
@@ -4431,13 +4421,8 @@ export default {
 
       // 3.5. Cấp hoặc Khóa / Cắt toàn bộ quyền các tab cho 1 user
       if (pathname === '/api/auth/user-permissions/bulk-set' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền phân quyền hàng loạt cho người dùng' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền phân quyền hàng loạt cho người dùng');
+        if (!auth.ok) return auth.response;
 
         await ensureUserPermissionsTable(env);
         const { userEmail, action } = await request.json(); // action: 'REVOKE_ALL' or 'GRANT_ALL'
@@ -4482,13 +4467,8 @@ export default {
 
       // 3.6. Lưu phân quyền chi tiết (Xem / Tạo / Sửa / Xóa) theo từng User và từng Tab
       if (pathname === '/api/auth/user-permissions/save-granular' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền cập nhật phân quyền chi tiết' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền cập nhật phân quyền chi tiết');
+        if (!auth.ok) return auth.response;
 
         await ensureUserPermissionsTable(env);
         const { userEmail, permissions } = await request.json();
@@ -4532,13 +4512,8 @@ export default {
 
       // 4. Cập nhật Vai trò (Role) cho User
       if (pathname === '/api/auth/users/update-role' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền cập nhật vai trò người dùng' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền cập nhật vai trò người dùng');
+        if (!auth.ok) return auth.response;
 
         const { userEmail, roleCode, resetPermissions } = await request.json();
         if (!userEmail || !roleCode) return new Response(JSON.stringify({ success: false, error: 'Thiếu userEmail hoặc roleCode' }), { status: 400, headers: corsHeaders });
@@ -4552,13 +4527,8 @@ export default {
 
       // 5. Khóa / Mở khóa tài khoản User
       if (pathname === '/api/auth/users/toggle-status' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canEdit && !p.canDelete) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền khóa hoặc mở khóa tài khoản người dùng' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền khóa hoặc mở khóa tài khoản người dùng');
+        if (!auth.ok) return auth.response;
 
         const { userEmail, status } = await request.json(); // 'ACTIVE' or 'LOCKED'
         if (!userEmail || !status) return new Response(JSON.stringify({ success: false, error: 'Thiếu thông tin' }), { status: 400, headers: corsHeaders });
@@ -4569,13 +4539,8 @@ export default {
 
       // 6. Thêm tài khoản User mới
       if (pathname === '/api/auth/users/create' && request.method === 'POST') {
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user.role_code !== 'ADMIN') {
-          const p = caller.permissions['user-matrix'];
-          if (!p || (!p.canCreate && !p.canEdit) || p.isRevoked || p.canView === false) {
-            return new Response(JSON.stringify({ success: false, error: 'Bạn không có quyền thêm tài khoản người dùng mới' }), { status: 403, headers: corsHeaders });
-          }
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['create', 'edit'], 'Bạn không có quyền thêm tài khoản người dùng mới');
+        if (!auth.ok) return auth.response;
 
         const { email, fullName, roleCode } = await request.json();
         if (!email) return new Response(JSON.stringify({ success: false, error: 'Email là bắt buộc' }), { status: 400, headers: corsHeaders });
@@ -4627,12 +4592,14 @@ export default {
 
       if (pathname === '/api/system/tab-visibility' && request.method === 'POST') {
         await ensureSystemTabVisibilityTable(env);
+        const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
-        const { requestorEmail, tabId, isHidden, tabOrder } = body;
+        const { tabId, isHidden, tabOrder } = body;
+        const requestorEmail = caller?.user?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
         const bulkUpdates = body.bulkUpdates || body.visibility;
 
-        // BẢO MẬT TUYỆT ĐỐI: CHỈ DUY NHẤT TÀI KHOẢN trantuandai2508 ĐƯỢC PHÉP CẤU HÌNH
-        const isMaster = requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508'));
+        // BẢO MẬT TUYỆT ĐỐI: CHỈ DUY NHẤT TÀI KHOẢN trantuandai2508@gmail.com ĐƯỢC PHÉP CẤU HÌNH
+        const isMaster = Boolean((caller && caller.isMaster) || isMasterEmail(requestorEmail));
         if (!isMaster) {
           return new Response(JSON.stringify({
             success: false,
@@ -4735,10 +4702,9 @@ export default {
 
       if (pathname === '/api/auth/default-user-permissions' && request.method === 'POST') {
         await ensureSystemSettingsTable(env);
-        const caller = await getCallerPermissions(env, request);
-        if (caller && !caller.isMaster && caller.user?.role_code !== 'ADMIN') {
-          return new Response(JSON.stringify({ success: false, error: 'Chỉ ADMIN hoặc Master Owner được cấu hình quyền mặc định cho User mới' }), { status: 403, headers: corsHeaders });
-        }
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Chỉ ADMIN hoặc Master Owner được cấu hình quyền mặc định cho User mới');
+        if (!auth.ok) return auth.response;
+        const caller = auth.caller;
 
         const body = await request.json().catch(() => ({}));
         const perms = body.permissions || body.data || {};
@@ -4860,6 +4826,8 @@ export default {
           `).catch(() => {});
 
           if (request.method === 'GET') {
+            const auth = await requireCallerPermission(env, request, 'hr-employees', 'view', 'Bạn không có quyền xem danh sách nhân sự');
+            if (!auth.ok) return auth.response;
             const { rows } = await db.query(env, `
               SELECT id, emp_code, full_name, job_title, gender, hire_date, birth_date, age,
                      COALESCE(NULLIF(status, ''), 'Đang làm việc') as status,
@@ -4986,7 +4954,7 @@ export default {
         const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
         const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
-        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        const isMaster = Boolean((caller && caller.isMaster) || isMasterEmail(requestorEmail));
         if (!isMaster) {
           return new Response(JSON.stringify({
             success: false,
@@ -5050,7 +5018,7 @@ export default {
         const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
         const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
-        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        const isMaster = Boolean((caller && caller.isMaster) || isMasterEmail(requestorEmail));
         if (!isMaster) {
           return new Response(JSON.stringify({
             success: false,
@@ -5088,7 +5056,7 @@ export default {
         await ensureAuditLogsTable(env);
         const caller = await getCallerPermissions(env, request);
         const requestorEmail = caller?.user?.email || caller?.email || request.headers.get('X-User-Email') || '';
-        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        const isMaster = Boolean((caller && caller.isMaster) || isMasterEmail(requestorEmail));
         if (!isMaster) {
           return new Response(JSON.stringify({
             success: false,
@@ -5153,7 +5121,7 @@ export default {
         const caller = await getCallerPermissions(env, request);
         const body = await request.json().catch(() => ({}));
         const requestorEmail = caller?.user?.email || caller?.email || body.requestorEmail || request.headers.get('X-User-Email') || '';
-        const isMaster = (caller && caller.isMaster) || (requestorEmail && (requestorEmail.toLowerCase().trim() === 'trantuandai2508@gmail.com' || requestorEmail.toLowerCase().includes('trantuandai2508')));
+        const isMaster = Boolean((caller && caller.isMaster) || isMasterEmail(requestorEmail));
         if (!isMaster) {
           return new Response(JSON.stringify({
             success: false,
@@ -5463,6 +5431,8 @@ export default {
 
       // 2.11.5 DANH SÁCH YÊU CẦU CẤP QUYỀN (/api/auth/access-requests)
       if (pathname === '/api/auth/access-requests' && request.method === 'GET') {
+        const auth = await requireCallerPermission(env, request, 'user-matrix', 'view', 'Bạn không có quyền xem danh sách yêu cầu cấp quyền');
+        if (!auth.ok) return auth.response;
         const { rows: results } = await db.query(env, `
           SELECT * FROM access_requests ORDER BY id DESC LIMIT 50
         `);
@@ -5472,6 +5442,8 @@ export default {
 
       // 2.11.6 PHÊ DUYỆT / TỪ CHỐI YÊU CẦU CẤP QUYỀN (/api/auth/approve-access-request)
       if (pathname === '/api/auth/approve-access-request' && request.method === 'POST') {
+        const auth = await requireCallerPermission(env, request, 'user-matrix', ['edit', 'delete'], 'Bạn không có quyền phê duyệt hoặc từ chối yêu cầu cấp quyền');
+        if (!auth.ok) return auth.response;
         const { requestId, action, reviewedBy } = await request.json();
         const req = await db.queryOne(env, `SELECT * FROM access_requests WHERE id = ?`, [requestId]);
         if (!req) {

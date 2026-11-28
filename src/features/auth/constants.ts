@@ -11,7 +11,7 @@ export function isMasterAccount(emailOrUser?: any): boolean {
     str = emailOrUser.email || emailOrUser.username || emailOrUser.user || '';
   }
   const clean = String(str).toLowerCase().trim();
-  return clean === 'trantuandai2508@gmail.com' || clean.includes('trantuandai2508');
+  return clean === 'trantuandai2508@gmail.com';
 }
 
 export interface TabCategoryGroup {
