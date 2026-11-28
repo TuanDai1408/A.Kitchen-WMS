@@ -762,12 +762,18 @@ async function getCallerPermissions(env, request) {
 }
 
 async function requireCallerPermission(env, request, featureCodes, action = 'view', errorMsg = 'Bạn không có quyền thực hiện thao tác này') {
+  const errHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-user-email, x-user-role',
+    'Content-Type': 'application/json; charset=utf-8'
+  };
   const caller = await getCallerPermissions(env, request);
   if (!caller || !caller.user || !caller.user.email) {
-    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Chưa xác thực người dùng' }), { status: 401, headers: corsHeaders }) };
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Chưa xác thực người dùng' }), { status: 401, headers: errHeaders }) };
   }
   if (caller.user.status === 'LOCKED' || caller.user.role_code === 'UNKNOWN') {
-    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Tài khoản không hợp lệ hoặc đã bị khóa' }), { status: 403, headers: corsHeaders }) };
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: 'Tài khoản không hợp lệ hoặc đã bị khóa' }), { status: 403, headers: errHeaders }) };
   }
   if (caller.isMaster) {
     return { ok: true, caller };
@@ -786,7 +792,7 @@ async function requireCallerPermission(env, request, featureCodes, action = 'vie
     });
   });
   if (!hasPerm) {
-    return { ok: false, response: new Response(JSON.stringify({ success: false, error: errorMsg }), { status: 403, headers: corsHeaders }) };
+    return { ok: false, response: new Response(JSON.stringify({ success: false, error: errorMsg }), { status: 403, headers: errHeaders }) };
   }
   return { ok: true, caller };
 }
